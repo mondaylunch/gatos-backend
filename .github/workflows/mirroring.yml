@@ -1,0 +1,16 @@
+name: Mirror Repository
+
+on:
+  push:
+    branches:
+      - "*"
+
+jobs:
+  to_github_kcl:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v1
+      - uses: pixta-dev/repository-mirroring-action@v1
+        with:
+          target_repo_url: git@github.kcl.ac.uk:k21002534/gatos-backend-mirror.git
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
