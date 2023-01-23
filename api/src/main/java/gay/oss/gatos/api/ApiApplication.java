@@ -14,7 +14,12 @@ public class ApiApplication {
 	}
 
 	@GetMapping("/")
-	public String hello(@RequestParam(value = "name", defaultValue = "Us") String name) {
+	public String hello(@RequestParam(value = "name", defaultValue = "Ussy...") String name) {
 		return String.format("Among %s", name);
+	}
+
+	@GetMapping("/dashboard")
+	public String dashboard(@RequestParam(value = "data", defaultValue = " allan please add details") String name) {
+		return String.format("this is a temp page until register and login are done.", name);
 	}
 }
