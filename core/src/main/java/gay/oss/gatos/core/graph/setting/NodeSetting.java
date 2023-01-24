@@ -27,6 +27,7 @@ public abstract class NodeSetting<T> {
 
     /**
      * Returns the name of the type of data which can be stored in this setting. Used for communication with the frontend.
+     * <p>By convention, this is a camel_case name.</p>
      * @return  the name of what this setting holds
      */
     public abstract String getTypeName();
