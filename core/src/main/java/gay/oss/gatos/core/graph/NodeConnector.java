@@ -3,6 +3,10 @@ package gay.oss.gatos.core.graph;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * Represents an input or output on a node.
+ * @param <T>   the type of data this node takes in or spits out
+ */
 public sealed abstract class NodeConnector<T extends NodeConnectorType<?>> {
     private final UUID nodeId;
     private final String name;
@@ -12,10 +16,18 @@ public sealed abstract class NodeConnector<T extends NodeConnectorType<?>> {
         this.name = name;
     }
 
+    /**
+     * Returns the UUID of the node this connector belongs to.
+     * @return the UUID of the node this belongs to
+     */
     public UUID nodeId() {
         return this.nodeId;
     }
 
+    /**
+     * Returns the name of this connector.
+     * @return the name of this connector
+     */
     public String name() {
         return this.name;
     }
@@ -34,12 +46,20 @@ public sealed abstract class NodeConnector<T extends NodeConnectorType<?>> {
         return Objects.hash(this.nodeId, this.name);
     }
 
+    /**
+     * An input connector on a node.
+     * @param <T>   the type of data this node takes in or spits out
+     */
     public static final class Input<T extends NodeConnectorType<?>> extends NodeConnector<T> {
         public Input(UUID nodeId, String name) {
             super(nodeId, name);
         }
     }
 
+    /**
+     * An output connector on a node.
+     * @param <T>   the type of data this node takes in or spits out
+     */
     public static final class Output<T extends NodeConnectorType<?>> extends NodeConnector<T> {
         public Output(UUID nodeId, String name) {
             super(nodeId, name);

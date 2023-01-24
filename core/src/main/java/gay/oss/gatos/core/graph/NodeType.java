@@ -2,6 +2,9 @@ package gay.oss.gatos.core.graph;
 
 import java.util.Set;
 
+/**
+ * A type of node that may go on a graph.
+ */
 public interface NodeType {
     /**
      * Whether nodes of this type can have inputs from other nodes. If not, then this is an <i>input node</i> type.
@@ -10,7 +13,7 @@ public interface NodeType {
     public boolean hasInputs();
 
     /**
-     * Whether nodes of this type can have outputs to other nodes. If not, then this is a <i>terminal node</i>.type
+     * Whether nodes of this type can have outputs to other nodes. If not, then this is a <i>terminal node</i> type.
      * @return whether nodes of this type can have outputs.
      */
     public boolean hasOutputs();
