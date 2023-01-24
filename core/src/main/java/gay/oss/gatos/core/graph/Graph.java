@@ -1,5 +1,7 @@
 package gay.oss.gatos.core.graph;
 
+import gay.oss.gatos.core.graph.connector.NodeConnection;
+
 import java.util.*;
 import java.util.function.UnaryOperator;
 

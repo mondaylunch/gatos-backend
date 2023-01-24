@@ -1,4 +1,4 @@
-package gay.oss.gatos.core.graph;
+package gay.oss.gatos.core.graph.connector;
 
 /**
  * Signifies a type of data which can be sent through a node connector.

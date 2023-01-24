@@ -1,4 +1,4 @@
-package gay.oss.gatos.core.graph;
+package gay.oss.gatos.core.graph.connector;
 
 import java.util.Objects;
 import java.util.UUID;

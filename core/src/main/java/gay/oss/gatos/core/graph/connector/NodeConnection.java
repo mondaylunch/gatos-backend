@@ -1,4 +1,4 @@
-package gay.oss.gatos.core.graph;
+package gay.oss.gatos.core.graph.connector;
 
 /**
  * A connection from an output connector on one node to an input connector on another.

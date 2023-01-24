@@ -1,4 +1,4 @@
-package gay.oss.gatos.core.graph;
+package gay.oss.gatos.core.graph.setting;
 
 /**
  * A box for a node setting value, which is aware of its type.

@@ -1,5 +1,8 @@
 package gay.oss.gatos.core.graph;
 
+import gay.oss.gatos.core.graph.connector.NodeConnector;
+import gay.oss.gatos.core.graph.setting.NodeSetting;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;

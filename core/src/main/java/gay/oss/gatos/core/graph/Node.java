@@ -1,5 +1,7 @@
 package gay.oss.gatos.core.graph;
 
+import gay.oss.gatos.core.graph.connector.NodeConnector;
+import gay.oss.gatos.core.graph.setting.NodeSetting;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
