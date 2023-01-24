@@ -2,9 +2,7 @@ package gay.oss.gatos.core.graph;
 
 import org.jetbrains.annotations.Unmodifiable;
 
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.UnaryOperator;
 
 /**
@@ -15,14 +13,14 @@ import java.util.function.UnaryOperator;
 public final class Node {
     private final UUID id;
     private final NodeType type;
-    private final @Unmodifiable Set<NodeSetting<?>> settings;
+    private final @Unmodifiable Map<String, NodeSetting<?>> settings;
     private final @Unmodifiable Set<NodeConnector.Input<?>> inputs;
     private final @Unmodifiable Set<NodeConnector.Output<?>> outputs;
 
     private Node(
             UUID id,
             NodeType type,
-            @Unmodifiable Set<NodeSetting<?>> settings,
+            @Unmodifiable Map<String, NodeSetting<?>> settings,
             @Unmodifiable Set<NodeConnector.Input<?>> inputs,
             @Unmodifiable Set<NodeConnector.Output<?>> outputs) {
         this.id = id;
@@ -50,15 +48,27 @@ public final class Node {
 
     /**
      * Create a new node, the same as this one, but with a modified setting.
-     * @param setting   the setting to modify
-     * @param value     the new value of the setting
-     * @return          the new node
-     * @param <T>       the type of the setting to modify
+     * @param settingKey    the key of the setting to modify
+     * @param value         the new value of the setting
+     * @return              the new node
+     * @param <T>           the type of the setting to modify
      */
-    public <T> Node modifySetting(NodeSetting<T> setting, T value) {
-        var newSettings = this.type.settings();
-        newSettings.remove(setting);
-        newSettings.add(setting.withValue(value));
+    public <T> Node modifySetting(String settingKey, T value) {
+        var setting = this.settings.get(settingKey);
+        if (setting == null) {
+            throw new IllegalArgumentException("Node contains no such setting "+settingKey);
+        }
+
+        if (!setting.getTypeClass().isInstance(value)) {
+            throw new IllegalArgumentException("Setting "+settingKey+" is not of type "+value.getClass().getName());
+        }
+
+        var newSettings = new HashMap<>(this.settings);
+
+        // We know this cast succeeds because of the check above
+        //noinspection unchecked
+        newSettings.put(settingKey, ((NodeSetting<T>) setting).withValue(value));
+
         return new Node(
                 this.id,
                 this.type,
@@ -86,10 +96,35 @@ public final class Node {
 
     /**
      * Returns the settings of this node.
-     * @return  the settings of this node
+     *
+     * @return the settings of this node
      */
-    public @Unmodifiable Set<NodeSetting<?>> settings() {
+    public @Unmodifiable Map<String, NodeSetting<?>> settings() {
         return this.settings;
+    }
+
+    /**
+     * Retrieve a setting for a given key.
+     * @param key   the setting key
+     * @param clazz the class of the setting
+     * @return      the setting
+     * @param <T>   the type of the setting
+     * @throws IllegalArgumentException if the node does not contain a setting with the given key
+     * @throws IllegalArgumentException if the setting with the given key does not hold data of the expected type
+     */
+    public <T> NodeSetting<T> getSetting(String key, Class<T> clazz) {
+        var setting = this.settings.get(key);
+        if (setting == null) {
+            throw new IllegalArgumentException("Node contains no such setting "+key);
+        }
+
+        if (!setting.getTypeClass().isAssignableFrom(clazz)) {
+            throw new IllegalArgumentException("Setting "+key+" is not of type "+clazz.getName());
+        }
+
+        // We know this cast succeeds because of the check above
+        //noinspection unchecked
+        return (NodeSetting<T>) setting;
     }
 
     /**
