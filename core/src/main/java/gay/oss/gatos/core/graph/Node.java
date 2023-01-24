@@ -37,8 +37,17 @@ public final class Node {
         );
     }
 
-    public Node modifySetting() {
-
+    public <T> Node modifySetting(NodeSetting<T> setting, T value) {
+        var newSettings = this.type.settings();
+        newSettings.remove(setting);
+        newSettings.add(setting.withValue(value));
+        return new Node(
+                this.id,
+                this.type,
+                newSettings,
+                this.type.inputs(newSettings),
+                this.type.outputs(newSettings)
+        );
     }
 
     public UUID id() {
