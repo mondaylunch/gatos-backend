@@ -1,8 +1,7 @@
 package gay.oss.gatos.api.repository;
 
 import org.springframework.stereotype.Repository;
-
-import gay.oss.gatos.api.model.UserModel;
+import gay.oss.gatos.core.models.User;
 
 @Repository
 public class LoginRepository {
