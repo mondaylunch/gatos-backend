@@ -1,15 +1,15 @@
 package gay.oss.gatos.core.graph.connector;
 
-import gay.oss.gatos.core.graph.data.DataType;
-
 import java.util.Objects;
 import java.util.UUID;
+
+import gay.oss.gatos.core.graph.data.DataType;
 
 /**
  * Represents an input or output on a node.
  * @param <T>   the type of data this node takes in or spits out
  */
-public sealed abstract class NodeConnector<T> {
+public abstract sealed class NodeConnector<T> {
     private final UUID nodeId;
     private final String name;
     private final DataType<T> dataType;
@@ -49,9 +49,9 @@ public sealed abstract class NodeConnector<T> {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (NodeConnector<?>) obj;
-        return  Objects.equals(this.nodeId, that.nodeId) &&
-                Objects.equals(this.name, that.name) &&
-                Objects.equals(this.dataType, that.dataType);
+        return Objects.equals(this.nodeId, that.nodeId)
+            && Objects.equals(this.name, that.name)
+            && Objects.equals(this.dataType, that.dataType);
     }
 
     @Override

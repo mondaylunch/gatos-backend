@@ -1,16 +1,17 @@
 package gay.oss.gatos.core.graph.test;
 
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import gay.oss.gatos.core.graph.Node;
 import gay.oss.gatos.core.graph.NodeType;
 import gay.oss.gatos.core.graph.connector.NodeConnector;
 import gay.oss.gatos.core.graph.data.DataBox;
 import gay.oss.gatos.core.graph.data.DataType;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 public class NodeTest {
     private static final NodeType TEST_NODE_TYPE = new TestNodeType();

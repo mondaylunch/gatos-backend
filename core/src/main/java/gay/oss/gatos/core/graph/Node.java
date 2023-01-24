@@ -1,12 +1,17 @@
 package gay.oss.gatos.core.graph;
 
-import gay.oss.gatos.core.graph.connector.NodeConnector;
-import gay.oss.gatos.core.graph.data.DataBox;
-import gay.oss.gatos.core.graph.data.DataType;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.UnaryOperator;
+
 import org.jetbrains.annotations.Unmodifiable;
 
-import java.util.*;
-import java.util.function.UnaryOperator;
+import gay.oss.gatos.core.graph.connector.NodeConnector;
+import gay.oss.gatos.core.graph.data.DataBox;
 
 /**
  * Represents a node in a flow graph.
@@ -54,8 +59,8 @@ public final class Node {
      * Create a new node, the same as this one, but with a modified setting.
      * @param settingKey    the key of the setting to modify
      * @param value         the new value of the setting
-     * @return              the new node
      * @param <T>           the type of the setting to modify
+     * @return              the new node
      */
     public <T> Node modifySetting(String settingKey, T value) {
         var setting = this.settings.get(settingKey);
@@ -111,8 +116,8 @@ public final class Node {
      * Retrieve a setting for a given key.
      * @param key   the setting key
      * @param clazz the class of the setting
-     * @return      the setting
      * @param <T>   the type of the setting
+     * @return      the setting
      * @throws IllegalArgumentException if the node does not contain a setting with the given key
      * @throws IllegalArgumentException if the setting with the given key does not hold data of the expected type
      */
@@ -140,7 +145,7 @@ public final class Node {
     }
 
     /**
-     * Possibly retrieves an input connector with the given name
+     * Possibly retrieves an input connector with the given name.
      * @param name  the name of the connector
      * @return      an Optional of the connector
      */
@@ -157,7 +162,7 @@ public final class Node {
     }
 
     /**
-     * Possibly retrieves an output connector with the given name
+     * Possibly retrieves an output connector with the given name.
      * @param name  the name of the connector
      * @return      an Optional of the connector
      */
@@ -170,11 +175,11 @@ public final class Node {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (Node) obj;
-        return Objects.equals(this.id, that.id) &&
-                Objects.equals(this.type, that.type) &&
-                Objects.equals(this.settings, that.settings) &&
-                Objects.equals(this.inputs, that.inputs) &&
-                Objects.equals(this.outputs, that.outputs);
+        return Objects.equals(this.id, that.id)
+            && Objects.equals(this.type, that.type)
+            && Objects.equals(this.settings, that.settings)
+            && Objects.equals(this.inputs, that.inputs)
+            && Objects.equals(this.outputs, that.outputs);
     }
 
     @Override
@@ -184,11 +189,12 @@ public final class Node {
 
     @Override
     public String toString() {
-        return "Node[" +
-                "id=" + this.id + ", " +
-                "type=" + this.type + ", " +
-                "settings=" + this.settings + ", " +
-                "inputs=" + this.inputs + ", " +
-                "outputs=" + this.outputs + ']';
+        return "Node[id=%s, type=%s, settings=%s, inputs=%s, outputs=%s]".formatted(
+            this.id,
+            this.type,
+            this.settings,
+            this.inputs,
+            this.outputs
+        );
     }
 }
