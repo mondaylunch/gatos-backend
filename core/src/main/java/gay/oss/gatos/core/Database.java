@@ -27,44 +27,73 @@ import com.mongodb.client.MongoDatabase;
 import gay.oss.gatos.core.models.Flow;
 import gay.oss.gatos.core.models.User;
 
+/**
+ * Singleton instance of the MongoDB client
+ */
 public class Database {
     private static Database INSTANCE = new Database();
     private MongoClient client;
     private CodecRegistry codecRegistry;
 
+    /**
+     * Configure the MongoDB driver
+     */
     private Database() {
+        // Create ClassModel for every single model
+        // Documentation:
+        // https://www.mongodb.com/docs/drivers/java/sync/current/fundamentals/data-formats/pojo-customization/#customize-a-pojocodecprovider
         ClassModel<User> userModel = ClassModel.builder(User.class)
                 .conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION)).build();
 
         ClassModel<Flow> flowModel = ClassModel.builder(Flow.class)
                 .conventions(Arrays.asList(Conventions.ANNOTATION_CONVENTION)).build();
 
+        // Register classes and create the registry
         CodecProvider pojoCodecProvider = PojoCodecProvider.builder().register(userModel, flowModel).build();
         this.codecRegistry = fromRegistries(getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
 
-        ConnectionString connectionString = new ConnectionString("mongodb://localhost:27017/test");
+        // Configure the connection settings
+        ConnectionString connectionString = new ConnectionString(Environment.getMongoUri());
         MongoClientSettings mongoClientSettings = MongoClientSettings.builder()
                 .uuidRepresentation(UuidRepresentation.STANDARD)
                 .applyConnectionString(connectionString).build();
 
+        // Build the client
         this.client = MongoClients.create(mongoClientSettings);
     }
 
+    /**
+     * Check whether we can talk with the database
+     */
     public static void checkConnection() {
         MongoDatabase database = INSTANCE.client.getDatabase("admin");
-
         Bson command = new BsonDocument("ping", new BsonInt64(1));
         database.runCommand(command);
     }
 
+    /**
+     * Get the Mongo Database
+     * 
+     * @return {@link MongoDatabase}
+     */
     public static MongoDatabase getDatabase() {
         return INSTANCE.client.getDatabase("gatos").withCodecRegistry(INSTANCE.codecRegistry);
     }
 
+    /**
+     * Get a Mongo Collection by name
+     * 
+     * @return {@link MongoCollection}
+     */
     public static MongoCollection<Document> getCollection(String name) {
         return getDatabase().getCollection(name);
     }
 
+    /**
+     * Get a Mongo Collection with POJO support by name and class
+     * 
+     * @return {@link MongoCollection}
+     */
     public static <TDocument> MongoCollection<TDocument> getCollection(String name, Class<TDocument> cls) {
         return getDatabase().getCollection(name, cls);
     }
