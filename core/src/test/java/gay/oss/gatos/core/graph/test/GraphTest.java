@@ -50,7 +50,7 @@ public class GraphTest {
         var node1 = graph.addNode(TEST_NODE_TYPE);
         var node2 = graph.addNode(TEST_NODE_TYPE);
 
-        var conn = NodeConnection.createConnection(node1, "in", node2, "out", DataType.INTEGER);
+        var conn = NodeConnection.createConnection(node1, "out", node2, "in", DataType.INTEGER);
         Assertions.assertTrue(conn.isPresent());
 
         graph.addConnection(conn.get());
@@ -65,7 +65,7 @@ public class GraphTest {
         var node1 = graph.addNode(TEST_NODE_TYPE);
         var node2 = graph.addNode(TEST_NODE_TYPE);
 
-        var conn = NodeConnection.createConnection(node1, "in", node2, "out", DataType.INTEGER);
+        var conn = NodeConnection.createConnection(node1, "out", node2, "in", DataType.INTEGER);
         Assertions.assertTrue(conn.isPresent());
 
         graph.addConnection(conn.get());

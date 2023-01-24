@@ -24,7 +24,7 @@ public class NodeTest {
     @Test
     public void outputsShouldExist() {
         var node = Node.create(TEST_NODE_TYPE);
-        Assertions.assertTrue(node.getOutputWithName("output").isPresent());
+        Assertions.assertTrue(node.getOutputWithName("out").isPresent());
     }
 
     @Test
