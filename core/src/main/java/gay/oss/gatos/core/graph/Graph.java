@@ -1,6 +1,7 @@
 package gay.oss.gatos.core.graph;
 
 import gay.oss.gatos.core.graph.connector.NodeConnection;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.UnaryOperator;
@@ -77,8 +78,12 @@ public class Graph {
      */
     public void removeNode(UUID id) {
         this.nodes.remove(id);
-        var conns = this.connectionsByNode.remove(id);
+        @Nullable var conns = this.connectionsByNode.remove(id);
+        if (conns == null) {
+            return;
+        }
         conns.forEach(this.connections::remove);
+        this.metadataByNode.remove(id);
     }
 
     /**
