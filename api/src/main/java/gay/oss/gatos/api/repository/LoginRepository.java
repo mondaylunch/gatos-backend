@@ -1,15 +1,28 @@
 package gay.oss.gatos.api.repository;
 
 import org.springframework.stereotype.Repository;
+
+import gay.oss.gatos.api.exceptions.UserNotFoundException;
 import gay.oss.gatos.core.models.User;
 
 @Repository
 public class LoginRepository {
-    //TODO: make it work after insert is done with the db.
 
-    // just a demo
-    public User validateUser(String username, String password) {
-        return User.objects.validateUser(username, password);
+    /**
+     * Validate user
+     * 
+     * TODO change after hashing the password
+     *
+     * @param String username
+     * @param String password
+     */
+    public User validateUser(String username, String password) throws UserNotFoundException {
+        // get the user first
+        User usr = User.objects.getUser(username);
+        if (usr.getPassword() == password) {
+            return usr;
+        }
+        return null;
     }
 
 }
