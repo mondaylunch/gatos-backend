@@ -37,12 +37,13 @@ public final class Node {
      */
     public static Node create(NodeType type) {
         var defaultSettings = type.settings();
+        var id = UUID.randomUUID();
         return new Node(
-                UUID.randomUUID(),
+                id,
                 type,
                 defaultSettings,
-                type.inputs(defaultSettings),
-                type.outputs(defaultSettings)
+                type.inputs(id, defaultSettings),
+                type.outputs(id, defaultSettings)
         );
     }
 
@@ -73,8 +74,8 @@ public final class Node {
                 this.id,
                 this.type,
                 newSettings,
-                this.type.inputs(newSettings),
-                this.type.outputs(newSettings)
+                this.type.inputs(this.id, newSettings),
+                this.type.outputs(this.id, newSettings)
         );
     }
 
