@@ -8,6 +8,8 @@ public class Graph {
     private final Set<NodeConnection<?>> connections = new HashSet<>();
     private final Map<UUID, Set<NodeConnection<?>>> connectionsByNode = new HashMap<>();
 
+    private final Map<UUID, NodeMetadata> metadataByNode = new HashMap<>();
+
     public Node addNode(NodeType type) {
         var node = Node.create(type);
         this.nodes.put(node.id(), node);
@@ -67,6 +69,20 @@ public class Graph {
 
     private Set<NodeConnection<?>> getOrCreateConnectionsForNode(UUID nodeId) {
         return this.connectionsByNode.computeIfAbsent(nodeId, $ -> new HashSet<>());
+    }
+
+    public NodeMetadata getMetadata(UUID nodeId) {
+        return this.getOrCreateMetadataForNode(nodeId);
+    }
+
+    private NodeMetadata getOrCreateMetadataForNode(UUID nodeId) {
+        return this.metadataByNode.computeIfAbsent(nodeId, $ -> new NodeMetadata(0f, 0f));
+    }
+
+    public NodeMetadata modifyMetadata(UUID nodeId, UnaryOperator<NodeMetadata> func) {
+        var result = func.apply(this.getOrCreateMetadataForNode(nodeId));
+        this.metadataByNode.put(nodeId, result);
+        return result;
     }
 
     private static boolean isConnectionValid(Node node, NodeConnection<?> connection) {
