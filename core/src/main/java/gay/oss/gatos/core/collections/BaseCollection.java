@@ -124,15 +124,16 @@ public class BaseCollection<T extends BaseModel> {
      */
     private static List<Bson> getNonNullUpdates(Object obj) {
         return createPropertyDescriptorStream(obj.getClass())
-            .filter(BaseCollection::hasGetter)
-            .map(descriptor -> getField(descriptor, obj))
-            .filter(Objects::nonNull)
-            .map(Field::toUpdate)
-            .toList();
+                .filter(BaseCollection::hasGetter)
+                .map(descriptor -> getField(descriptor, obj))
+                .filter(Objects::nonNull)
+                .map(Field::toUpdate)
+                .toList();
     }
 
     /**
-     * Creates a stream of {@code PropertyDescriptors} from a class. The {@link Object} class is excluded.
+     * Creates a stream of {@code PropertyDescriptors} from a class. The
+     * {@link Object} class is excluded.
      *
      * @param clazz The class.
      * @return A stream of {@code PropertyDescriptors}.
@@ -149,14 +150,16 @@ public class BaseCollection<T extends BaseModel> {
      * Checks if a {@code PropertyDescriptor} has a getter.
      *
      * @param descriptor The {@code PropertyDescriptor}.
-     * @return {@code true} if the {@code PropertyDescriptor} has a getter, {@code false} otherwise.
+     * @return {@code true} if the {@code PropertyDescriptor} has a getter,
+     *         {@code false} otherwise.
      */
     private static boolean hasGetter(PropertyDescriptor descriptor) {
         return descriptor.getReadMethod() != null;
     }
 
     /**
-     * Creates a {@code Field} object by invoking the getter of a {@code PropertyDescriptor} on the passed object.
+     * Creates a {@code Field} object by invoking the getter of a
+     * {@code PropertyDescriptor} on the passed object.
      *
      * @param descriptor The {@code PropertyDescriptor}.
      * @param obj        The object to invoke the getter on.

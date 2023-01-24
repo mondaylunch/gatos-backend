@@ -17,6 +17,10 @@ public class Flow extends BaseModel {
      * Display name.
      */
     private String name;
+
+    /**
+     * UUID of the user who owns this flow.
+     */
     @BsonProperty("author_id")
     private UUID authorId;
 
