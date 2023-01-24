@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/sign_up")
+@RequestMapping("/api/sign_up")
 public class SignUpController {
 
     private final SignUpRepository repository;
