@@ -3,14 +3,14 @@ package gay.oss.gatos.core;
 import io.github.cdimascio.dotenv.Dotenv;
 
 /**
- * Single source of truth about the environment
+ * Single source of truth about the environment.
  */
 public enum Environment {
 
     INSTANCE;
 
     /**
-     * Load configuration from disk and process environment
+     * Load configuration from disk and process environment.
      */
     private final Dotenv env = Dotenv.configure()
         .directory("..")
@@ -19,7 +19,7 @@ public enum Environment {
         .load();
 
     /**
-     * Get the MongoDB connection URI
+     * Get the MongoDB connection URI.
      *
      * @return String
      */
@@ -28,7 +28,7 @@ public enum Environment {
     }
 
     /**
-     * Get the Redis connection URI
+     * Get the Redis connection URI.
      *
      * @return String
      */

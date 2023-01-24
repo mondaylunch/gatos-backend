@@ -1,35 +1,36 @@
 package gay.oss.gatos.core.models;
 
-import gay.oss.gatos.core.collections.FlowCollection;
-import org.bson.codecs.pojo.annotations.BsonProperty;
-
 import java.util.UUID;
 
+import org.bson.codecs.pojo.annotations.BsonProperty;
+
+import gay.oss.gatos.core.collections.FlowCollection;
+
 /**
- * POJO for flows
+ * POJO for flows.
  */
 public class Flow extends BaseModel {
 
     public static FlowCollection objects = new FlowCollection();
 
     /**
-     * Display name
+     * Display name.
      */
     private String name;
     @BsonProperty("author_id")
     private UUID authorId;
 
     /**
-     * Get the display name
+     * Get the display name.
      *
      * @return display name
      */
     public String getName() {
-        return name;
+        return this.name;
     }
 
     /**
-     * Set the display name
+     * Set the display name.
      *
      * @param name display name
      */
@@ -38,16 +39,16 @@ public class Flow extends BaseModel {
     }
 
     /**
-     * Get the author's UUID
+     * Get the author's UUID.
      *
      * @return author's UUID
      */
     public UUID getAuthorId() {
-        return authorId;
+        return this.authorId;
     }
 
     /**
-     * Set the author's UUID
+     * Set the author's UUID.
      *
      * @param authorId author's UUID
      */

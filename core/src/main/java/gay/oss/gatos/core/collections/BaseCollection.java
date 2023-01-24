@@ -1,11 +1,6 @@
 package gay.oss.gatos.core.collections;
 
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Updates;
-import gay.oss.gatos.core.Database;
-import gay.oss.gatos.core.models.BaseModel;
-import org.bson.conversions.Bson;
-import org.jetbrains.annotations.Nullable;
+import static com.mongodb.client.model.Filters.eq;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -16,7 +11,13 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static com.mongodb.client.model.Filters.eq;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Updates;
+import org.bson.conversions.Bson;
+import org.jetbrains.annotations.Nullable;
+
+import gay.oss.gatos.core.Database;
+import gay.oss.gatos.core.models.BaseModel;
 
 /**
  * Common Database collection queries.
@@ -32,7 +33,7 @@ public class BaseCollection<T extends BaseModel> {
      * @param cls            Model class.
      */
     public BaseCollection(String collectionName, Class<T> cls) {
-        collection = Database.getCollection(collectionName, cls);
+        this.collection = Database.getCollection(collectionName, cls);
     }
 
     /**
@@ -41,7 +42,7 @@ public class BaseCollection<T extends BaseModel> {
      * @return underlying Mongo Collection.
      */
     public MongoCollection<T> getCollection() {
-        return collection;
+        return this.collection;
     }
 
     /**
@@ -53,7 +54,7 @@ public class BaseCollection<T extends BaseModel> {
         if (obj.getId() == null) {
             obj.setId(UUID.randomUUID());
         }
-        getCollection().insertOne(obj);
+        this.getCollection().insertOne(obj);
     }
 
     /**
@@ -63,7 +64,7 @@ public class BaseCollection<T extends BaseModel> {
      * @return The POJO.
      */
     public T get(UUID id) {
-        return getCollection().find(idFilter(id)).first();
+        return this.getCollection().find(idFilter(id)).first();
     }
 
     /**
@@ -75,7 +76,7 @@ public class BaseCollection<T extends BaseModel> {
      */
     public List<T> get(String field, Object value) {
         List<T> list = new ArrayList<>();
-        for (T obj : getCollection().find(eq(field, value))) {
+        for (T obj : this.getCollection().find(eq(field, value))) {
             list.add(obj);
         }
         return list;
@@ -91,9 +92,9 @@ public class BaseCollection<T extends BaseModel> {
     public T update(UUID id, T obj) {
         List<Bson> updates = getNonNullUpdates(obj);
         if (!updates.isEmpty()) {
-            getCollection().updateOne(idFilter(id), Updates.combine(updates));
+            this.getCollection().updateOne(idFilter(id), Updates.combine(updates));
         }
-        return get(id);
+        return this.get(id);
     }
 
     /**
@@ -102,7 +103,7 @@ public class BaseCollection<T extends BaseModel> {
      * @param id The ID of the document to delete.
      */
     public void delete(UUID id) {
-        getCollection().deleteOne(idFilter(id));
+        this.getCollection().deleteOne(idFilter(id));
     }
 
     /**
@@ -181,14 +182,13 @@ public class BaseCollection<T extends BaseModel> {
      * @param value The value of the field.
      */
     private record Field(String name, Object value) {
-
         /**
          * Creates a MongoDB update.
          *
          * @return The update.
          */
         private Bson toUpdate() {
-            return Updates.set(name, value);
+            return Updates.set(this.name, this.value);
         }
     }
 }
