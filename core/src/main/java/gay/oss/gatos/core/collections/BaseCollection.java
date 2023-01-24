@@ -1,11 +1,6 @@
 package gay.oss.gatos.core.collections;
 
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Updates;
-import gay.oss.gatos.core.Database;
-import gay.oss.gatos.core.models.BaseModel;
-import org.bson.conversions.Bson;
-import org.jetbrains.annotations.Nullable;
+import static com.mongodb.client.model.Filters.eq;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -16,7 +11,14 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static com.mongodb.client.model.Filters.eq;
+import org.bson.conversions.Bson;
+import org.jetbrains.annotations.Nullable;
+
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Updates;
+
+import gay.oss.gatos.core.Database;
+import gay.oss.gatos.core.models.BaseModel;
 
 /**
  * Common Database collection queries.
@@ -123,15 +125,16 @@ public class BaseCollection<T extends BaseModel> {
      */
     private static List<Bson> getNonNullUpdates(Object obj) {
         return createPropertyDescriptorStream(obj.getClass())
-            .filter(BaseCollection::hasGetter)
-            .map(descriptor -> getField(descriptor, obj))
-            .filter(Objects::nonNull)
-            .map(Field::toUpdate)
-            .toList();
+                .filter(BaseCollection::hasGetter)
+                .map(descriptor -> getField(descriptor, obj))
+                .filter(Objects::nonNull)
+                .map(Field::toUpdate)
+                .toList();
     }
 
     /**
-     * Creates a stream of {@code PropertyDescriptors} from a class. The {@link Object} class is excluded.
+     * Creates a stream of {@code PropertyDescriptors} from a class. The
+     * {@link Object} class is excluded.
      *
      * @param clazz The class.
      * @return A stream of {@code PropertyDescriptors}.
@@ -148,14 +151,16 @@ public class BaseCollection<T extends BaseModel> {
      * Checks if a {@code PropertyDescriptor} has a getter.
      *
      * @param descriptor The {@code PropertyDescriptor}.
-     * @return {@code true} if the {@code PropertyDescriptor} has a getter, {@code false} otherwise.
+     * @return {@code true} if the {@code PropertyDescriptor} has a getter,
+     *         {@code false} otherwise.
      */
     private static boolean hasGetter(PropertyDescriptor descriptor) {
         return descriptor.getReadMethod() != null;
     }
 
     /**
-     * Creates a {@code Field} object by invoking the getter of a {@code PropertyDescriptor} on the passed object.
+     * Creates a {@code Field} object by invoking the getter of a
+     * {@code PropertyDescriptor} on the passed object.
      *
      * @param descriptor The {@code PropertyDescriptor}.
      * @param obj        The object to invoke the getter on.
@@ -181,7 +186,6 @@ public class BaseCollection<T extends BaseModel> {
      * @param value The value of the field.
      */
     private record Field(String name, Object value) {
-
         /**
          * Creates a MongoDB update.
          *

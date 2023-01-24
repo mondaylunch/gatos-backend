@@ -1,9 +1,10 @@
 package gay.oss.gatos.core.models;
 
-import gay.oss.gatos.core.collections.FlowCollection;
+import java.util.UUID;
+
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
-import java.util.UUID;
+import gay.oss.gatos.core.collections.FlowCollection;
 
 /**
  * POJO for flows
@@ -16,6 +17,10 @@ public class Flow extends BaseModel {
      * Display name
      */
     private String name;
+
+    /**
+     * UUID of the user who owns this flow
+     */
     @BsonProperty("author_id")
     private UUID authorId;
 
