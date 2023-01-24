@@ -5,25 +5,22 @@ import io.github.cdimascio.dotenv.Dotenv;
 /**
  * Single source of truth about the environment
  */
-public class Environment {
-    private static Environment INSTANCE = new Environment();
-    private Dotenv env;
+public enum Environment {
+
+    INSTANCE;
 
     /**
      * Load configuration from disk and process environment
      */
-    private Environment() {
-        this.env = Dotenv
-                .configure()
-                .directory("..")
-                .ignoreIfMalformed()
-                .ignoreIfMissing()
-                .load();
-    }
+    private final Dotenv env = Dotenv.configure()
+        .directory("..")
+        .ignoreIfMalformed()
+        .ignoreIfMissing()
+        .load();
 
     /**
      * Get the MongoDB connection URI
-     * 
+     *
      * @return String
      */
     public static String getMongoUri() {
@@ -32,7 +29,7 @@ public class Environment {
 
     /**
      * Get the Redis connection URI
-     * 
+     *
      * @return String
      */
     public static String getRedisUri() {

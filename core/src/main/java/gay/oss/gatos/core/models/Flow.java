@@ -6,6 +6,7 @@ import gay.oss.gatos.core.collections.FlowCollection;
  * POJO for flows
  */
 public class Flow extends BaseModel {
+
     public static FlowCollection objects = new FlowCollection();
 
     /**
@@ -15,7 +16,7 @@ public class Flow extends BaseModel {
 
     /**
      * Set the display name
-     * 
+     *
      * @param name display name
      */
     public void setName(String name) {
@@ -24,10 +25,10 @@ public class Flow extends BaseModel {
 
     /**
      * Get the display name
-     * 
+     *
      * @return display name
      */
     public String getName() {
-        return this.name;
+        return name;
     }
 }
