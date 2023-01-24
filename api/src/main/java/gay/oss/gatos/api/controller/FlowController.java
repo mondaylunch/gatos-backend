@@ -3,6 +3,10 @@ package gay.oss.gatos.api.controller;
 import java.util.List;
 import java.util.UUID;
 
+import javax.validation.Valid;
+
+import org.hibernate.validator.constraints.Length;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,11 +28,11 @@ public class FlowController {
     }
 
     private record BodyAddFlow(
-            String name) {
+            @NotNull @Length(min = 1, max = 32) String name) {
     };
 
     @PostMapping
-    public Flow addFlow(@RequestBody BodyAddFlow data) {
+    public Flow addFlow(@Valid @RequestBody BodyAddFlow data) {
         Flow flow = new Flow();
         flow.setName(data.name);
 
@@ -37,11 +41,11 @@ public class FlowController {
     }
 
     private record BodyUpdateFlow(
-            String name) {
+            @NotNull @Length(min = 1, max = 32) String name) {
     };
 
     @PutMapping("{flowId}")
-    public Flow updateFlow(@PathVariable UUID flowId, @RequestBody BodyUpdateFlow data) {
+    public Flow updateFlow(@PathVariable UUID flowId, @Valid @RequestBody BodyUpdateFlow data) {
         Flow partial = new Flow();
         partial.setName(data.name);
 
