@@ -1,6 +1,8 @@
 .gradle
 .metals
 .data
+.env
+
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
