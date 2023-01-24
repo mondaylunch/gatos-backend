@@ -139,11 +139,29 @@ public final class Node {
     }
 
     /**
+     * Possibly retrieves an input connector with the given name
+     * @param name  the name of the connector
+     * @return      an Optional of the connector
+     */
+    public Optional<NodeConnector.Input<?>> getInputWithName(String name) {
+        return this.inputs.stream().filter(c -> c.name().equals(name)).findAny();
+    }
+
+    /**
      * Returns the outputs of this node.
      * @return  the outputs of this node
      */
     public @Unmodifiable Set<NodeConnector.Output<?>> outputs() {
         return this.outputs;
+    }
+
+    /**
+     * Possibly retrieves an output connector with the given name
+     * @param name  the name of the connector
+     * @return      an Optional of the connector
+     */
+    public Optional<NodeConnector.Output<?>> getOutputWithName(String name) {
+        return this.outputs.stream().filter(c -> c.name().equals(name)).findAny();
     }
 
     @Override
