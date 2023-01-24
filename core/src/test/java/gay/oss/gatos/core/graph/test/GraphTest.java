@@ -1,5 +1,12 @@
 package gay.oss.gatos.core.graph.test;
 
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import gay.oss.gatos.core.graph.Graph;
 import gay.oss.gatos.core.graph.NodeMetadata;
 import gay.oss.gatos.core.graph.NodeType;
@@ -7,12 +14,6 @@ import gay.oss.gatos.core.graph.connector.NodeConnection;
 import gay.oss.gatos.core.graph.connector.NodeConnector;
 import gay.oss.gatos.core.graph.data.DataBox;
 import gay.oss.gatos.core.graph.data.DataType;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 public class GraphTest {
     private static final NodeType TEST_NODE_TYPE = new TestNodeType();
@@ -83,7 +84,6 @@ public class GraphTest {
         Assertions.assertNotNull(metadata);
         Assertions.assertEquals(new NodeMetadata(0f, 0f), metadata);
     }
-
 
     @Test
     public void canModifyMetadata() {

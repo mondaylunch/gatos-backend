@@ -7,7 +7,7 @@ package gay.oss.gatos.core.graph;
  */
 public record NodeMetadata(float xPos, float yPos) {
     /**
-     * Create a new metadata with the given X-Coordinate value
+     * Create a new metadata with the given X-Coordinate value.
      * @param value the X-Coordinate value
      * @return  a new metadata, the same as this but with the given X-Coordinate
      */
@@ -15,7 +15,7 @@ public record NodeMetadata(float xPos, float yPos) {
         return new NodeMetadata(value, this.yPos);
     }
     /**
-     * Create a new metadata with the given Y-Coordinate value
+     * Create a new metadata with the given Y-Coordinate value.
      * @param value the Y-Coordinate value
      * @return  a new metadata, the same as this but with the given Y-Coordinate
      */

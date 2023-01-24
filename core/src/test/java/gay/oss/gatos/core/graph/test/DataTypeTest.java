@@ -1,8 +1,9 @@
 package gay.oss.gatos.core.graph.test;
 
-import gay.oss.gatos.core.graph.data.DataType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import gay.oss.gatos.core.graph.data.DataType;
 
 public class DataTypeTest {
     @Test

@@ -1,10 +1,15 @@
 package gay.oss.gatos.core.graph;
 
-import gay.oss.gatos.core.graph.connector.NodeConnection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.UnaryOperator;
+
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.function.UnaryOperator;
+import gay.oss.gatos.core.graph.connector.NodeConnection;
 
 /**
  * A flow graph.
