@@ -6,10 +6,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import gay.oss.gatos.core.Database;
+
 @SpringBootApplication
 @RestController
 public class ApiApplication {
 	public static void main(String[] args) {
+		Database.checkConnection();
 		SpringApplication.run(ApiApplication.class, args);
 	}
 
