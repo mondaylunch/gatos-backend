@@ -20,14 +20,14 @@ public interface NodeType {
      * @param state the node settings
      * @return the input connectors of the node
      */
-    public Set<NodeConnector.Input> inputs(Set<NodeSetting<?>> state);
+    public Set<NodeConnector.Input<?>> inputs(Set<NodeSetting<?>> state);
 
     /**
      * The output connectors of a node with a given settings state.
      * @param state the node settings
      * @return the output connectors of the node
      */
-    public Set<NodeConnector.Output> outputs(Set<NodeSetting<?>> state);
+    public Set<NodeConnector.Output<?>> outputs(Set<NodeSetting<?>> state);
 
     /**
      * The settings available for a node of this type.

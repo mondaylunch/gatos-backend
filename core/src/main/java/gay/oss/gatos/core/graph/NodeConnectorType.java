@@ -1,4 +1,4 @@
 package gay.oss.gatos.core.graph;
 
-public class NodeConnectorType {
+public record NodeConnectorType<T>(Class<T> clazz) {
 }

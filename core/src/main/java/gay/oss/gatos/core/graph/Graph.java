@@ -5,8 +5,8 @@ import java.util.function.UnaryOperator;
 
 public class Graph {
     private final Map<UUID, Node> nodes = new HashMap<>();
-    private final Set<NodeConnection> connections = new HashSet<>();
-    private final Map<UUID, Set<NodeConnection>> connectionsByNode = new HashMap<>();
+    private final Set<NodeConnection<?>> connections = new HashSet<>();
+    private final Map<UUID, Set<NodeConnection<?>>> connectionsByNode = new HashMap<>();
 
     public Node addNode(NodeType type) {
         var node = Node.create(type);
@@ -40,7 +40,7 @@ public class Graph {
         conns.forEach(this.connections::remove);
     }
 
-    public void addConnection(NodeConnection connection) {
+    public void addConnection(NodeConnection<?> connection) {
         var nodeFrom = this.nodes.get(connection.from().nodeId());
         var nodeTo = this.nodes.get(connection.to().nodeId());
         if (nodeFrom == null) {
@@ -55,21 +55,21 @@ public class Graph {
         this.getOrCreateConnectionsForNode(nodeTo.id()).add(connection);
     }
 
-    public void removeConnection(NodeConnection connection) {
+    public void removeConnection(NodeConnection<?> connection) {
         this.connections.remove(connection);
         this.getOrCreateConnectionsForNode(connection.from().nodeId()).remove(connection);
         this.getOrCreateConnectionsForNode(connection.to().nodeId()).remove(connection);
     }
 
-    public Set<NodeConnection> getConnectionsForNode(UUID nodeId) {
+    public Set<NodeConnection<?>> getConnectionsForNode(UUID nodeId) {
         return new HashSet<>(this.getOrCreateConnectionsForNode(nodeId));
     }
 
-    private Set<NodeConnection> getOrCreateConnectionsForNode(UUID nodeId) {
+    private Set<NodeConnection<?>> getOrCreateConnectionsForNode(UUID nodeId) {
         return this.connectionsByNode.computeIfAbsent(nodeId, $ -> new HashSet<>());
     }
 
-    private static boolean isConnectionValid(Node node, NodeConnection connection) {
+    private static boolean isConnectionValid(Node node, NodeConnection<?> connection) {
         if (connection.from().nodeId().equals(node.id())) {
             return node.outputs().contains(connection.from());
         }

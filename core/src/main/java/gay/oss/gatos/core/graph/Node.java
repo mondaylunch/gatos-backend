@@ -10,15 +10,15 @@ public final class Node {
     private final UUID id;
     private final NodeType type;
     private final @Unmodifiable Set<NodeSetting<?>> settings;
-    private final @Unmodifiable Set<NodeConnector.Input> inputs;
-    private final @Unmodifiable Set<NodeConnector.Output> outputs;
+    private final @Unmodifiable Set<NodeConnector.Input<?>> inputs;
+    private final @Unmodifiable Set<NodeConnector.Output<?>> outputs;
 
     private Node(
             UUID id,
             NodeType type,
             @Unmodifiable Set<NodeSetting<?>> settings,
-            @Unmodifiable Set<NodeConnector.Input> inputs,
-            @Unmodifiable Set<NodeConnector.Output> outputs) {
+            @Unmodifiable Set<NodeConnector.Input<?>> inputs,
+            @Unmodifiable Set<NodeConnector.Output<?>> outputs) {
         this.id = id;
         this.type = type;
         this.settings = settings;
@@ -62,11 +62,11 @@ public final class Node {
         return this.settings;
     }
 
-    public @Unmodifiable Set<NodeConnector.Input> inputs() {
+    public @Unmodifiable Set<NodeConnector.Input<?>> inputs() {
         return this.inputs;
     }
 
-    public @Unmodifiable Set<NodeConnector.Output> outputs() {
+    public @Unmodifiable Set<NodeConnector.Output<?>> outputs() {
         return this.outputs;
     }
 
