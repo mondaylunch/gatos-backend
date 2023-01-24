@@ -1,5 +1,6 @@
 package gay.oss.gatos.core.models;
 
+import org.bson.codecs.pojo.annotations.BsonProperty;
 import gay.oss.gatos.core.collections.UserCollection;
 
 /**
@@ -9,7 +10,9 @@ public class User extends BaseModel {
 
     public static UserCollection objects = new UserCollection();
 
+    @BsonProperty("first_name")
     private String firstName;
+    @BsonProperty("last_name")
     private String lastName;
     private String username;
     private String email;
@@ -103,14 +106,5 @@ public class User extends BaseModel {
      */
     public void setPassword(String password){
         this.password = password;
-    }
-
-    // to string method
-    @Override
-    public String toString(){
-        return "user " + this.firstName + " " + this.lastName + " \n"
-                + "username: " + this.username + " \n"
-                + "email: " + this.email + " \n"
-                + "password: " + this.password;
     }
 }
