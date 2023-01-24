@@ -8,10 +8,8 @@ public class LoginRepository {
     //TODO: make it work after insert is done with the db.
 
     // just a demo
-    public String findByUsername(String username) {
-        if(username.equals("ff")){
-            return "you found me!!!";
-        }
-        return "you didn't find me :(";
+    public User validateUser(String username, String password) {
+        return User.objects.validateUser(username, password);
     }
+
 }
