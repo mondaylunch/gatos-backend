@@ -1,7 +1,8 @@
 package gay.oss.gatos.core.graph;
 
 import gay.oss.gatos.core.graph.connector.NodeConnector;
-import gay.oss.gatos.core.graph.setting.NodeSetting;
+import gay.oss.gatos.core.graph.data.DataBox;
+import gay.oss.gatos.core.graph.data.DataType;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
@@ -15,14 +16,14 @@ import java.util.function.UnaryOperator;
 public final class Node {
     private final UUID id;
     private final NodeType type;
-    private final @Unmodifiable Map<String, NodeSetting<?>> settings;
+    private final @Unmodifiable Map<String, DataBox<?>> settings;
     private final @Unmodifiable Set<NodeConnector.Input<?>> inputs;
     private final @Unmodifiable Set<NodeConnector.Output<?>> outputs;
 
     private Node(
             UUID id,
             NodeType type,
-            @Unmodifiable Map<String, NodeSetting<?>> settings,
+            @Unmodifiable Map<String, DataBox<?>> settings,
             @Unmodifiable Set<NodeConnector.Input<?>> inputs,
             @Unmodifiable Set<NodeConnector.Output<?>> outputs) {
         this.id = id;
@@ -62,7 +63,7 @@ public final class Node {
             throw new IllegalArgumentException("Node contains no such setting "+settingKey);
         }
 
-        if (!setting.getTypeClass().isInstance(value)) {
+        if (!setting.type().clazz().isInstance(value)) {
             throw new IllegalArgumentException("Setting "+settingKey+" is not of type "+value.getClass().getName());
         }
 
@@ -70,7 +71,7 @@ public final class Node {
 
         // We know this cast succeeds because of the check above
         //noinspection unchecked
-        newSettings.put(settingKey, ((NodeSetting<T>) setting).withValue(value));
+        newSettings.put(settingKey, ((DataBox<T>) setting).withValue(value));
 
         return new Node(
                 this.id,
@@ -102,7 +103,7 @@ public final class Node {
      *
      * @return the settings of this node
      */
-    public @Unmodifiable Map<String, NodeSetting<?>> settings() {
+    public @Unmodifiable Map<String, DataBox<?>> settings() {
         return this.settings;
     }
 
@@ -115,19 +116,19 @@ public final class Node {
      * @throws IllegalArgumentException if the node does not contain a setting with the given key
      * @throws IllegalArgumentException if the setting with the given key does not hold data of the expected type
      */
-    public <T> NodeSetting<T> getSetting(String key, Class<T> clazz) {
+    public <T> DataBox<T> getSetting(String key, Class<T> clazz) {
         var setting = this.settings.get(key);
         if (setting == null) {
             throw new IllegalArgumentException("Node contains no such setting "+key);
         }
 
-        if (!setting.getTypeClass().isAssignableFrom(clazz)) {
+        if (!setting.type().clazz().isAssignableFrom(clazz)) {
             throw new IllegalArgumentException("Setting "+key+" is not of type "+clazz.getName());
         }
 
         // We know this cast succeeds because of the check above
         //noinspection unchecked
-        return (NodeSetting<T>) setting;
+        return (DataBox<T>) setting;
     }
 
     /**

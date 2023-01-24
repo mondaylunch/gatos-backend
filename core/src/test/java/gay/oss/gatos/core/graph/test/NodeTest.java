@@ -1,12 +1,10 @@
 package gay.oss.gatos.core.graph.test;
 
 import gay.oss.gatos.core.graph.Node;
-import gay.oss.gatos.core.graph.connector.NodeConnection;
-import gay.oss.gatos.core.graph.connector.NodeConnector;
-import gay.oss.gatos.core.graph.setting.BooleanNodeSetting;
-import gay.oss.gatos.core.graph.setting.IntegerNodeSetting;
-import gay.oss.gatos.core.graph.setting.NodeSetting;
 import gay.oss.gatos.core.graph.NodeType;
+import gay.oss.gatos.core.graph.connector.NodeConnector;
+import gay.oss.gatos.core.graph.data.DataBox;
+import gay.oss.gatos.core.graph.data.DataType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -63,19 +61,19 @@ public class NodeTest {
         }
 
         @Override
-        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, NodeSetting<?>> state) {
+        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
             return Set.of(
-                    new NodeConnector.Input<>(nodeId, "in")
+                    new NodeConnector.Input<>(nodeId, "in", DataType.INTEGER)
             );
         }
 
         @Override
-        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, NodeSetting<?>> state) {
-            var out = new NodeConnector.Output<>(nodeId, "out");
+        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
+            var out = new NodeConnector.Output<>(nodeId, "out", DataType.INTEGER);
             return (Boolean) state.get("setting_2").value()
                     ? Set.of(
                     out,
-                    new NodeConnector.Output<>(nodeId, "out_2")
+                    new NodeConnector.Output<>(nodeId, "out_2", DataType.INTEGER)
             )
                     : Set.of(
                     out
@@ -83,10 +81,10 @@ public class NodeTest {
         }
 
         @Override
-        public Map<String, NodeSetting<?>> settings() {
+        public Map<String, DataBox<?>> settings() {
             return Map.of(
-                    "setting_1", new IntegerNodeSetting(0),
-                    "setting_2", new BooleanNodeSetting(false)
+                    "setting_1", DataType.INTEGER.create(0),
+                    "setting_2", DataType.BOOLEAN.create(false)
             );
         }
     }

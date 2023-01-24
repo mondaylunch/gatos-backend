@@ -82,6 +82,24 @@ public class Graph {
     }
 
     /**
+     * Whether this <em>exact</em> node exists in the graph.
+     * @param node  the node
+     * @return      whether this node exists in the graph
+     */
+    public boolean containsNode(Node node) {
+        return this.nodes.containsValue(node);
+    }
+
+    /**
+     * Returns whether this graph has a node with the given UUID.
+     * @param id    the UUID
+     * @return      whether there is a node with the given UUID
+     */
+    public boolean containsNode(UUID id) {
+        return this.nodes.containsKey(id);
+    }
+
+    /**
      * Adds a new node connection between connectors of two existing nodes.
      * @param connection    the connection to add
      * @throws IllegalArgumentException if the node connection has a null node at either end
