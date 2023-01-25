@@ -1,6 +1,9 @@
 package gay.oss.gatos.api.repository;
 
 import org.springframework.stereotype.Repository;
+
+import gay.oss.gatos.api.exceptions.EmailAlreadyInUseException;
+import gay.oss.gatos.api.exceptions.UsernameAlreadyInUseException;
 import gay.oss.gatos.core.models.User;
 
 @Repository
@@ -10,17 +13,20 @@ public class SignUpRepository {
      * add a new user to the db
      *
      * @param User user
+     * @throws UsernameAlreadyInUseException
+     * @throws EmailAlreadyInUseException
      */
-    public User addUser(User user) {
+    public User addUser(User user) throws UsernameAlreadyInUseException, EmailAlreadyInUseException{
         // validate if we can add the user
-        if (usernameAlreadyInUse(user.getUsername()) || emailAlreadyInUse(user.getEmail())) {
-            // probably return some error :thinkin:
+        if (usernameAlreadyInUse(user.getUsername())){
+            throw new UsernameAlreadyInUseException();
+        } else if(emailAlreadyInUse(user.getEmail())) {
+            throw new EmailAlreadyInUseException();
         }else{
             User.objects.insert(user);
         }
         return user;
     }
-
 
     /**
      * check if the username is already in use

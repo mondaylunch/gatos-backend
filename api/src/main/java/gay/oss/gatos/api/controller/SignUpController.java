@@ -2,6 +2,8 @@ package gay.oss.gatos.api.controller;
 
 // imports from other packages
 import gay.oss.gatos.core.models.User;
+import gay.oss.gatos.api.exceptions.EmailAlreadyInUseException;
+import gay.oss.gatos.api.exceptions.UsernameAlreadyInUseException;
 import gay.oss.gatos.api.repository.SignUpRepository;
 
 // rest api stuff do not touch 
@@ -30,17 +32,15 @@ public class SignUpController {
     public Boolean usernameAlreadyInUse(@PathVariable String username) {
         return this.repository.usernameAlreadyInUse(username);
     }
-    
 
     @GetMapping("/check_email/{email}")
     public Boolean emailAlreadyInUse(@PathVariable String email) {
         return this.repository.emailAlreadyInUse(email);
     }
     
-
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public User addUser(@RequestBody User user) {
+    public User addUser(@RequestBody User user) throws UsernameAlreadyInUseException, EmailAlreadyInUseException {
         return this.repository.addUser(user);
     }
 

@@ -22,7 +22,7 @@ public class LoginRepository {
         if (usr.getPassword().equals(password)) {
             return usr;
         }
-        return null;
+        throw new UserNotFoundException();
     }
 
 }
