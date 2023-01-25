@@ -5,5 +5,5 @@ import org.springframework.http.HttpStatus;
 
 @ResponseStatus(HttpStatus.CONFLICT)
 public class EmailAlreadyInUseException extends Exception{
-    
+
 }

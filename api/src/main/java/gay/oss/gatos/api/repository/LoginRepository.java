@@ -9,8 +9,7 @@ import gay.oss.gatos.core.models.User;
 public class LoginRepository {
 
     /**
-     * Validate user
-     * 
+     * Validate user.
      * TODO change after hashing the password
      *
      * @param String username

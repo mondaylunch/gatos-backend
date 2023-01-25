@@ -1,21 +1,22 @@
 package gay.oss.gatos.core.collections;
 
+import static com.mongodb.client.model.Filters.eq;
+
 import java.util.UUID;
 
-import gay.oss.gatos.core.models.User;
-
 import org.bson.conversions.Bson;
-import static com.mongodb.client.model.Filters.eq;
+
+import gay.oss.gatos.core.models.User;
 
 /**
  * "users" collection for {@link User}.
  */
 public class UserCollection extends BaseCollection<User> {
-    
+
     public UserCollection() {
         super("users", User.class);
     }
-    
+
     /**
      * Gets a document.
      *
@@ -27,22 +28,22 @@ public class UserCollection extends BaseCollection<User> {
     }
 
     /**
-     * checks if the username is already in use
+     * checks if the username is already in use.
      *
      * @param username The potential username of the user.
      * @return true if the username is already in use
      */
-    public Boolean usernameAlreadyInUse(String username){
+    public Boolean usernameAlreadyInUse(String username) {
         return getCollection().find(usernameFilter(username)).first() != null;
     }
 
     /**
-     * checks if the email is already in use
+     * checks if the email is already in use.
      *
      * @param email The potential email of the user.
      * @return true if the email is already in use
      */
-    public Boolean emailAlreadyInUse(String username){
+    public Boolean emailAlreadyInUse(String username) {
         return getCollection().find(emailFilter(username)).first() != null;
     }
 
