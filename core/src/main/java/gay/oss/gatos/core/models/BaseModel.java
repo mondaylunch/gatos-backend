@@ -31,4 +31,20 @@ public class BaseModel {
     public void setId(UUID uuid) {
         this.id = uuid;
     }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        } else if (obj instanceof BaseModel other) {
+            return this.id.equals(other.id);
+        } else {
+            return false;
+        }
+    }
 }
