@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
@@ -276,6 +277,11 @@ public class GraphTest {
                     "setting_1", DataType.INTEGER.create(0)
             );
         }
+
+        @Override
+        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+            return Map.of();
+        }
     }
 
     private static final class TestInputNodeType implements NodeType {
@@ -300,6 +306,11 @@ public class GraphTest {
         public Map<String, DataBox<?>> settings() {
             return Map.of();
         }
+
+        @Override
+        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+            return Map.of();
+        }
     }
 
     private static final class TestOutputNodeType implements NodeType {
@@ -322,6 +333,11 @@ public class GraphTest {
 
         @Override
         public Map<String, DataBox<?>> settings() {
+            return Map.of();
+        }
+
+        @Override
+        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
             return Map.of();
         }
     }
