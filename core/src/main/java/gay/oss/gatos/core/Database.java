@@ -1,13 +1,17 @@
 package gay.oss.gatos.core;
 
+import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
+
+import java.util.List;
+
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import gay.oss.gatos.core.models.Flow;
-import gay.oss.gatos.core.models.User;
 import org.bson.BsonDocument;
 import org.bson.BsonInt64;
 import org.bson.Document;
@@ -19,14 +23,11 @@ import org.bson.codecs.pojo.Conventions;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.conversions.Bson;
 
-import java.util.List;
-
-import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
-import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
+import gay.oss.gatos.core.models.Flow;
+import gay.oss.gatos.core.models.User;
 
 /**
- * Singleton instance of the MongoDB client
+ * Singleton instance of the MongoDB client.
  */
 public enum Database {
 
@@ -36,7 +37,7 @@ public enum Database {
     private final CodecRegistry codecRegistry = createRegistry();
 
     /**
-     * Configure the MongoDB driver
+     * Configure the MongoDB driver.
      */
     private static MongoClient createClient() {
         // Configure the connection settings
@@ -50,7 +51,7 @@ public enum Database {
     }
 
     /**
-     * Configure the MongoDB driver
+     * Configure the MongoDB driver.
      */
     private static CodecRegistry createRegistry() {
         // Create ClassModel for every single model
@@ -68,7 +69,7 @@ public enum Database {
     }
 
     /**
-     * Check whether we can talk with the database
+     * Check whether we can talk with the database.
      */
     public static void checkConnection() {
         MongoDatabase database = INSTANCE.client.getDatabase("admin");
@@ -77,7 +78,7 @@ public enum Database {
     }
 
     /**
-     * Get the Mongo Database
+     * Get the Mongo Database.
      *
      * @return {@link MongoDatabase}
      */
@@ -86,7 +87,7 @@ public enum Database {
     }
 
     /**
-     * Get a Mongo Collection by name
+     * Get a Mongo Collection by name.
      *
      * @return {@link MongoCollection}
      */
@@ -95,7 +96,7 @@ public enum Database {
     }
 
     /**
-     * Get a Mongo Collection with POJO support by name and class
+     * Get a Mongo Collection with POJO support by name and class.
      *
      * @return {@link MongoCollection}
      */

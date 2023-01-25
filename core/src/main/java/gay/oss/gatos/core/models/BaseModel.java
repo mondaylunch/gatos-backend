@@ -1,12 +1,12 @@
 package gay.oss.gatos.core.models;
 
+import java.util.UUID;
+
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
-import java.util.UUID;
-
 /**
- * Class describing common properties for all database models
+ * Class describing common properties for all database models.
  */
 public class BaseModel {
 
@@ -15,7 +15,7 @@ public class BaseModel {
     private UUID id;
 
     /**
-     * Get model's UUID
+     * Get model's UUID.
      *
      * @return UUID
      */
@@ -24,7 +24,7 @@ public class BaseModel {
     }
 
     /**
-     * Set model's UUID
+     * Set model's UUID.
      *
      * @param uuid UUID
      */

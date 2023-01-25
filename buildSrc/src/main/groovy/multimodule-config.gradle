@@ -1,9 +1,15 @@
 plugins {
     id 'java'
+    id 'checkstyle'
 }
 
 repositories {
 	mavenCentral()
+}
+
+dependencies {
+    // Java code annotations
+    implementation 'org.jetbrains:annotations:24.0.0'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17

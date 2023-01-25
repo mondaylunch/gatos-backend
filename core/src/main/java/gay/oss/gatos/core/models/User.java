@@ -4,7 +4,7 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 import gay.oss.gatos.core.collections.UserCollection;
 
 /**
- * POJO for users
+ * POJO for users.
  */
 public class User extends BaseModel {
 

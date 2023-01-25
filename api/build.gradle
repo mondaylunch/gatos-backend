@@ -9,8 +9,16 @@ version = '0.0.1-SNAPSHOT'
 
 dependencies {
 	implementation project(":core")
+
+	// validation
+	implementation 'javax.validation:validation-api:2.0.1.Final'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// web
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+	// spring testing
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
