@@ -1,5 +1,7 @@
 package gay.oss.gatos.core.graph.test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -169,6 +171,83 @@ public class GraphTest {
         graph.addConnection(conn.get());
 
         Assertions.assertTrue(graph.validate());
+    }
+
+    @Test
+    public void graphWithLongerPathAndExtraNodesIsValid() {
+        var graph = new Graph();
+        var input = graph.addNode(INPUT_NODE_TYPE);
+        var output = graph.addNode(OUTPUT_NODE_TYPE);
+
+        @Nullable Node lastNode = null;
+        for (int i = 0; i < 10; i++) {
+            var intermediary = graph.addNode(TEST_NODE_TYPE);
+            var conn = NodeConnection.createConnection(
+                lastNode == null ? input : lastNode, "out",
+                intermediary, "in",
+                DataType.INTEGER
+            );
+            Assertions.assertTrue(conn.isPresent());
+            graph.addConnection(conn.get());
+
+            lastNode = intermediary;
+        }
+
+        var conn = NodeConnection.createConnection(
+            lastNode, "out",
+            output, "in",
+            DataType.INTEGER
+        );
+        Assertions.assertTrue(conn.isPresent());
+        graph.addConnection(conn.get());
+
+        for (int i = 0; i < 10; i++) {
+            graph.addNode(TEST_NODE_TYPE);
+        }
+
+        Assertions.assertTrue(graph.validate());
+    }
+
+    @Test
+    public void graphHasCorrectPath() {
+        var graph = new Graph();
+        var input = graph.addNode(INPUT_NODE_TYPE);
+        var output = graph.addNode(OUTPUT_NODE_TYPE);
+        List<Node> list = new ArrayList<>();
+        list.add(input);
+
+        @Nullable Node lastNode = null;
+        for (int i = 0; i < 10; i++) {
+            var intermediary = graph.addNode(TEST_NODE_TYPE);
+            var conn = NodeConnection.createConnection(
+                lastNode == null ? input : lastNode, "out",
+                intermediary, "in",
+                DataType.INTEGER
+            );
+            Assertions.assertTrue(conn.isPresent());
+            graph.addConnection(conn.get());
+
+            lastNode = intermediary;
+            list.add(intermediary);
+        }
+
+        var conn = NodeConnection.createConnection(
+            lastNode, "out",
+            output, "in",
+            DataType.INTEGER
+        );
+        Assertions.assertTrue(conn.isPresent());
+        graph.addConnection(conn.get());
+
+        list.add(output);
+
+        for (int i = 0; i < 10; i++) {
+            graph.addNode(TEST_NODE_TYPE);
+        }
+
+        var sorted = graph.getExecutionOrder();
+        Assertions.assertTrue(sorted.isPresent());
+        Assertions.assertEquals(list, sorted.get());
     }
 
     private static final class TestNodeType implements NodeType {
