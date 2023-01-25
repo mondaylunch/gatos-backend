@@ -34,7 +34,7 @@ public class BaseModel {
 
     @Override
     public int hashCode() {
-        return id.hashCode();
+        return this.id.hashCode();
     }
 
     @Override
