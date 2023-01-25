@@ -14,7 +14,6 @@ import java.util.stream.Stream;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.conversions.Bson;
 import org.jetbrains.annotations.Nullable;
-
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Updates;
 
