@@ -13,6 +13,14 @@ public class Flow extends BaseModel {
 
     public static final FlowCollection objects = new FlowCollection();
 
+    public Flow(String name, UUID authorId) {
+        this.name = name;
+        this.authorId = authorId;
+    }
+
+    public Flow() {
+    }
+
     /**
      * Display name.
      */
