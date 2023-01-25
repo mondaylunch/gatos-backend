@@ -23,8 +23,8 @@ public class LoginController {
         this.repository = repository;
     }
     
-    @GetMapping("/get/{username}?{password}")
-    public User getUser(@PathVariable String username, @PathVariable String password) throws UserNotFoundException {
+    @GetMapping("/get/{username}/{password}")
+    public User getUser(@PathVariable("username") String username, @PathVariable("password") String password) throws UserNotFoundException {
         return this.repository.validateUser(username, password);
     }
 
