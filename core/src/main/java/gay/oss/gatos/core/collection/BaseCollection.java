@@ -84,6 +84,7 @@ public class BaseCollection<T extends BaseModel> {
 
     /**
      * Updates a document. Only non-null fields will be updated.
+     * The ID field cannot be updated.
      *
      * @param id  The ID of the document to update.
      * @param obj The POJO to update with.
@@ -147,14 +148,15 @@ public class BaseCollection<T extends BaseModel> {
     }
 
     /**
-     * Checks if a {@code PropertyDescriptor} has a getter.
+     * Checks if a {@code PropertyDescriptor} has a getter. The {@code id}
+     * field is excluded.
      *
      * @param descriptor The {@code PropertyDescriptor}.
      * @return {@code true} if the {@code PropertyDescriptor} has a getter,
      *         {@code false} otherwise.
      */
     private static boolean hasGetter(PropertyDescriptor descriptor) {
-        return descriptor.getReadMethod() != null;
+        return descriptor.getReadMethod() != null && !descriptor.getName().equals("id");
     }
 
     /**
