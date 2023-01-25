@@ -1,4 +1,4 @@
-package gay.oss.gatos.core.collection;
+package gay.oss.gatos.core.collection.test;
 
 import java.util.UUID;
 
@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import com.mongodb.MongoWriteException;
 
+import gay.oss.gatos.core.collection.FlowCollection;
 import gay.oss.gatos.core.models.Flow;
 
 public class FlowCollectionTest {
