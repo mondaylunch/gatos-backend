@@ -1,5 +1,6 @@
 package gay.oss.gatos.core.graph;
 
+import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -187,6 +188,55 @@ public class Graph {
 
         this.metadataByNode.put(nodeId, result);
         return result;
+    }
+
+    /**
+     * Determines whether this graph is <i>valid</i>.
+     * A graph is valid if there is a path from a {@link NodeCategory#PUSHED_INPUT input} node to
+     * an {@link NodeCategory#OUTPUT output} node, and there are no cycles.
+     *
+     * @return whether this graph is valid
+     */
+    public boolean validate() {
+        return this.nodes.values().stream()
+            .filter(n -> n.type().category() == NodeCategory.PUSHED_INPUT)
+            .anyMatch(n -> this.hasPathToOutput(n.id()));
+    }
+
+    /**
+     * Determines whether there is an acyclic path from the given input node to any output node.
+     * @param input the UUID of the input node
+     * @return      whether there is an acyclic path to an output node
+     */
+    private boolean hasPathToOutput(UUID input) {
+        if (!this.containsNode(input)) {
+            return false;
+        }
+
+        ArrayDeque<UUID> stack = new ArrayDeque<>();
+        Set<UUID> visitedNodes = new HashSet<>();
+        stack.push(input);
+        while (!stack.isEmpty()) {
+            UUID top = stack.pop();
+            if (visitedNodes.contains(top)) {
+                return false;
+            }
+            visitedNodes.add(top);
+
+            if (this.nodes.get(top).type().category() == NodeCategory.OUTPUT) {
+                return true;
+            }
+
+            var connections = this.getConnectionsForNode(top);
+            for (var conn : connections) {
+                if (conn.from().nodeId() != top) {
+                    continue;
+                }
+                stack.push(conn.to().nodeId());
+            }
+        }
+
+        return false;
     }
 
     /**
