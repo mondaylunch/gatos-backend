@@ -127,7 +127,7 @@ public class BaseCollection<T extends BaseModel> {
     private static List<Bson> getNonNullUpdates(Object obj) {
         return createPropertyDescriptorStream(obj.getClass())
                 .filter(BaseCollection::hasGetter)
-                .map(descriptor -> getField(descriptor, obj, obj.getClass()))
+                .map(descriptor -> getField(descriptor, obj))
                 .filter(Objects::nonNull)
                 .map(Field::toUpdate)
                 .toList();
@@ -169,7 +169,7 @@ public class BaseCollection<T extends BaseModel> {
      * @return A {@code Field} object.
      */
     @Nullable
-    private static Field getField(PropertyDescriptor descriptor, Object obj, Class<?> cls) {
+    private static Field getField(PropertyDescriptor descriptor, Object obj) {
         try {
             Object value = descriptor.getReadMethod().invoke(obj);
             if (value != null) {
@@ -178,7 +178,7 @@ public class BaseCollection<T extends BaseModel> {
 
                 // 🙂 reflection time! 🙂
                 // Find the field we are dealing with
-                java.lang.reflect.Field field = cls.getDeclaredField(descriptor.getName());
+                java.lang.reflect.Field field = obj.getClass().getDeclaredField(descriptor.getName());
 
                 // Get BsonProperty annotations
                 BsonProperty[] properties = field.getDeclaredAnnotationsByType(BsonProperty.class);
