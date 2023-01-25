@@ -11,10 +11,48 @@ import static com.mongodb.client.model.Filters.eq;
  * "users" collection for {@link User}.
  */
 public class UserCollection extends BaseCollection<User> {
+    
     public UserCollection() {
         super("users", User.class);
     }
     
+    /**
+     * Gets a document.
+     *
+     * @param username The username of the user.
+     * @return The POJO.
+     */
+    public User getUser(String username) {
+        return getCollection().find(usernameFilter(username)).first();
+    }
+
+    /**
+     * checks if the username is already in use
+     *
+     * @param username The potential username of the user.
+     * @return true if the username is already in use
+     */
+    public Boolean usernameAlreadyInUse(String username){
+        return getCollection().find(usernameFilter(username)).first() != null;
+    }
+
+    /**
+     * checks if the email is already in use
+     *
+     * @param email The potential email of the user.
+     * @return true if the email is already in use
+     */
+    public Boolean emailAlreadyInUse(String username){
+        return getCollection().find(emailFilter(username)).first() != null;
+    }
+
+    public User authenticate(String token) throws RuntimeException {
+        User user = new User();
+        user.setId(new UUID(0, 0));
+
+        return user;
+    }
+
     /**
      * Creates a username filter.
      *
@@ -26,21 +64,12 @@ public class UserCollection extends BaseCollection<User> {
     }
 
     /**
-     * Gets a document.
+     * Creates an email filter.
      *
-     * @param username The username of the user.
-     * @return The POJO.
+     * @param String The email to filter by.
+     * @return The filter.
      */
-    public User getUser(String username) {
-        return getCollection().find(usernameFilter(username)).first();
+    private static Bson emailFilter(String email) {
+        return eq("email", email);
     }
-
-
-    public User authenticate(String token) throws RuntimeException {
-        User user = new User();
-        user.setId(new UUID(0, 0));
-
-        return user;
-    }
-
 }
