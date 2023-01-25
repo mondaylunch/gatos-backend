@@ -11,7 +11,7 @@ import gay.oss.gatos.core.collection.FlowCollection;
  */
 public class Flow extends BaseModel {
 
-    public static FlowCollection objects = new FlowCollection();
+    public static final FlowCollection objects = new FlowCollection();
 
     /**
      * Display name.

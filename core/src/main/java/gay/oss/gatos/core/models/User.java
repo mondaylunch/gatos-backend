@@ -7,5 +7,5 @@ import gay.oss.gatos.core.collection.UserCollection;
  */
 public class User extends BaseModel {
 
-    public static UserCollection objects = new UserCollection();
+    public static final UserCollection objects = new UserCollection();
 }
