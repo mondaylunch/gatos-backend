@@ -26,7 +26,7 @@ public class FlowCollectionTest {
     }
 
     private void reset() {
-        Flow.objects.getCollection().drop();
+        Flow.objects.clear();
     }
 
     @Test

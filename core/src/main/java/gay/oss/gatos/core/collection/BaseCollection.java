@@ -109,6 +109,13 @@ public class BaseCollection<T extends BaseModel> {
     }
 
     /**
+     * Deletes all documents.
+     */
+    public void clear() {
+        this.getCollection().drop();
+    }
+
+    /**
      * Creates an ID filter.
      *
      * @param id The ID to filter by.
