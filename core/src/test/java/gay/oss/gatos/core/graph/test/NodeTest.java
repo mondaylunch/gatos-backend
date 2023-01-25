@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import gay.oss.gatos.core.graph.Node;
+import gay.oss.gatos.core.graph.NodeCategory;
 import gay.oss.gatos.core.graph.NodeType;
 import gay.oss.gatos.core.graph.connector.NodeConnector;
 import gay.oss.gatos.core.graph.data.DataBox;
@@ -51,14 +52,10 @@ public class NodeTest {
     }
 
     private static final class TestNodeType implements NodeType {
-        @Override
-        public boolean hasInputs() {
-            return true;
-        }
 
         @Override
-        public boolean hasOutputs() {
-            return true;
+        public NodeCategory category() {
+            return NodeCategory.PROCESS;
         }
 
         @Override
