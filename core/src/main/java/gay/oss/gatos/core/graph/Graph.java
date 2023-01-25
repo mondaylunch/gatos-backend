@@ -149,6 +149,14 @@ public class Graph {
     }
 
     /**
+     * Returns a copy of the set of all connections in this graph.
+     * @return the connections in this graph
+     */
+    public Set<NodeConnection<?>> getConnections() {
+        return new HashSet<>(this.connections);
+    }
+
+    /**
      * Retrieves all connections associated with a node UUID. Returns an empty set if there is no node with the given UUID.
      * @param nodeId    the node UUID
      * @return          all connections associated with the node with the UUID
