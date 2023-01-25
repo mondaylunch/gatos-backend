@@ -11,10 +11,12 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Updates;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.conversions.Bson;
 import org.jetbrains.annotations.Nullable;
+
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Updates;
 
 import gay.oss.gatos.core.Database;
 import gay.oss.gatos.core.models.BaseModel;
@@ -126,7 +128,7 @@ public class BaseCollection<T extends BaseModel> {
     private static List<Bson> getNonNullUpdates(Object obj) {
         return createPropertyDescriptorStream(obj.getClass())
                 .filter(BaseCollection::hasGetter)
-                .map(descriptor -> getField(descriptor, obj))
+                .map(descriptor -> getField(descriptor, obj, obj.getClass()))
                 .filter(Objects::nonNull)
                 .map(Field::toUpdate)
                 .toList();
@@ -168,11 +170,26 @@ public class BaseCollection<T extends BaseModel> {
      * @return A {@code Field} object.
      */
     @Nullable
-    private static Field getField(PropertyDescriptor descriptor, Object obj) {
+    private static Field getField(PropertyDescriptor descriptor, Object obj, Class<?> cls) {
         try {
             Object value = descriptor.getReadMethod().invoke(obj);
             if (value != null) {
-                return new Field(descriptor.getName(), value);
+                // Assume the name is the exact name we want
+                String name = descriptor.getName();
+
+                // 🙂 reflection time! 🙂
+                // Find the field we are dealing with
+                java.lang.reflect.Field field = cls.getDeclaredField(descriptor.getName());
+
+                // Get BsonProperty annotations
+                BsonProperty[] properties = field.getDeclaredAnnotationsByType(BsonProperty.class);
+
+                // Apply correct name if it exists
+                if (properties.length > 0) {
+                    name = properties[0].value();
+                }
+
+                return new Field(name, value);
             }
         } catch (Exception e) {
             e.printStackTrace();
