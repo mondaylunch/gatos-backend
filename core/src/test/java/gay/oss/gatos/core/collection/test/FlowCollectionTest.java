@@ -155,7 +155,7 @@ public class FlowCollectionTest {
     }
 
     private static long getFlowCount() {
-        return Flow.objects.getCollection().countDocuments();
+        return Flow.objects.size();
     }
 
     private static Flow createFlow() {
