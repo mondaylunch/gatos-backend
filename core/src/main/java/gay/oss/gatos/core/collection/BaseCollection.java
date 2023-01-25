@@ -1,4 +1,4 @@
-package gay.oss.gatos.core.collections;
+package gay.oss.gatos.core.collection;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -185,6 +185,7 @@ public class BaseCollection<T extends BaseModel> {
      * @param value The value of the field.
      */
     private record Field(String name, Object value) {
+
         /**
          * Creates a MongoDB update.
          *

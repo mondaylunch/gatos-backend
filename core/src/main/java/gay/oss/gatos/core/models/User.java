@@ -1,6 +1,6 @@
 package gay.oss.gatos.core.models;
 
-import gay.oss.gatos.core.collections.UserCollection;
+import gay.oss.gatos.core.collection.UserCollection;
 
 /**
  * POJO for users.

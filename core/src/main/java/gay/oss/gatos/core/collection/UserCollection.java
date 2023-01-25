@@ -1,4 +1,4 @@
-package gay.oss.gatos.core.collections;
+package gay.oss.gatos.core.collection;
 
 import java.util.UUID;
 

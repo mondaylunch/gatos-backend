@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
-import gay.oss.gatos.core.collections.FlowCollection;
+import gay.oss.gatos.core.collection.FlowCollection;
 
 /**
  * POJO for flows.
