@@ -6,9 +6,11 @@ import gay.oss.gatos.api.repository.SignUpRepository;
 
 // rest api stuff do not touch 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -22,8 +24,9 @@ public class SignUpController {
         this.repository = repository;
     }
     
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public User addUser(@PathVariable User user) {
+    public User addUser(@RequestBody User user) {
         return this.repository.addUser(user);
     }
 
