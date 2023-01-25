@@ -8,6 +8,10 @@ import gay.oss.gatos.core.models.Flow;
 public class FlowCollection extends BaseCollection<Flow> {
 
     public FlowCollection() {
-        super("flows", Flow.class);
+        this("flows");
+    }
+
+    public FlowCollection(String collectionName) {
+        super(collectionName, Flow.class);
     }
 }
