@@ -1,4 +1,4 @@
-package gay.oss.gatos.core.collections;
+package gay.oss.gatos.core.collection;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -11,10 +11,11 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Updates;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.conversions.Bson;
 import org.jetbrains.annotations.Nullable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Updates;
 
 import gay.oss.gatos.core.Database;
 import gay.oss.gatos.core.models.BaseModel;
@@ -84,6 +85,7 @@ public class BaseCollection<T extends BaseModel> {
 
     /**
      * Updates a document. Only non-null fields will be updated.
+     * The ID field cannot be updated.
      *
      * @param id  The ID of the document to update.
      * @param obj The POJO to update with.
@@ -147,14 +149,15 @@ public class BaseCollection<T extends BaseModel> {
     }
 
     /**
-     * Checks if a {@code PropertyDescriptor} has a getter.
+     * Checks if a {@code PropertyDescriptor} has a getter. The {@code id}
+     * field is excluded.
      *
      * @param descriptor The {@code PropertyDescriptor}.
      * @return {@code true} if the {@code PropertyDescriptor} has a getter,
      *         {@code false} otherwise.
      */
     private static boolean hasGetter(PropertyDescriptor descriptor) {
-        return descriptor.getReadMethod() != null;
+        return descriptor.getReadMethod() != null && !descriptor.getName().equals("id");
     }
 
     /**
@@ -170,7 +173,22 @@ public class BaseCollection<T extends BaseModel> {
         try {
             Object value = descriptor.getReadMethod().invoke(obj);
             if (value != null) {
-                return new Field(descriptor.getName(), value);
+                // Assume the name is the exact name we want
+                String name = descriptor.getName();
+
+                // 🙂 reflection time! 🙂
+                // Find the field we are dealing with
+                java.lang.reflect.Field field = obj.getClass().getDeclaredField(descriptor.getName());
+
+                // Get BsonProperty annotations
+                BsonProperty[] properties = field.getDeclaredAnnotationsByType(BsonProperty.class);
+
+                // Apply correct name if it exists
+                if (properties.length > 0) {
+                    name = properties[0].value();
+                }
+
+                return new Field(name, value);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -185,6 +203,7 @@ public class BaseCollection<T extends BaseModel> {
      * @param value The value of the field.
      */
     private record Field(String name, Object value) {
+
         /**
          * Creates a MongoDB update.
          *

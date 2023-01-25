@@ -32,7 +32,7 @@ public class FlowController {
 
     private record BodyAddFlow(
             @NotNull @Length(min = 1, max = 32) String name) {
-    };
+    }
 
     @PostMapping
     public Flow addFlow(@RequestHeader("x-auth-token") String token, @Valid @RequestBody BodyAddFlow data) {
@@ -48,7 +48,7 @@ public class FlowController {
 
     private record BodyUpdateFlow(
             @NotNull @Length(min = 1, max = 32) String name) {
-    };
+    }
 
     @PutMapping("{flowId}")
     public Flow updateFlow(@RequestHeader("x-auth-token") String token, @PathVariable UUID flowId,
