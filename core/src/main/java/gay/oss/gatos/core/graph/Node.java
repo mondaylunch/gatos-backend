@@ -6,7 +6,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -22,20 +24,20 @@ public final class Node {
     private final UUID id;
     private final NodeType type;
     private final @Unmodifiable Map<String, DataBox<?>> settings;
-    private final @Unmodifiable Set<NodeConnector.Input<?>> inputs;
-    private final @Unmodifiable Set<NodeConnector.Output<?>> outputs;
+    private final @Unmodifiable Map<String, NodeConnector.Input<?>> inputs;
+    private final @Unmodifiable Map<String, NodeConnector.Output<?>> outputs;
 
     private Node(
             UUID id,
             NodeType type,
-            @Unmodifiable Map<String, DataBox<?>> settings,
-            @Unmodifiable Set<NodeConnector.Input<?>> inputs,
-            @Unmodifiable Set<NodeConnector.Output<?>> outputs) {
+            Map<String, DataBox<?>> settings,
+            Set<NodeConnector.Input<?>> inputs,
+            Set<NodeConnector.Output<?>> outputs) {
         this.id = id;
         this.type = type;
-        this.settings = settings;
-        this.inputs = inputs;
-        this.outputs = outputs;
+        this.settings = Map.copyOf(settings);
+        this.inputs = Map.copyOf(inputs.stream().collect(Collectors.toMap(NodeConnector::name, Function.identity())));
+        this.outputs = Map.copyOf(outputs.stream().collect(Collectors.toMap(NodeConnector::name, Function.identity())));
     }
 
     /**
@@ -140,7 +142,7 @@ public final class Node {
      * Returns the inputs of this node.
      * @return  the inputs of this node
      */
-    public @Unmodifiable Set<NodeConnector.Input<?>> inputs() {
+    public @Unmodifiable Map<String, NodeConnector.Input<?>> inputs() {
         return this.inputs;
     }
 
@@ -150,14 +152,14 @@ public final class Node {
      * @return      an Optional of the connector
      */
     public Optional<NodeConnector.Input<?>> getInputWithName(String name) {
-        return this.inputs.stream().filter(c -> c.name().equals(name)).findAny();
+        return Optional.ofNullable(this.inputs.get(name));
     }
 
     /**
      * Returns the outputs of this node.
      * @return  the outputs of this node
      */
-    public @Unmodifiable Set<NodeConnector.Output<?>> outputs() {
+    public @Unmodifiable Map<String, NodeConnector.Output<?>> outputs() {
         return this.outputs;
     }
 
@@ -167,7 +169,7 @@ public final class Node {
      * @return      an Optional of the connector
      */
     public Optional<NodeConnector.Output<?>> getOutputWithName(String name) {
-        return this.outputs.stream().filter(c -> c.name().equals(name)).findAny();
+        return Optional.ofNullable(this.outputs.get(name));
     }
 
     @Override

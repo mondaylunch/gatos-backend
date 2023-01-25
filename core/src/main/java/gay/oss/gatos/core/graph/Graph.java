@@ -198,11 +198,11 @@ public class Graph {
      */
     private static boolean isConnectionValid(Node node, NodeConnection<?> connection) {
         if (connection.from().nodeId().equals(node.id())) {
-            return node.outputs().contains(connection.from());
+            return node.outputs().containsValue(connection.from());
         }
 
         if (connection.to().nodeId().equals(node.id())) {
-            return node.inputs().contains(connection.to());
+            return node.inputs().containsValue(connection.to());
         }
 
         return false;
