@@ -1,6 +1,5 @@
 package gay.oss.gatos.core.models;
 
-import org.bson.codecs.pojo.annotations.BsonProperty;
 import gay.oss.gatos.core.collections.UserCollection;
 
 /**
@@ -10,31 +9,9 @@ public class User extends BaseModel {
 
     public static UserCollection objects = new UserCollection();
 
-    @BsonProperty("first_name")
-    private String firstName;
-    @BsonProperty("last_name")
-    private String lastName;
     private String username;
     private String email;
     private String password;
-
-    /**
-     * Get the first name
-     *
-     * @return display first name
-     */
-    public String getFirstName(){
-        return firstName;
-    }
-
-    /**
-     * Get the last name
-     *
-     * @return display last name
-     */
-    public String getLastName(){
-        return lastName;
-    }
 
     /**
      * Get the username
@@ -61,24 +38,6 @@ public class User extends BaseModel {
      */
     public String getPassword(){
         return password;
-    }
-
-    /**
-     * Set the first name
-     *
-     * @param String firstName
-     */
-    public void setFirstName(String firstName){
-        this.firstName = firstName;
-    }
-
-    /**
-     * Set the last name
-     *
-     * @param String lastName
-     */
-    public void setLastName(String lastName){
-        this.lastName = lastName;
     }
 
     /**
