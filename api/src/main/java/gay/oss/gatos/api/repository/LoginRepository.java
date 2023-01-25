@@ -10,18 +10,20 @@ public class LoginRepository {
 
     /**
      * Validate user.
-     * TODO change after hashing the password
      *
      * @param String username
      * @param String password
      */
     public User validateUser(String username, String password) throws UserNotFoundException {
-        // get the user first
         User usr = User.objects.getUser(username);
-        if (usr.getPassword().equals(password)) {
+        if (usr.comparePassword(password)) {
             return usr;
         }
         throw new UserNotFoundException();
+    }
+
+    public User getUser(String username) {
+        return User.objects.getUser(username);
     }
 
 }

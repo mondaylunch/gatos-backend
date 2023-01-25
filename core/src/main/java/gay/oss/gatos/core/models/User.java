@@ -1,5 +1,8 @@
 package gay.oss.gatos.core.models;
 
+import de.mkammerer.argon2.Argon2;
+import de.mkammerer.argon2.Argon2Factory;
+
 import gay.oss.gatos.core.collections.UserCollection;
 
 /**
@@ -59,11 +62,21 @@ public class User extends BaseModel {
     }
 
     /**
-     * Set the password.
+     * Set the password field to a hashed password using argon2.
      *
      * @param String password
      */
     public void setPassword(String password) {
-        this.password = password;
+        Argon2 argon2 = this.getArgon2Instance();
+        this.password = argon2.hash(4, 65586, 2, password.toCharArray());
+    }
+
+    public boolean comparePassword(String password) {
+        Argon2 argon2 = this.getArgon2Instance();
+        return argon2.verify(this.getPassword(), password.toCharArray());
+    }
+
+    private Argon2 getArgon2Instance() {
+        return Argon2Factory.create();
     }
 }
