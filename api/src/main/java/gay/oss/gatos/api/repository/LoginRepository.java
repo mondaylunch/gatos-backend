@@ -21,9 +21,4 @@ public class LoginRepository {
         }
         throw new UserNotFoundException();
     }
-
-    public User getUser(String username) {
-        return User.objects.getUser(username);
-    }
-
 }
