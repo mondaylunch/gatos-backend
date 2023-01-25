@@ -5,12 +5,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -23,13 +27,17 @@ import gay.oss.gatos.core.models.Flow;
 public class FlowControllerTest {
 
     private static final UUID ZERO_UUID = new UUID(0, 0);
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final String OBJECT_EXPRESSION_PREFIX = "$.";
 
     @Autowired
     private MockMvc mockMvc;
+    private long initialFlowCount;
 
     @BeforeEach
     void setUp() {
         this.reset();
+        this.initialFlowCount = getFlowCount();
     }
 
     @AfterEach
@@ -56,6 +64,59 @@ public class FlowControllerTest {
         this.testGetFlows(10);
     }
 
+    @Test
+    public void cannotGetFlowsWithoutToken() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/flows/list"))
+            .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    }
+
+    @Test
+    public void canAddFlow() throws Exception {
+        Flow flow = createFlow();
+        String flowJson = MAPPER.writeValueAsString(flow);
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/flows")
+                .header("x-auth-token", "")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(flowJson)
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        this.assertFlowCountChange(1);
+        result = compareFields(OBJECT_EXPRESSION_PREFIX, result,
+            Map.entry("name", flow.getName()),
+            Map.entry("authorId", flow.getAuthorId())
+        );
+        String responseJson = result.andReturn().getResponse().getContentAsString();
+        UUID flowId = UUID.fromString(JsonPath.read(responseJson, "$.id"));
+        Flow newFlow = Flow.objects.get(flowId);
+        Assertions.assertNotNull(newFlow);
+        Assertions.assertEquals(flow.getName(), newFlow.getName());
+        Assertions.assertEquals(flow.getAuthorId(), newFlow.getAuthorId());
+    }
+
+    @Test
+    public void cannotAddFlowWithoutToken() throws Exception {
+        Flow flow = createFlow();
+        String flowJson = MAPPER.writeValueAsString(flow);
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/flows")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(flowJson)
+            )
+            .andExpect(MockMvcResultMatchers.status().isBadRequest());
+        this.assertFlowCountChange(0);
+    }
+
+    private void assertFlowCountChange(long change) {
+        Assertions.assertEquals(this.initialFlowCount + change, getFlowCount());
+    }
+
+    private static long getFlowCount() {
+        return Flow.objects.size();
+    }
+
+    private static Flow createFlow() {
+        return new Flow("Test Flow", ZERO_UUID);
+    }
+
     private void testGetFlows(int flowCount) throws Exception {
         List<Flow> flows = new ArrayList<>();
         for (int i = 0; i < flowCount; i++) {
@@ -65,7 +126,7 @@ public class FlowControllerTest {
         }
         ResultActions result = this.getFlows(flowCount);
         for (int i = 0; i < flowCount; i++) {
-            result = this.compareFlow(flows.get(i), i, result);
+            result = compareFlow(flows.get(i), i, result);
         }
     }
 
@@ -77,25 +138,30 @@ public class FlowControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(expectedFlowCount)));
     }
 
-    private ResultActions compareFlow(Flow flow, int index, ResultActions result) throws Exception {
-        return this.compareFields(index, result,
+    private static ResultActions compareFlow(Flow flow, int index, ResultActions result) throws Exception {
+        return compareFields(objectArrayExpressionPrefix(index), result,
             Map.entry("name", flow.getName()),
             Map.entry("authorId", flow.getAuthorId())
         );
     }
 
     @SafeVarargs
-    private ResultActions compareFields(int index, ResultActions result, Map.Entry<String, Object> field, Map.Entry<String, Object>... fields) throws Exception {
-        result = result.andExpect(MockMvcResultMatchers.jsonPath(
-            "$[" + index + "]." + field.getKey(),
-            Matchers.is(field.getValue().toString())
-        ));
+    private static ResultActions compareFields(String objectExpression, ResultActions result, Map.Entry<String, Object> field, Map.Entry<String, Object>... fields) throws Exception {
+        result = compareField(objectExpression, result, field.getKey(), field.getValue());
         for (Map.Entry<String, Object> pair : fields) {
-            result = result.andExpect(MockMvcResultMatchers.jsonPath(
-                "$[" + index + "]." + pair.getKey(),
-                Matchers.is(pair.getValue().toString())
-            ));
+            result = compareField(objectExpression, result, pair.getKey(), pair.getValue());
         }
         return result;
+    }
+
+    private static ResultActions compareField(String objectExpression, ResultActions result, String fieldName, Object fieldValue) throws Exception {
+        return result.andExpect(MockMvcResultMatchers.jsonPath(
+            objectExpression + fieldName,
+            Matchers.is(fieldValue.toString())
+        ));
+    }
+
+    private static String objectArrayExpressionPrefix(int index) {
+        return "$[" + index + "].";
     }
 }
