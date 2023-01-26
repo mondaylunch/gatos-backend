@@ -69,7 +69,7 @@ public class FlowController {
     public void deleteFlow(@RequestHeader("x-auth-token") String token, @PathVariable UUID flowId) {
         var user = User.objects.authenticate(token);
         Flow flow = Flow.objects.get(flowId);
-        if (flow.getAuthorId() != user.getId()) {
+        if (!flow.getAuthorId().equals(user.getId())) {
             throw new RuntimeException("User does not own flow.");
         }
 
