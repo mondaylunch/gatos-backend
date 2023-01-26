@@ -58,7 +58,7 @@ public class GraphTest {
         var graph = new Graph();
         var node = graph.addNode(TEST_NODE_TYPE);
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-                graph.modifyNode(UUID.randomUUID(), n -> n.modifySetting("setting_1", 100));
+            graph.modifyNode(UUID.randomUUID(), n -> n.modifySetting("setting_1", 100));
         });
     }
 
@@ -96,7 +96,7 @@ public class GraphTest {
         Assertions.assertTrue(conn1.isPresent());
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-                graph.addConnection(conn1.get());
+            graph.addConnection(conn1.get());
         });
 
         var conn2 = NodeConnection.createConnection(node2, "out", node1, "in", DataType.INTEGER);
