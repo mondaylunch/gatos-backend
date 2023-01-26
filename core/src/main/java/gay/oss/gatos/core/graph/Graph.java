@@ -118,7 +118,7 @@ public class Graph {
      * Adds a new node connection between connectors of two existing nodes.
      * @param connection    the connection to add
      * @throws IllegalArgumentException if the node connection has a null node at either end
-     * @throws IllegalArgumentException if the node connection has a connector already involved in a connection at either end
+     * @throws IllegalArgumentException if the node connection is to a connector already involved in a connection
      */
     public void addConnection(NodeConnection<?> connection) {
         var nodeFrom = this.nodes.get(connection.from().nodeId());
@@ -129,8 +129,8 @@ public class Graph {
         if (nodeTo == null) {
             throw new IllegalArgumentException("Node connection cannot be to a nonexistent node.");
         }
-        if (this.connections.stream().anyMatch(conn -> conn.to().equals(connection.to()) || conn.from().equals(connection.from()))) {
-            throw new IllegalArgumentException("Node connection cannot be to or from connectors which are already part of a connection.");
+        if (this.connections.stream().anyMatch(conn -> conn.to().equals(connection.to()))) {
+            throw new IllegalArgumentException("Node connection cannot be to a connector which is already part of a connection.");
         }
 
         this.connections.add(connection);
