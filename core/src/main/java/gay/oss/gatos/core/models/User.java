@@ -1,5 +1,6 @@
 package gay.oss.gatos.core.models;
 
+import org.bson.codecs.pojo.annotations.BsonIgnore;
 import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
 
@@ -15,6 +16,12 @@ public class User extends BaseModel {
     private String username;
     private String email;
     private String password;
+    @BsonIgnore
+    private Argon2 argon2;
+
+    public User() {
+        this.argon2 = this.getArgon2Instance();
+    }
 
     /**
      * Get the username.
@@ -67,15 +74,23 @@ public class User extends BaseModel {
      * @param String password
      */
     public void setPassword(String password) {
-        Argon2 argon2 = this.getArgon2Instance();
-        this.password = argon2.hash(4, 65586, 2, password.toCharArray());
+        this.password = this.argon2.hash(4, 65586, 2, password.toCharArray());
     }
 
+    /**
+     * compare what is in the database with the actual password.
+     *
+     * @param String password
+     */
     public boolean comparePassword(String password) {
-        Argon2 argon2 = this.getArgon2Instance();
-        return argon2.verify(this.getPassword(), password.toCharArray());
+        return this.argon2.verify(this.getPassword(), password.toCharArray());
     }
 
+    /**
+     * get an argon2 instance.
+     *
+     * @return an Argon2 instance
+     */
     private Argon2 getArgon2Instance() {
         return Argon2Factory.create();
     }
