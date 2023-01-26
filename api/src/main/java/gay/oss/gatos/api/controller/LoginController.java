@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 // imports from other packages
-import gay.oss.gatos.core.models.User;
 import gay.oss.gatos.api.repository.LoginRepository;
 
 @RestController
