@@ -16,9 +16,13 @@ public class LoginRepository {
      */
     public User validateUser(String username, String password) throws UserNotFoundException {
         User usr = User.objects.getUser(username);
-        if (usr.comparePassword(password)) {
-            return usr;
+        if (usr == null) {
+            throw new UserNotFoundException();
+        } else {
+            if (usr.comparePassword(password)) {
+                return usr;
+            }
+            throw new UserNotFoundException();
         }
-        throw new UserNotFoundException();
     }
 }

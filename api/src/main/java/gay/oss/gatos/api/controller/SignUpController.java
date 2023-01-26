@@ -3,6 +3,7 @@ package gay.oss.gatos.api.controller;
 // rest api
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,8 +41,14 @@ public class SignUpController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public User addUser(@RequestBody User user) throws UsernameAlreadyInUseException, EmailAlreadyInUseException {
-        return this.repository.addUser(user);
+    public ResponseEntity addUser(@RequestBody User user) {
+        try {
+            return new ResponseEntity<>(this.repository.addUser(user), HttpStatus.CREATED);
+        } catch (UsernameAlreadyInUseException e) {
+            return new ResponseEntity<>("username already in use", HttpStatus.BAD_REQUEST);
+        } catch (EmailAlreadyInUseException ex) {
+            return new ResponseEntity<>("email already in use", HttpStatus.BAD_REQUEST);
+        }
     }
 
 }
