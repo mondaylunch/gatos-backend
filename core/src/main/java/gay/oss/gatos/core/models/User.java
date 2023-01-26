@@ -18,6 +18,8 @@ public class User extends BaseModel {
     private String password;
     @BsonIgnore
     private Argon2 argon2;
+    @BsonIgnore
+    private String rawPassword;
 
     public User() {
         this.argon2 = this.getArgon2Instance();
@@ -51,6 +53,15 @@ public class User extends BaseModel {
     }
 
     /**
+     * Get the raw password for authentication purposes.
+     *
+     * @return display the raw password.
+     */
+    public String getRawPassword() {
+        return this.rawPassword;
+    }
+
+    /**
      * Set the username.
      *
      * @param String username
@@ -75,15 +86,25 @@ public class User extends BaseModel {
      */
     public void setPassword(String password) {
         this.password = this.argon2.hash(4, 65586, 2, password.toCharArray());
+        this.argon2.wipeArray(password.toCharArray());
+    }
+
+    /**
+     * Set the raw password field.
+     *
+     * @param String rawPassword
+     */
+    public void setRawPassword(String rawPassword) {
+        this.rawPassword = rawPassword;
     }
 
     /**
      * compare what is in the database with the actual password.
      *
-     * @param String password
+     * @param String rawPassword
      */
-    public boolean comparePassword(String password) {
-        return this.argon2.verify(this.getPassword(), password.toCharArray());
+    public boolean comparePassword(String rawPassword) {
+        return this.argon2.verify(this.getPassword(), rawPassword.toCharArray());
     }
 
     /**
