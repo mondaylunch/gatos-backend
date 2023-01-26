@@ -142,6 +142,7 @@ public class FlowCollectionTest {
         this.assertFlowCountChange(1);
         Flow.objects.delete(flow.getId());
         this.assertFlowCountChange(0);
+        Assertions.assertNull(Flow.objects.get(flow.getId()));
     }
 
     @Test
