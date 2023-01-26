@@ -54,6 +54,24 @@ public class GraphTest {
     }
 
     @Test
+    public void modifyingNonexistentNodeThrows() {
+        var graph = new Graph();
+        var node = graph.addNode(TEST_NODE_TYPE);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+                graph.modifyNode(UUID.randomUUID(), n -> n.modifySetting("setting_1", 100));
+        });
+    }
+
+    @Test
+    public void modifyingNodeWithNullThrows() {
+        var graph = new Graph();
+        var node = graph.addNode(TEST_NODE_TYPE);
+        Assertions.assertThrows(NullPointerException.class, () -> {
+            graph.modifyNode(node.id(), n -> null);
+        });
+    }
+
+    @Test
     public void canAddConnection() {
         var graph = new Graph();
         var node1 = graph.addNode(TEST_NODE_TYPE);
@@ -69,6 +87,47 @@ public class GraphTest {
     }
 
     @Test
+    public void addingConnectionWithNonexistentNodeThrows() {
+        var graph = new Graph();
+        var node1 = Node.create(TEST_NODE_TYPE);
+        var node2 = graph.addNode(TEST_NODE_TYPE);
+
+        var conn1 = NodeConnection.createConnection(node1, "out", node2, "in", DataType.INTEGER);
+        Assertions.assertTrue(conn1.isPresent());
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+                graph.addConnection(conn1.get());
+        });
+
+        var conn2 = NodeConnection.createConnection(node2, "out", node1, "in", DataType.INTEGER);
+        Assertions.assertTrue(conn2.isPresent());
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            graph.addConnection(conn2.get());
+        });
+    }
+
+    @Test
+    public void multipleConnectionsToOneConnectorThrows() {
+        var graph = new Graph();
+        var node1 = graph.addNode(TEST_NODE_TYPE);
+        var node2 = graph.addNode(TEST_NODE_TYPE);
+        var node3 = graph.addNode(TEST_NODE_TYPE);
+
+        var conn1 = NodeConnection.createConnection(node1, "out", node3, "in", DataType.INTEGER);
+        Assertions.assertTrue(conn1.isPresent());
+
+        graph.addConnection(conn1.get());
+
+        var conn2 = NodeConnection.createConnection(node2, "out", node3, "in", DataType.INTEGER);
+        Assertions.assertTrue(conn2.isPresent());
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            graph.addConnection(conn2.get());
+        });
+    }
+
+    @Test
     public void canRemoveConnection() {
         var graph = new Graph();
         var node1 = graph.addNode(TEST_NODE_TYPE);
@@ -79,6 +138,40 @@ public class GraphTest {
 
         graph.addConnection(conn.get());
         graph.removeConnection(conn.get());
+
+        Assertions.assertFalse(graph.getConnectionsForNode(node1.id()).contains(conn.get()));
+        Assertions.assertFalse(graph.getConnectionsForNode(node2.id()).contains(conn.get()));
+    }
+
+    @Test
+    public void removingSourceNodeRemovesConnections() {
+        var graph = new Graph();
+        var node1 = graph.addNode(TEST_NODE_TYPE);
+        var node2 = graph.addNode(TEST_NODE_TYPE);
+
+        var conn = NodeConnection.createConnection(node1, "out", node2, "in", DataType.INTEGER);
+        Assertions.assertTrue(conn.isPresent());
+
+        graph.addConnection(conn.get());
+
+        graph.removeNode(node1.id());
+
+        Assertions.assertFalse(graph.getConnectionsForNode(node1.id()).contains(conn.get()));
+        Assertions.assertFalse(graph.getConnectionsForNode(node2.id()).contains(conn.get()));
+    }
+
+    @Test
+    public void removingDestinationNodeRemovesConnections() {
+        var graph = new Graph();
+        var node1 = graph.addNode(TEST_NODE_TYPE);
+        var node2 = graph.addNode(TEST_NODE_TYPE);
+
+        var conn = NodeConnection.createConnection(node1, "out", node2, "in", DataType.INTEGER);
+        Assertions.assertTrue(conn.isPresent());
+
+        graph.addConnection(conn.get());
+
+        graph.removeNode(node2.id());
 
         Assertions.assertFalse(graph.getConnectionsForNode(node1.id()).contains(conn.get()));
         Assertions.assertFalse(graph.getConnectionsForNode(node2.id()).contains(conn.get()));
@@ -100,6 +193,24 @@ public class GraphTest {
         var res = graph.modifyMetadata(node.id(), meta -> meta.withX(10f).withY(20f));
         Assertions.assertEquals(new NodeMetadata(10f, 20f), res);
         Assertions.assertEquals(new NodeMetadata(10f, 20f), graph.getOrCreateMetadataForNode(node.id()));
+    }
+
+    @Test
+    public void modifyingMetadataWithNullThrows() {
+        var graph = new Graph();
+        var node = graph.addNode(TEST_NODE_TYPE);
+        Assertions.assertThrows(NullPointerException.class, () -> {
+            graph.modifyMetadata(node.id(), n -> null);
+        });
+    }
+
+    @Test
+    public void removingNodeRemovesMetadata() {
+        var graph = new Graph();
+        var node = graph.addNode(TEST_NODE_TYPE);
+        var res = graph.modifyMetadata(node.id(), meta -> meta.withX(10f).withY(20f));
+        graph.removeNode(node.id());
+        Assertions.assertNotEquals(res, graph.getOrCreateMetadataForNode(node.id()));
     }
 
     @Test
