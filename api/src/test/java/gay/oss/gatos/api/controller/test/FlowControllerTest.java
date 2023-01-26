@@ -243,6 +243,46 @@ public class FlowControllerTest {
         assertFlowEquality(flow, newFlow);
     }
 
+    @Test
+    public void canDeleteFlow() throws Exception {
+        Flow flow = createFlow();
+        Flow.objects.insert(flow);
+        this.assertFlowCountChange(1);
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT + "/" + flow.getId())
+                .header("x-auth-token", "")
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        this.assertFlowCountChange(0);
+        Assertions.assertNull(Flow.objects.get(flow.getId()));
+    }
+
+    @Test
+    public void cannotDeleteNonExistentFlow() throws Exception {
+        Flow flow = createFlow();
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT + "/" + flow.getId())
+            .header("x-auth-token", "")
+        );
+        Assertions.assertThrows(
+            AssertionError.class,
+            () -> result.andExpect(MockMvcResultMatchers.status().isOk())
+        );
+        this.assertFlowCountChange(0);
+    }
+
+    @Test
+    public void cannotDeleteFlowWithoutToken() throws Exception {
+        Flow flow = createFlow();
+        Flow.objects.insert(flow);
+        this.assertFlowCountChange(1);
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT + "/" + flow.getId()));
+        Assertions.assertThrows(
+            AssertionError.class,
+            () -> result.andExpect(MockMvcResultMatchers.status().isOk())
+        );
+        this.assertFlowCountChange(1);
+        Assertions.assertNotNull(Flow.objects.get(flow.getId()));
+    }
+
     private void assertFlowCountChange(long change) {
         Assertions.assertEquals(this.initialFlowCount + change, getFlowCount());
     }
