@@ -86,12 +86,8 @@ public class FlowControllerTest {
             Map.entry("name", flow.getName()),
             Map.entry("authorId", flow.getAuthorId())
         );
-        String responseJson = result.andReturn().getResponse().getContentAsString();
-        UUID flowId = UUID.fromString(JsonPath.read(responseJson, "$.id"));
-        Flow newFlow = Flow.objects.get(flowId);
-        Assertions.assertNotNull(newFlow);
-        Assertions.assertEquals(flow.getName(), newFlow.getName());
-        Assertions.assertEquals(flow.getAuthorId(), newFlow.getAuthorId());
+        Flow newFlow = getFlow(result);
+        assertFlowEquality(flow, newFlow);
     }
 
     @Test
@@ -142,6 +138,111 @@ public class FlowControllerTest {
         this.assertFlowCountChange(0);
     }
 
+    @Test
+    public void cannotUpdateNoFlowFields() throws Exception {
+        Flow flow = createFlow();
+        Flow.objects.insert(flow);
+        Flow update = new Flow();
+        String flowJson = MAPPER.writeValueAsString(update);
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flow.getId())
+            .header("x-auth-token", "")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(flowJson)
+        );
+        Assertions.assertThrows(
+            AssertionError.class,
+            () -> result.andExpect(MockMvcResultMatchers.status().isOk())
+        );
+        this.assertFlowCountChange(1);
+        Flow newFlow = Flow.objects.get(flow.getId());
+        assertFlowEquality(flow, newFlow);
+    }
+
+    @Test
+    public void canUpdateFlowName() throws Exception {
+        Flow flow = createFlow();
+        Flow.objects.insert(flow);
+        Flow update = new Flow();
+        update.setName("New Name");
+        String flowJson = MAPPER.writeValueAsString(update);
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flow.getId())
+                .header("x-auth-token", "")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(flowJson)
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        this.assertFlowCountChange(1);
+        result = compareFields(OBJECT_EXPRESSION_PREFIX, result,
+            Map.entry("name", update.getName()),
+            Map.entry("authorId", flow.getAuthorId())
+        );
+        Flow newFlow = getFlow(result);
+        Assertions.assertNotNull(newFlow);
+        Assertions.assertEquals(update.getName(), newFlow.getName());
+        Assertions.assertEquals(flow.getAuthorId(), newFlow.getAuthorId());
+    }
+
+    @Test
+    public void cannotUpdateFlowAuthorId() throws Exception {
+        Flow flow = createFlow();
+        Flow.objects.insert(flow);
+        Flow update = new Flow();
+        update.setAuthorId(UUID.randomUUID());
+        String flowJson = MAPPER.writeValueAsString(update);
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flow.getId())
+            .header("x-auth-token", "")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(flowJson)
+        );
+        Assertions.assertThrows(
+            AssertionError.class,
+            () -> result.andExpect(MockMvcResultMatchers.status().isOk())
+        );
+        this.assertFlowCountChange(1);
+        Flow newFlow = Flow.objects.get(flow.getId());
+        assertFlowEquality(flow, newFlow);
+    }
+
+    @Test
+    public void cannotUpdateFlowWithoutToken() throws Exception {
+        Flow flow = createFlow();
+        Flow.objects.insert(flow);
+        Flow update = new Flow();
+        update.setName("New Name");
+        String flowJson = MAPPER.writeValueAsString(update);
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flow.getId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(flowJson)
+        );
+        Assertions.assertThrows(
+            AssertionError.class,
+            () -> result.andExpect(MockMvcResultMatchers.status().isOk())
+        );
+        this.assertFlowCountChange(1);
+        Flow newFlow = Flow.objects.get(flow.getId());
+        assertFlowEquality(flow, newFlow);
+    }
+
+    @Test
+    public void cannotUpdateFlowWithoutContentType() throws Exception {
+        Flow flow = createFlow();
+        Flow.objects.insert(flow);
+        Flow update = new Flow();
+        update.setName("New Name");
+        String flowJson = MAPPER.writeValueAsString(update);
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flow.getId())
+            .header("x-auth-token", "")
+            .content(flowJson)
+        );
+        Assertions.assertThrows(
+            AssertionError.class,
+            () -> result.andExpect(MockMvcResultMatchers.status().isOk())
+        );
+        this.assertFlowCountChange(1);
+        Flow newFlow = Flow.objects.get(flow.getId());
+        assertFlowEquality(flow, newFlow);
+    }
+
     private void assertFlowCountChange(long change) {
         Assertions.assertEquals(this.initialFlowCount + change, getFlowCount());
     }
@@ -152,6 +253,12 @@ public class FlowControllerTest {
 
     private static Flow createFlow() {
         return new Flow("Test Flow", ZERO_UUID);
+    }
+
+    private static Flow getFlow(ResultActions result) throws Exception {
+        String responseJson = result.andReturn().getResponse().getContentAsString();
+        UUID flowId = UUID.fromString(JsonPath.read(responseJson, "$.id"));
+        return Flow.objects.get(flowId);
     }
 
     private void testGetFlows(int flowCount) throws Exception {
@@ -173,6 +280,13 @@ public class FlowControllerTest {
             )
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(expectedFlowCount)));
+    }
+
+    private static void assertFlowEquality(Flow oldFlow, Flow newFlow) {
+        Assertions.assertNotNull(oldFlow);
+        Assertions.assertNotNull(newFlow);
+        Assertions.assertEquals(oldFlow.getName(), newFlow.getName());
+        Assertions.assertEquals(oldFlow.getAuthorId(), newFlow.getAuthorId());
     }
 
     private static ResultActions compareFlow(Flow flow, int index, ResultActions result) throws Exception {
