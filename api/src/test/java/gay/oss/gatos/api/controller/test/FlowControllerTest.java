@@ -102,10 +102,11 @@ public class FlowControllerTest {
 
     @Test
     public void cannotAddFlowWithInvalidBody() throws Exception {
+        String invalidJson = "invalid";
         this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT)
             .header("x-auth-token", "")
             .contentType(MediaType.APPLICATION_JSON)
-            .content("{}")
+            .content(invalidJson)
         );
         this.assertFlowCountChange(0);
     }
