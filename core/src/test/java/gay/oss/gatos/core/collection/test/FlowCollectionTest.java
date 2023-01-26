@@ -1,20 +1,23 @@
-package gay.oss.gatos.core.collection;
+package gay.oss.gatos.core.collection.test;
 
 import java.util.UUID;
 
+import com.mongodb.MongoWriteException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import com.mongodb.MongoWriteException;
 
 import gay.oss.gatos.core.models.Flow;
 
 public class FlowCollectionTest {
 
+    private long initialFlowCount;
+
     @BeforeEach
     void setUp() {
         this.reset();
+        this.initialFlowCount = getFlowCount();
     }
 
     @AfterEach
@@ -23,17 +26,16 @@ public class FlowCollectionTest {
     }
 
     private void reset() {
-        Flow.objects.getCollection().drop();
+        Flow.objects.clear();
     }
 
     @Test
     public void canInsertFlow() {
-        Flow flow = this.createFlow();
+        Flow flow = createFlow();
         String flowName = flow.getName();
         UUID authorId = flow.getAuthorId();
-        long countBefore = this.getFlowCount();
         Flow.objects.insert(flow);
-        this.assertFlowCount(countBefore + 1);
+        this.assertFlowCountChange(1);
         Flow retrievedFlow = Flow.objects.get(flow.getId());
         Assertions.assertEquals(flowName, retrievedFlow.getName());
         Assertions.assertEquals(authorId, retrievedFlow.getAuthorId());
@@ -41,14 +43,13 @@ public class FlowCollectionTest {
 
     @Test
     public void canInsertFlowWithId() {
-        Flow flow = this.createFlow();
+        Flow flow = createFlow();
         String flowName = flow.getName();
         UUID authorId = flow.getAuthorId();
         UUID id = UUID.randomUUID();
         flow.setId(id);
-        long countBefore = this.getFlowCount();
         Flow.objects.insert(flow);
-        this.assertFlowCount(countBefore + 1);
+        this.assertFlowCountChange(1);
         Flow retrievedFlow = Flow.objects.get(flow.getId());
         Assertions.assertEquals(flowName, retrievedFlow.getName());
         Assertions.assertEquals(authorId, retrievedFlow.getAuthorId());
@@ -65,9 +66,8 @@ public class FlowCollectionTest {
         String flowName = "Test Flow";
         UUID authorId = UUID.randomUUID();
         Flow flow = new Flow(flowName, authorId);
-        long countBefore = this.getFlowCount();
         Flow.objects.insert(flow);
-        this.assertFlowCount(countBefore + 1);
+        this.assertFlowCountChange(1);
         Assertions.assertThrows(MongoWriteException.class, () -> Flow.objects.insert(flow));
     }
 
@@ -75,22 +75,20 @@ public class FlowCollectionTest {
     public void canHaveDuplicateName() {
         String flowName = "Test Flow";
         Flow flow = new Flow(flowName, UUID.randomUUID());
-        long countBefore = this.getFlowCount();
         Flow.objects.insert(flow);
         Flow flow2 = new Flow(flowName, UUID.randomUUID());
         Assertions.assertDoesNotThrow(() -> Flow.objects.insert(flow2));
-        this.assertFlowCount(countBefore + 2);
+        this.assertFlowCountChange(2);
     }
 
     @Test
     public void canHaveDuplicateAuthorId() {
         UUID authorId = UUID.randomUUID();
         Flow flow = new Flow("Test Flow", authorId);
-        long countBefore = this.getFlowCount();
         Flow.objects.insert(flow);
         Flow flow2 = new Flow("Test Flow 2", authorId);
         Assertions.assertDoesNotThrow(() -> Flow.objects.insert(flow2));
-        this.assertFlowCount(countBefore + 2);
+        this.assertFlowCountChange(2);
     }
 
     @Test
@@ -109,7 +107,7 @@ public class FlowCollectionTest {
 
     @Test
     public void canUpdateFlowName() {
-        Flow flow = this.createFlow();
+        Flow flow = createFlow();
         Flow.objects.insert(flow);
         Flow flowUpdate = new Flow();
         String newName = "New Name";
@@ -120,7 +118,7 @@ public class FlowCollectionTest {
 
     @Test
     public void canUpdateFlowAuthorId() {
-        Flow flow = this.createFlow();
+        Flow flow = createFlow();
         Flow.objects.insert(flow);
         Flow flowUpdate = new Flow();
         UUID newAuthorId = UUID.randomUUID();
@@ -139,30 +137,29 @@ public class FlowCollectionTest {
 
     @Test
     public void canDeleteFlow() {
-        Flow flow = this.createFlow();
-        long countBefore = this.getFlowCount();
+        Flow flow = createFlow();
         Flow.objects.insert(flow);
-        this.assertFlowCount(countBefore + 1);
+        this.assertFlowCountChange(1);
         Flow.objects.delete(flow.getId());
-        this.assertFlowCount(countBefore);
+        this.assertFlowCountChange(0);
+        Assertions.assertNull(Flow.objects.get(flow.getId()));
     }
 
     @Test
     public void canDeleteNonExistentFlow() {
-        long countBefore = this.getFlowCount();
         Flow.objects.delete(UUID.randomUUID());
-        this.assertFlowCount(countBefore);
+        this.assertFlowCountChange(0);
     }
 
-    private long getFlowCount() {
-        return Flow.objects.getCollection().countDocuments();
+    private void assertFlowCountChange(long change) {
+        Assertions.assertEquals(this.initialFlowCount + change, getFlowCount());
     }
 
-    private void assertFlowCount(long count) {
-        Assertions.assertEquals(count, this.getFlowCount());
+    private static long getFlowCount() {
+        return Flow.objects.size();
     }
 
-    private Flow createFlow() {
+    private static Flow createFlow() {
         return new Flow("Test Flow", UUID.randomUUID());
     }
 }
