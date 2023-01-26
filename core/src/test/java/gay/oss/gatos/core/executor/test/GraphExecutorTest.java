@@ -24,7 +24,7 @@ import gay.oss.gatos.core.graph.data.DataType;
 
 public class GraphExecutorTest {
     private static final NodeType ADD_INTS = new AddIntNodeType();
-    private static final NodeType ADD_INTS_SLOWLY = new AddIntNodeType();
+    private static final NodeType ADD_INTS_SLOWLY = new SlowlyAddIntNodeType();
     private static final NodeType ADD_INTS_2INPUT = new AddIntTwoInputNodeType();
     private static final NodeType INPUT_INT = new InputIntNodeType();
 
@@ -136,6 +136,55 @@ public class GraphExecutorTest {
 
         CompletableFuture.runAsync(graphExecutor.execute()).join();
         Assertions.assertEquals(32, result.get());
+    }
+
+    @Test
+    public void complexGraphWithMultiConnectComputesCorrectly() {
+        var graph = new Graph();
+        AtomicInteger result1 = new AtomicInteger();
+        var output1 = graph.addNode(new OutputIntNodeType(result1));
+        AtomicInteger result2 = new AtomicInteger();
+        var output2 = graph.addNode(new OutputIntNodeType(result2));
+
+        var inputs = IntStream.of(2, 4, 8, 16, 2)
+            .mapToObj(i -> {
+                var input = graph.addNode(INPUT_INT);
+                return graph.modifyNode(input.id(), node -> node.modifySetting("value", i));
+            })
+            .toList();
+
+        var adder1 = graph.addNode(ADD_INTS_2INPUT);
+        var adder2 = graph.addNode(ADD_INTS_2INPUT);
+        var adder3 = graph.addNode(ADD_INTS_2INPUT);
+        var adder4 = graph.addNode(ADD_INTS_2INPUT);
+        var adder5 = graph.addNode(ADD_INTS_2INPUT);
+
+        connectInt(graph, inputs.get(1), "out", adder1, "in1");
+        connectInt(graph, inputs.get(2), "out", adder1, "in2");
+
+        connectInt(graph, inputs.get(3), "out", adder2, "in1");
+        connectInt(graph, inputs.get(4), "out", adder2, "in2");
+
+        connectInt(graph, adder1, "out", adder3, "in1");
+        connectInt(graph, adder2, "out", adder3, "in2");
+
+        connectInt(graph, adder3, "out", adder4, "in1");
+        connectInt(graph, inputs.get(0), "out", adder4, "in2");
+
+        connectInt(graph, adder4, "out", output1, "in");
+
+        connectInt(graph, adder4, "out", adder5, "in1");
+        connectInt(graph, inputs.get(3), "out", adder5, "in2");
+
+        connectInt(graph, adder5, "out", output2, "in");
+
+        var executionOrderedNodes = graph.getExecutionOrder();
+        Assertions.assertTrue(executionOrderedNodes.isPresent());
+        var graphExecutor = new GraphExecutor(executionOrderedNodes.get(), graph.getConnections());
+
+        CompletableFuture.runAsync(graphExecutor.execute()).join();
+        Assertions.assertEquals(32, result1.get());
+        Assertions.assertEquals(48, result2.get());
     }
 
     private static void connectInt(Graph graph, Node a, String connectorA, Node b, String connectorB) {
