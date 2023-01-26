@@ -88,12 +88,12 @@ public class Graph {
      */
     public void removeNode(UUID id) {
         this.nodes.remove(id);
+        this.metadataByNode.remove(id);
         @Nullable var conns = this.connectionsByNode.remove(id);
         if (conns == null) {
             return;
         }
-        conns.forEach(this.connections::remove);
-        this.metadataByNode.remove(id);
+        conns.forEach(this::removeConnection);
     }
 
     /**
