@@ -26,6 +26,7 @@ import gay.oss.gatos.core.models.Flow;
 @WebMvcTest(FlowController.class)
 public class FlowControllerTest {
 
+    private static final String ENDPOINT = "/api/v1/flows";
     private static final UUID ZERO_UUID = new UUID(0, 0);
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String OBJECT_EXPRESSION_PREFIX = "$.";
@@ -66,7 +67,7 @@ public class FlowControllerTest {
 
     @Test
     public void cannotGetFlowsWithoutToken() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/flows/list"))
+        this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/list"))
             .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
@@ -74,7 +75,7 @@ public class FlowControllerTest {
     public void canAddFlow() throws Exception {
         Flow flow = createFlow();
         String flowJson = MAPPER.writeValueAsString(flow);
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/flows")
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT)
                 .header("x-auth-token", "")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(flowJson)
@@ -94,14 +95,50 @@ public class FlowControllerTest {
     }
 
     @Test
+    public void cannotAddFlowWithoutBody() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT)
+                .header("x-auth-token", "")
+                .contentType(MediaType.APPLICATION_JSON)
+            )
+            .andExpect(MockMvcResultMatchers.status().isBadRequest());
+        this.assertFlowCountChange(0);
+    }
+
+    @Test
+    public void cannotAddFlowWithInvalidBody() throws Exception {
+        this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT)
+                .header("x-auth-token", "")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}")
+            )
+            .andExpect(MockMvcResultMatchers.status().isBadRequest());
+        this.assertFlowCountChange(0);
+    }
+
+    @Test
     public void cannotAddFlowWithoutToken() throws Exception {
         Flow flow = createFlow();
         String flowJson = MAPPER.writeValueAsString(flow);
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/flows")
+        this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(flowJson)
             )
             .andExpect(MockMvcResultMatchers.status().isBadRequest());
+        this.assertFlowCountChange(0);
+    }
+
+    @Test
+    public void cannotAddFlowWithoutContentType() throws Exception {
+        Flow flow = createFlow();
+        String flowJson = MAPPER.writeValueAsString(flow);
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT)
+            .header("x-auth-token", "")
+            .content(flowJson)
+        );
+        Assertions.assertThrows(
+            AssertionError.class,
+            () -> result.andExpect(MockMvcResultMatchers.status().isOk())
+        );
         this.assertFlowCountChange(0);
     }
 
@@ -131,7 +168,7 @@ public class FlowControllerTest {
     }
 
     private ResultActions getFlows(int expectedFlowCount) throws Exception {
-        return this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/flows/list")
+        return this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/list")
                 .header("x-auth-token", "")
             )
             .andExpect(MockMvcResultMatchers.status().isOk())
