@@ -9,18 +9,17 @@ import gay.oss.gatos.core.models.User;
 public class LoginRepository {
 
     /**
-     * Validate user.
+     * Authenticate the user.
      *
-     * @param String username
-     * @param String password
+     * @param User the user we want to authenticate
      */
-    public User validateUser(String username, String password) throws UserNotFoundException {
-        User usr = User.objects.getUser(username);
-        if (usr == null) {
+    public User authenticatUser(User user) throws UserNotFoundException {
+        User databaseUser = User.objects.getUser(user.getUsername());
+        if (databaseUser == null) {
             throw new UserNotFoundException();
         } else {
-            if (usr.comparePassword(password)) {
-                return usr;
+            if (databaseUser.comparePassword(user.getRawPassword())) {
+                return databaseUser;
             }
             throw new UserNotFoundException();
         }
