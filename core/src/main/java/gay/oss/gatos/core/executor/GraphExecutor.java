@@ -13,20 +13,24 @@ import java.util.stream.Collectors;
 import org.jetbrains.annotations.Unmodifiable;
 
 import gay.oss.gatos.core.graph.Node;
-import gay.oss.gatos.core.graph.NodeCategory;
 import gay.oss.gatos.core.graph.connector.NodeConnection;
 import gay.oss.gatos.core.graph.data.DataBox;
 
-//TODO cleanup
+/**
+ * Handles execution of a {@link gay.oss.gatos.core.graph.Graph flow graph}.
+ */
 public class GraphExecutor {
     private final @Unmodifiable List<Node> nodes;
-    private final @Unmodifiable Collection<Node> outputNodes;
     private final @Unmodifiable Collection<NodeConnection<?>> connections;
     private final @Unmodifiable Map<Node, Collection<NodeConnection<?>>> nodeDependencies;
 
+    /**
+     * Creates a new GraphExecutor.
+     * @param nodes         the nodes to execute, in execution order
+     * @param connections   a set of all connections between nodes
+     */
     public GraphExecutor(List<Node> nodes, Set<NodeConnection<?>> connections) {
         this.nodes = List.copyOf(nodes);
-        this.outputNodes = nodes.stream().filter(n -> n.type().category() == NodeCategory.OUTPUT).toList();
         this.connections = List.copyOf(connections);
         this.nodeDependencies = this.nodes.stream().collect(Collectors.toMap(
             Function.identity(),
@@ -34,18 +38,30 @@ public class GraphExecutor {
         ));
     }
 
+    /**
+     * Creates a Runnable which, when run, executes this flow graph.
+     * @return an execution Runnable.
+     */
     public Runnable execute() {
         Map<NodeConnection<?>, CompletableFuture<DataBox<?>>> results = new ConcurrentHashMap<>();
 
         return () -> {
             for (var node : this.nodes) {
-                var res = this.resultOfNode(node, results);
+                var inputs = this.collectInputsForNode(node, results);
+                var res = this.getNodeResults(node, inputs);
                 results.putAll(res);
             }
         };
     }
 
-    private Map<NodeConnection<?>, CompletableFuture<DataBox<?>>> resultOfNode(
+    /**
+     * Waits for the dependencies of a node to be completed, then returns them in a map associated by their input
+     * connector name.
+     * @param node          the node
+     * @param allResults    the map of node connection results, for retrieving input values from
+     * @return              the input values, associated by connector name
+     */
+    private Map<String, DataBox<?>> collectInputsForNode(
         Node node,
         Map<NodeConnection<?>, CompletableFuture<DataBox<?>>> allResults
     ) {
@@ -56,10 +72,36 @@ public class GraphExecutor {
             inputs.put(depInputName, resForDep.join());
         }
 
-        return node.type().compute(inputs, node.settings()).entrySet().stream().collect(Collectors.toMap(e -> this.getOutputConnectionByName(node, e.getKey()), Map.Entry::getValue));
+        return inputs;
     }
 
-    private NodeConnection<?> getOutputConnectionByName(Node node, String name) {
-        return node.getOutputWithName(name).flatMap(c -> this.connections.stream().filter(a -> a.from().equals(c)).findAny()).orElseThrow();
+    /**
+     * Creates a map of each of a node's output connections to a CompletableFuture of their output data.
+     * @param node          the node
+     * @param inputs        a map of inputs to the node
+     * @return              a map from each output connection to that connection's output
+     */
+    private Map<NodeConnection<?>, CompletableFuture<DataBox<?>>> getNodeResults(Node node, Map<String, DataBox<?>> inputs) {
+        Map<NodeConnection<?>, CompletableFuture<DataBox<?>>> resultsByConnection = new HashMap<>();
+        Map<String, CompletableFuture<DataBox<?>>> resultsByConnectorName = node.type().compute(inputs, node.settings());
+        for (var entry : resultsByConnectorName.entrySet()) {
+            for (var conn : this.getOutputConnectionsByName(node, entry.getKey())) {
+                resultsByConnection.put(conn, entry.getValue());
+            }
+        }
+
+        return resultsByConnection;
+    }
+
+    /**
+     * Creates an iterable of all connections associated with an output connector on a node.
+     * @param node  the node
+     * @param name  the name of the output connector on the node
+     * @return      an iterable of all connections from that output connector
+     */
+    private Iterable<NodeConnection<?>> getOutputConnectionsByName(Node node, String name) {
+        return node.getOutputWithName(name).stream()
+            .flatMap(c -> this.connections.stream().filter(a -> a.from().equals(c)))
+            .toList();
     }
 }
