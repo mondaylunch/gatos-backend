@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import gay.oss.gatos.api.exceptions.UserNotFoundException;
 // imports from other packages
+import gay.oss.gatos.api.exceptions.UserNotFoundException;
 import gay.oss.gatos.api.repository.LoginRepository;
 import gay.oss.gatos.core.models.User;
 
