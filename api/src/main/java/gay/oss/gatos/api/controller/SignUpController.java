@@ -45,9 +45,9 @@ public class SignUpController {
         try {
             return new ResponseEntity<>(this.repository.addUser(user), HttpStatus.CREATED);
         } catch (UsernameAlreadyInUseException e) {
-            return new ResponseEntity<>("username already in use", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(UsernameAlreadyInUseException.getErrorAsJSON(), HttpStatus.BAD_REQUEST);
         } catch (EmailAlreadyInUseException ex) {
-            return new ResponseEntity<>("email already in use", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(EmailAlreadyInUseException.getErrorAsJSON(), HttpStatus.BAD_REQUEST);
         }
     }
 
