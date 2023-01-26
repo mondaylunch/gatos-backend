@@ -3,6 +3,7 @@ package gay.oss.gatos.core.graph.test;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -84,6 +85,11 @@ public class NodeTest {
                     "setting_1", DataType.INTEGER.create(0),
                     "setting_2", DataType.BOOLEAN.create(false)
             );
+        }
+
+        @Override
+        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+            return Map.of();
         }
     }
 }

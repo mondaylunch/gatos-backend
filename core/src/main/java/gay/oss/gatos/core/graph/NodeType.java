@@ -3,6 +3,7 @@ package gay.oss.gatos.core.graph;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import gay.oss.gatos.core.graph.connector.NodeConnector;
 import gay.oss.gatos.core.graph.data.DataBox;
@@ -38,4 +39,12 @@ public interface NodeType {
      * @return the settings for a node of this type
      */
     Map<String, DataBox<?>> settings();
+
+    /**
+     * (Asynchronously) compute the outputs of this node in a map of output connector name to value.
+     * @param inputs    a map of input connector name to value
+     * @param settings  a map of node settings
+     * @return          a CompletableFuture of each output in a map by name
+     */
+    Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings);
 }
