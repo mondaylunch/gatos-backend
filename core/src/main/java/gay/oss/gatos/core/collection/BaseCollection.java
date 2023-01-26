@@ -5,8 +5,10 @@ import static com.mongodb.client.model.Filters.eq;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -145,7 +147,7 @@ public class BaseCollection<T extends BaseModel> {
             .filter(BaseCollection::hasGetter)
             .map(descriptor -> getField(descriptor, obj))
             .filter(Objects::nonNull)
-            .map(Field::toUpdate)
+            .map(BaseCollection::createUpdate)
             .toList();
     }
 
@@ -177,15 +179,16 @@ public class BaseCollection<T extends BaseModel> {
     }
 
     /**
-     * Creates a {@code Field} object by invoking the getter of a
-     * {@code PropertyDescriptor} on the passed object.
+     * Creates a representation of an object field by
+     * invoking the getter of a {@code PropertyDescriptor}
+     * on the passed object.
      *
      * @param descriptor The {@code PropertyDescriptor}.
      * @param obj        The object to invoke the getter on.
-     * @return A {@code Field} object.
+     * @return An {@code Entry} representing the object field.
      */
     @Nullable
-    private static Field getField(PropertyDescriptor descriptor, Object obj) {
+    private static Map.Entry<String, Object> getField(PropertyDescriptor descriptor, Object obj) {
         try {
             Object value = descriptor.getReadMethod().invoke(obj);
             if (value != null) {
@@ -194,7 +197,7 @@ public class BaseCollection<T extends BaseModel> {
 
                 // 🙂 reflection time! 🙂
                 // Find the field we are dealing with
-                java.lang.reflect.Field field = obj.getClass().getDeclaredField(descriptor.getName());
+                Field field = obj.getClass().getDeclaredField(descriptor.getName());
 
                 // Get BsonProperty annotations
                 BsonProperty[] properties = field.getDeclaredAnnotationsByType(BsonProperty.class);
@@ -204,7 +207,7 @@ public class BaseCollection<T extends BaseModel> {
                     name = properties[0].value();
                 }
 
-                return new Field(name, value);
+                return Map.entry(name, value);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -213,20 +216,12 @@ public class BaseCollection<T extends BaseModel> {
     }
 
     /**
-     * Represents a field of an object.
+     * Creates a MongoDB update.
      *
-     * @param name  The name of the field.
-     * @param value The value of the field.
+     * @param entry The entry to create an update from.
+     * @return The update.
      */
-    private record Field(String name, Object value) {
-
-        /**
-         * Creates a MongoDB update.
-         *
-         * @return The update.
-         */
-        private Bson toUpdate() {
-            return Updates.set(this.name, this.value);
-        }
+    private static Bson createUpdate(Map.Entry<String, Object> entry) {
+        return Updates.set(entry.getKey(), entry.getValue());
     }
 }
