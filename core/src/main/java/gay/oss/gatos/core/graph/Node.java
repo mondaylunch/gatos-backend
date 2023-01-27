@@ -123,7 +123,7 @@ public final class Node {
      * @throws IllegalArgumentException if the node does not contain a setting with the given key
      * @throws IllegalArgumentException if the setting with the given key does not hold data of the expected type
      */
-    public <T> DataBox<T> getSetting(String key, Class<T> clazz) {
+    public <T> DataBox<T> getSetting(String key, Class<T> clazz) { // TODO: should this take a DataType instead of a class?
         var setting = this.settings.get(key);
         if (setting == null) {
             throw new IllegalArgumentException("Node contains no such setting "+key);

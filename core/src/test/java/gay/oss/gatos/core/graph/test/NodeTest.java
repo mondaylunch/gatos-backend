@@ -19,21 +19,49 @@ public class NodeTest {
     private static final NodeType TEST_NODE_TYPE = new TestNodeType();
 
     @Test
-    public void inputsShouldExist() {
+    public void canGetInputs() {
+        var node = Node.create(TEST_NODE_TYPE);
+        Assertions.assertTrue(node.inputs().containsKey("in"));
+    }
+
+    @Test
+    public void canGetInputByName() {
         var node = Node.create(TEST_NODE_TYPE);
         Assertions.assertTrue(node.getInputWithName("in").isPresent());
     }
 
     @Test
-    public void outputsShouldExist() {
+    public void canGetOutputs() {
+        var node = Node.create(TEST_NODE_TYPE);
+        Assertions.assertTrue(node.outputs().containsKey("out"));
+    }
+
+    @Test
+    public void canGetOutputByName() {
         var node = Node.create(TEST_NODE_TYPE);
         Assertions.assertTrue(node.getOutputWithName("out").isPresent());
     }
 
     @Test
-    public void settingsShouldExist() {
+    public void canGetSettingByName() {
         var node = Node.create(TEST_NODE_TYPE);
         Assertions.assertEquals(0, node.getSetting("setting_1", Integer.class).value());
+    }
+
+    @Test
+    public void gettingWrongSettingThrows() {
+        var node = Node.create(TEST_NODE_TYPE);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            node.getSetting("setting_3", Integer.class);
+        });
+    }
+
+    @Test
+    public void gettingWrongTypeSettingThrows() {
+        var node = Node.create(TEST_NODE_TYPE);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            node.getSetting("setting_2", Integer.class);
+        });
     }
 
     @Test
@@ -42,6 +70,22 @@ public class NodeTest {
         var newNode = node.modifySetting("setting_1", 100);
         Assertions.assertEquals(node.id(), newNode.id());
         Assertions.assertEquals(100, newNode.getSetting("setting_1", Integer.class).value());
+    }
+
+    @Test
+    public void changingNonexistentSettingThrows() {
+        var node = Node.create(TEST_NODE_TYPE);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            node.modifySetting("setting_3", 100);
+        });
+    }
+
+    @Test
+    public void changingWrongTypeSettingThrows() {
+        var node = Node.create(TEST_NODE_TYPE);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            node.modifySetting("setting_2", 100);
+        });
     }
 
     @Test
