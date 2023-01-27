@@ -1,5 +1,6 @@
 package gay.oss.gatos.api.repository;
 
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import gay.oss.gatos.api.exceptions.UserNotFoundException;
@@ -18,7 +19,8 @@ public class LoginRepository {
         if (databaseUser == null) {
             throw new UserNotFoundException();
         } else {
-            if (databaseUser.comparePassword(user.getRawPassword())) {
+            Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
+            if (encoder.matches(user.getPassword(), databaseUser.getPassword())) {
                 return databaseUser;
             }
             throw new UserNotFoundException();

@@ -1,5 +1,6 @@
 package gay.oss.gatos.api.repository;
 
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import gay.oss.gatos.api.exceptions.EmailAlreadyInUseException;
@@ -23,6 +24,9 @@ public class SignUpRepository {
         } else if (this.emailAlreadyInUse(user.getEmail())) {
             throw new EmailAlreadyInUseException();
         } else {
+            Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
+            String hash = encoder.encode(user.getPassword());
+            user.setPassword(hash);
             User.objects.insert(user);
         }
         return user;
