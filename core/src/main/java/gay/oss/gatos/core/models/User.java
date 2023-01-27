@@ -1,9 +1,5 @@
 package gay.oss.gatos.core.models;
 
-import org.bson.codecs.pojo.annotations.BsonIgnore;
-import de.mkammerer.argon2.Argon2;
-import de.mkammerer.argon2.Argon2Factory;
-
 import gay.oss.gatos.core.collections.UserCollection;
 
 /**
@@ -16,14 +12,6 @@ public class User extends BaseModel {
     private String username;
     private String email;
     private String password;
-    @BsonIgnore
-    private Argon2 argon2;
-    @BsonIgnore
-    private String rawPassword;
-
-    public User() {
-        this.argon2 = this.getArgon2Instance();
-    }
 
     /**
      * Get the username.
@@ -53,15 +41,6 @@ public class User extends BaseModel {
     }
 
     /**
-     * Get the raw password for authentication purposes.
-     *
-     * @return display the raw password.
-     */
-    public String getRawPassword() {
-        return this.rawPassword;
-    }
-
-    /**
      * Set the username.
      *
      * @param String username
@@ -80,39 +59,11 @@ public class User extends BaseModel {
     }
 
     /**
-     * Set the password field to a hashed password using argon2.
+     * Set the password.
      *
      * @param String password
      */
     public void setPassword(String password) {
-        this.password = this.argon2.hash(4, 65586, 2, password.toCharArray());
-        this.argon2.wipeArray(password.toCharArray());
-    }
-
-    /**
-     * Set the raw password field.
-     *
-     * @param String rawPassword
-     */
-    public void setRawPassword(String rawPassword) {
-        this.rawPassword = rawPassword;
-    }
-
-    /**
-     * compare what is in the database with the actual password.
-     *
-     * @param String rawPassword
-     */
-    public boolean comparePassword(String rawPassword) {
-        return this.argon2.verify(this.getPassword(), rawPassword.toCharArray());
-    }
-
-    /**
-     * get an argon2 instance.
-     *
-     * @return an Argon2 instance
-     */
-    private Argon2 getArgon2Instance() {
-        return Argon2Factory.create();
+        this.password = password;
     }
 }
