@@ -1,5 +1,7 @@
 package gay.oss.gatos.api.controller;
 
+import java.util.HashMap;
+
 // rest api
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,13 +32,10 @@ public class SignUpController {
     }
 
     @GetMapping("/check_username/{username}")
-    public Boolean usernameAlreadyInUse(@PathVariable String username) {
-        return this.repository.usernameAlreadyInUse(username);
-    }
-
-    @GetMapping("/check_email/{email}")
-    public Boolean emailAlreadyInUse(@PathVariable String email) {
-        return this.repository.emailAlreadyInUse(email);
+    public ResponseEntity usernameAlreadyInUse(@PathVariable String username) {
+        HashMap<String, Boolean> response = new HashMap<>();
+        response.put("in_use", this.repository.usernameAlreadyInUse(username));
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
