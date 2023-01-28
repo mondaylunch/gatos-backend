@@ -28,6 +28,16 @@ public class UserCollection extends BaseCollection<User> {
     }
 
     /**
+     * Gets a document.
+     *
+     * @param email The email of the user.
+     * @return The POJO.
+     */
+    public User getUserUsingEmail(String email) {
+        return getCollection().find(usernameFilter(email)).first();
+    }
+
+    /**
      * checks if the username is already in use.
      *
      * @param username The potential username of the user.
@@ -62,6 +72,13 @@ public class UserCollection extends BaseCollection<User> {
      */
     private static Bson usernameFilter(String username) {
         return eq("username", username);
+    }
+
+    /**
+     * deletes all documents.
+     */
+    public void clear() {
+        this.getCollection().drop();
     }
 
     /**
