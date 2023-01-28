@@ -34,7 +34,7 @@ public class UserCollection extends BaseCollection<User> {
      * @return The POJO.
      */
     public User getUserUsingEmail(String email) {
-        return getCollection().find(usernameFilter(email)).first();
+        return getCollection().find(emailFilter(email)).first();
     }
 
     /**
@@ -53,8 +53,8 @@ public class UserCollection extends BaseCollection<User> {
      * @param email The potential email of the user.
      * @return true if the email is already in use
      */
-    public Boolean emailAlreadyInUse(String username) {
-        return getCollection().find(emailFilter(username)).first() != null;
+    public Boolean emailAlreadyInUse(String email) {
+        return getCollection().find(emailFilter(email)).first() != null;
     }
 
     public User authenticate(String token) throws RuntimeException {
