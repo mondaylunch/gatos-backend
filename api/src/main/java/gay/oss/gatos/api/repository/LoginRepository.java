@@ -15,7 +15,7 @@ public class LoginRepository {
      * @param User the user we want to authenticate
      */
     public User authenticatUser(User user) throws UserNotFoundException {
-        User databaseUser = User.objects.getUser(user.getUsername());
+        User databaseUser = User.objects.getUserUsingEmail(user.getEmail());
         if (databaseUser == null) {
             throw new UserNotFoundException();
         } else {
