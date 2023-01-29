@@ -21,7 +21,7 @@ import gay.oss.gatos.api.exceptions.UsernameAlreadyInUseException;
 import gay.oss.gatos.api.repository.SignUpRepository;
 
 @RestController
-@RequestMapping("/api/sign_up")
+@RequestMapping("api/v1/sign_up")
 public class SignUpController {
 
     private final SignUpRepository repository;
