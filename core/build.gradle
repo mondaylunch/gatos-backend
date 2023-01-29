@@ -9,6 +9,10 @@ dependencies {
 	// database driver
 	implementation 'org.mongodb:mongodb-driver-sync:4.8.2'
 
+	// argon2 for hashing passwords
+	implementation group: 'org.springframework.security', name: 'spring-security-core', version: '6.0.1'
+	implementation group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.70'
+
 	// load environment variables from files
 	implementation 'io.github.cdimascio:dotenv-java:2.3.2'
 
