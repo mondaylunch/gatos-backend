@@ -75,13 +75,6 @@ public class UserCollection extends BaseCollection<User> {
     }
 
     /**
-     * deletes all documents.
-     */
-    public void clear() {
-        this.getCollection().drop();
-    }
-
-    /**
      * Creates an email filter.
      *
      * @param String The email to filter by.
