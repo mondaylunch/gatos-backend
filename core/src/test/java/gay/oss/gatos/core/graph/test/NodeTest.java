@@ -3,11 +3,13 @@ package gay.oss.gatos.core.graph.test;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import gay.oss.gatos.core.graph.Node;
+import gay.oss.gatos.core.graph.NodeCategory;
 import gay.oss.gatos.core.graph.NodeType;
 import gay.oss.gatos.core.graph.connector.NodeConnector;
 import gay.oss.gatos.core.graph.data.DataBox;
@@ -17,21 +19,49 @@ public class NodeTest {
     private static final NodeType TEST_NODE_TYPE = new TestNodeType();
 
     @Test
-    public void inputsShouldExist() {
+    public void canGetInputs() {
+        var node = Node.create(TEST_NODE_TYPE);
+        Assertions.assertTrue(node.inputs().containsKey("in"));
+    }
+
+    @Test
+    public void canGetInputByName() {
         var node = Node.create(TEST_NODE_TYPE);
         Assertions.assertTrue(node.getInputWithName("in").isPresent());
     }
 
     @Test
-    public void outputsShouldExist() {
+    public void canGetOutputs() {
+        var node = Node.create(TEST_NODE_TYPE);
+        Assertions.assertTrue(node.outputs().containsKey("out"));
+    }
+
+    @Test
+    public void canGetOutputByName() {
         var node = Node.create(TEST_NODE_TYPE);
         Assertions.assertTrue(node.getOutputWithName("out").isPresent());
     }
 
     @Test
-    public void settingsShouldExist() {
+    public void canGetSettingByName() {
         var node = Node.create(TEST_NODE_TYPE);
         Assertions.assertEquals(0, node.getSetting("setting_1", Integer.class).value());
+    }
+
+    @Test
+    public void gettingWrongSettingThrows() {
+        var node = Node.create(TEST_NODE_TYPE);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            node.getSetting("setting_3", Integer.class);
+        });
+    }
+
+    @Test
+    public void gettingWrongTypeSettingThrows() {
+        var node = Node.create(TEST_NODE_TYPE);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            node.getSetting("setting_2", Integer.class);
+        });
     }
 
     @Test
@@ -43,6 +73,22 @@ public class NodeTest {
     }
 
     @Test
+    public void changingNonexistentSettingThrows() {
+        var node = Node.create(TEST_NODE_TYPE);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            node.modifySetting("setting_3", 100);
+        });
+    }
+
+    @Test
+    public void changingWrongTypeSettingThrows() {
+        var node = Node.create(TEST_NODE_TYPE);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            node.modifySetting("setting_2", 100);
+        });
+    }
+
+    @Test
     public void connectorsChangeBasedOnSettings() {
         var node = Node.create(TEST_NODE_TYPE);
         var newNode = node.modifySetting("setting_2", true);
@@ -51,14 +97,10 @@ public class NodeTest {
     }
 
     private static final class TestNodeType implements NodeType {
-        @Override
-        public boolean hasInputs() {
-            return true;
-        }
 
         @Override
-        public boolean hasOutputs() {
-            return true;
+        public NodeCategory category() {
+            return NodeCategory.PROCESS;
         }
 
         @Override
@@ -87,6 +129,11 @@ public class NodeTest {
                     "setting_1", DataType.INTEGER.create(0),
                     "setting_2", DataType.BOOLEAN.create(false)
             );
+        }
+
+        @Override
+        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+            return Map.of();
         }
     }
 }

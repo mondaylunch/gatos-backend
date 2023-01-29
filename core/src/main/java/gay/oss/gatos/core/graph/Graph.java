@@ -1,8 +1,13 @@
 package gay.oss.gatos.core.graph;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.UnaryOperator;
@@ -83,12 +88,12 @@ public class Graph {
      */
     public void removeNode(UUID id) {
         this.nodes.remove(id);
+        this.metadataByNode.remove(id);
         @Nullable var conns = this.connectionsByNode.remove(id);
         if (conns == null) {
             return;
         }
-        conns.forEach(this.connections::remove);
-        this.metadataByNode.remove(id);
+        conns.forEach(this::removeConnection);
     }
 
     /**
@@ -113,7 +118,7 @@ public class Graph {
      * Adds a new node connection between connectors of two existing nodes.
      * @param connection    the connection to add
      * @throws IllegalArgumentException if the node connection has a null node at either end
-     * @throws IllegalArgumentException if the node connection has a connector already involved in a connection at either end
+     * @throws IllegalArgumentException if the node connection is to a connector already involved in a connection
      */
     public void addConnection(NodeConnection<?> connection) {
         var nodeFrom = this.nodes.get(connection.from().nodeId());
@@ -124,8 +129,8 @@ public class Graph {
         if (nodeTo == null) {
             throw new IllegalArgumentException("Node connection cannot be to a nonexistent node.");
         }
-        if (this.connections.stream().anyMatch(conn -> conn.to().equals(connection.to()) || conn.from().equals(connection.from()))) {
-            throw new IllegalArgumentException("Node connection cannot be to or from connectors which are already part of a connection.");
+        if (this.connections.stream().anyMatch(conn -> conn.to().equals(connection.to()))) {
+            throw new IllegalArgumentException("Node connection cannot be to a connector which is already part of a connection.");
         }
 
         this.connections.add(connection);
@@ -141,6 +146,14 @@ public class Graph {
         this.connections.remove(connection);
         this.getOrCreateConnectionsForNode(connection.from().nodeId()).remove(connection);
         this.getOrCreateConnectionsForNode(connection.to().nodeId()).remove(connection);
+    }
+
+    /**
+     * Returns a copy of the set of all connections in this graph.
+     * @return the connections in this graph
+     */
+    public Set<NodeConnection<?>> getConnections() {
+        return new HashSet<>(this.connections);
     }
 
     /**
@@ -187,6 +200,71 @@ public class Graph {
 
         this.metadataByNode.put(nodeId, result);
         return result;
+    }
+
+    /**
+     * Determines whether this graph is <i>valid</i>.
+     * A graph is valid if there is a path from a {@link NodeCategory#PUSHED_INPUT input} node to
+     * an {@link NodeCategory#OUTPUT output} node, and there are no cycles.
+     *
+     * @return whether this graph is valid
+     */
+    public boolean validate() {
+        return this.getExecutionOrder().isPresent();
+    }
+
+    /**
+     * Performs a topological sort on this graph. Ignores nodes with no connections. If the graph is not
+     * {@link #validate() valid}, this will return an empty Optional.
+     * @return  a topological sort of this graph
+     */
+    public Optional<List<Node>> getExecutionOrder() {
+        Set<UUID> relevantNodes = new HashSet<>(this.nodes.keySet());
+        relevantNodes.removeIf(n -> this.getConnectionsForNode(n).isEmpty());
+
+        boolean hasSeenInput = false;
+        boolean hasSeenOutput = false;
+
+        Set<NodeConnection<?>> visitedConnections = new HashSet<>();
+
+        Deque<UUID> nodesWithoutIncoming = new ArrayDeque<>();
+        for (var uuid : relevantNodes) {
+            if (this.getConnectionsForNode(uuid).stream().noneMatch(c -> c.to().nodeId() == uuid)) {
+                nodesWithoutIncoming.add(uuid);
+            }
+        }
+
+        List<Node> res = new ArrayList<>();
+
+        while (!nodesWithoutIncoming.isEmpty()) {
+            UUID nodeId = nodesWithoutIncoming.pop();
+            var node = this.nodes.get(nodeId);
+            res.add(node);
+
+            if (!hasSeenInput && node.type().category() == NodeCategory.PUSHED_INPUT) {
+                hasSeenInput = true;
+            }
+
+            if (!hasSeenOutput && node.type().category() == NodeCategory.OUTPUT) {
+                hasSeenOutput = true;
+            }
+
+            for (NodeConnection<?> conn : this.getConnectionsForNode(nodeId)) {
+                if (!visitedConnections.contains(conn) && conn.from().nodeId().equals(nodeId)) {
+                    visitedConnections.add(conn);
+                    UUID to = conn.to().nodeId();
+                    if (this.getConnectionsForNode(to).stream().noneMatch(c -> !visitedConnections.contains(c) && c.to().nodeId() == to)) {
+                        nodesWithoutIncoming.add(to);
+                    }
+                }
+            }
+        }
+
+        if (!hasSeenInput || !hasSeenOutput || !visitedConnections.containsAll(this.connections)) {
+            return Optional.empty();
+        }
+
+        return Optional.of(res);
     }
 
     /**

@@ -3,6 +3,7 @@ package gay.oss.gatos.core.graph;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import gay.oss.gatos.core.graph.connector.NodeConnector;
 import gay.oss.gatos.core.graph.data.DataBox;
@@ -12,16 +13,10 @@ import gay.oss.gatos.core.graph.data.DataBox;
  */
 public interface NodeType {
     /**
-     * Whether nodes of this type can have inputs from other nodes. If not, then this is an <i>input node</i> type.
-     * @return whether nodes of this type can have inputs.
+     * Returns the category this node type belongs to.
+     * @return the category this node type belongs to
      */
-    boolean hasInputs();
-
-    /**
-     * Whether nodes of this type can have outputs to other nodes. If not, then this is a <i>terminal node</i> type.
-     * @return whether nodes of this type can have outputs.
-     */
-    boolean hasOutputs();
+    NodeCategory category();
 
     /**
      * The input connectors of a node with a given UUID & settings state.
@@ -44,4 +39,12 @@ public interface NodeType {
      * @return the settings for a node of this type
      */
     Map<String, DataBox<?>> settings();
+
+    /**
+     * (Asynchronously) compute the outputs of this node in a map of output connector name to value.
+     * @param inputs    a map of input connector name to value
+     * @param settings  a map of node settings
+     * @return          a CompletableFuture of each output in a map by name
+     */
+    Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings);
 }

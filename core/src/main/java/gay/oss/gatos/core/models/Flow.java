@@ -4,14 +4,22 @@ import java.util.UUID;
 
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
-import gay.oss.gatos.core.collections.FlowCollection;
+import gay.oss.gatos.core.collection.FlowCollection;
 
 /**
  * POJO for flows.
  */
 public class Flow extends BaseModel {
 
-    public static FlowCollection objects = new FlowCollection();
+    public static final FlowCollection objects = new FlowCollection();
+
+    public Flow(String name, UUID authorId) {
+        this.name = name;
+        this.authorId = authorId;
+    }
+
+    public Flow() {
+    }
 
     /**
      * Display name.
