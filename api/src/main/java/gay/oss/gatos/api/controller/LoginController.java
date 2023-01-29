@@ -15,7 +15,7 @@ import gay.oss.gatos.api.repository.LoginRepository;
 import gay.oss.gatos.core.models.User;
 
 @RestController
-@RequestMapping("/api/login")
+@RequestMapping("api/v1/login")
 public class LoginController {
 
     private final LoginRepository repository;
@@ -26,9 +26,9 @@ public class LoginController {
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity authenticatUser(@RequestBody User user) {
+    public ResponseEntity authenticateUser(@RequestBody User user) {
         try {
-            return new ResponseEntity<>(this.repository.authenticatUser(user), HttpStatus.OK);
+            return new ResponseEntity<>(this.repository.authenticateUser(user), HttpStatus.OK);
         } catch (UserNotFoundException e) {
             return new ResponseEntity<>(UserNotFoundException.getErrorAsJSON(), HttpStatus.NOT_FOUND);
         }
