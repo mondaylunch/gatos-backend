@@ -1,4 +1,5 @@
 package gay.oss.gatos.api.signup.test;
+import gay.oss.gatos.api.controller.SignUpController;
 import gay.oss.gatos.api.exceptions.EmailAlreadyInUseException;
 import gay.oss.gatos.api.exceptions.UsernameAlreadyInUseException;
 import gay.oss.gatos.api.repository.SignUpRepository;
@@ -6,6 +7,8 @@ import gay.oss.gatos.core.models.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
 
 public class SignUpRepositoryTest {
     private SignUpRepository signUpRepo = new SignUpRepository();
@@ -31,6 +34,10 @@ public class SignUpRepositoryTest {
         return user;
     }
 
+    private UserAddedOutcomes addDefaultUser() {
+        return attemptAddUser(createSimpleUser(DEFAULT_USERNAME, DEFAULT_EMAIL));
+    }
+
     @BeforeEach
     public void setUp() {
         this.signUpRepo = new SignUpRepository();
@@ -40,10 +47,6 @@ public class SignUpRepositoryTest {
     @AfterEach
     public void resetRepo() {
         this.setUp();
-    }
-
-    private UserAddedOutcomes addDefaultUser() {
-        return attemptAddUser(createSimpleUser(DEFAULT_USERNAME, DEFAULT_EMAIL));
     }
 
     @Test
@@ -61,6 +64,24 @@ public class SignUpRepositoryTest {
     public void cannotSignUpWithUsedEmail() {
         addDefaultUser();
         assert attemptAddUser(createSimpleUser("FakePerson", DEFAULT_EMAIL)) == UserAddedOutcomes.EMAIL_IN_USE;
+    }
+
+    // test for the sign-up controller
+    @Test
+    public void checkUsernameNotInUse() {
+        var key = "in_use";
+        var controller = new SignUpController(this.signUpRepo);
+        var responseBody = controller.usernameAlreadyInUse(DEFAULT_USERNAME).getBody();
+        assert responseBody instanceof HashMap<?, ?> bodyMap && bodyMap.get(key) instanceof Boolean bool && !bool;
+    }
+
+    @Test
+    public void checkUsernameInUse() {
+        var key = "in_use";
+        var controller = new SignUpController(this.signUpRepo);
+        addDefaultUser();
+        var responseBody = controller.usernameAlreadyInUse(DEFAULT_USERNAME).getBody();
+        assert responseBody instanceof HashMap<?, ?> bodyMap && bodyMap.get(key) instanceof Boolean bool && bool;
     }
 
     private enum UserAddedOutcomes {
