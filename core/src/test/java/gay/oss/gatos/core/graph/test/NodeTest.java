@@ -44,14 +44,14 @@ public class NodeTest {
     @Test
     public void canGetSettingByName() {
         var node = Node.create(TEST_NODE_TYPE);
-        Assertions.assertEquals(0, node.getSetting("setting_1", Integer.class).value());
+        Assertions.assertEquals(0, node.getSetting("setting_1", DataType.INTEGER).value());
     }
 
     @Test
     public void gettingWrongSettingThrows() {
         var node = Node.create(TEST_NODE_TYPE);
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            node.getSetting("setting_3", Integer.class);
+            node.getSetting("setting_3", DataType.INTEGER);
         });
     }
 
@@ -59,23 +59,23 @@ public class NodeTest {
     public void gettingWrongTypeSettingThrows() {
         var node = Node.create(TEST_NODE_TYPE);
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            node.getSetting("setting_2", Integer.class);
+            node.getSetting("setting_2", DataType.INTEGER);
         });
     }
 
     @Test
     public void canMakeNewNodeWithChangedSettings() {
         var node = Node.create(TEST_NODE_TYPE);
-        var newNode = node.modifySetting("setting_1", 100);
+        var newNode = node.modifySetting("setting_1", DataType.INTEGER.create(100));
         Assertions.assertEquals(node.id(), newNode.id());
-        Assertions.assertEquals(100, newNode.getSetting("setting_1", Integer.class).value());
+        Assertions.assertEquals(100, newNode.getSetting("setting_1", DataType.INTEGER).value());
     }
 
     @Test
     public void changingNonexistentSettingThrows() {
         var node = Node.create(TEST_NODE_TYPE);
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            node.modifySetting("setting_3", 100);
+            node.modifySetting("setting_3", DataType.INTEGER.create(100));
         });
     }
 
@@ -83,14 +83,14 @@ public class NodeTest {
     public void changingWrongTypeSettingThrows() {
         var node = Node.create(TEST_NODE_TYPE);
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            node.modifySetting("setting_2", 100);
+            node.modifySetting("setting_2", DataType.INTEGER.create(100));
         });
     }
 
     @Test
     public void connectorsChangeBasedOnSettings() {
         var node = Node.create(TEST_NODE_TYPE);
-        var newNode = node.modifySetting("setting_2", true);
+        var newNode = node.modifySetting("setting_2", DataType.BOOLEAN.create(true));
         Assertions.assertFalse(node.getOutputWithName("out_2").isPresent());
         Assertions.assertTrue(newNode.getOutputWithName("out_2").isPresent());
     }
