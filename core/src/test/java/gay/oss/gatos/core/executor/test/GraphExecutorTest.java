@@ -14,12 +14,11 @@ import org.junit.jupiter.api.Test;
 import gay.oss.gatos.core.executor.GraphExecutor;
 import gay.oss.gatos.core.graph.Graph;
 import gay.oss.gatos.core.graph.Node;
-import gay.oss.gatos.core.graph.NodeCategory;
-import gay.oss.gatos.core.graph.NodeType;
 import gay.oss.gatos.core.graph.connector.NodeConnection;
 import gay.oss.gatos.core.graph.connector.NodeConnector;
 import gay.oss.gatos.core.graph.data.DataBox;
 import gay.oss.gatos.core.graph.data.DataType;
+import gay.oss.gatos.core.graph.type.NodeType;
 
 public class GraphExecutorTest {
     private static final NodeType ADD_INTS = new AddIntNodeType();
@@ -196,12 +195,7 @@ public class GraphExecutorTest {
         graph.addConnection(conn.get());
     }
 
-    private static final class AddIntNodeType implements NodeType {
-        @Override
-        public NodeCategory category() {
-            return NodeCategory.PROCESS;
-        }
-
+    private static final class AddIntNodeType extends NodeType.Process {
         @Override
         public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
             return Set.of(
@@ -234,12 +228,7 @@ public class GraphExecutorTest {
         }
     }
 
-    private static final class AddIntTwoInputNodeType implements NodeType {
-        @Override
-        public NodeCategory category() {
-            return NodeCategory.PROCESS;
-        }
-
+    private static final class AddIntTwoInputNodeType extends NodeType.Process {
         @Override
         public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
             return Set.of(
@@ -271,12 +260,7 @@ public class GraphExecutorTest {
         }
     }
 
-    private static final class SlowlyAddIntNodeType implements NodeType {
-        @Override
-        public NodeCategory category() {
-            return NodeCategory.PROCESS;
-        }
-
+    private static final class SlowlyAddIntNodeType extends NodeType.Process {
         @Override
         public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
             return Set.of(
@@ -320,17 +304,7 @@ public class GraphExecutorTest {
         }
     }
 
-    private static final class InputIntNodeType implements NodeType {
-        @Override
-        public NodeCategory category() {
-            return NodeCategory.PUSHED_INPUT;
-        }
-
-        @Override
-        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
-            return Set.of();
-        }
-
+    private static final class InputIntNodeType extends NodeType.Start {
         @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
             return Set.of(
@@ -353,17 +327,12 @@ public class GraphExecutorTest {
         }
     }
 
-    private static final class OutputIntNodeType implements NodeType {
+    private static final class OutputIntNodeType extends NodeType.End {
         public final AtomicInteger result;
 
         // obviously outside of tests we would not be instantiating node types multiple times...
         private OutputIntNodeType(AtomicInteger result) {
             this.result = result;
-        }
-
-        @Override
-        public NodeCategory category() {
-            return NodeCategory.OUTPUT;
         }
 
         @Override
@@ -374,19 +343,14 @@ public class GraphExecutorTest {
         }
 
         @Override
-        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
-            return Set.of();
-        }
-
-        @Override
         public Map<String, DataBox<?>> settings() {
             return Map.of();
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+        public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
             this.result.set(DataBox.get(inputs, "in", DataType.INTEGER).orElseThrow());
-            return Map.of();
+            return CompletableFuture.runAsync(() -> {});
         }
     }
 }

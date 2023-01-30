@@ -15,12 +15,15 @@ import org.jetbrains.annotations.Unmodifiable;
 import gay.oss.gatos.core.graph.Node;
 import gay.oss.gatos.core.graph.connector.NodeConnection;
 import gay.oss.gatos.core.graph.data.DataBox;
+import gay.oss.gatos.core.graph.type.NodeCategory;
+import gay.oss.gatos.core.graph.type.NodeType;
 
 /**
  * Handles execution of a {@link gay.oss.gatos.core.graph.Graph flow graph}.
  */
 public class GraphExecutor {
-    private final @Unmodifiable List<Node> nodes;
+    private final @Unmodifiable List<Node> nonEndNodes;
+    private final @Unmodifiable Collection<Node> endNodes;
     private final @Unmodifiable Collection<NodeConnection<?>> connections;
     private final @Unmodifiable Map<Node, Collection<NodeConnection<?>>> nodeDependencies;
 
@@ -30,12 +33,13 @@ public class GraphExecutor {
      * @param connections   a set of all connections between nodes
      */
     public GraphExecutor(List<Node> nodes, Set<NodeConnection<?>> connections) {
-        this.nodes = List.copyOf(nodes);
         this.connections = List.copyOf(connections);
-        this.nodeDependencies = this.nodes.stream().collect(Collectors.toMap(
+        this.nodeDependencies = nodes.stream().collect(Collectors.toMap(
             Function.identity(),
             n -> n.inputs().values().stream().flatMap(connector -> this.connections.stream().filter(connection -> connection.to().equals(connector))).toList()
         ));
+        this.nonEndNodes = nodes.stream().filter(n -> n.type() instanceof NodeType.WithOutputs).toList();
+        this.endNodes = nodes.stream().filter(n -> n.type().category() == NodeCategory.END).toList();
     }
 
     /**
@@ -46,11 +50,15 @@ public class GraphExecutor {
         Map<NodeConnection<?>, CompletableFuture<DataBox<?>>> results = new ConcurrentHashMap<>();
 
         return () -> {
-            for (var node : this.nodes) {
+            for (var node : this.nonEndNodes) {
                 var inputs = this.collectInputsForNode(node, results);
                 var res = this.getNodeResults(node, inputs);
                 results.putAll(res);
             }
+            CompletableFuture.allOf(this.endNodes.stream().map(node -> {
+                var inputs = this.collectInputsForNode(node, results);
+                return ((NodeType.End) node.type()).compute(inputs, node.settings());
+            }).toArray(CompletableFuture[]::new)).join();
         };
     }
 
@@ -83,7 +91,9 @@ public class GraphExecutor {
      */
     private Map<NodeConnection<?>, CompletableFuture<DataBox<?>>> getNodeResults(Node node, Map<String, DataBox<?>> inputs) {
         Map<NodeConnection<?>, CompletableFuture<DataBox<?>>> resultsByConnection = new HashMap<>();
-        Map<String, CompletableFuture<DataBox<?>>> resultsByConnectorName = node.type().compute(inputs, node.settings());
+        Map<String, CompletableFuture<DataBox<?>>> resultsByConnectorName = node.type() instanceof NodeType.WithOutputs outputs
+            ? outputs.compute(inputs, node.settings())
+            : Map.of();
         for (var entry : resultsByConnectorName.entrySet()) {
             for (var conn : this.getOutputConnectionsByName(node, entry.getKey())) {
                 resultsByConnection.put(conn, entry.getValue());

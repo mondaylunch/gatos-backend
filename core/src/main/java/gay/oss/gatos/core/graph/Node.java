@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import gay.oss.gatos.core.graph.connector.NodeConnector;
 import gay.oss.gatos.core.graph.data.DataBox;
+import gay.oss.gatos.core.graph.type.NodeType;
 
 /**
  * Represents a node in a flow graph.
@@ -52,8 +53,8 @@ public final class Node {
                 id,
                 type,
                 defaultSettings,
-                type.inputs(id, defaultSettings),
-                type.outputs(id, defaultSettings)
+                NodeType.inputsOrEmpty(type, id, defaultSettings),
+                NodeType.outputsOrEmpty(type, id, defaultSettings)
         );
     }
 
@@ -84,8 +85,8 @@ public final class Node {
                 this.id,
                 this.type,
                 newSettings,
-                this.type.inputs(this.id, newSettings),
-                this.type.outputs(this.id, newSettings)
+                NodeType.inputsOrEmpty(this.type, this.id, newSettings),
+                NodeType.outputsOrEmpty(this.type, this.id, newSettings)
         );
     }
 

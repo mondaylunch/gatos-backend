@@ -15,6 +15,8 @@ import java.util.function.UnaryOperator;
 import org.jetbrains.annotations.Nullable;
 
 import gay.oss.gatos.core.graph.connector.NodeConnection;
+import gay.oss.gatos.core.graph.type.NodeCategory;
+import gay.oss.gatos.core.graph.type.NodeType;
 
 /**
  * A flow graph.
@@ -204,8 +206,8 @@ public class Graph {
 
     /**
      * Determines whether this graph is <i>valid</i>.
-     * A graph is valid if there is a path from a {@link NodeCategory#PUSHED_INPUT input} node to
-     * an {@link NodeCategory#OUTPUT output} node, and there are no cycles.
+     * A graph is valid if there is a path from a {@link NodeCategory#START input} node to
+     * an {@link NodeCategory#END output} node, and there are no cycles.
      *
      * @return whether this graph is valid
      */
@@ -241,11 +243,11 @@ public class Graph {
             var node = this.nodes.get(nodeId);
             res.add(node);
 
-            if (!hasSeenInput && node.type().category() == NodeCategory.PUSHED_INPUT) {
+            if (!hasSeenInput && node.type().category() == NodeCategory.START) {
                 hasSeenInput = true;
             }
 
-            if (!hasSeenOutput && node.type().category() == NodeCategory.OUTPUT) {
+            if (!hasSeenOutput && node.type().category() == NodeCategory.END) {
                 hasSeenOutput = true;
             }
 
