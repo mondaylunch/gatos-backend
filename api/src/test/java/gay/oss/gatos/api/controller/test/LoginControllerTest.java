@@ -11,7 +11,7 @@ import gay.oss.gatos.api.controller.LoginController;
 import gay.oss.gatos.api.repository.LoginRepository;
 import gay.oss.gatos.core.models.User;
 
-public class LoginTest implements UserCreationHelper {
+public class LoginControllerTest implements UserCreationHelper {
     private LoginRepository loginRepo = new LoginRepository();
     private LoginController controller = new LoginController(this.loginRepo);
 

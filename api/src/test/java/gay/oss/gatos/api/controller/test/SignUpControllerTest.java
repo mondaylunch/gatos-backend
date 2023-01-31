@@ -13,7 +13,7 @@ import gay.oss.gatos.api.exceptions.UsernameAlreadyInUseException;
 import gay.oss.gatos.api.repository.SignUpRepository;
 import gay.oss.gatos.core.models.User;
 
-public class SignUpTest implements UserCreationHelper {
+public class SignUpControllerTest implements UserCreationHelper {
     private SignUpRepository signUpRepo = new SignUpRepository();
     private SignUpController controller = new SignUpController(this.signUpRepo);
     private static final String KEY = "in_use";
