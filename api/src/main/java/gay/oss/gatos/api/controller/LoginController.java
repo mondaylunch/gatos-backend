@@ -1,5 +1,9 @@
 package gay.oss.gatos.api.controller;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.Length;
 // rest api
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 // imports from other packages
 import gay.oss.gatos.api.exceptions.UserNotFoundException;
 import gay.oss.gatos.api.repository.LoginRepository;
-import gay.oss.gatos.core.models.User;
 
 @RestController
 @RequestMapping("api/v1/login")
@@ -25,10 +28,15 @@ public class LoginController {
         this.repository = repository;
     }
 
+    private record BodyAuthenticate(
+        @NotNull @Email String email,
+        @NotNull @Length(min = 8) String password) {
+    }
+
     @PostMapping("/authenticate")
-    public ResponseEntity authenticateUser(@RequestBody User user) {
+    public ResponseEntity authenticateUser(@RequestBody BodyAuthenticate data) {
         try {
-            return new ResponseEntity<>(this.repository.authenticateUser(user), HttpStatus.OK);
+            return new ResponseEntity<>(this.repository.authenticateUser(data.email, data.password), HttpStatus.OK);
         } catch (UserNotFoundException e) {
             return new ResponseEntity<>(UserNotFoundException.getErrorAsJSON(), HttpStatus.NOT_FOUND);
         }
