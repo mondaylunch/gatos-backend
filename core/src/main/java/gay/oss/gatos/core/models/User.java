@@ -73,7 +73,6 @@ public class User extends BaseModel {
 
     /**
      * Check whether a given plaintext password is correct for the stored hash.
-     * 
      * @param plaintextPassword Plaintext password
      * @return Whether it is valid
      */

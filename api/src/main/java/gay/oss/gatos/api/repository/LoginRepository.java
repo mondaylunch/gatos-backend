@@ -11,7 +11,7 @@ public class LoginRepository {
     /**
      * Authenticate and fetch user by email and password.
      *
-     * @param email user's email
+     * @param email    user's email
      * @param password given password
      */
     public User authenticateUser(String email, String password) throws UserNotFoundException {
@@ -22,7 +22,6 @@ public class LoginRepository {
             if (user.validatePassword(password)) {
                 return user;
             }
-            
             throw new UserNotFoundException();
         }
     }
