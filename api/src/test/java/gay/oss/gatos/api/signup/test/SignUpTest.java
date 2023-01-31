@@ -1,7 +1,10 @@
 package gay.oss.gatos.api.signup.test;
+import gay.oss.gatos.api.UserCreationHelper;
+import gay.oss.gatos.api.controller.LoginController;
 import gay.oss.gatos.api.controller.SignUpController;
 import gay.oss.gatos.api.exceptions.EmailAlreadyInUseException;
 import gay.oss.gatos.api.exceptions.UsernameAlreadyInUseException;
+import gay.oss.gatos.api.repository.LoginRepository;
 import gay.oss.gatos.api.repository.SignUpRepository;
 import gay.oss.gatos.core.models.User;
 import org.junit.jupiter.api.AfterEach;
@@ -10,10 +13,10 @@ import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 
-public class SignUpRepositoryTest {
+public class SignUpTest implements UserCreationHelper {
     private SignUpRepository signUpRepo = new SignUpRepository();
-    private static final String DEFAULT_USERNAME = "RealPerson";
-    private static final String DEFAULT_EMAIL = "jeroenisthebest@example.com";
+    private SignUpController controller = new SignUpController(this.signUpRepo);
+    private static final String KEY = "in_use";
 
     private UserAddedOutcomes attemptAddUser(User user) {
         try {
@@ -26,22 +29,13 @@ public class SignUpRepositoryTest {
         return UserAddedOutcomes.SUCCESS;
     }
 
-    private User createSimpleUser(String username, String email) {
-        var user = new User();
-        user.setUsername(username);
-        user.setEmail(email);
-        user.setPassword("Kolling22");
-        return user;
-    }
-
     private UserAddedOutcomes addDefaultUser() {
-        return attemptAddUser(createSimpleUser(DEFAULT_USERNAME, DEFAULT_EMAIL));
+        return attemptAddUser(UserCreationHelper.createDefaultUser());
     }
 
     @BeforeEach
     public void setUp() {
-        this.signUpRepo = new SignUpRepository();
-        User.objects.clear();
+        this.clearUserDatabase();
     }
 
     @AfterEach
@@ -57,31 +51,28 @@ public class SignUpRepositoryTest {
     @Test
     public void cannotSignUpWithUsedName() {
         addDefaultUser();
-        assert attemptAddUser(createSimpleUser(DEFAULT_USERNAME, "fake@example.com")) == UserAddedOutcomes.NAME_IN_USE;
+        //var xy = new LoginController(new LoginRepository()).authenticateUser(UserCreationHelper.createDefaultUser());
+        assert attemptAddUser(UserCreationHelper.createSimpleUser(DEFAULT_USERNAME, "fake@example.com")) == UserAddedOutcomes.NAME_IN_USE;
     }
 
     @Test
     public void cannotSignUpWithUsedEmail() {
         addDefaultUser();
-        assert attemptAddUser(createSimpleUser("FakePerson", DEFAULT_EMAIL)) == UserAddedOutcomes.EMAIL_IN_USE;
+        assert attemptAddUser(UserCreationHelper.createSimpleUser("FakePerson", DEFAULT_EMAIL)) == UserAddedOutcomes.EMAIL_IN_USE;
     }
 
     // test for the sign-up controller
     @Test
     public void checkUsernameNotInUse() {
-        var key = "in_use";
-        var controller = new SignUpController(this.signUpRepo);
         var responseBody = controller.usernameAlreadyInUse(DEFAULT_USERNAME).getBody();
-        assert responseBody instanceof HashMap<?, ?> bodyMap && bodyMap.get(key) instanceof Boolean bool && !bool;
+        assert responseBody instanceof HashMap<?, ?> bodyMap && bodyMap.get(KEY) instanceof Boolean bool && !bool;
     }
 
     @Test
     public void checkUsernameInUse() {
-        var key = "in_use";
-        var controller = new SignUpController(this.signUpRepo);
         addDefaultUser();
         var responseBody = controller.usernameAlreadyInUse(DEFAULT_USERNAME).getBody();
-        assert responseBody instanceof HashMap<?, ?> bodyMap && bodyMap.get(key) instanceof Boolean bool && bool;
+        assert responseBody instanceof HashMap<?, ?> bodyMap && bodyMap.get(KEY) instanceof Boolean bool && bool;
     }
 
     private enum UserAddedOutcomes {

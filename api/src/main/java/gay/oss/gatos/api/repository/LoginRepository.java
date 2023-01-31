@@ -20,6 +20,7 @@ public class LoginRepository {
             throw new UserNotFoundException();
         } else {
             Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
+            var math = encoder.matches(user.getPassword(), databaseUser.getPassword());
             if (encoder.matches(user.getPassword(), databaseUser.getPassword())) {
                 return databaseUser;
             }
