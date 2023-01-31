@@ -1,4 +1,4 @@
-package gay.oss.gatos.api.login.test;
+package gay.oss.gatos.api.controller.test;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,4 +1,4 @@
-package gay.oss.gatos.api.signup.test;
+package gay.oss.gatos.api.controller.test;
 
 import java.util.HashMap;
 
@@ -51,13 +51,15 @@ public class SignUpTest implements UserCreationHelper {
     @Test
     public void cannotSignUpWithUsedName() {
         this.addDefaultUser();
-        assert this.attemptAddUser(UserCreationHelper.createSimpleUser(DEFAULT_USERNAME, "fake@example.com")) == UserAddedOutcomes.NAME_IN_USE;
+        assert this.attemptAddUser(UserCreationHelper.createSimpleUser(DEFAULT_USERNAME,
+                "fake@example.com")) == UserAddedOutcomes.NAME_IN_USE;
     }
 
     @Test
     public void cannotSignUpWithUsedEmail() {
         this.addDefaultUser();
-        assert this.attemptAddUser(UserCreationHelper.createSimpleUser("FakePerson", DEFAULT_EMAIL)) == UserAddedOutcomes.EMAIL_IN_USE;
+        assert this.attemptAddUser(
+                UserCreationHelper.createSimpleUser("FakePerson", DEFAULT_EMAIL)) == UserAddedOutcomes.EMAIL_IN_USE;
     }
 
     // test for the sign-up controller
