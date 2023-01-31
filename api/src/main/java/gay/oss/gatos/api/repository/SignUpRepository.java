@@ -1,6 +1,5 @@
 package gay.oss.gatos.api.repository;
 
-import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import gay.oss.gatos.api.exceptions.EmailAlreadyInUseException;
@@ -11,29 +10,34 @@ import gay.oss.gatos.core.models.User;
 public class SignUpRepository {
 
     /**
-     * add a new user to the db.
+     * Add a new user to the db.
      *
-     * @param User user
+     * @param email user's email
+     * @param username user's username
+     * @param plaintextPassword given password
      * @throws UsernameAlreadyInUseException
      * @throws EmailAlreadyInUseException
      */
-    public User addUser(User user) throws UsernameAlreadyInUseException, EmailAlreadyInUseException {
-        // validate if we can add the user
-        if (this.usernameAlreadyInUse(user.getUsername())) {
+    public User addUser(String email, String username, String plaintextPassword) throws UsernameAlreadyInUseException, EmailAlreadyInUseException {
+        // Validate username and email are available
+        if (this.usernameAlreadyInUse(username)) {
             throw new UsernameAlreadyInUseException();
-        } else if (this.emailAlreadyInUse(user.getEmail())) {
+        } else if (this.emailAlreadyInUse(email)) {
             throw new EmailAlreadyInUseException();
-        } else {
-            Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
-            String hash = encoder.encode(user.getPassword());
-            user.setPassword(hash);
-            User.objects.insert(user);
         }
+
+        // Create and insert new User
+        User user = new User();
+        user.setEmail(email);
+        user.setUsername(username);
+        user.setPassword(plaintextPassword);
+        User.objects.insert(user);
+
         return user;
     }
 
     /**
-     * check if the username is already in use.
+     * Check if the username is already in use.
      *
      * @param String username
      * @return true if the username is already in use
@@ -43,7 +47,7 @@ public class SignUpRepository {
     }
 
     /**
-     * checks if the email is already in use.
+     * Checks if the email is already in use.
      *
      * @param String email
      * @return true if the email is already in use

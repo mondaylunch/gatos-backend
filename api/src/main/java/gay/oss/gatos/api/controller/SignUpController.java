@@ -2,20 +2,21 @@ package gay.oss.gatos.api.controller;
 
 import java.util.HashMap;
 
-// rest api
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
-// imports from other packages
-import gay.oss.gatos.core.models.User;
 import gay.oss.gatos.api.exceptions.EmailAlreadyInUseException;
 import gay.oss.gatos.api.exceptions.UsernameAlreadyInUseException;
 import gay.oss.gatos.api.repository.SignUpRepository;
@@ -38,11 +39,17 @@ public class SignUpController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    private record BodyAddUser(
+        @NotNull @Email String email,
+        @NotNull @Length(min = 2, max = 32) String username,
+        @NotNull @Length(min = 8) String password) {
+    }
+
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ResponseEntity addUser(@RequestBody User user) {
+    public ResponseEntity addUser(@RequestBody BodyAddUser data) {
         try {
-            return new ResponseEntity<>(this.repository.addUser(user), HttpStatus.CREATED);
+            return new ResponseEntity<>(this.repository.addUser(data.email, data.username, data.password), HttpStatus.CREATED);
         } catch (UsernameAlreadyInUseException e) {
             return new ResponseEntity<>(UsernameAlreadyInUseException.getErrorAsJSON(), HttpStatus.BAD_REQUEST);
         } catch (EmailAlreadyInUseException ex) {
