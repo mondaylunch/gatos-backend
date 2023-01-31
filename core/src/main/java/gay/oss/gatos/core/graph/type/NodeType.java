@@ -8,7 +8,7 @@ import java.util.concurrent.CompletableFuture;
 import org.jetbrains.annotations.ApiStatus;
 
 import gay.oss.gatos.core.graph.connector.NodeConnector;
-import gay.oss.gatos.core.graph.data.DataBox;
+import gay.oss.gatos.core.data.DataBox;
 
 /**
  * A type of node that may go on a graph.

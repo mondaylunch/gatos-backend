@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 import gay.oss.gatos.core.graph.Node;
 import gay.oss.gatos.core.graph.connector.NodeConnection;
 import gay.oss.gatos.core.graph.connector.NodeConnector;
-import gay.oss.gatos.core.graph.data.DataBox;
-import gay.oss.gatos.core.graph.data.DataType;
+import gay.oss.gatos.core.data.DataBox;
+import gay.oss.gatos.core.data.DataType;
 import gay.oss.gatos.core.graph.type.NodeType;
 
 public class NodeConnectionTest {

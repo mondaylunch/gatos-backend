@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import gay.oss.gatos.core.graph.Node;
 import gay.oss.gatos.core.graph.connector.NodeConnection;
-import gay.oss.gatos.core.graph.data.DataBox;
+import gay.oss.gatos.core.data.DataBox;
 import gay.oss.gatos.core.graph.type.NodeCategory;
 import gay.oss.gatos.core.graph.type.NodeType;
 

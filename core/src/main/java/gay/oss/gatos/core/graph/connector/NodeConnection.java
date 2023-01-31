@@ -3,7 +3,7 @@ package gay.oss.gatos.core.graph.connector;
 import java.util.Optional;
 
 import gay.oss.gatos.core.graph.Node;
-import gay.oss.gatos.core.graph.data.DataType;
+import gay.oss.gatos.core.data.DataType;
 
 /**
  * A connection from an output connector on one node to an input connector on another.

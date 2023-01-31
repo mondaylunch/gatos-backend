@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 import org.jetbrains.annotations.Unmodifiable;
 
 import gay.oss.gatos.core.graph.connector.NodeConnector;
-import gay.oss.gatos.core.graph.data.DataBox;
-import gay.oss.gatos.core.graph.data.DataType;
+import gay.oss.gatos.core.data.DataBox;
+import gay.oss.gatos.core.data.DataType;
 import gay.oss.gatos.core.graph.type.NodeType;
 
 /**

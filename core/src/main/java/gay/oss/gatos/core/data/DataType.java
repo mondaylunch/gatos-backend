@@ -1,4 +1,4 @@
-package gay.oss.gatos.core.graph.data;
+package gay.oss.gatos.core.data;
 
 /**
  * A type of value which can be stored in a {@link DataBox}.

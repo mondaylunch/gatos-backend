@@ -1,4 +1,4 @@
-package gay.oss.gatos.core.graph.data;
+package gay.oss.gatos.core.data;
 
 import java.util.Map;
 import java.util.Optional;
