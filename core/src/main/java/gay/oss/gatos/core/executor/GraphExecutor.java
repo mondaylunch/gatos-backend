@@ -22,7 +22,7 @@ import gay.oss.gatos.core.graph.type.NodeType;
  * Handles execution of a {@link gay.oss.gatos.core.graph.Graph flow graph}.
  */
 public class GraphExecutor {
-    private final @Unmodifiable List<Node> nonEndNodes;
+    private final @Unmodifiable Collection<Node> nonEndNodes;
     private final @Unmodifiable Collection<Node> endNodes;
     private final @Unmodifiable Collection<NodeConnection<?>> connections;
     private final @Unmodifiable Map<Node, Collection<NodeConnection<?>>> nodeDependencies;
