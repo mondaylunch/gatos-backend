@@ -2,3 +2,4 @@ rootProject.name = "Gatos Backend"
 
 include "api"
 include "core"
+include "basic_nodes"

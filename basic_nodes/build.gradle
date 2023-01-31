@@ -1,0 +1,18 @@
+plugins {
+    id 'multimodule-config'
+}
+
+group = 'gay.oss.gatos'
+version = '0.0.1-SNAPSHOT'
+
+dependencies {
+    implementation project(":core")
+
+    // Tests
+    testImplementation(platform('org.junit:junit-bom:5.9.2'))
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
