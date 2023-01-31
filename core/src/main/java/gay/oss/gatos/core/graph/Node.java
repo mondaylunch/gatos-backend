@@ -13,7 +13,8 @@ import java.util.stream.Collectors;
 import org.jetbrains.annotations.Unmodifiable;
 
 import gay.oss.gatos.core.graph.connector.NodeConnector;
-import gay.oss.gatos.core.graph.data.DataBox;
+import gay.oss.gatos.core.data.DataBox;
+import gay.oss.gatos.core.data.DataType;
 import gay.oss.gatos.core.graph.type.NodeType;
 
 /**
@@ -65,21 +66,19 @@ public final class Node {
      * @param <T>           the type of the setting to modify
      * @return              the new node
      */
-    public <T> Node modifySetting(String settingKey, T value) {
+    public <T> Node modifySetting(String settingKey, DataBox<T> value) {
         var setting = this.settings.get(settingKey);
         if (setting == null) {
             throw new IllegalArgumentException("Node contains no such setting "+settingKey);
         }
 
-        if (!setting.type().clazz().isInstance(value)) {
-            throw new IllegalArgumentException("Setting "+settingKey+" is not of type "+value.getClass().getName());
+        if (!setting.type().equals(value.type())) {
+            throw new IllegalArgumentException("Setting "+settingKey+" is not of type "+value.type().name());
         }
 
         var newSettings = new HashMap<>(this.settings);
 
-        // We know this cast succeeds because of the check above
-        //noinspection unchecked
-        newSettings.put(settingKey, ((DataBox<T>) setting).withValue(value));
+        newSettings.put(settingKey, value);
 
         return new Node(
                 this.id,
@@ -118,20 +117,20 @@ public final class Node {
     /**
      * Retrieve a setting for a given key.
      * @param key   the setting key
-     * @param clazz the class of the setting
+     * @param type  the datatype of the setting
      * @param <T>   the type of the setting
      * @return      the setting
      * @throws IllegalArgumentException if the node does not contain a setting with the given key
      * @throws IllegalArgumentException if the setting with the given key does not hold data of the expected type
      */
-    public <T> DataBox<T> getSetting(String key, Class<T> clazz) { // TODO: should this take a DataType instead of a class?
+    public <T> DataBox<T> getSetting(String key, DataType<T> type) {
         var setting = this.settings.get(key);
         if (setting == null) {
             throw new IllegalArgumentException("Node contains no such setting "+key);
         }
 
-        if (!setting.type().clazz().isAssignableFrom(clazz)) {
-            throw new IllegalArgumentException("Setting "+key+" is not of type "+clazz.getName());
+        if (!setting.type().equals(type)) {
+            throw new IllegalArgumentException("Setting "+key+" is not of type "+type.name());
         }
 
         // We know this cast succeeds because of the check above

@@ -1,4 +1,4 @@
-package gay.oss.gatos.core.graph.test;
+package gay.oss.gatos.core.data.test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,8 +6,8 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import gay.oss.gatos.core.graph.data.DataBox;
-import gay.oss.gatos.core.graph.data.DataType;
+import gay.oss.gatos.core.data.DataBox;
+import gay.oss.gatos.core.data.DataType;
 
 public class DataBoxTest {
     @Test

@@ -16,8 +16,8 @@ import gay.oss.gatos.core.graph.Node;
 import gay.oss.gatos.core.graph.NodeMetadata;
 import gay.oss.gatos.core.graph.connector.NodeConnection;
 import gay.oss.gatos.core.graph.connector.NodeConnector;
-import gay.oss.gatos.core.graph.data.DataBox;
-import gay.oss.gatos.core.graph.data.DataType;
+import gay.oss.gatos.core.data.DataBox;
+import gay.oss.gatos.core.data.DataType;
 import gay.oss.gatos.core.graph.type.NodeType;
 
 public class GraphTest {
@@ -45,11 +45,11 @@ public class GraphTest {
     public void canModifyNode() {
         var graph = new Graph();
         var node = graph.addNode(TEST_NODE_TYPE);
-        var modifiedNode = graph.modifyNode(node.id(), n -> n.modifySetting("setting_1", 100));
+        var modifiedNode = graph.modifyNode(node.id(), n -> n.modifySetting("setting_1", DataType.INTEGER.create(100)));
         Assertions.assertFalse(graph.containsNode(node));
         Assertions.assertTrue(graph.containsNode(node.id()));
         Assertions.assertTrue(graph.containsNode(modifiedNode));
-        Assertions.assertEquals(100, modifiedNode.getSetting("setting_1", Integer.class).value());
+        Assertions.assertEquals(100, modifiedNode.getSetting("setting_1", DataType.INTEGER).value());
     }
 
     @Test
@@ -57,7 +57,7 @@ public class GraphTest {
         var graph = new Graph();
         var node = graph.addNode(TEST_NODE_TYPE);
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            graph.modifyNode(UUID.randomUUID(), n -> n.modifySetting("setting_1", 100));
+            graph.modifyNode(UUID.randomUUID(), n -> n.modifySetting("setting_1", DataType.INTEGER.create(100)));
         });
     }
 

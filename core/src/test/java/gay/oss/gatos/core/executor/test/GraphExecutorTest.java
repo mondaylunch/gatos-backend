@@ -16,8 +16,8 @@ import gay.oss.gatos.core.graph.Graph;
 import gay.oss.gatos.core.graph.Node;
 import gay.oss.gatos.core.graph.connector.NodeConnection;
 import gay.oss.gatos.core.graph.connector.NodeConnector;
-import gay.oss.gatos.core.graph.data.DataBox;
-import gay.oss.gatos.core.graph.data.DataType;
+import gay.oss.gatos.core.data.DataBox;
+import gay.oss.gatos.core.data.DataType;
 import gay.oss.gatos.core.graph.type.NodeType;
 
 public class GraphExecutorTest {
@@ -31,11 +31,11 @@ public class GraphExecutorTest {
         var graph = new Graph();
         AtomicInteger result = new AtomicInteger();
         var input = graph.addNode(INPUT_INT);
-        graph.modifyNode(input.id(), node -> node.modifySetting("value", 10));
+        graph.modifyNode(input.id(), node -> node.modifySetting("value", DataType.INTEGER.create(10)));
         var output = graph.addNode(new OutputIntNodeType(result));
 
         var adder = graph.addNode(ADD_INTS);
-        graph.modifyNode(adder.id(), node -> node.modifySetting("value_to_add", 5));
+        graph.modifyNode(adder.id(), node -> node.modifySetting("value_to_add", DataType.INTEGER.create(5)));
 
         var conn = NodeConnection.createConnection(
             input, "out",
@@ -66,11 +66,11 @@ public class GraphExecutorTest {
         var graph = new Graph();
         AtomicInteger result = new AtomicInteger();
         var input = graph.addNode(INPUT_INT);
-        graph.modifyNode(input.id(), node -> node.modifySetting("value", 10));
+        graph.modifyNode(input.id(), node -> node.modifySetting("value", DataType.INTEGER.create(10)));
         var output = graph.addNode(new OutputIntNodeType(result));
 
         var adder = graph.addNode(ADD_INTS_SLOWLY);
-        graph.modifyNode(adder.id(), node -> node.modifySetting("value_to_add", 5));
+        graph.modifyNode(adder.id(), node -> node.modifySetting("value_to_add", DataType.INTEGER.create(5)));
 
         var conn = NodeConnection.createConnection(
             input, "out",
@@ -105,7 +105,7 @@ public class GraphExecutorTest {
         var inputs = IntStream.of(2, 4, 8, 16, 2)
             .mapToObj(i -> {
                 var input = graph.addNode(INPUT_INT);
-                return graph.modifyNode(input.id(), node -> node.modifySetting("value", i));
+                return graph.modifyNode(input.id(), node -> node.modifySetting("value", DataType.INTEGER.create(i)));
             })
             .toList();
 
@@ -147,7 +147,7 @@ public class GraphExecutorTest {
         var inputs = IntStream.of(2, 4, 8, 16, 2)
             .mapToObj(i -> {
                 var input = graph.addNode(INPUT_INT);
-                return graph.modifyNode(input.id(), node -> node.modifySetting("value", i));
+                return graph.modifyNode(input.id(), node -> node.modifySetting("value", DataType.INTEGER.create(i)));
             })
             .toList();
 

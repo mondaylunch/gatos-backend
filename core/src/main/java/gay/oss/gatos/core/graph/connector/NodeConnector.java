@@ -3,7 +3,7 @@ package gay.oss.gatos.core.graph.connector;
 import java.util.Objects;
 import java.util.UUID;
 
-import gay.oss.gatos.core.graph.data.DataType;
+import gay.oss.gatos.core.data.DataType;
 
 /**
  * Represents an input or output on a node.
