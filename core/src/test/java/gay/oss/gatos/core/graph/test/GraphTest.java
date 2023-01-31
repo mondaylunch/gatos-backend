@@ -13,13 +13,12 @@ import org.junit.jupiter.api.Test;
 
 import gay.oss.gatos.core.graph.Graph;
 import gay.oss.gatos.core.graph.Node;
-import gay.oss.gatos.core.graph.NodeCategory;
 import gay.oss.gatos.core.graph.NodeMetadata;
-import gay.oss.gatos.core.graph.NodeType;
 import gay.oss.gatos.core.graph.connector.NodeConnection;
 import gay.oss.gatos.core.graph.connector.NodeConnector;
 import gay.oss.gatos.core.graph.data.DataBox;
 import gay.oss.gatos.core.graph.data.DataType;
+import gay.oss.gatos.core.graph.type.NodeType;
 
 public class GraphTest {
     private static final NodeType TEST_NODE_TYPE = new TestNodeType();
@@ -362,12 +361,7 @@ public class GraphTest {
         Assertions.assertEquals(list, sorted.get());
     }
 
-    private static final class TestNodeType implements NodeType {
-        @Override
-        public NodeCategory category() {
-            return NodeCategory.PROCESS;
-        }
-
+    private static final class TestNodeType extends NodeType.Process {
         @Override
         public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
             return Set.of(
@@ -395,17 +389,7 @@ public class GraphTest {
         }
     }
 
-    private static final class TestInputNodeType implements NodeType {
-        @Override
-        public NodeCategory category() {
-            return NodeCategory.PUSHED_INPUT;
-        }
-
-        @Override
-        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
-            return Set.of();
-        }
-
+    private static final class TestInputNodeType extends NodeType.Start {
         @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
             return Set.of(
@@ -424,12 +408,7 @@ public class GraphTest {
         }
     }
 
-    private static final class TestOutputNodeType implements NodeType {
-        @Override
-        public NodeCategory category() {
-            return NodeCategory.OUTPUT;
-        }
-
+    private static final class TestOutputNodeType extends NodeType.End {
         @Override
         public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
             return Set.of(
@@ -438,18 +417,13 @@ public class GraphTest {
         }
 
         @Override
-        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
-            return Set.of();
-        }
-
-        @Override
         public Map<String, DataBox<?>> settings() {
             return Map.of();
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
-            return Map.of();
+        public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+            return CompletableFuture.runAsync(() -> {});
         }
     }
 }
