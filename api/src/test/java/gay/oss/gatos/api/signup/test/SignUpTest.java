@@ -18,6 +18,18 @@ public class SignUpTest implements UserCreationHelper {
     private SignUpController controller = new SignUpController(this.signUpRepo);
     private static final String KEY = "in_use";
 
+
+
+
+    private enum UserAddedOutcomes {
+        SUCCESS,
+        NAME_IN_USE,
+        EMAIL_IN_USE
+    }
+
+
+
+
     private UserAddedOutcomes attemptAddUser(User user) {
         try {
             signUpRepo.addUser(user);
@@ -51,7 +63,6 @@ public class SignUpTest implements UserCreationHelper {
     @Test
     public void cannotSignUpWithUsedName() {
         addDefaultUser();
-        //var xy = new LoginController(new LoginRepository()).authenticateUser(UserCreationHelper.createDefaultUser());
         assert attemptAddUser(UserCreationHelper.createSimpleUser(DEFAULT_USERNAME, "fake@example.com")) == UserAddedOutcomes.NAME_IN_USE;
     }
 
@@ -73,11 +84,5 @@ public class SignUpTest implements UserCreationHelper {
         addDefaultUser();
         var responseBody = controller.usernameAlreadyInUse(DEFAULT_USERNAME).getBody();
         assert responseBody instanceof HashMap<?, ?> bodyMap && bodyMap.get(KEY) instanceof Boolean bool && bool;
-    }
-
-    private enum UserAddedOutcomes {
-        SUCCESS,
-        NAME_IN_USE,
-        EMAIL_IN_USE
     }
 }
