@@ -9,6 +9,7 @@ package gay.oss.gatos.core.graph.data;
 public record DataType<T>(Class<T> clazz, String name) {
     public static final DataType<Integer> INTEGER = new DataType<>(Integer.class, "integer");
     public static final DataType<Boolean> BOOLEAN = new DataType<>(Boolean.class, "boolean");
+    public static final DataType<String> STRING = new DataType<>(String.class, "string");
 
     /**
      * Creates a new {@link DataBox} with this type and a given value.
