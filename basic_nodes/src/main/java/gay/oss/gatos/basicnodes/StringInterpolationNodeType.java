@@ -16,7 +16,7 @@ import gay.oss.gatos.core.data.DataBox;
 import gay.oss.gatos.core.graph.type.NodeType;
 
 public class StringInterpolationNodeType extends NodeType.Process {
-    private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("(?<!\\\\)(?:\\\\\\\\)*\\{(?<name>(?:[\\h\\w]*)?)(?<!\\\\)(?:\\\\\\\\)*}");
+    private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("(?<!\\\\)(?:\\\\\\\\)*\\{(?<name>(?:[\\h\\w]*)?)}");
 
     @Override
     public Map<String, DataBox<?>> settings() {
