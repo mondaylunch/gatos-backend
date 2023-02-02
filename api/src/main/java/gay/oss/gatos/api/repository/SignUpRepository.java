@@ -12,13 +12,14 @@ public class SignUpRepository {
     /**
      * Add a new user to the db.
      *
-     * @param email user's email
-     * @param username user's username
+     * @param email             user's email
+     * @param username          user's username
      * @param plaintextPassword given password
      * @throws UsernameAlreadyInUseException
      * @throws EmailAlreadyInUseException
      */
-    public User addUser(String email, String username, String plaintextPassword) throws UsernameAlreadyInUseException, EmailAlreadyInUseException {
+    public User addUser(String email, String username, String plaintextPassword)
+            throws UsernameAlreadyInUseException, EmailAlreadyInUseException {
         // Validate username and email are available
         if (this.usernameAlreadyInUse(username)) {
             throw new UsernameAlreadyInUseException();
@@ -30,7 +31,7 @@ public class SignUpRepository {
         User user = new User();
         user.setEmail(email);
         user.setUsername(username);
-        user.setPassword(plaintextPassword);
+        user.hashPlaintextPassword(plaintextPassword);
         User.objects.insert(user);
 
         return user;
@@ -55,5 +56,4 @@ public class SignUpRepository {
     public Boolean emailAlreadyInUse(String email) {
         return User.objects.emailAlreadyInUse(email);
     }
-
 }

@@ -7,7 +7,6 @@ import gay.oss.gatos.core.models.User;
 
 @Repository
 public class LoginRepository {
-
     /**
      * Authenticate and fetch user by email and password.
      *
