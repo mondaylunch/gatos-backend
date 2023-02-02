@@ -8,7 +8,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class BaseMvcTest {
+    protected static final ObjectMapper MAPPER = new ObjectMapper();
+    protected static final String OBJECT_EXPRESSION_PREFIX = "$.";
+
     @Autowired
     protected MockMvc mockMvc;
 
