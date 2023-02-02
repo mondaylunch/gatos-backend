@@ -1,6 +1,7 @@
 package gay.oss.gatos.api;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.hamcrest.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +30,13 @@ public class BaseMvcTest {
 
     protected static ResultActions compareField(String objectExpression, ResultActions result, String fieldName,
             Object fieldValue) throws Exception {
+        if (fieldValue instanceof UUID) {
+            fieldValue = fieldValue.toString();
+        }
+
         return result.andExpect(MockMvcResultMatchers.jsonPath(
                 objectExpression + fieldName,
-                Matchers.is(fieldValue.toString())));
+                Matchers.is(fieldValue)));
     }
 
     protected static String objectArrayExpressionPrefix(int index) {
