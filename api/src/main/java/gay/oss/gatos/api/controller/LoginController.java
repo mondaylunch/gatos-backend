@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import gay.oss.gatos.api.exceptions.UserNotFoundException;
-import gay.oss.gatos.api.repository.LoginRepository;
 import jakarta.validation.Valid;
+
+import gay.oss.gatos.api.repository.LoginRepository;
+import gay.oss.gatos.api.exceptions.UserNotFoundException;
 
 @RestController
 @RequestMapping("api/v1/login")

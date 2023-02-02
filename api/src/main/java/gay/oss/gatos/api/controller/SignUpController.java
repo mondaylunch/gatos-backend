@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 
 import gay.oss.gatos.api.exceptions.EmailAlreadyInUseException;
 import gay.oss.gatos.api.exceptions.UsernameAlreadyInUseException;
 import gay.oss.gatos.api.repository.SignUpRepository;
-import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/v1/sign_up")

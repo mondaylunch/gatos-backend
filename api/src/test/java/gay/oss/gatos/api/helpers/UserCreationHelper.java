@@ -3,13 +3,12 @@ package gay.oss.gatos.api.helpers;
 import gay.oss.gatos.core.models.User;
 
 public interface UserCreationHelper {
-    static String DEFAULT_USERNAME = "RealPerson";
-    static String DEFAULT_EMAIL = "jeroenisthebest@example.com";
-    static String DEFAULT_PASSWORD = "Kolling2021";
+    String DEFAULT_USERNAME = "RealPerson";
+    String DEFAULT_EMAIL = "jeroenisthebest@example.com";
+    String DEFAULT_PASSWORD = "Kolling2021";
 
     /**
-     * Create a new user with given properties
-     * 
+     * Create a new user with given properties.
      * @param username Username
      * @param email    Email
      * @return New user
@@ -24,9 +23,9 @@ public interface UserCreationHelper {
     }
 
     /**
-     * Create a new user with default values
+     * Create a new user with default values.
      */
     default User createDefaultUser() {
-        return createSimpleUser(DEFAULT_USERNAME, DEFAULT_EMAIL);
+        return this.createSimpleUser(DEFAULT_USERNAME, DEFAULT_EMAIL);
     }
 }
