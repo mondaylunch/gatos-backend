@@ -117,4 +117,28 @@ public class SignUpControllerTest extends BaseMvcTest implements UserCreationHel
                 .content(userJson))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
+
+    /// --- CHECK USERNAME ---
+
+    @Test
+    public void testCheckUsernameIsInUse() throws Exception {
+        this.createDefaultUser();
+
+        ResultActions result = this.mockMvc
+                .perform(MockMvcRequestBuilders.get(ENDPOINT + "/check_username/" + DEFAULT_USERNAME))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        result = compareFields(OBJECT_EXPRESSION_PREFIX, result,
+                Map.entry("in_use", true));
+    }
+
+    @Test
+    public void testCheckUsernameIsNotInUse() throws Exception {
+        ResultActions result = this.mockMvc
+                .perform(MockMvcRequestBuilders.get(ENDPOINT + "/check_username/" + DEFAULT_USERNAME))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        result = compareFields(OBJECT_EXPRESSION_PREFIX, result,
+                Map.entry("in_use", false));
+    }
 }
