@@ -19,17 +19,21 @@ public class VariableExtractionNodeType extends NodeType.Process {
     @Override
     public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
         return Set.of(
+            new NodeConnector.Input<>(nodeId, "input", DataType.STRING),
             new NodeConnector.Input<>(nodeId, "tag", DataType.STRING)
         );
     }
 
     @Override
     public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
-        return Set.of(null);
+        return Set.of(
+            new NodeConnector.Output<>(nodeId, "output", DataType.STRING)
+        );
     }
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+        var input = DataBox.get(settings, "input", DataType.STRING).orElse("");
         return null;
     }
 }
