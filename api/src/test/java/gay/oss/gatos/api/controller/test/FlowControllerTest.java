@@ -19,12 +19,13 @@ import com.jayway.jsonpath.JsonPath;
 
 import gay.oss.gatos.api.BaseMvcTest;
 import gay.oss.gatos.api.controller.FlowController;
+import gay.oss.gatos.api.helpers.UserCreationHelper;
 import gay.oss.gatos.core.models.Flow;
+import gay.oss.gatos.core.models.User;
 
 @WebMvcTest(FlowController.class)
-public class FlowControllerTest extends BaseMvcTest {
+public class FlowControllerTest extends BaseMvcTest implements UserCreationHelper {
     private static final String ENDPOINT = "/api/v1/flows";
-    private static final UUID ZERO_UUID = new UUID(0, 0);
 
     @BeforeEach
     void setUp() {
@@ -63,10 +64,11 @@ public class FlowControllerTest extends BaseMvcTest {
 
     @Test
     public void canAddFlow() throws Exception {
-        Flow flow = createFlow();
+        var user = this.createDefaultUser();
+        Flow flow = createFlow(user);
         String flowJson = MAPPER.writeValueAsString(flow);
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT)
-                .header("x-auth-token", "")
+                .header("x-auth-token", user.getId().toString())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(flowJson))
                 .andExpect(MockMvcResultMatchers.status().isOk());
@@ -80,8 +82,9 @@ public class FlowControllerTest extends BaseMvcTest {
 
     @Test
     public void cannotAddFlowWithoutBody() throws Exception {
+        var user = this.createDefaultUser();
         this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT)
-                .header("x-auth-token", "")
+                .header("x-auth-token", user.getId().toString())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
         this.assertFlowCount(0);
@@ -90,8 +93,9 @@ public class FlowControllerTest extends BaseMvcTest {
     @Test
     public void cannotAddFlowWithInvalidBody() throws Exception {
         String invalidJson = "invalid";
+        var user = this.createDefaultUser();
         this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT)
-                .header("x-auth-token", "")
+                .header("x-auth-token", user.getId().toString())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidJson));
         this.assertFlowCount(0);
@@ -99,7 +103,7 @@ public class FlowControllerTest extends BaseMvcTest {
 
     @Test
     public void cannotAddFlowWithoutToken() throws Exception {
-        Flow flow = createFlow();
+        Flow flow = createFlow(new User());
         String flowJson = MAPPER.writeValueAsString(flow);
         this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -110,10 +114,11 @@ public class FlowControllerTest extends BaseMvcTest {
 
     @Test
     public void cannotAddFlowWithoutContentType() throws Exception {
-        Flow flow = createFlow();
+        var user = this.createDefaultUser();
+        Flow flow = createFlow(user);
         String flowJson = MAPPER.writeValueAsString(flow);
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT)
-                .header("x-auth-token", "")
+                .header("x-auth-token", user.getId().toString())
                 .content(flowJson));
         Assertions.assertThrows(
                 AssertionError.class,
@@ -125,12 +130,13 @@ public class FlowControllerTest extends BaseMvcTest {
 
     @Test
     public void cannotUpdateNoFlowFields() throws Exception {
-        Flow flow = createFlow();
+        var user = this.createDefaultUser();
+        Flow flow = createFlow(user);
         Flow.objects.insert(flow);
         Flow update = new Flow();
         String flowJson = MAPPER.writeValueAsString(update);
         this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flow.getId())
-                .header("x-auth-token", "")
+                .header("x-auth-token", user.getId().toString())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(flowJson));
         this.assertFlowCount(1);
@@ -140,13 +146,14 @@ public class FlowControllerTest extends BaseMvcTest {
 
     @Test
     public void canUpdateFlowName() throws Exception {
-        Flow flow = createFlow();
+        var user = this.createDefaultUser();
+        Flow flow = createFlow(user);
         Flow.objects.insert(flow);
         Flow update = new Flow();
         update.setName("New Name");
         String flowJson = MAPPER.writeValueAsString(update);
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flow.getId())
-                .header("x-auth-token", "")
+                .header("x-auth-token", user.getId().toString())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(flowJson))
                 .andExpect(MockMvcResultMatchers.status().isOk());
@@ -162,13 +169,14 @@ public class FlowControllerTest extends BaseMvcTest {
 
     @Test
     public void cannotUpdateFlowAuthorId() throws Exception {
-        Flow flow = createFlow();
+        var user = this.createDefaultUser();
+        Flow flow = createFlow(user);
         Flow.objects.insert(flow);
         Flow update = new Flow();
         update.setAuthorId(UUID.randomUUID());
         String flowJson = MAPPER.writeValueAsString(update);
         this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flow.getId())
-                .header("x-auth-token", "")
+                .header("x-auth-token", user.getId().toString())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(flowJson));
         this.assertFlowCount(1);
@@ -178,7 +186,7 @@ public class FlowControllerTest extends BaseMvcTest {
 
     @Test
     public void cannotUpdateFlowWithoutToken() throws Exception {
-        Flow flow = createFlow();
+        Flow flow = createFlow(new User());
         Flow.objects.insert(flow);
         Flow update = new Flow();
         update.setName("New Name");
@@ -196,13 +204,14 @@ public class FlowControllerTest extends BaseMvcTest {
 
     @Test
     public void cannotUpdateFlowWithoutContentType() throws Exception {
-        Flow flow = createFlow();
+        var user = this.createDefaultUser();
+        Flow flow = createFlow(user);
         Flow.objects.insert(flow);
         Flow update = new Flow();
         update.setName("New Name");
         String flowJson = MAPPER.writeValueAsString(update);
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flow.getId())
-                .header("x-auth-token", "")
+                .header("x-auth-token", user.getId().toString())
                 .content(flowJson));
         Assertions.assertThrows(
                 AssertionError.class,
@@ -216,11 +225,12 @@ public class FlowControllerTest extends BaseMvcTest {
 
     @Test
     public void canDeleteFlow() throws Exception {
-        Flow flow = createFlow();
+        var user = this.createDefaultUser();
+        Flow flow = createFlow(user);
         Flow.objects.insert(flow);
         this.assertFlowCount(1);
         this.mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT + "/" + flow.getId())
-                .header("x-auth-token", ""))
+                .header("x-auth-token", user.getId().toString()))
                 .andExpect(MockMvcResultMatchers.status().isOk());
         this.assertFlowCount(0);
         Assertions.assertNull(Flow.objects.get(flow.getId()));
@@ -228,9 +238,10 @@ public class FlowControllerTest extends BaseMvcTest {
 
     @Test
     public void cannotDeleteNonExistentFlow() throws Exception {
-        Flow flow = createFlow();
+        Flow flow = createFlow(new User());
+        var user = this.createDefaultUser();
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT + "/" + flow.getId())
-                .header("x-auth-token", ""));
+                .header("x-auth-token", user.getId().toString()));
         Assertions.assertThrows(
                 AssertionError.class,
                 () -> result.andExpect(MockMvcResultMatchers.status().isOk()));
@@ -239,7 +250,7 @@ public class FlowControllerTest extends BaseMvcTest {
 
     @Test
     public void cannotDeleteFlowWithoutToken() throws Exception {
-        Flow flow = createFlow();
+        Flow flow = createFlow(new User());
         Flow.objects.insert(flow);
         this.assertFlowCount(1);
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT + "/" + flow.getId()));
@@ -260,8 +271,8 @@ public class FlowControllerTest extends BaseMvcTest {
         return Flow.objects.size();
     }
 
-    private static Flow createFlow() {
-        return new Flow("Test Flow", ZERO_UUID);
+    private static Flow createFlow(User author) {
+        return new Flow("Test Flow", author.getId());
     }
 
     private static Flow getFlow(ResultActions result) throws Exception {
@@ -271,21 +282,22 @@ public class FlowControllerTest extends BaseMvcTest {
     }
 
     private void testGetFlows(int flowCount) throws Exception {
+        var user = this.createDefaultUser();
         List<Flow> flows = new ArrayList<>();
         for (int i = 0; i < flowCount; i++) {
-            Flow flow = new Flow("Test Flow " + i, ZERO_UUID);
+            Flow flow = new Flow("Test Flow " + i, user.getId());
             Flow.objects.insert(flow);
             flows.add(flow);
         }
-        ResultActions result = this.getFlows(flowCount);
+        ResultActions result = this.getFlows(user, flowCount);
         for (int i = 0; i < flowCount; i++) {
             result = compareFlow(flows.get(i), i, result);
         }
     }
 
-    private ResultActions getFlows(int expectedFlowCount) throws Exception {
+    private ResultActions getFlows(User user, int expectedFlowCount) throws Exception {
         return this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/list")
-                .header("x-auth-token", ""))
+                .header("x-auth-token", user.getId().toString()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(expectedFlowCount)));
     }
