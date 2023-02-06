@@ -1,4 +1,4 @@
-package gay.oss.gatos.basicnodes.regex;
+package gay.oss.gatos.basicnodes;
 
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +22,7 @@ public class RegexNodeType extends NodeType.Process {
     public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
         return Set.of(
             new NodeConnector.Input<>(nodeId, "regex", DataType.STRING),
-            new NodeConnector.Input<>(nodeId, "word" , DataType.STRING)
+            new NodeConnector.Input<>(nodeId, "word", DataType.STRING)
         );
     }
 
@@ -32,7 +32,7 @@ public class RegexNodeType extends NodeType.Process {
             new NodeConnector.Output<>(nodeId, "output", DataType.BOOLEAN)
         );
     }
-    
+
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
         return Map.of(
