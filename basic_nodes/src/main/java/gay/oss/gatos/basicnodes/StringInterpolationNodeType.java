@@ -1,18 +1,19 @@
 package gay.oss.gatos.basicnodes;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.ToIntFunction;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import gay.oss.gatos.core.data.DataBox;
 import gay.oss.gatos.core.data.DataType;
 import gay.oss.gatos.core.graph.connector.NodeConnector;
-import gay.oss.gatos.core.data.DataBox;
 import gay.oss.gatos.core.graph.type.NodeType;
 
 public class StringInterpolationNodeType extends NodeType.Process {
@@ -31,7 +32,7 @@ public class StringInterpolationNodeType extends NodeType.Process {
         var matcher = PLACEHOLDER_PATTERN.matcher(template);
         var matches = matcher.results().toList();
         return matches.stream().map(match ->
-            new NodeConnector.Input<>(nodeId, getNameForPlaceholder(matches, match), DataType.STRING)
+            new NodeConnector.Input<>(nodeId, getNameForPlaceholder(m -> matches.indexOf(m)+1, match), DataType.STRING)
         ).collect(Collectors.toSet());
     }
 
@@ -46,17 +47,18 @@ public class StringInterpolationNodeType extends NodeType.Process {
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
         String template = DataBox.get(settings, "template", DataType.STRING).orElse("");
         var matcher = PLACEHOLDER_PATTERN.matcher(template);
-        var matches = matcher.results().toList();
-        String result = matcher.replaceAll(match ->
-            Matcher.quoteReplacement(DataBox.get(inputs, getNameForPlaceholder(matches, match), DataType.STRING).orElse(""))
-        );
+        AtomicInteger i = new AtomicInteger(0);
+        String result = matcher.replaceAll(match -> {
+            i.getAndIncrement();
+            return Matcher.quoteReplacement(DataBox.get(inputs, getNameForPlaceholder($ -> i.get(), match), DataType.STRING).orElse(""));
+        });
         return Map.of(
             "result", CompletableFuture.completedFuture(DataType.STRING.create(result))
         );
     }
 
-    private static String getNameForPlaceholder(List<MatchResult> allPlaceholders, MatchResult placeholder) {
+    private static String getNameForPlaceholder(ToIntFunction<MatchResult> placeholderIndexer, MatchResult placeholder) {
         String name = placeholder.group(1);
-        return name.isBlank() ? "Placeholder "+allPlaceholders.indexOf(placeholder) : name;
+        return name.isBlank() ? "Placeholder " + (placeholderIndexer.applyAsInt(placeholder)) : name;
     }
 }
