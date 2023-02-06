@@ -1,5 +1,7 @@
 package gay.oss.gatos.core.models;
 
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
+
 import gay.oss.gatos.core.collection.UserCollection;
 
 /**
@@ -61,9 +63,30 @@ public class User extends BaseModel {
     /**
      * Set the password.
      *
+     * @param String hashed password
+     */
+    public void setPassword(String passwordHash) {
+        this.password = passwordHash;
+    }
+
+    /**
+     * Hash and set the password.
+     *
      * @param String password
      */
-    public void setPassword(String password) {
-        this.password = password;
+    public void hashPlaintextPassword(String plaintextPassword) {
+        Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
+        String hash = encoder.encode(plaintextPassword);
+        this.password = hash;
+    }
+
+    /**
+     * Check whether a given plaintext password is correct for the stored hash.
+     * @param plaintextPassword Plaintext password
+     * @return Whether it is valid
+     */
+    public boolean validatePassword(String plaintextPassword) {
+        Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
+        return encoder.matches(plaintextPassword, this.getPassword());
     }
 }
