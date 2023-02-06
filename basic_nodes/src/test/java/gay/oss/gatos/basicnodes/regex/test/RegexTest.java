@@ -21,22 +21,22 @@ import gay.oss.gatos.core.graph.Graph;
 import gay.oss.gatos.core.graph.connector.NodeConnector;
 import gay.oss.gatos.core.data.DataBox;
 import gay.oss.gatos.core.graph.type.NodeType;
-import gay.oss.gatos.basicnodes.regex.RegexMatchesNodeType;
+import gay.oss.gatos.basicnodes.regex.RegexNodeType;
 
 public class RegexTest {
-    private static final NodeType TEST_REGEX_MATCHES_NODE_TYPE = new RegexMatchesNodeType();
+    private static final NodeType TEST_REGEX_NODE_TYPE = new RegexNodeType();
 
     @Test   
     public void nodeAddsToGraph() {
         var graph = new Graph();
-        var node = graph.addNode(TEST_REGEX_MATCHES_NODE_TYPE);
+        var node = graph.addNode(TEST_REGEX_NODE_TYPE);
         Assertions.assertTrue(graph.containsNode(node));
     }
 
     @Test
     public void matchesSingleCharToSingleChar() {
         var graph = new Graph();
-        var node = graph.addNode(TEST_REGEX_MATCHES_NODE_TYPE);
+        var node = graph.addNode(TEST_REGEX_NODE_TYPE);
         graph.modifyNode(node.id(), n -> n.modifySetting("regex", DataType.STRING.create("a")));
         graph.modifyNode(node.id(), n -> n.modifySetting("word" , DataType.STRING.create("a")));
 
@@ -56,7 +56,7 @@ public class RegexTest {
     @Test
     public void matchesWordToWord() {
         var graph1 = new Graph();
-        var node1 = graph1.addNode(TEST_REGEX_MATCHES_NODE_TYPE);
+        var node1 = graph1.addNode(TEST_REGEX_NODE_TYPE);
         graph1.modifyNode(node1.id(), n -> n.modifySetting("regex", DataType.STRING.create("^https?://")));
         graph1.modifyNode(node1.id(), n -> n.modifySetting("word" , DataType.STRING.create("https://my.website.co.uk")));
 
@@ -66,7 +66,7 @@ public class RegexTest {
         connectBool(graph1, node1, "ouput", output1, "in");
         
         var graph2 = new Graph();
-        var node2 = graph2.addNode(TEST_REGEX_MATCHES_NODE_TYPE);
+        var node2 = graph2.addNode(TEST_REGEX_NODE_TYPE);
         graph2.modifyNode(node2.id(), n -> n.modifySetting("regex", DataType.STRING.create("^https?://")));
         graph2.modifyNode(node2.id(), n -> n.modifySetting("word" , DataType.STRING.create("this is totally a website link")));
 
