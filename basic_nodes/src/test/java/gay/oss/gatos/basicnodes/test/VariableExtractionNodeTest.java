@@ -24,6 +24,7 @@ public class VariableExtractionNodeTest {
         private final String testString = "tickles";
         private final Collection<Integer> testCollection = List.of(0, 1, 2, 3);
     }
+
     private static final Gson GSON = new Gson();
     private static final JsonObject TEST_JSON_OBJECT = GSON.fromJson(GSON.toJson(new TestJSONExtractionClass()), JsonObject.class);
 

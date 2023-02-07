@@ -1,14 +1,9 @@
 package gay.oss.gatos.basicnodes.test;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,6 +18,7 @@ public class VariableRemappingNodeTest {
         private final String secondKey = "Jeroen";
         private final String thirdKey = "Keppens";
     }
+
     private static final Gson GSON = new Gson();
     private static final JsonObject TEST_JSON_OBJECT = GSON.fromJson(GSON.toJson(new TestJSONRemappingClass()), JsonObject.class);
 
@@ -65,10 +61,10 @@ public class VariableRemappingNodeTest {
         );
         var result2 = BasicNodes.VARIABLE_REMAPPING.compute(input2, Map.of());
 
-        Assertions.assertTrue(result2.get("output").join().value() instanceof JsonObject jsonObject &&
-            jsonObject.get("title").getAsString().equals("Doctor") &&
-            jsonObject.get("firstName").getAsString().equals("Jeroen") &&
-            jsonObject.get("lastName").getAsString().equals("Keppens"));
+        Assertions.assertTrue(result2.get("output").join().value() instanceof JsonObject jsonObject
+            && jsonObject.get("title").getAsString().equals("Doctor")
+            && jsonObject.get("firstName").getAsString().equals("Jeroen")
+            && jsonObject.get("lastName").getAsString().equals("Keppens"));
     }
 
     @Test
