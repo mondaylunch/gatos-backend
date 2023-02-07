@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 /**
  * A type of value which can be stored in a {@link DataBox}.
  */
@@ -11,9 +14,9 @@ public final class DataType<T> {
     public static final DataType<Integer> INTEGER = new DataType<>("integer");
     public static final DataType<Boolean> BOOLEAN = new DataType<>("boolean");
     public static final DataType<String> STRING = new DataType<>("string");
-
+    public static final DataType<JsonObject> JSONOBJECT = new DataType<>("jsonobject");
+    public static final DataType<JsonElement> JSONELEMENT = new DataType<>("jsonelement");
     private final String name;
-
     private DataType<Optional<T>> optionalType = null;
     private DataType<List<T>> listType = null;
 
