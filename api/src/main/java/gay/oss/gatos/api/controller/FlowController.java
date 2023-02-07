@@ -31,7 +31,7 @@ public class FlowController {
     }
 
     private record BodyAddFlow(
-        @NotNull @Length(min = 1, max = 32) String name) {
+        @NotNull @Length(min = 1, max = 32) String name, String description) {
     }
 
     @PostMapping
@@ -41,13 +41,14 @@ public class FlowController {
         Flow flow = new Flow();
         flow.setName(data.name);
         flow.setAuthorId(user.getId());
+        flow.setDescription(data.description);
 
         Flow.objects.insert(flow);
         return flow;
     }
 
     private record BodyUpdateFlow(
-        @NotNull @Length(min = 1, max = 32) String name) {
+        @NotNull @Length(min = 1, max = 32) String name, String description) {
     }
 
     @PatchMapping("{flowId}")
@@ -61,6 +62,7 @@ public class FlowController {
 
         Flow partial = new Flow();
         partial.setName(data.name);
+        partial.setDescription(data.description);
 
         return Flow.objects.update(flowId, partial);
     }

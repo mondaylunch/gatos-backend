@@ -27,6 +27,11 @@ public class Flow extends BaseModel {
     private String name;
 
     /**
+     * Display description
+     */
+    private String description = "";
+
+    /**
      * UUID of the user who owns this flow.
      */
     @BsonProperty("author_id")
@@ -50,6 +55,23 @@ public class Flow extends BaseModel {
         this.name = name;
     }
 
+    /**
+     * Set the description.
+     * 
+     * @return description
+     */
+    public String getDescription() {
+        return this.description;
+    }
+
+    /**
+     * Set the description.
+     * 
+     * @param description description
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
     /**
      * Get the author's UUID.
      *
