@@ -27,7 +27,7 @@ public class Flow extends BaseModel {
     private String name;
 
     /**
-     * Display description
+     * Display description.
      */
     private String description = "";
 
@@ -57,7 +57,7 @@ public class Flow extends BaseModel {
 
     /**
      * Set the description.
-     * 
+     *
      * @return description
      */
     public String getDescription() {
@@ -66,12 +66,13 @@ public class Flow extends BaseModel {
 
     /**
      * Set the description.
-     * 
+     *
      * @param description description
      */
     public void setDescription(String description) {
         this.description = description;
     }
+
     /**
      * Get the author's UUID.
      *
