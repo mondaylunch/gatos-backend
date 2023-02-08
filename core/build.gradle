@@ -3,6 +3,8 @@ plugins {
 }
 
 dependencies {
+    implementation project(":basic_nodes")
+
 	// database driver
 	implementation 'org.mongodb:mongodb-driver-sync:4.8.2'
 
