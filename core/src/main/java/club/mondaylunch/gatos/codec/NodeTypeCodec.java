@@ -3,13 +3,14 @@ package club.mondaylunch.gatos.codec;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-import club.mondaylunch.gatos.core.graph.type.NodeType;
-import club.mondaylunch.gatos.core.graph.type.NodeTypeRegistry;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
 import org.bson.codecs.Codec;
 import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
+
+import club.mondaylunch.gatos.core.graph.type.NodeType;
+import club.mondaylunch.gatos.core.graph.type.NodeTypeRegistry;
 
 public enum NodeTypeCodec implements Codec<NodeType> {
 

@@ -13,13 +13,14 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import club.mondaylunch.gatos.core.Database;
-import club.mondaylunch.gatos.core.models.BaseModel;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Updates;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.conversions.Bson;
 import org.jetbrains.annotations.Nullable;
+
+import club.mondaylunch.gatos.core.Database;
+import club.mondaylunch.gatos.core.models.BaseModel;
 
 /**
  * Common Database collection queries.
