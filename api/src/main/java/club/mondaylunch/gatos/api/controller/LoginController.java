@@ -44,6 +44,7 @@ public class LoginController {
         byte[] salt = new byte[64];
         this.random.nextBytes(salt);
         user.setAuthToken(new String(Base64.getEncoder().encode(salt)));
+        User.objects.update(user.getId(), user);
 
         return user;
     }
