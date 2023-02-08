@@ -9,8 +9,10 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
@@ -44,6 +46,11 @@ public class LoginController {
         user.setAuthToken(new String(Base64.getEncoder().encode(salt)));
 
         return user;
+    }
+
+    @GetMapping("/self")
+    public User fetchUser(@RequestHeader("x-auth-token") String token) {
+        return this.repository.authenticateUser(token);
     }
 
 }
