@@ -17,26 +17,34 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import gay.oss.gatos.api.repository.FlowRepository;
+import gay.oss.gatos.api.repository.LoginRepository;
 import gay.oss.gatos.core.models.Flow;
-import gay.oss.gatos.core.models.User;
 
 @RestController
 @RequestMapping("api/v1/flows")
 public class FlowController {
+    private final LoginRepository userRepository;
+    private final FlowRepository flowRepository;
+
+    public FlowController(LoginRepository repository, FlowRepository flowRepository) {
+        this.userRepository = repository;
+        this.flowRepository = flowRepository;
+    }
 
     @GetMapping("list")
     public List<Flow> getFlows(@RequestHeader("x-auth-token") String token) {
-        var user = User.objects.authenticate(token);
+        var user = this.userRepository.authenticateUser(token);
         return Flow.objects.get("author_id", user.getId());
     }
 
     private record BodyAddFlow(
-        @NotNull @Length(min = 1, max = 32) String name, String description) {
+            @NotNull @Length(min = 1, max = 32) String name, String description) {
     }
 
     @PostMapping
     public Flow addFlow(@RequestHeader("x-auth-token") String token, @Valid @RequestBody BodyAddFlow data) {
-        var user = User.objects.authenticate(token);
+        var user = this.userRepository.authenticateUser(token);
 
         Flow flow = new Flow();
         flow.setName(data.name);
@@ -48,33 +56,27 @@ public class FlowController {
     }
 
     private record BodyUpdateFlow(
-        @NotNull @Length(min = 1, max = 32) String name, String description) {
+            @NotNull @Length(min = 1, max = 32) String name, String description) {
     }
 
     @PatchMapping("{flowId}")
     public Flow updateFlow(@RequestHeader("x-auth-token") String token, @PathVariable UUID flowId,
-                           @Valid @RequestBody BodyUpdateFlow data) {
-        var user = User.objects.authenticate(token);
-        Flow flow = Flow.objects.get(flowId);
-        if (!flow.getAuthorId().equals(user.getId())) {
-            throw new RuntimeException("User does not own flow.");
-        }
+            @Valid @RequestBody BodyUpdateFlow data) {
+        var user = this.userRepository.authenticateUser(token);
+        var flow = this.flowRepository.getFlow(user, flowId);
 
         Flow partial = new Flow();
         partial.setName(data.name);
         partial.setDescription(data.description);
 
-        return Flow.objects.update(flowId, partial);
+        return Flow.objects.update(flow.getId(), partial);
     }
 
     @DeleteMapping("{flowId}")
     public void deleteFlow(@RequestHeader("x-auth-token") String token, @PathVariable UUID flowId) {
-        var user = User.objects.authenticate(token);
-        Flow flow = Flow.objects.get(flowId);
-        if (!flow.getAuthorId().equals(user.getId())) {
-            throw new RuntimeException("User does not own flow.");
-        }
+        var user = this.userRepository.authenticateUser(token);
+        var flow = this.flowRepository.getFlow(user, flowId);
 
-        Flow.objects.delete(flowId);
+        Flow.objects.delete(flow.getId());
     }
 }

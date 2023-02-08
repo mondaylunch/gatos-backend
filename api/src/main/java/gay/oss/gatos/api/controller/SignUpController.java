@@ -18,9 +18,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 
-import gay.oss.gatos.api.exceptions.EmailAlreadyInUseException;
-import gay.oss.gatos.api.exceptions.UsernameAlreadyInUseException;
 import gay.oss.gatos.api.repository.SignUpRepository;
+import gay.oss.gatos.core.models.User;
 
 @RestController
 @RequestMapping("api/v1/sign_up")
@@ -34,7 +33,7 @@ public class SignUpController {
     }
 
     @GetMapping("/check_username/{username}")
-    public ResponseEntity usernameAlreadyInUse(@PathVariable String username) {
+    public ResponseEntity<HashMap<String, Boolean>> usernameAlreadyInUse(@PathVariable String username) {
         HashMap<String, Boolean> response = new HashMap<>();
         response.put("in_use", this.repository.usernameAlreadyInUse(username));
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -48,15 +47,9 @@ public class SignUpController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ResponseEntity addUser(@Valid @RequestBody BodyAddUser data) {
-        try {
-            return new ResponseEntity<>(this.repository.addUser(data.email, data.username, data.password),
-                    HttpStatus.CREATED);
-        } catch (UsernameAlreadyInUseException e) {
-            return new ResponseEntity<>(UsernameAlreadyInUseException.getErrorAsJSON(), HttpStatus.BAD_REQUEST);
-        } catch (EmailAlreadyInUseException ex) {
-            return new ResponseEntity<>(EmailAlreadyInUseException.getErrorAsJSON(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<User> addUser(@Valid @RequestBody BodyAddUser data) {
+        return new ResponseEntity<>(this.repository.addUser(data.email, data.username, data.password),
+                HttpStatus.CREATED);
     }
 
 }

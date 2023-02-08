@@ -132,7 +132,7 @@ public class BaseCollection<T extends BaseModel> {
      * @param id The ID to filter by.
      * @return The filter.
      */
-    private static Bson idFilter(UUID id) {
+    protected static Bson idFilter(UUID id) {
         return eq("_id", id);
     }
 
@@ -144,11 +144,11 @@ public class BaseCollection<T extends BaseModel> {
      */
     private static List<Bson> getNonNullUpdates(Object obj) {
         return createPropertyDescriptorStream(obj.getClass())
-            .filter(BaseCollection::hasGetter)
-            .map(descriptor -> getField(descriptor, obj))
-            .filter(Objects::nonNull)
-            .map(BaseCollection::createUpdate)
-            .toList();
+                .filter(BaseCollection::hasGetter)
+                .map(descriptor -> getField(descriptor, obj))
+                .filter(Objects::nonNull)
+                .map(BaseCollection::createUpdate)
+                .toList();
     }
 
     /**
@@ -172,7 +172,7 @@ public class BaseCollection<T extends BaseModel> {
      *
      * @param descriptor The {@code PropertyDescriptor}.
      * @return {@code true} if the {@code PropertyDescriptor} has a getter,
-     * {@code false} otherwise.
+     *         {@code false} otherwise.
      */
     private static boolean hasGetter(PropertyDescriptor descriptor) {
         return descriptor.getReadMethod() != null && !descriptor.getName().equals("id");
