@@ -5,11 +5,12 @@ import java.util.HashMap;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(HttpStatus.NOT_FOUND)
-public class UserNotFoundException extends Exception {
+@ResponseStatus(HttpStatus.UNAUTHORIZED)
+public class InvalidTokenException extends Exception {
+
     public static HashMap<String, String> getErrorAsJSON() {
         HashMap<String, String> error = new HashMap<>();
-        error.put("error", "User Not Found");
+        error.put("error", "Invalid Token");
         return error;
     }
 }

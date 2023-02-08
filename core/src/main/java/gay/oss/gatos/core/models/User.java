@@ -1,5 +1,6 @@
 package gay.oss.gatos.core.models;
 
+import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 
 import gay.oss.gatos.core.collection.UserCollection;
@@ -14,6 +15,8 @@ public class User extends BaseModel {
     private String username;
     private String email;
     private String password;
+    @BsonProperty("auth_token")
+    private String authToken;
 
     /**
      * Get the username.
@@ -40,6 +43,15 @@ public class User extends BaseModel {
      */
     public String getPassword() {
         return this.password;
+    }
+
+    /**
+     * Get the auth token.
+     *
+     * @return Auth token
+     */
+    public String getAuthToken() {
+        return this.authToken;
     }
 
     /**
@@ -70,6 +82,15 @@ public class User extends BaseModel {
     }
 
     /**
+     * Set the auth token.
+     *
+     * @param String Auth token
+     */
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
+
+    /**
      * Hash and set the password.
      *
      * @param String password
@@ -82,6 +103,7 @@ public class User extends BaseModel {
 
     /**
      * Check whether a given plaintext password is correct for the stored hash.
+     *
      * @param plaintextPassword Plaintext password
      * @return Whether it is valid
      */

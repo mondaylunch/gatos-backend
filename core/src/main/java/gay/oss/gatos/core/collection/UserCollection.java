@@ -2,8 +2,6 @@ package gay.oss.gatos.core.collection;
 
 import static com.mongodb.client.model.Filters.eq;
 
-import java.util.UUID;
-
 import org.bson.conversions.Bson;
 
 import gay.oss.gatos.core.models.User;
@@ -33,8 +31,18 @@ public class UserCollection extends BaseCollection<User> {
      * @param email The email of the user.
      * @return The POJO.
      */
-    public User getUserUsingEmail(String email) {
+    public User getUserByEmail(String email) {
         return getCollection().find(emailFilter(email)).first();
+    }
+
+    /**
+     * Gets a document.
+     *
+     * @param authToken User's auth token.
+     * @return The POJO.
+     */
+    public User getUserByToken(String authToken) {
+        return getCollection().find(eq("auth_token", authToken)).first();
     }
 
     /**
@@ -55,15 +63,6 @@ public class UserCollection extends BaseCollection<User> {
      */
     public Boolean emailAlreadyInUse(String email) {
         return getCollection().find(emailFilter(email)).first() != null;
-    }
-
-    public User authenticate(String token) throws RuntimeException {
-        User user = User.objects.get(UUID.fromString(token));
-        if (user == null) {
-            throw new RuntimeException();
-        }
-
-        return user;
     }
 
     /**
