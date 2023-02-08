@@ -1,11 +1,16 @@
 package club.mondaylunch.gatos.core.codec.test;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
-import club.mondaylunch.gatos.basicnodes.BasicNodes;
 import club.mondaylunch.gatos.codec.ClassModelRegistry;
 import club.mondaylunch.gatos.core.collection.BaseCollection;
+import club.mondaylunch.gatos.core.data.DataBox;
+import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
+import club.mondaylunch.gatos.core.graph.type.NodeTypeRegistry;
 import club.mondaylunch.gatos.core.models.BaseModel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -19,6 +24,10 @@ public class NodeTypeCodecTest {
             NodeTypeContainer.class,
             NodeTypeContainerContainer.class
         );
+
+        NodeTypeRegistry.register(TestStartNodeType.INSTANCE);
+        NodeTypeRegistry.register(TestProcessNodeType.INSTANCE);
+        NodeTypeRegistry.register(TestEndNodeType.INSTANCE);
     }
 
     private static final BaseCollection<NodeTypeContainer> CONTAINER_COLLECTION = new BaseCollection<>("nodeTypeContainers", NodeTypeContainer.class);
@@ -42,31 +51,34 @@ public class NodeTypeCodecTest {
 
     @Test
     public void canInsertNodeTypeContainer() {
-        assertInsertNodeTypeContainers(BasicNodes.STRING_INTERPOLATION);
+        assertInsertNodeTypeContainers(TestStartNodeType.INSTANCE);
     }
 
     @Test
     public void canInsertMultipleNodeTypeContainers() {
         assertInsertNodeTypeContainers(
-            BasicNodes.STRING_INTERPOLATION,
-            BasicNodes.VARIABLE_EXTRACTION,
-            BasicNodes.VARIABLE_REMAPPING
+            TestStartNodeType.INSTANCE,
+            TestProcessNodeType.INSTANCE,
+            TestEndNodeType.INSTANCE
         );
     }
 
     @Test
     public void canInsertNodeTypeContainersWithDuplicates() {
         assertInsertNodeTypeContainers(
-            BasicNodes.STRING_INTERPOLATION,
-            BasicNodes.STRING_INTERPOLATION,
-            BasicNodes.STRING_INTERPOLATION
+            TestStartNodeType.INSTANCE,
+            TestProcessNodeType.INSTANCE,
+            TestEndNodeType.INSTANCE,
+            TestStartNodeType.INSTANCE,
+            TestProcessNodeType.INSTANCE,
+            TestEndNodeType.INSTANCE
         );
     }
 
     @Test
     public void canInsertNestedContainer() {
         UUID id = UUID.randomUUID();
-        NodeType nodeType = BasicNodes.STRING_INTERPOLATION;
+        NodeType nodeType = TestStartNodeType.INSTANCE;
         NodeTypeContainer container = new NodeTypeContainer();
         container.nodeType = nodeType;
         NodeTypeContainerContainer containerContainer = new NodeTypeContainerContainer(id, container);
@@ -76,7 +88,7 @@ public class NodeTypeCodecTest {
         Assertions.assertNotNull(retrievedContainerContainer);
         NodeTypeContainer retrievedContainer = retrievedContainerContainer.nodeTypeContainer;
         Assertions.assertNotNull(retrievedContainer);
-        Assertions.assertSame(BasicNodes.STRING_INTERPOLATION, retrievedContainer.nodeType);
+        Assertions.assertSame(nodeType, retrievedContainer.nodeType);
     }
 
     private static void assertContainerCount(long expected) {
@@ -135,6 +147,86 @@ public class NodeTypeCodecTest {
 
         @SuppressWarnings("unused")
         public NodeTypeContainerContainer() {
+        }
+    }
+
+    private static class TestStartNodeType extends NodeType.Start {
+
+        public static final TestStartNodeType INSTANCE = new TestStartNodeType();
+
+        @Override
+        public Map<String, DataBox<?>> settings() {
+            return Map.of();
+        }
+
+        @Override
+        public String name() {
+            return "test_start";
+        }
+
+        @Override
+        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
+            return Set.of();
+        }
+
+        @Override
+        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+            return Map.of();
+        }
+    }
+
+    private static class TestProcessNodeType extends NodeType.Process {
+
+        public static final TestProcessNodeType INSTANCE = new TestProcessNodeType();
+
+        @Override
+        public Map<String, DataBox<?>> settings() {
+            return Map.of();
+        }
+
+        @Override
+        public String name() {
+            return "test_process";
+        }
+
+        @Override
+        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
+            return Set.of();
+        }
+
+        @Override
+        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
+            return Set.of();
+        }
+
+        @Override
+        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+            return Map.of();
+        }
+    }
+
+    private static class TestEndNodeType extends NodeType.End {
+
+        public static final TestEndNodeType INSTANCE = new TestEndNodeType();
+
+        @Override
+        public Map<String, DataBox<?>> settings() {
+            return Map.of();
+        }
+
+        @Override
+        public String name() {
+            return "test_end";
+        }
+
+        @Override
+        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
+            return Set.of();
+        }
+
+        @Override
+        public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+            return CompletableFuture.completedFuture(null);
         }
     }
 }
