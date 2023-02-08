@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import club.mondaylunch.gatos.codec.ClassModelRegistry;
+import club.mondaylunch.gatos.core.Database;
 import club.mondaylunch.gatos.core.collection.BaseCollection;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
@@ -25,18 +26,21 @@ public class NodeTypeCodecTest {
             NodeTypeContainerContainer.class
         );
 
+        Database.refreshCodecRegistry();
+
         NodeTypeRegistry.register(TestStartNodeType.INSTANCE);
         NodeTypeRegistry.register(TestProcessNodeType.INSTANCE);
         NodeTypeRegistry.register(TestEndNodeType.INSTANCE);
     }
 
-    private static final BaseCollection<NodeTypeContainer> CONTAINER_COLLECTION = new BaseCollection<>("nodeTypeContainers", NodeTypeContainer.class);
-    private static final BaseCollection<NodeTypeContainerContainer> CONTAINER_CONTAINER_COLLECTION = new BaseCollection<>("nodeTypeContainerContainers", NodeTypeContainerContainer.class);
+    private static final BaseCollection<NodeTypeContainer> CONTAINER_COLLECTION = new BaseCollection<>(Database.getCollection("nodeTypeContainers", NodeTypeContainer.class));
+    private static final BaseCollection<NodeTypeContainerContainer> CONTAINER_CONTAINER_COLLECTION = new BaseCollection<>(Database.getCollection("nodeTypeContainerContainers", NodeTypeContainerContainer.class));
 
     @BeforeEach
     void setUp() {
         this.reset();
         assertContainerCount(0);
+        assertContainerContainerCount(0);
     }
 
     @AfterEach
