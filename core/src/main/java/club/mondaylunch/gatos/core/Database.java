@@ -5,7 +5,6 @@ import static org.bson.codecs.configuration.CodecRegistries.fromCodecs;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 import club.mondaylunch.gatos.codec.ClassModelRegistry;
-import club.mondaylunch.gatos.codec.DataTypeCodec;
 import club.mondaylunch.gatos.codec.NodeTypeCodec;
 import club.mondaylunch.gatos.core.models.Flow;
 import club.mondaylunch.gatos.core.models.User;
@@ -64,10 +63,7 @@ public enum Database {
         return fromRegistries(
             getDefaultCodecRegistry(),
             ClassModelRegistry.createCodecRegistry(),
-            fromCodecs(
-                NodeTypeCodec.INSTANCE,
-                DataTypeCodec.INSTANCE
-            )
+            fromCodecs(NodeTypeCodec.INSTANCE)
         );
     }
 
