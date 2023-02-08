@@ -19,6 +19,11 @@ public class VariableExtractionNodeType extends NodeType.Process {
     }
 
     @Override
+    public String name() {
+        return "variable_extraction";
+    }
+
+    @Override
     public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
         return Set.of(
                 new NodeConnector.Input<>(nodeId, "input", DataType.JSONOBJECT),

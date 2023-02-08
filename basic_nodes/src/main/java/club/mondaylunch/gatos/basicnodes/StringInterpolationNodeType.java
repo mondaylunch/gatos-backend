@@ -27,6 +27,11 @@ public class StringInterpolationNodeType extends NodeType.Process {
     }
 
     @Override
+    public String name() {
+        return "string_interpolation";
+    }
+
+    @Override
     public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
         String template = DataBox.get(state, "template", DataType.STRING).orElse("");
         var matcher = PLACEHOLDER_PATTERN.matcher(template);
