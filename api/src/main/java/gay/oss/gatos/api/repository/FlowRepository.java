@@ -17,16 +17,16 @@ public class FlowRepository {
      * @param user   User to check permissions against
      * @param flowId Flow to fetch from database
      */
-    public User getFlow(User user, UUID flowId) throws FlowNotFoundException, NoPermissionException {
+    public Flow getFlow(User user, UUID flowId) throws FlowNotFoundException, NoPermissionException {
         Flow flow = Flow.objects.get(flowId);
         if (flow == null) {
             throw new FlowNotFoundException();
         }
 
-        if (user.getId() != flow.getAuthorId()) {
+        if (!user.getId().equals(flow.getAuthorId())) {
             throw new NoPermissionException();
         }
 
-        return user;
+        return flow;
     }
 }
