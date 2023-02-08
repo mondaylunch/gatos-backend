@@ -37,6 +37,7 @@ public class NodeTypeCodecTest {
 
     private void reset() {
         CONTAINER_COLLECTION.clear();
+        CONTAINER_CONTAINER_COLLECTION.clear();
     }
 
     @Test
