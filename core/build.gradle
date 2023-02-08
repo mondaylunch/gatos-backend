@@ -2,9 +2,6 @@ plugins {
 	id 'multimodule-config'
 }
 
-group = 'club.mondaylunch.gatos'
-version = '0.0.1-SNAPSHOT'
-
 dependencies {
 	// database driver
 	implementation 'org.mongodb:mongodb-driver-sync:4.8.2'
