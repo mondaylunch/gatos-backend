@@ -9,14 +9,16 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import jakarta.validation.Valid;
 
 import club.mondaylunch.gatos.api.repository.LoginRepository;
 import club.mondaylunch.gatos.core.models.User;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/v1/login")
@@ -44,6 +46,11 @@ public class LoginController {
         user.setAuthToken(new String(Base64.getEncoder().encode(salt)));
 
         return user;
+    }
+
+    @GetMapping("/self")
+    public User fetchUser(@RequestHeader("x-auth-token") String token) {
+        return this.repository.authenticateUser(token);
     }
 
 }
