@@ -5,6 +5,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromCodecs;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 import club.mondaylunch.gatos.codec.ClassModelRegistry;
+import club.mondaylunch.gatos.codec.DataTypeCodec;
 import club.mondaylunch.gatos.codec.NodeTypeCodec;
 import club.mondaylunch.gatos.core.models.Flow;
 import club.mondaylunch.gatos.core.models.User;
@@ -29,7 +30,7 @@ public enum Database {
     INSTANCE;
 
     private final MongoClient client = createClient();
-    private final CodecRegistry codecRegistry = createRegistry();
+    private CodecRegistry codecRegistry = createRegistry();
 
     /**
      * Configure the MongoDB driver.
@@ -63,8 +64,18 @@ public enum Database {
         return fromRegistries(
             getDefaultCodecRegistry(),
             ClassModelRegistry.createCodecRegistry(),
-            fromCodecs(NodeTypeCodec.INSTANCE)
+            fromCodecs(
+                NodeTypeCodec.INSTANCE,
+                DataTypeCodec.INSTANCE
+            )
         );
+    }
+
+    /**
+     * Refresh the codec registry with any new changes.
+     */
+    public static void refreshCodecRegistry() {
+        INSTANCE.codecRegistry = createRegistry();
     }
 
     /**

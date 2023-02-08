@@ -1,8 +1,7 @@
 package club.mondaylunch.gatos.codec;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 import org.bson.codecs.configuration.CodecProvider;
 import org.bson.codecs.configuration.CodecRegistries;
@@ -13,7 +12,7 @@ import org.bson.codecs.pojo.PojoCodecProvider;
 
 public class ClassModelRegistry {
 
-    private static final Set<ClassModel<?>> registry = new HashSet<>();
+    private static final HashMap<Class<?>, ClassModel<?>> registry = new HashMap<>();
 
     /**
      * Registers class models.
@@ -22,10 +21,10 @@ public class ClassModelRegistry {
      */
     public static void register(Class<?>... classes) {
         for (Class<?> clazz : classes) {
-            ClassModel<?> model = ClassModel.builder(clazz)
+            registry.computeIfAbsent(clazz, cls -> ClassModel.builder(cls)
                 .conventions(List.of(Conventions.ANNOTATION_CONVENTION))
-                .build();
-            registry.add(model);
+                .build()
+            );
         }
     }
 
@@ -44,6 +43,6 @@ public class ClassModelRegistry {
      * @return The codec provider.
      */
     private static CodecProvider createCodecProvider() {
-        return PojoCodecProvider.builder().register(registry.toArray(new ClassModel<?>[0])).build();
+        return PojoCodecProvider.builder().register(registry.values().toArray(new ClassModel<?>[0])).build();
     }
 }
