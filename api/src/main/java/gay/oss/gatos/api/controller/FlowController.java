@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import gay.oss.gatos.api.repository.FlowRepository;
 import gay.oss.gatos.api.repository.LoginRepository;
 import gay.oss.gatos.core.models.Flow;
 
@@ -24,9 +25,11 @@ import gay.oss.gatos.core.models.Flow;
 @RequestMapping("api/v1/flows")
 public class FlowController {
     private final LoginRepository userRepository;
+    private final FlowRepository flowRepository;
 
-    public FlowController(LoginRepository repository) {
+    public FlowController(LoginRepository repository, FlowRepository flowRepository) {
         this.userRepository = repository;
+        this.flowRepository = flowRepository;
     }
 
     @GetMapping("list")
@@ -60,28 +63,20 @@ public class FlowController {
     public Flow updateFlow(@RequestHeader("x-auth-token") String token, @PathVariable UUID flowId,
             @Valid @RequestBody BodyUpdateFlow data) {
         var user = this.userRepository.authenticateUser(token);
-
-        Flow flow = Flow.objects.get(flowId);
-        if (!flow.getAuthorId().equals(user.getId())) {
-            throw new RuntimeException("User does not own flow.");
-        }
+        var flow = this.flowRepository.getFlow(user, flowId);
 
         Flow partial = new Flow();
         partial.setName(data.name);
         partial.setDescription(data.description);
 
-        return Flow.objects.update(flowId, partial);
+        return Flow.objects.update(flow.getId(), partial);
     }
 
     @DeleteMapping("{flowId}")
     public void deleteFlow(@RequestHeader("x-auth-token") String token, @PathVariable UUID flowId) {
         var user = this.userRepository.authenticateUser(token);
+        var flow = this.flowRepository.getFlow(user, flowId);
 
-        Flow flow = Flow.objects.get(flowId);
-        if (!flow.getAuthorId().equals(user.getId())) {
-            throw new RuntimeException("User does not own flow.");
-        }
-
-        Flow.objects.delete(flowId);
+        Flow.objects.delete(flow.getId());
     }
 }
