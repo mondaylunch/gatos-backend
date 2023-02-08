@@ -5,6 +5,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import club.mondaylunch.gatos.codec.ClassModelRegistry;
 import club.mondaylunch.gatos.core.Database;
 import club.mondaylunch.gatos.core.collection.BaseCollection;
@@ -13,10 +18,6 @@ import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 import club.mondaylunch.gatos.core.graph.type.NodeTypeRegistry;
 import club.mondaylunch.gatos.core.models.BaseModel;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 public class NodeTypeCodecTest {
 

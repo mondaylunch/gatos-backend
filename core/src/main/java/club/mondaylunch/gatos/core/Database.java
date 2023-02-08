@@ -4,10 +4,6 @@ import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
 import static org.bson.codecs.configuration.CodecRegistries.fromCodecs;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
-import club.mondaylunch.gatos.codec.ClassModelRegistry;
-import club.mondaylunch.gatos.codec.NodeTypeCodec;
-import club.mondaylunch.gatos.core.models.Flow;
-import club.mondaylunch.gatos.core.models.User;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
@@ -20,6 +16,11 @@ import org.bson.Document;
 import org.bson.UuidRepresentation;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
+
+import club.mondaylunch.gatos.codec.ClassModelRegistry;
+import club.mondaylunch.gatos.codec.NodeTypeCodec;
+import club.mondaylunch.gatos.core.models.Flow;
+import club.mondaylunch.gatos.core.models.User;
 
 /**
  * Singleton instance of the MongoDB client.
