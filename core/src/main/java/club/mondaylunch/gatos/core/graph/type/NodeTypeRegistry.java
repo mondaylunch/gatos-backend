@@ -12,12 +12,11 @@ public final class NodeTypeRegistry {
 
     /**
      * Registers a given node type to the registry.
-     * @param name  the name of the node type
      * @param value the node type
      * @return the node type
      */
-    public static <T extends NodeType> T register(String name, T value) {
-        registry.put(name, value);
+    public static <T extends NodeType> T register(T value) {
+        registry.put(value.name(), value);
         return value;
     }
 

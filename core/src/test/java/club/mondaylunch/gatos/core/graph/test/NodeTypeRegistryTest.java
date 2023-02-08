@@ -23,9 +23,14 @@ public class NodeTypeRegistryTest {
             public Map<String, DataBox<?>> settings() {
                 return Map.of();
             }
+
+            @Override
+            public String name() {
+                return "my_node";
+            }
         };
 
-        Assertions.assertEquals(node, NodeTypeRegistry.register("my_node", node));
+        Assertions.assertEquals(node, NodeTypeRegistry.register(node));
         var res = NodeTypeRegistry.get("my_node");
         Assertions.assertTrue(res.isPresent());
         Assertions.assertEquals(node, res.get());
