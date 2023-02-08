@@ -1,30 +1,25 @@
 package club.mondaylunch.gatos.core;
 
 import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromCodecs;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
-import java.util.List;
-
-import org.bson.BsonDocument;
-import org.bson.BsonInt64;
-import org.bson.Document;
-import org.bson.UuidRepresentation;
-import org.bson.codecs.configuration.CodecProvider;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.codecs.pojo.ClassModel;
-import org.bson.codecs.pojo.Conventions;
-import org.bson.codecs.pojo.PojoCodecProvider;
-import org.bson.conversions.Bson;
+import club.mondaylunch.gatos.codec.ClassModelRegistry;
+import club.mondaylunch.gatos.codec.NodeTypeCodec;
+import club.mondaylunch.gatos.core.models.Flow;
+import club.mondaylunch.gatos.core.models.User;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-
-import club.mondaylunch.gatos.core.models.Flow;
-import club.mondaylunch.gatos.core.models.User;
+import org.bson.BsonDocument;
+import org.bson.BsonInt64;
+import org.bson.Document;
+import org.bson.UuidRepresentation;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.conversions.Bson;
 
 /**
  * Singleton instance of the MongoDB client.
@@ -43,8 +38,8 @@ public enum Database {
         // Configure the connection settings
         ConnectionString connectionString = new ConnectionString(Environment.getMongoUri());
         MongoClientSettings mongoClientSettings = MongoClientSettings.builder()
-                .uuidRepresentation(UuidRepresentation.STANDARD)
-                .applyConnectionString(connectionString).build();
+            .uuidRepresentation(UuidRepresentation.STANDARD)
+            .applyConnectionString(connectionString).build();
 
         // Build the client
         return MongoClients.create(mongoClientSettings);
@@ -57,15 +52,19 @@ public enum Database {
         // Create ClassModel for every single model
         // Documentation:
         // https://www.mongodb.com/docs/drivers/java/sync/current/fundamentals/data-formats/pojo-customization/#customize-a-pojocodecprovider
-        ClassModel<User> userModel = ClassModel.builder(User.class)
-                .conventions(List.of(Conventions.ANNOTATION_CONVENTION)).build();
 
-        ClassModel<Flow> flowModel = ClassModel.builder(Flow.class)
-                .conventions(List.of(Conventions.ANNOTATION_CONVENTION)).build();
+        // Register classes
+        ClassModelRegistry.register(
+            User.class,
+            Flow.class
+        );
 
-        // Register classes and create the registry
-        CodecProvider pojoCodecProvider = PojoCodecProvider.builder().register(userModel, flowModel).build();
-        return fromRegistries(getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
+        // Create the registry
+        return fromRegistries(
+            getDefaultCodecRegistry(),
+            ClassModelRegistry.createCodecRegistry(),
+            fromCodecs(NodeTypeCodec.INSTANCE)
+        );
     }
 
     /**
@@ -84,7 +83,7 @@ public enum Database {
      */
     public static MongoDatabase getDatabase() {
         return INSTANCE.client.getDatabase(Environment.isJUnitTest() ? "gatos-testdb" : "gatos")
-                .withCodecRegistry(INSTANCE.codecRegistry);
+            .withCodecRegistry(INSTANCE.codecRegistry);
     }
 
     /**
