@@ -13,7 +13,6 @@ import gay.oss.gatos.core.models.User;
 public class FlowRepository {
     /**
      * Get a flow by ID for a given User.
-     * 
      * @param user   User to check permissions against
      * @param flowId Flow to fetch from database
      */

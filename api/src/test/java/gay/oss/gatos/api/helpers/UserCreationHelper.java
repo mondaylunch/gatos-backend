@@ -9,7 +9,6 @@ public interface UserCreationHelper {
 
     /**
      * Create a new user with given properties.
-     * 
      * @param username Username
      * @param email    Email
      * @return New user

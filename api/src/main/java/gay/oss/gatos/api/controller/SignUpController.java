@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 
 import gay.oss.gatos.api.repository.SignUpRepository;
 import gay.oss.gatos.core.models.User;
-import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/v1/sign_up")
