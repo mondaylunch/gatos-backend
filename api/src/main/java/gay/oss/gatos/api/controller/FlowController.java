@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import gay.oss.gatos.api.repository.LoginRepository;
 import gay.oss.gatos.core.models.Flow;
-import gay.oss.gatos.core.models.User;
 
 @RestController
 @RequestMapping("api/v1/flows")
@@ -42,7 +41,7 @@ public class FlowController {
 
     @PostMapping
     public Flow addFlow(@RequestHeader("x-auth-token") String token, @Valid @RequestBody BodyAddFlow data) {
-        var user = User.objects.authenticate(token);
+        var user = this.userRepository.authenticateUser(token);
 
         Flow flow = new Flow();
         flow.setName(data.name);
@@ -60,7 +59,8 @@ public class FlowController {
     @PatchMapping("{flowId}")
     public Flow updateFlow(@RequestHeader("x-auth-token") String token, @PathVariable UUID flowId,
             @Valid @RequestBody BodyUpdateFlow data) {
-        var user = User.objects.authenticate(token);
+        var user = this.userRepository.authenticateUser(token);
+
         Flow flow = Flow.objects.get(flowId);
         if (!flow.getAuthorId().equals(user.getId())) {
             throw new RuntimeException("User does not own flow.");
@@ -75,7 +75,8 @@ public class FlowController {
 
     @DeleteMapping("{flowId}")
     public void deleteFlow(@RequestHeader("x-auth-token") String token, @PathVariable UUID flowId) {
-        var user = User.objects.authenticate(token);
+        var user = this.userRepository.authenticateUser(token);
+
         Flow flow = Flow.objects.get(flowId);
         if (!flow.getAuthorId().equals(user.getId())) {
             throw new RuntimeException("User does not own flow.");

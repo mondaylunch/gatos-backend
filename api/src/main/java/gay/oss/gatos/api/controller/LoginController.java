@@ -9,14 +9,11 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import gay.oss.gatos.api.exceptions.UserNotFoundException;
 import gay.oss.gatos.api.repository.LoginRepository;
 import gay.oss.gatos.core.models.User;
 import jakarta.validation.Valid;
@@ -38,19 +35,15 @@ public class LoginController {
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity authenticateUser(@Valid @RequestBody BodyAuthenticate data) {
-        try {
-            User user = this.repository.authenticateUser(data.email, data.password);
+    public User authenticateUser(@Valid @RequestBody BodyAuthenticate data) {
+        User user = this.repository.authenticateUser(data.email, data.password);
 
-            // Generate random authentication token
-            byte[] salt = new byte[64];
-            this.random.nextBytes(salt);
-            user.setAuthToken(new String(Base64.getEncoder().encode(salt)));
+        // Generate random authentication token
+        byte[] salt = new byte[64];
+        this.random.nextBytes(salt);
+        user.setAuthToken(new String(Base64.getEncoder().encode(salt)));
 
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        } catch (UserNotFoundException e) {
-            return new ResponseEntity<>(UserNotFoundException.getErrorAsJSON(), HttpStatus.NOT_FOUND);
-        }
+        return user;
     }
 
 }
