@@ -46,9 +46,9 @@ public interface NodeType {
     Map<String, DataBox<?>> settings();
 
     /**
-     * The name of this node type.
+     * The unique name of this node type.
      *
-     * @return the name of this node type.
+     * @return the unique name of this node type.
      */
     String name();
 

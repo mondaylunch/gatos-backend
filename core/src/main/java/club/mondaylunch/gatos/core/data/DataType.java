@@ -38,8 +38,8 @@ public final class DataType<T> {
     }
 
     /**
-     * Returns the name for the type this represents.
-     * @return the name for the type this represents
+     * The unique name of this data type.
+     * @return the unique name of this data type.
      */
     public String name() {
         return this.name;
