@@ -42,19 +42,19 @@ public class VariableRemappingNodeTest {
     @Test
     public void correctlyRemapsKeys() {
         Map<String, DataBox<?>> input0 = Map.of(
-                "input", DataType.JSONOBJECT.create(TEST_JSON_OBJECT),
+                "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
                 "oldKey", DataType.STRING.create("firstKey"),
                 "newKey", DataType.STRING.create("title"));
         var result0 = BasicNodes.VARIABLE_REMAPPING.compute(input0, Map.of());
 
         Map<String, DataBox<?>> input1 = Map.of(
-                "input", DataType.JSONOBJECT.create((JsonObject) result0.get("output").join().value()),
+                "input", DataType.JSON_OBJECT.create((JsonObject) result0.get("output").join().value()),
                 "oldKey", DataType.STRING.create("secondKey"),
                 "newKey", DataType.STRING.create("firstName"));
         var result1 = BasicNodes.VARIABLE_REMAPPING.compute(input1, Map.of());
 
         Map<String, DataBox<?>> input2 = Map.of(
-                "input", DataType.JSONOBJECT.create((JsonObject) result1.get("output").join().value()),
+                "input", DataType.JSON_OBJECT.create((JsonObject) result1.get("output").join().value()),
                 "oldKey", DataType.STRING.create("thirdKey"),
                 "newKey", DataType.STRING.create("lastName"));
         var result2 = BasicNodes.VARIABLE_REMAPPING.compute(input2, Map.of());
@@ -68,13 +68,13 @@ public class VariableRemappingNodeTest {
     @Test
     public void doesNotRemapInvalidKeys() {
         Map<String, DataBox<?>> input0 = Map.of(
-                "input", DataType.JSONOBJECT.create(TEST_JSON_OBJECT),
+                "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
                 "newKey", DataType.STRING.create("title"));
         var result0 = BasicNodes.VARIABLE_REMAPPING.compute(input0, Map.of());
         Assertions.assertEquals(result0.get("output").join().value(), TEST_JSON_OBJECT);
 
         Map<String, DataBox<?>> input1 = Map.of(
-                "input", DataType.JSONOBJECT.create(TEST_JSON_OBJECT),
+                "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
                 "oldKey", DataType.STRING.create("firstKey"));
         var result1 = BasicNodes.VARIABLE_REMAPPING.compute(input1, Map.of());
         Assertions.assertEquals(result1.get("output").join().value(), TEST_JSON_OBJECT);
@@ -89,7 +89,7 @@ public class VariableRemappingNodeTest {
     @Test
     public void doesNotRemapSameKeys() {
         Map<String, DataBox<?>> input = Map.of(
-                "input", DataType.JSONOBJECT.create(TEST_JSON_OBJECT),
+                "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
                 "oldKey", DataType.STRING.create("firstKey"),
                 "newKey", DataType.STRING.create("firstKey"));
         var result = BasicNodes.VARIABLE_REMAPPING.compute(input, Map.of());
@@ -99,7 +99,7 @@ public class VariableRemappingNodeTest {
     @Test
     public void doesNotRemapIncorrectKeys() {
         Map<String, DataBox<?>> input = Map.of(
-                "input", DataType.JSONOBJECT.create(TEST_JSON_OBJECT),
+                "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
                 "oldKey", DataType.STRING.create("thisDoesNotExist"),
                 "newKey", DataType.STRING.create("title"));
         var result = BasicNodes.VARIABLE_REMAPPING.compute(input, Map.of());
