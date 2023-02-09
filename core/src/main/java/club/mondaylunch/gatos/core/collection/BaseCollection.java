@@ -36,16 +36,7 @@ public class BaseCollection<T extends BaseModel> {
      * @param cls            Model class.
      */
     public BaseCollection(String collectionName, Class<T> cls) {
-        this(Database.getCollection(collectionName, cls));
-    }
-
-    /**
-     * Construct a new BaseCollection.
-     *
-     * @param collection The Mongo Collection.
-     */
-    public BaseCollection(MongoCollection<T> collection) {
-        this.collection = collection;
+        this.collection = Database.getCollection(collectionName, cls);
     }
 
     /**

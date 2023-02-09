@@ -34,8 +34,8 @@ public class NodeTypeCodecTest {
         NodeTypeRegistry.register(TestEndNodeType.INSTANCE);
     }
 
-    private static final BaseCollection<NodeTypeContainer> CONTAINER_COLLECTION = new BaseCollection<>(Database.getCollection("nodeTypeContainers", NodeTypeContainer.class));
-    private static final BaseCollection<NodeTypeContainerContainer> CONTAINER_CONTAINER_COLLECTION = new BaseCollection<>(Database.getCollection("nodeTypeContainerContainers", NodeTypeContainerContainer.class));
+    private static final BaseCollection<NodeTypeContainer> CONTAINER_COLLECTION = new BaseCollection<>("nodeTypeContainers", NodeTypeContainer.class);
+    private static final BaseCollection<NodeTypeContainerContainer> CONTAINER_CONTAINER_COLLECTION = new BaseCollection<>("nodeTypeContainerContainers", NodeTypeContainerContainer.class);
 
     @BeforeEach
     void setUp() {
