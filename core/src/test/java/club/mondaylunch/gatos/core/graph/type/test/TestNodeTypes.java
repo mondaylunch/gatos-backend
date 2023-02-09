@@ -15,7 +15,7 @@ public class TestNodeTypes {
     public static final NodeType.Process PROCESS = new TestProcessNodeType();
     public static final NodeType.End END = new TestEndNodeType();
 
-    public static class TestStartNodeType extends NodeType.Start {
+    private static class TestStartNodeType extends NodeType.Start {
 
         @Override
         public Map<String, DataBox<?>> settings() {
@@ -38,7 +38,7 @@ public class TestNodeTypes {
         }
     }
 
-    public static class TestProcessNodeType extends NodeType.Process {
+    private static class TestProcessNodeType extends NodeType.Process {
 
         @Override
         public Map<String, DataBox<?>> settings() {
@@ -66,7 +66,7 @@ public class TestNodeTypes {
         }
     }
 
-    public static class TestEndNodeType extends NodeType.End {
+    private static class TestEndNodeType extends NodeType.End {
 
         @Override
         public Map<String, DataBox<?>> settings() {
