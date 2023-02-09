@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.UnaryOperator;
 
+import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.jetbrains.annotations.Nullable;
 
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
@@ -42,6 +43,7 @@ public class Graph {
     /**
      * The edges of this graph, easily retrievable by their associated nodes' UUIDs.
      */
+    @BsonIgnore
     private final Map<UUID, Set<NodeConnection<?>>> connectionsByNode = new HashMap<>();
 
     /**
@@ -237,6 +239,7 @@ public class Graph {
      * {@link #validate() valid}, this will return an empty Optional.
      * @return a topological sort of this graph
      */
+    @BsonIgnore
     public Optional<List<Node>> getExecutionOrder() {
         Set<UUID> relevantNodes = new HashSet<>(this.nodes.keySet());
         relevantNodes.removeIf(n -> this.getConnectionsForNode(n).isEmpty());

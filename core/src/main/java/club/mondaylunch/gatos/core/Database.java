@@ -20,6 +20,12 @@ import org.bson.conversions.Bson;
 import club.mondaylunch.gatos.codec.ClassModelRegistry;
 import club.mondaylunch.gatos.codec.DataTypeCodec;
 import club.mondaylunch.gatos.codec.NodeTypeCodec;
+import club.mondaylunch.gatos.core.data.DataBox;
+import club.mondaylunch.gatos.core.graph.Graph;
+import club.mondaylunch.gatos.core.graph.Node;
+import club.mondaylunch.gatos.core.graph.NodeMetadata;
+import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
+import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.models.Flow;
 import club.mondaylunch.gatos.core.models.User;
 
@@ -56,10 +62,7 @@ public enum Database {
         // https://www.mongodb.com/docs/drivers/java/sync/current/fundamentals/data-formats/pojo-customization/#customize-a-pojocodecprovider
 
         // Register classes
-        ClassModelRegistry.register(
-            User.class,
-            Flow.class
-        );
+        registerClassModels();
 
         // Create the registry
         return fromRegistries(
@@ -114,5 +117,18 @@ public enum Database {
      */
     public static <TDocument> MongoCollection<TDocument> getCollection(String name, Class<TDocument> cls) {
         return getDatabase().getCollection(name, cls);
+    }
+
+    private static void registerClassModels() {
+        ClassModelRegistry.register(
+            User.class,
+            Flow.class,
+            Graph.class,
+            Node.class,
+            DataBox.class,
+            NodeConnector.class,
+            NodeConnection.class,
+            NodeMetadata.class
+        );
     }
 }
