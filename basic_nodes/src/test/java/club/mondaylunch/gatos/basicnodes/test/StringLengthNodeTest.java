@@ -2,12 +2,13 @@ package club.mondaylunch.gatos.basicnodes.test;
 
 import java.util.Map;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Node;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 public class StringLengthNodeTest {
     private static final String TEST_STR = "The quick brown fox jumps over the lazy dog.";
