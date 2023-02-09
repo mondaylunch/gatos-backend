@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 /**
@@ -15,11 +14,10 @@ public final class DataType<T> {
     public static final DataType<Boolean> BOOLEAN = new DataType<>("boolean");
     public static final DataType<String> STRING = new DataType<>("string");
     public static final DataType<JsonObject> JSONOBJECT = new DataType<>("jsonobject");
-    public static final DataType<JsonElement> JSONELEMENT = new DataType<>("jsonelement");
+    public static final DataType<DataType> DATATYPE = new DataType<>("datatype");
     private final String name;
     private DataType<Optional<T>> optionalType = null;
     private DataType<List<T>> listType = null;
-
     /**
      * @param name  the name for the type this represents
      */
