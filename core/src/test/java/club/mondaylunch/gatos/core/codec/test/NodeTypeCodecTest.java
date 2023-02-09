@@ -26,7 +26,6 @@ public class NodeTypeCodecTest {
             NodeTypeContainer.class,
             NodeTypeContainerContainer.class
         );
-
         Database.refreshCodecRegistry();
 
         NodeTypeRegistry.register(TestStartNodeType.INSTANCE);
@@ -96,21 +95,12 @@ public class NodeTypeCodecTest {
         Assertions.assertSame(nodeType, retrievedContainer.nodeType);
     }
 
-    private static void assertContainerCount(long expected) {
-        Assertions.assertEquals(expected, CONTAINER_COLLECTION.size());
-    }
-
-    @SuppressWarnings("SameParameterValue")
-    private static void assertContainerContainerCount(long expected) {
-        Assertions.assertEquals(expected, CONTAINER_CONTAINER_COLLECTION.size());
-    }
-
     private static UUID insertNodeTypeContainer(NodeType nodeType) {
         UUID id = UUID.randomUUID();
         NodeTypeContainer container = new NodeTypeContainer(id, nodeType);
         long countBefore = CONTAINER_COLLECTION.size();
         CONTAINER_COLLECTION.insert(container);
-        Assertions.assertEquals(countBefore + 1, CONTAINER_COLLECTION.size());
+        assertContainerCount(countBefore + 1);
         return id;
     }
 
@@ -126,13 +116,20 @@ public class NodeTypeCodecTest {
         }
     }
 
+    private static void assertContainerCount(long expected) {
+        Assertions.assertEquals(expected, CONTAINER_COLLECTION.size());
+    }
+
+    private static void assertContainerContainerCount(long expected) {
+        Assertions.assertEquals(expected, CONTAINER_CONTAINER_COLLECTION.size());
+    }
+
     public static class NodeTypeContainer extends BaseModel {
 
         public NodeType nodeType;
 
         public NodeTypeContainer(UUID id, NodeType nodeType) {
-            super();
-            this.setId(id);
+            super(id);
             this.nodeType = nodeType;
         }
 
@@ -145,8 +142,7 @@ public class NodeTypeCodecTest {
         public NodeTypeContainer nodeTypeContainer;
 
         public NodeTypeContainerContainer(UUID id, NodeTypeContainer nodeTypeContainer) {
-            super();
-            this.setId(id);
+            super(id);
             this.nodeTypeContainer = nodeTypeContainer;
         }
 
