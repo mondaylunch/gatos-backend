@@ -7,7 +7,12 @@ public final class BasicNodes {
             .register("string_interpolation", new StringInterpolationNodeType());
     public static final VariableExtractionNodeType VARIABLE_EXTRACTION = NodeTypeRegistry
             .register("variable_extraction", new VariableExtractionNodeType());
-    public static final VariableRemappingNodeType VARIABLE_REMAPPING = NodeTypeRegistry.register(
-            "variable_remapping",
-            new VariableRemappingNodeType());
+    public static final VariableRemappingNodeType VARIABLE_REMAPPING = NodeTypeRegistry
+        .register("variable_remapping", new VariableRemappingNodeType());
+    public static final StringLengthNodeType STRING_LENGTH = NodeTypeRegistry
+        .register("string_length", new StringLengthNodeType());
+    public static final StringContainsNodeType STRING_CONTAINS = NodeTypeRegistry
+        .register("string_contains", new StringContainsNodeType());
+    public static final StringConcatNodeType STRING_CONCAT = NodeTypeRegistry
+        .register("string_concat", new StringConcatNodeType());
 }
