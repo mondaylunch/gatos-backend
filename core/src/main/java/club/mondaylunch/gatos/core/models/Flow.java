@@ -16,6 +16,12 @@ public class Flow extends BaseModel {
 
     private final Graph graph = new Graph();
 
+    public Flow(UUID id, String name, UUID authorId) {
+        super(id);
+        this.name = name;
+        this.authorId = authorId;
+    }
+
     public Flow(String name, UUID authorId) {
         this.name = name;
         this.authorId = authorId;
