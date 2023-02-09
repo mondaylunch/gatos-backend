@@ -12,11 +12,11 @@ import com.google.gson.JsonObject;
  */
 public final class DataType<T> {
 
-    public static final DataType<Integer> INTEGER = new DataType<>("integer");
-    public static final DataType<Boolean> BOOLEAN = new DataType<>("boolean");
-    public static final DataType<String> STRING = new DataType<>("string");
-    public static final DataType<JsonObject> JSON_OBJECT = new DataType<>("jsonobject");
-    public static final DataType<JsonElement> JSON_ELEMENT = new DataType<>("jsonelement");
+    public static final DataType<Integer> INTEGER = DataTypeRegistry.register(new DataType<>("integer"));
+    public static final DataType<Boolean> BOOLEAN = DataTypeRegistry.register(new DataType<>("boolean"));
+    public static final DataType<String> STRING = DataTypeRegistry.register(new DataType<>("string"));
+    public static final DataType<JsonObject> JSON_OBJECT = DataTypeRegistry.register(new DataType<>("jsonobject"));
+    public static final DataType<JsonElement> JSON_ELEMENT = DataTypeRegistry.register(new DataType<>("jsonelement"));
     private final String name;
     private DataType<Optional<T>> optionalType = null;
     private DataType<List<T>> listType = null;
