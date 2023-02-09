@@ -71,6 +71,7 @@ public class VariableExtractionNodeType extends NodeType.Process {
         ReturnType(DataType dataType) {
             this.dataType = dataType;
         }
+
         public static ReturnType getFromDataType(DataType dataType) {
             var type = Arrays.stream(ReturnType.values())
                 .filter(x -> x.dataType.equals(dataType)).toList();
