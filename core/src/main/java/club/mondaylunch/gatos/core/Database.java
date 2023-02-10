@@ -17,9 +17,9 @@ import org.bson.UuidRepresentation;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
 
-import club.mondaylunch.gatos.codec.ClassModelRegistry;
-import club.mondaylunch.gatos.codec.DataTypeCodec;
-import club.mondaylunch.gatos.codec.NodeTypeCodec;
+import club.mondaylunch.gatos.core.codec.ClassModelRegistry;
+import club.mondaylunch.gatos.core.codec.DataTypeCodec;
+import club.mondaylunch.gatos.core.codec.NodeTypeCodec;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.Node;

@@ -1,4 +1,4 @@
-package club.mondaylunch.gatos.codec;
+package club.mondaylunch.gatos.core.codec;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
