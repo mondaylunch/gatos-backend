@@ -369,7 +369,7 @@ public class Graph implements DatabaseSerializable {
     }
 
     /**
-     * Needed so that {@link #serializableMetadata} will be serialized.
+     * Needed so that {@link #serializableMetadata} will be serialized automatically.
      *
      * @return the serializable metadata.
      */
