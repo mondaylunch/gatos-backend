@@ -10,6 +10,7 @@ import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Unmodifiable;
 
 import club.mondaylunch.gatos.core.data.DataBox;
@@ -46,6 +47,10 @@ public final class Node {
         this.outputs = Map.copyOf(outputs.stream().collect(Collectors.toMap(NodeConnector::name, Function.identity())));
     }
 
+    /**
+     * Needed for deserialization.
+     */
+    @ApiStatus.Internal
     public Node() {
         this.id = null;
         this.type = null;
