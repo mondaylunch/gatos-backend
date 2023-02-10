@@ -20,7 +20,7 @@ public class NodeTest {
     @Test
     public void canGetInputs() {
         var node = Node.create(TEST_NODE_TYPE);
-        Assertions.assertTrue(node.inputs().containsKey("in"));
+        Assertions.assertTrue(node.getInputs().containsKey("in"));
     }
 
     @Test
@@ -32,7 +32,7 @@ public class NodeTest {
     @Test
     public void canGetOutputs() {
         var node = Node.create(TEST_NODE_TYPE);
-        Assertions.assertTrue(node.outputs().containsKey("out"));
+        Assertions.assertTrue(node.getOutputs().containsKey("out"));
     }
 
     @Test
@@ -67,7 +67,7 @@ public class NodeTest {
     public void canMakeNewNodeWithChangedSettings() {
         var node = Node.create(TEST_NODE_TYPE);
         var newNode = node.modifySetting("setting_1", DataType.INTEGER.create(100));
-        Assertions.assertEquals(node.id(), newNode.id());
+        Assertions.assertEquals(node.getId(), newNode.getId());
         Assertions.assertEquals(100, newNode.getSetting("setting_1", DataType.INTEGER).value());
     }
 

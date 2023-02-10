@@ -6,14 +6,16 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import club.mondaylunch.gatos.core.data.DataBox;
+import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
+import club.mondaylunch.gatos.core.graph.type.NodeTypeRegistry;
 
 public class TestNodeTypes {
 
-    public static final NodeType.Start START = new TestStartNodeType();
-    public static final NodeType.Process PROCESS = new TestProcessNodeType();
-    public static final NodeType.End END = new TestEndNodeType();
+    public static final NodeType.Start START = NodeTypeRegistry.register(new TestStartNodeType());
+    public static final NodeType.Process PROCESS = NodeTypeRegistry.register(new TestProcessNodeType());
+    public static final NodeType.End END = NodeTypeRegistry.register(new TestEndNodeType());
 
     private static class TestStartNodeType extends NodeType.Start {
 
@@ -29,7 +31,7 @@ public class TestNodeTypes {
 
         @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
-            return Set.of();
+            return Set.of(new NodeConnector.Output<>(nodeId, "out", DataType.INTEGER));
         }
 
         @Override
@@ -52,12 +54,12 @@ public class TestNodeTypes {
 
         @Override
         public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
-            return Set.of();
+            return Set.of(new NodeConnector.Input<>(nodeId, "in", DataType.INTEGER));
         }
 
         @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
-            return Set.of();
+            return Set.of(new NodeConnector.Output<>(nodeId, "out", DataType.INTEGER));
         }
 
         @Override
@@ -80,7 +82,7 @@ public class TestNodeTypes {
 
         @Override
         public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
-            return Set.of();
+            return Set.of(new NodeConnector.Input<>(nodeId, "in", DataType.INTEGER));
         }
 
         @Override

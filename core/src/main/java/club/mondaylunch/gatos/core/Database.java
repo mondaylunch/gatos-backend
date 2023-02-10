@@ -1,9 +1,5 @@
 package club.mondaylunch.gatos.core;
 
-import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
-import static org.bson.codecs.configuration.CodecRegistries.fromCodecs;
-import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
-
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
@@ -14,18 +10,18 @@ import org.bson.BsonDocument;
 import org.bson.BsonInt64;
 import org.bson.Document;
 import org.bson.UuidRepresentation;
+import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
 
 import club.mondaylunch.gatos.core.codec.ClassModelRegistry;
 import club.mondaylunch.gatos.core.codec.DataTypeCodec;
+import club.mondaylunch.gatos.core.codec.NodeConnectionCodecProvider;
+import club.mondaylunch.gatos.core.codec.NodeConnectorCodecProvider;
 import club.mondaylunch.gatos.core.codec.NodeTypeCodec;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.Node;
-import club.mondaylunch.gatos.core.graph.NodeMetadata;
-import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
-import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.models.Flow;
 import club.mondaylunch.gatos.core.models.User;
 
@@ -65,13 +61,17 @@ public enum Database {
         registerClassModels();
 
         // Create the registry
-        return fromRegistries(
-            getDefaultCodecRegistry(),
-            ClassModelRegistry.createCodecRegistry(),
-            fromCodecs(
+        return CodecRegistries.fromRegistries(
+            CodecRegistries.fromCodecs(
                 NodeTypeCodec.INSTANCE,
                 DataTypeCodec.INSTANCE
-            )
+            ),
+            CodecRegistries.fromProviders(
+                NodeConnectorCodecProvider.INSTANCE,
+                NodeConnectionCodecProvider.INSTANCE
+            ),
+            ClassModelRegistry.createCodecRegistry(),
+            MongoClientSettings.getDefaultCodecRegistry()
         );
     }
 
@@ -125,10 +125,7 @@ public enum Database {
             Flow.class,
             Graph.class,
             Node.class,
-            DataBox.class,
-            NodeConnector.class,
-            NodeConnection.class,
-            NodeMetadata.class
+            DataBox.class
         );
     }
 }

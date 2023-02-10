@@ -32,16 +32,16 @@ public class VariableExtractionNodeTest {
     @Test
     public void areInputsCorrect() {
         var node = Node.create(BasicNodes.VARIABLE_EXTRACTION);
-        Assertions.assertEquals(2, node.inputs().size());
-        Assertions.assertTrue(node.inputs().containsKey("input"));
-        Assertions.assertTrue(node.inputs().containsKey("key"));
+        Assertions.assertEquals(2, node.getInputs().size());
+        Assertions.assertTrue(node.getInputs().containsKey("input"));
+        Assertions.assertTrue(node.getInputs().containsKey("key"));
     }
 
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.VARIABLE_EXTRACTION);
-        Assertions.assertEquals(1, node.outputs().size());
-        Assertions.assertTrue(node.outputs().containsKey("output"));
+        Assertions.assertEquals(1, node.getOutputs().size());
+        Assertions.assertTrue(node.getOutputs().containsKey("output"));
     }
 
     @Test

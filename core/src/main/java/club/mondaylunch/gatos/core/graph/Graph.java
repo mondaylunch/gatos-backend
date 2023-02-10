@@ -14,8 +14,10 @@ import java.util.UUID;
 import java.util.function.UnaryOperator;
 
 import org.bson.codecs.pojo.annotations.BsonIgnore;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import club.mondaylunch.gatos.core.codec.DatabaseSerializable;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.type.NodeCategory;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
@@ -32,10 +34,12 @@ import club.mondaylunch.gatos.core.graph.type.NodeType;
  * In addition, {@link NodeMetadata extra metadata} is stored per-node.
  * </p>
  */
-public class Graph {
+public class Graph implements DatabaseSerializable {
+
     /**
      * The nodes of this graph.
      */
+    @BsonIgnore
     private final Map<UUID, Node> nodes = new HashMap<>();
     /**
      * The edges of this graph.
@@ -50,7 +54,18 @@ public class Graph {
     /**
      * The metadata of each node in the graph.
      */
+    @BsonIgnore
     private final Map<UUID, NodeMetadata> metadataByNode = new HashMap<>();
+
+    /**
+     * The serialized representation of {@link #nodes}.
+     */
+    private final Set<Node> serializableNodes = new HashSet<>();
+
+    /**
+     * The serialized representation of {@link #connections}.
+     */
+    private final Map<String, NodeMetadata> serializableMetadata = new HashMap<>();
 
     /**
      * Adds a new Node to the graph of the given type. The new node is returned.
@@ -60,7 +75,7 @@ public class Graph {
      */
     public Node addNode(NodeType type) {
         var node = Node.create(type);
-        this.nodes.put(node.id(), node);
+        this.nodes.put(node.getId(), node);
         return node;
     }
 
@@ -153,8 +168,8 @@ public class Graph {
         }
 
         this.connections.add(connection);
-        this.getOrCreateConnectionsForNode(nodeFrom.id()).add(connection);
-        this.getOrCreateConnectionsForNode(nodeTo.id()).add(connection);
+        this.getOrCreateConnectionsForNode(nodeFrom.getId()).add(connection);
+        this.getOrCreateConnectionsForNode(nodeTo.getId()).add(connection);
     }
 
     /**
@@ -277,11 +292,11 @@ public class Graph {
             var node = this.nodes.get(nodeId);
             res.add(node);
 
-            if (!hasSeenInput && node.type().category() == NodeCategory.START) {
+            if (!hasSeenInput && node.getType().category() == NodeCategory.START) {
                 hasSeenInput = true;
             }
 
-            if (!hasSeenOutput && node.type().category() == NodeCategory.END) {
+            if (!hasSeenOutput && node.getType().category() == NodeCategory.END) {
                 hasSeenOutput = true;
             }
 
@@ -313,12 +328,12 @@ public class Graph {
      * @return whether the connection is valid for the given node
      */
     private static boolean isConnectionValid(Node node, NodeConnection<?> connection) {
-        if (connection.from().nodeId().equals(node.id())) {
-            return node.outputs().containsValue(connection.from());
+        if (connection.from().nodeId().equals(node.getId())) {
+            return node.getOutputs().containsValue(connection.from());
         }
 
-        if (connection.to().nodeId().equals(node.id())) {
-            return node.inputs().containsValue(connection.to());
+        if (connection.to().nodeId().equals(node.getId())) {
+            return node.getInputs().containsValue(connection.to());
         }
 
         return false;
@@ -340,6 +355,48 @@ public class Graph {
      */
     public int connectionCount() {
         return this.connections.size();
+    }
+
+    /**
+     * Needed so that {@link #serializableNodes} will be serialized automatically.
+     *
+     * @return the serializable nodes.
+     */
+    @SuppressWarnings("unused")
+    @ApiStatus.Internal
+    public Set<Node> getSerializableNodes() {
+        return this.serializableNodes;
+    }
+
+    /**
+     * Needed so that {@link #serializableMetadata} will be serialized.
+     *
+     * @return the serializable metadata.
+     */
+    @SuppressWarnings("unused")
+    @ApiStatus.Internal
+    public Map<String, NodeMetadata> getSerializableMetadata() {
+        return this.serializableMetadata;
+    }
+
+    @Override
+    public void beforeSerialization() {
+        this.serializableNodes.clear();
+        this.serializableNodes.addAll(this.nodes.values());
+        this.serializableMetadata.clear();
+        for (var entry : this.metadataByNode.entrySet()) {
+            this.serializableMetadata.put(entry.getKey().toString(), entry.getValue());
+        }
+    }
+
+    @Override
+    public void afterDeserialization() {
+        for (var node : this.serializableNodes) {
+            this.nodes.put(node.getId(), node);
+        }
+        for (var entry : this.serializableMetadata.entrySet()) {
+            this.metadataByNode.put(UUID.fromString(entry.getKey()), entry.getValue());
+        }
     }
 
     @Override

@@ -22,7 +22,10 @@ public class ClassModelRegistry {
     public static void register(Class<?>... classes) {
         for (Class<?> clazz : classes) {
             registry.computeIfAbsent(clazz, cls -> ClassModel.builder(cls)
-                .conventions(List.of(Conventions.ANNOTATION_CONVENTION))
+                .conventions(List.of(
+                    Conventions.ANNOTATION_CONVENTION,
+                    Conventions.SET_PRIVATE_FIELDS_CONVENTION
+                ))
                 .build()
             );
         }

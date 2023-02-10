@@ -26,17 +26,17 @@ public class VariableRemappingNodeTest {
     @Test
     public void areInputsCorrect() {
         var node = Node.create(BasicNodes.VARIABLE_REMAPPING);
-        Assertions.assertEquals(3, node.inputs().size());
-        Assertions.assertTrue(node.inputs().containsKey("input"));
-        Assertions.assertTrue(node.inputs().containsKey("oldKey"));
-        Assertions.assertTrue(node.inputs().containsKey("newKey"));
+        Assertions.assertEquals(3, node.getInputs().size());
+        Assertions.assertTrue(node.getInputs().containsKey("input"));
+        Assertions.assertTrue(node.getInputs().containsKey("oldKey"));
+        Assertions.assertTrue(node.getInputs().containsKey("newKey"));
     }
 
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.VARIABLE_REMAPPING);
-        Assertions.assertEquals(1, node.outputs().size());
-        Assertions.assertTrue(node.outputs().containsKey("output"));
+        Assertions.assertEquals(1, node.getOutputs().size());
+        Assertions.assertTrue(node.getOutputs().containsKey("output"));
     }
 
     @Test

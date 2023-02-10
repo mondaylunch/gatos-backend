@@ -26,6 +26,7 @@ import club.mondaylunch.gatos.core.graph.type.NodeType;
  * </p>
  */
 public final class Node {
+
     private final UUID id;
     private final NodeType type;
     private final @Unmodifiable Map<String, DataBox<?>> settings;
@@ -43,6 +44,14 @@ public final class Node {
         this.settings = Map.copyOf(settings);
         this.inputs = Map.copyOf(inputs.stream().collect(Collectors.toMap(NodeConnector::name, Function.identity())));
         this.outputs = Map.copyOf(outputs.stream().collect(Collectors.toMap(NodeConnector::name, Function.identity())));
+    }
+
+    public Node() {
+        this.id = null;
+        this.type = null;
+        this.settings = null;
+        this.inputs = null;
+        this.outputs = null;
     }
 
     /**
@@ -94,7 +103,7 @@ public final class Node {
      * Returns the UUID of this node.
      * @return the UUID of this node
      */
-    public UUID id() {
+    public UUID getId() {
         return this.id;
     }
 
@@ -102,7 +111,7 @@ public final class Node {
      * Returns the type of this node.
      * @return the type of this node
      */
-    public NodeType type() {
+    public NodeType getType() {
         return this.type;
     }
 
@@ -111,7 +120,7 @@ public final class Node {
      *
      * @return the settings of this node
      */
-    public @Unmodifiable Map<String, DataBox<?>> settings() {
+    public @Unmodifiable Map<String, DataBox<?>> getSettings() {
         return this.settings;
     }
 
@@ -145,7 +154,7 @@ public final class Node {
      * Returns the inputs of this node.
      * @return the inputs of this node
      */
-    public @Unmodifiable Map<String, NodeConnector.Input<?>> inputs() {
+    public @Unmodifiable Map<String, NodeConnector.Input<?>> getInputs() {
         return this.inputs;
     }
 
@@ -162,7 +171,7 @@ public final class Node {
      * Returns the outputs of this node.
      * @return the outputs of this node
      */
-    public @Unmodifiable Map<String, NodeConnector.Output<?>> outputs() {
+    public @Unmodifiable Map<String, NodeConnector.Output<?>> getOutputs() {
         return this.outputs;
     }
 
