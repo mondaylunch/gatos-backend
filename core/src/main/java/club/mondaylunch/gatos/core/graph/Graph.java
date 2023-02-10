@@ -394,9 +394,11 @@ public class Graph implements DatabaseSerializable {
         for (var node : this.serializableNodes) {
             this.nodes.put(node.getId(), node);
         }
+        this.serializableNodes.clear();
         for (var entry : this.serializableMetadata.entrySet()) {
             this.metadataByNode.put(UUID.fromString(entry.getKey()), entry.getValue());
         }
+        this.serializableMetadata.clear();
     }
 
     @Override
