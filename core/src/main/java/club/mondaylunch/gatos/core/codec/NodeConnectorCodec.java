@@ -12,6 +12,9 @@ import org.bson.codecs.configuration.CodecRegistry;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 
+/**
+ * Needed to avoid errors with generics with the default codec.
+ */
 public class NodeConnectorCodec implements Codec<NodeConnector<?>> {
 
     private final CodecRegistry registry;
