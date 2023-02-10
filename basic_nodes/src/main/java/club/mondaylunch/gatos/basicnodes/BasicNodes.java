@@ -4,9 +4,15 @@ import club.mondaylunch.gatos.core.graph.type.NodeTypeRegistry;
 
 public final class BasicNodes {
     public static final StringInterpolationNodeType STRING_INTERPOLATION = NodeTypeRegistry
-            .register(new StringInterpolationNodeType());
+            .register("string_interpolation", new StringInterpolationNodeType());
     public static final VariableExtractionNodeType VARIABLE_EXTRACTION = NodeTypeRegistry
-            .register(new VariableExtractionNodeType());
+            .register("variable_extraction", new VariableExtractionNodeType());
     public static final VariableRemappingNodeType VARIABLE_REMAPPING = NodeTypeRegistry
-        .register(new VariableRemappingNodeType());
+        .register("variable_remapping", new VariableRemappingNodeType());
+    public static final StringLengthNodeType STRING_LENGTH = NodeTypeRegistry
+        .register("string_length", new StringLengthNodeType());
+    public static final StringContainsNodeType STRING_CONTAINS = NodeTypeRegistry
+        .register("string_contains", new StringContainsNodeType());
+    public static final StringConcatNodeType STRING_CONCAT = NodeTypeRegistry
+        .register("string_concat", new StringConcatNodeType());
 }
