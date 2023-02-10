@@ -5,6 +5,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import com.google.gson.JsonObject;
+
 import gay.oss.gatos.core.data.DataBox;
 import gay.oss.gatos.core.data.DataType;
 import gay.oss.gatos.core.graph.connector.NodeConnector;
@@ -34,13 +36,13 @@ public class VariableRemappingNodeType extends NodeType.Process {
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
-        var jsonInput = DataBox.get(inputs, "input", DataType.JSONOBJECT).orElse(null);
-        var oldKeyStr = DataBox.get(inputs, "oldKey", DataType.STRING).orElse(null);
-        var newKeyStr = DataBox.get(inputs, "newKey", DataType.STRING).orElse(null);
-        if (jsonInput == null || oldKeyStr == null || newKeyStr == null || oldKeyStr.equals(newKeyStr) || jsonInput.get(oldKeyStr) == null) {
+        var jsonInput = DataBox.get(inputs, "input", DataType.JSONOBJECT).orElse(new JsonObject());
+        var oldKeyStr = DataBox.get(inputs, "oldKey", DataType.STRING).orElse("");
+        var newKeyStr = DataBox.get(inputs, "newKey", DataType.STRING).orElse("");
+        var value = jsonInput.get(oldKeyStr);
+        if (oldKeyStr.equals(newKeyStr) || value == null) {
             return Map.of("output", CompletableFuture.completedFuture(DataType.JSONOBJECT.create(jsonInput)));
         }
-        var value = jsonInput.get(oldKeyStr);
         jsonInput.add(newKeyStr, jsonInput.remove(oldKeyStr));
         return Map.of(
             "output", CompletableFuture.completedFuture(DataType.JSONOBJECT.create(jsonInput))

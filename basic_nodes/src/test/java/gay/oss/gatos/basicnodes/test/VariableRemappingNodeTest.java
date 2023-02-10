@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +21,12 @@ public class VariableRemappingNodeTest {
     }
 
     private static final Gson GSON = new Gson();
-    private static final JsonObject TEST_JSON_OBJECT = GSON.fromJson(GSON.toJson(new TestJSONRemappingClass()), JsonObject.class);
+    private static JsonObject TEST_JSON_OBJECT = GSON.fromJson(GSON.toJson(new TestJSONRemappingClass()), JsonObject.class);
+
+    @AfterEach
+    public void resetDefaultObject() {
+        TEST_JSON_OBJECT = GSON.fromJson(GSON.toJson(new TestJSONRemappingClass()), JsonObject.class);
+    }
 
     @Test
     public void areInputsCorrect() {
@@ -88,7 +94,7 @@ public class VariableRemappingNodeTest {
             "newKey", DataType.STRING.create("title")
         );
         var result2 = BasicNodes.VARIABLE_REMAPPING.compute(input2, Map.of());
-        Assertions.assertNull(result2.get("output").join().value());
+        Assertions.assertEquals(result2.get("output").join().value(), new JsonObject());
     }
 
     @Test
