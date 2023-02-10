@@ -429,7 +429,6 @@ public class Graph implements DatabaseSerializable {
         return "Graph{"
             + "nodes=" + this.nodes
             + ", connections=" + this.connections
-            + ", connectionsByNode=" + this.connectionsByNode
             + ", metadataByNode=" + this.metadataByNode
             + '}';
     }
