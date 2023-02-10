@@ -67,11 +67,13 @@ public class VariableExtractionNodeTest {
 
     @Test
     public void correctlyExtractsString() {
+        var node = Node.create(BasicNodes.VARIABLE_EXTRACTION)
+            .modifySetting("output_type", DataType.DATATYPE.create(DataType.STRING));
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.JSONOBJECT.create(TEST_JSON_OBJECT),
             "key", DataType.STRING.create("testString")
         );
-        var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, Map.of());
+        var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, node.settings());
         Assertions.assertEquals(result.get("output").join().value(), Optional.of(new TestJSONExtractionClass().testString));
     }
 

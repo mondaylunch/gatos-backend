@@ -24,7 +24,7 @@ public class VariableExtractionNodeType extends NodeType.Process {
     @Override
     public Map<String, DataBox<?>> settings() {
         return Map.of(
-            "output_type", DataType.DATATYPE.create(DataType.STRING)
+            "output_type", DataType.DATATYPE.create(DataType.DATATYPE)
         );
     }
 
@@ -47,7 +47,7 @@ public class VariableExtractionNodeType extends NodeType.Process {
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
         var jsonInput = DataBox.get(inputs, "input", DataType.JSONOBJECT).orElse(new JsonObject());
         var keyStr = DataBox.get(inputs, "key", DataType.STRING).orElse("");
-        var returnType = DataBox.get(settings, "output_type", DataType.DATATYPE).orElse(DataType.STRING);
+        var returnType = DataBox.get(settings, "output_type", DataType.DATATYPE).orElse(DataType.DATATYPE);
         var value = jsonInput.get(keyStr);
         if (value == null) {
             return Map.of("output", CompletableFuture.completedFuture(
@@ -96,7 +96,8 @@ public class VariableExtractionNodeType extends NodeType.Process {
             DataType.STRING.listOf(),
             DataType.BOOLEAN.listOf(),
             DataType.JSONOBJECT.listOf()
-        );
+        ),
+        DEFAULT;
         private final DataType[] dataType;
         ReturnType(DataType... dataType) {
             this.dataType = dataType;
@@ -105,7 +106,7 @@ public class VariableExtractionNodeType extends NodeType.Process {
         public static ReturnType getFromDataType(DataType dataType) {
             var type = Arrays.stream(ReturnType.values())
                 .filter(x -> Arrays.stream(x.dataType).toList().contains(dataType)).toList();
-            return type.size() > 0 ? type.get(0) : STRING;
+            return type.size() > 0 ? type.get(0) : DEFAULT;
         }
     }
 }
