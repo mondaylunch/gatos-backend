@@ -50,7 +50,7 @@ public class VariableExtractionNodeTest {
             "key", DataType.STRING.create("testInt")
         );
         var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, node.settings());
-        Assertions.assertEquals(result.get("output").join().value(), Optional.of(420));
+        Assertions.assertEquals(result.get("output").join().value(), Optional.of(new TestJSONExtractionClass().testInt));
     }
 
     @Test
@@ -62,7 +62,7 @@ public class VariableExtractionNodeTest {
             "key", DataType.STRING.create("testBoolean")
         );
         var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, node.settings());
-        Assertions.assertEquals(result.get("output").join().value(), Optional.of(true));
+        Assertions.assertEquals(result.get("output").join().value(), Optional.of(new TestJSONExtractionClass().testBoolean));
     }
 
     @Test
@@ -72,25 +72,23 @@ public class VariableExtractionNodeTest {
             "key", DataType.STRING.create("testString")
         );
         var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, Map.of());
-        Assertions.assertEquals(result.get("output").join().value(), Optional.of("tickles"));
+        Assertions.assertEquals(result.get("output").join().value(), Optional.of(new TestJSONExtractionClass().testString));
     }
 
     @Test
     public void correctlyExtractsCollection() {
-        /*Map<String, DataBox<?>> input = Map.of(
+        var node = Node.create(BasicNodes.VARIABLE_EXTRACTION)
+            .modifySetting("output_type", DataType.DATATYPE.create(DataType.INTEGER.listOf()));
+        Map<String, DataBox<?>> input = Map.of(
             "input", DataType.JSONOBJECT.create(TEST_JSON_OBJECT),
             "key", DataType.STRING.create("testCollection")
         );
-        var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, Map.of());
-        var expectedResult = new JsonArray();
-        for (int i = 0; i < 4; ++i) {
-            expectedResult.add(i);
-        }
-        Assertions.assertEquals(result.get("output").join().value(), expectedResult);*/
+        var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, node.settings());
+        Assertions.assertEquals(result.get("output").join().value(), Optional.of(new TestJSONExtractionClass().testCollection));
     }
 
     @Test
-    public void extractMissingValuesAsNull() {
+    public void extractMissingValuesAsEmpty() {
         Map<String, DataBox<?>> input0 = Map.of(
             "input", DataType.JSONOBJECT.create(TEST_JSON_OBJECT),
             "key", DataType.STRING.create("notAValidKey")
