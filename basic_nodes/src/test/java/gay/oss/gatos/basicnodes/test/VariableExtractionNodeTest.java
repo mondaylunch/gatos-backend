@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 
 import gay.oss.gatos.basicnodes.BasicNodes;
 import gay.oss.gatos.basicnodes.VariableExtractionNodeType;
-import gay.oss.gatos.basicnodes.VariableRemappingNodeType;
 import gay.oss.gatos.core.data.DataBox;
 import gay.oss.gatos.core.data.DataType;
 import gay.oss.gatos.core.graph.Node;
