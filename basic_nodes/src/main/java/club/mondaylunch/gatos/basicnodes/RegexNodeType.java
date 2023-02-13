@@ -18,7 +18,7 @@ import club.mondaylunch.gatos.core.graph.type.NodeType;
  * A node that operates on regular expressions.
  *
  * <p>
- * This is a {@link Node nodes} (addressable by UUID).
+ * This is a {@link Node node} (addressable by UUID).
  * </p>
  * <p>
  * It takes a regular expression: "regex" and input word: "word"
