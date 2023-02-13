@@ -1,31 +1,17 @@
 package club.mondaylunch.gatos.basicnodes.test;
 
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.MatchResult;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.TestOnly;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import club.mondaylunch.gatos.core.data.DataType;
-import club.mondaylunch.gatos.core.executor.GraphExecutor;
 import club.mondaylunch.gatos.core.graph.Graph;
-import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.data.DataBox;
-import club.mondaylunch.gatos.core.graph.type.NodeType;
 import club.mondaylunch.gatos.basicnodes.RegexNodeType;
 
 public class RegexTest {
-    private static final NodeType TEST_REGEX_NODE_TYPE = new RegexNodeType();
+    private static final RegexNodeType TEST_REGEX_NODE_TYPE = new RegexNodeType();
 
     @Test   
     public void nodeAddsToGraph() {
@@ -36,157 +22,56 @@ public class RegexTest {
 
     @Test
     public void matchesSingleCharToSingleChar() {
-        var graph = new Graph();
-        var node = graph.addNode(TEST_REGEX_NODE_TYPE);
-        graph.modifyNode(node.id(), n -> n.modifySetting("regex", DataType.STRING.create("a")));
-        graph.modifyNode(node.id(), n -> n.modifySetting("word",  DataType.STRING.create("a")));
-
-        var result = new AtomicBoolean();
-        var ouput = graph.addNode(new OutputBoolNodeType(result));
-
-        connectBool(graph, node, "isMatch", output, "in");
-        
-        var executionOrder = graph.getExecutionOrder();
-        Assertions.assertTrue(executionOrder.isPresent());
-        var executor = new GraphExecutor(executionOrder.get(), graph.getConnections());
-
-        CompletableFuture.runAsync(executor.execute()).join();
-        Assertions.assertTrue(result.get());
+        Map<String, DataBox<?>> input = Map.of(
+            "regex", DataType.STRING.create("a"),
+            "word", DataType.STRING.create("a")
+        );
+        var output = TEST_REGEX_NODE_TYPE.compute(input, Map.of());
+        Assertions.assertEquals(true, output.get("isMatch").join().value());
     }
 
     @Test
     public void matchesWordToWord() {
-        var graph1 = new Graph();
-        var node1 = graph1.addNode(TEST_REGEX_NODE_TYPE);
-        graph1.modifyNode(node1.id(), n -> n.modifySetting("regex", DataType.STRING.create("^https?://")));
-        graph1.modifyNode(node1.id(), n -> n.modifySetting("word",  DataType.STRING.create("https://my.website.co.uk")));
+        Map<String, DataBox<?>> input = Map.of(
+            "regex", DataType.STRING.create("https://"),
+            "word", DataType.STRING.create("https://my.website.co.uk")
+        );
+        var output = TEST_REGEX_NODE_TYPE.compute(input, Map.of());
+        Assertions.assertEquals(true, output.get("isMatch").join().value());
+    }
 
-        var result1 = new AtomicBoolean();
-        var ouput1 = graph1.addNode(new OutputBoolNode1Type(result1));
-
-        connectBool(graph1, node1, "isMatch", output1, "in");
-        
-        var graph2 = new Graph();
-        var node2 = graph2.addNode(TEST_REGEX_NODE_TYPE);
-        graph2.modifyNode(node2.id(), n -> n.modifySetting("regex", DataType.STRING.create("^https?://")));
-        graph2.modifyNode(node2.id(), n -> n.modifySetting("word",  DataType.STRING.create("this is totally a website link")));
-
-        var result2 = new AtomicBoolean();
-        var ouput2 = graph1.addNode(new OutputBoolNode1Type(result2));
-
-        connectBool(graph2, node2, "isMatch", output2, "in");        
-
-        var executionOrder1 = graph1.getExecutionOrder();
-        Assertions.assertTrue(executionOrder1.isPresent());
-
-        var executionOrder2 = graph2.getExecutionOrder();
-        Assertions.assertTrue(executionOrder2.isPresent());
-        
-        var executor1 = new GraphExecutor(executionOrder1.get(), graph1.getConnections());
-        var executor2 = new GraphExecutor(executionOrder2.get(), graph2.getConnections());
-
-        CompletableFuture.runAsync(executor1.execute()).join();
-        CompletableFuture.runAsync(executor2.execute()).join();
-        Assertions.assertTrue(result1.get());
-        Assertions.assertFalse(result2.get());
+    @Test
+    public void doesntMatchOtherToWord() {
+        Map<String, DataBox<?>> input = Map.of(
+            "regex", DataType.STRING.create("^https?://"),
+            "word", DataType.STRING.create("totally a real website")
+        );
+        var output = TEST_REGEX_NODE_TYPE.compute(input, Map.of());
+        Assertions.assertEquals(false, output.get("isMatch").join().value());
     }
 
     @Test
     public void matchesBoolAndString() {
-        var graph = new Graph();
-        var node = graph.addNode(TEST_REGEX_NODE_TYPE);
-        graph.modifyNode(node.id(), n -> n.modifySetting("regex", DataType.STRING.create("H(e)(l)lo")));
-        graph.modifyNode(node.id(), n -> n.modifySetting("word",  DataType.STRING.create("Hello")));
-        
-        var isMatch = new AtomicBoolean();
-        var match = new String();
-
-        var outIsMatch = graph.addNode(new OutputBoolNodeType(isMatch));
-        var outMatch = graph.addNode(new OutputStringNodeType(match));
-
-        connectBool(graph, node, "isMatch", outIsMatch, "in");
-        connectString(graph, node, "match", outMatch, "in");
-
-        var executionOrder = graph.getExecutionOrder();
-        Assertions.assertTrue(executionOrder.isPresent());
-        var executor = new GraphExecutor(executionOrder.get(), graph.getConnections());
-
-        CompletableFuture.runAsync(executor.execute()).join();
-        Assertions.assertTrue(isMatch);
-        Assertions.assertEquals("Hello", match);
-    }
-
-    private static final class OutputBoolNodeType extends NodeType.End {
-        public final AtomicBoolean result;
-
-        private OutputBoolNodeType(AtomicBoolean result) {
-            this.result = result;
-        }
-
-        @Override
-        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
-            return Set.of(
-                new NodeConnector.Input<>(nodeId, "in", DataType.BOOLEAN)
-            );
-        }
-
-        @Override
-        public Map<String, DataBox<?>> settings() {
-            return Map.of();
-        }
-
-        @Override
-        public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
-            this.result.set(DataBox.get(inputs, "in", DataType.BOOLEAN).orElseThrow());
-            return CompletableFuture.runAsync(() -> {});
-        }
-    }
-
-    private static final class OutputStringNodeType extends NodeType.End {
-        public final String result;
-
-        private OutputBoolNodeType(String result) {
-            this.result = result;
-        }
-
-        @Override
-        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
-            return Set.of(
-                new NodeConnector.Input<>(nodeId, "in", DataType.STRING)
-            );
-        }
-
-        @Override
-        public Map<String, DataBox<?>> settings() {
-            return Map.of();
-        }
-
-        @Override
-        public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
-            this.result.set(DataBox.get(inputs, "in", DataType.STRING).orElseThrow());
-            return CompletableFuture.runAsync(() -> {});
-        }
-    }
-
-    private static void connectString(Graph graph, Node a, String connectorA, Node b, String connectorB) {
-        var conn = NodeConnection.createConnection(
-            a, connectorA,
-            b, connectorB,
-            DataType.STRING
+        Map<String, DataBox<?>> input = Map.of(
+            "regex", DataType.STRING.create("Hello"),
+            "word", DataType.STRING.create("Hello")
         );
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
+        var output = TEST_REGEX_NODE_TYPE.compute(input, Map.of());
+        Assertions.assertEquals(true, output.get("isMatch").join().value());
+        Assertions.assertEquals("Hello", output.get("match").join().value());
     }
 
-    private static void connectBool(Graph graph, Node a, String connectorA, Node b, String connectorB) {
-        var conn = NodeConnection.createConnection(
-            a, connectorA,
-            b, connectorB,
-            DataType.BOOLEAN
+    @Test
+    public void matchesHello() {
+        Map<String, DataBox<?>> input = Map.of(
+            "regex", DataType.STRING.create("H(e)(l)lo"),
+            "word", DataType.STRING.create("Hello")
         );
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
+        var output = TEST_REGEX_NODE_TYPE.compute(input, Map.of());
+        Assertions.assertEquals(true, output.get("isMatch").join().value());
+        Assertions.assertEquals("Hello", output.get("match").join().value());
+        ArrayList<String> expected = new ArrayList<String>();
+        expected.add("e"); expected.add("l");
+        Assertions.assertEquals(expected, output.get("group").join().value());
     }
-
-
 }
