@@ -2,7 +2,7 @@ plugins {
 	id 'multimodule-config'
 }
 
-group = 'gay.oss.gatos'
+group = 'club.mondaylunch.gatos'
 version = '0.0.1-SNAPSHOT'
 
 dependencies {
@@ -15,6 +15,9 @@ dependencies {
 
 	// load environment variables from files
 	implementation 'io.github.cdimascio:dotenv-java:2.3.2'
+
+    // GSON
+    implementation 'com.google.code.gson:gson:2.8.6'
 
 	// Tests
 	testImplementation(platform('org.junit:junit-bom:5.9.2'))

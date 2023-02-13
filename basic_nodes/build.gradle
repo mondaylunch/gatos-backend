@@ -2,11 +2,12 @@ plugins {
     id 'multimodule-config'
 }
 
-group = 'gay.oss.gatos'
+group = 'club.mondaylunch.gatos'
 version = '0.0.1-SNAPSHOT'
 
 dependencies {
     implementation project(":core")
+    implementation 'com.google.code.gson:gson:2.8.6'
 
     // Tests
     testImplementation(platform('org.junit:junit-bom:5.9.2'))
