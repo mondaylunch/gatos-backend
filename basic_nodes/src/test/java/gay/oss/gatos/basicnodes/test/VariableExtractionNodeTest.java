@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -64,7 +63,7 @@ public class VariableExtractionNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.JSONOBJECT.create(TEST_JSON_OBJECT),
             "key", DataType.STRING.create("testBoolean")
-        );;
+        );
         var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, node.settings());
         Assertions.assertEquals(result.get("output").join().value(), Optional.of(new TestJSONExtractionClass().testBoolean));
     }
