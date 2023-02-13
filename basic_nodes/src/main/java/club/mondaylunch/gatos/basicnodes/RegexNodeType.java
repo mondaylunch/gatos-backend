@@ -21,11 +21,13 @@ import club.mondaylunch.gatos.core.graph.type.NodeType;
  * This is a {@link Node node} (addressable by UUID).
  * </p>
  * <p>
- * It takes a regular expression: "regex" and input word: "word"
+ * It takes a regular expression: "regex" and input word: "word".
+ * </p>
+ * <p>
  * It outputs:
- * "isMatch" a boolean to confirm if a match was found, if false all other output values are null
- * "match" the first matching String
- * "group" a List of all groups, if the regex has no groups this returns null
+ * "isMatch" a boolean to confirm if a match was found, if false all other output values are null.
+ * "match" the first matching String.
+ * "group" a List of all groups, if the regex has no groups this returns null.
  * </p>
  */
 public class RegexNodeType extends NodeType.Process {
