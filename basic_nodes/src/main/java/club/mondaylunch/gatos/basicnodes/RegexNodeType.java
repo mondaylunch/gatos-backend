@@ -14,6 +14,20 @@ import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
+/**
+ * A node that operates on regular expressions.
+ *
+ * <p>
+ * This is a {@link Node nodes} (addressable by UUID).
+ * </p>
+ * <p>
+ * It takes a regular expression: "regex" and input word: "word"
+ * It outputs:
+ * "isMatch" a boolean to confirm if a match was found, if false all other output values are null
+ * "match" the first matching String
+ * "group" a List of all groups, if the regex has no groups this returns null
+ * </p>
+ */
 public class RegexNodeType extends NodeType.Process {
     @Override
     public Map<String, DataBox<?>> settings() {
@@ -58,6 +72,12 @@ public class RegexNodeType extends NodeType.Process {
         );
     }
 
+    /**
+     * A function method to gather all the groups a regular expression
+     * finds in an input word as a list 
+     * @param matcher a Matcher given a word set to a regex Pattern
+     * @return a List<String> of groups
+     */
     public List<String> getGroups(Matcher matcher) {
         int groups = matcher.groupCount();
         if(groups == 0) return null;
