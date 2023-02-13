@@ -1,4 +1,4 @@
-package gay.oss.gatos.basicnodes;
+package club.mondaylunch.gatos.basicnodes;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -8,10 +8,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import gay.oss.gatos.core.data.DataType;
-import gay.oss.gatos.core.graph.connector.NodeConnector;
-import gay.oss.gatos.core.data.DataBox;
-import gay.oss.gatos.core.graph.type.NodeType;
+import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
+import club.mondaylunch.gatos.core.data.DataBox;
+import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 public class RegexNodeType extends NodeType.Process {
     @Override

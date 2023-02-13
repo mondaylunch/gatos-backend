@@ -1,4 +1,4 @@
-package gay.oss.gatos.basicnodes.test;
+package club.mondaylunch.gatos.basicnodes.test;
 
 import java.util.List;
 import java.util.Map;
@@ -16,13 +16,13 @@ import org.jetbrains.annotations.TestOnly;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import gay.oss.gatos.core.data.DataType;
-import gay.oss.gatos.core.executor.GraphExecutor;
-import gay.oss.gatos.core.graph.Graph;
-import gay.oss.gatos.core.graph.connector.NodeConnector;
-import gay.oss.gatos.core.data.DataBox;
-import gay.oss.gatos.core.graph.type.NodeType;
-import gay.oss.gatos.basicnodes.regex.RegexNodeType;
+import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.executor.GraphExecutor;
+import club.mondaylunch.gatos.core.graph.Graph;
+import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
+import club.mondaylunch.gatos.core.data.DataBox;
+import club.mondaylunch.gatos.core.graph.type.NodeType;
+import club.mondaylunch.gatos.basicnodes.RegexNodeType;
 
 public class RegexTest {
     private static final NodeType TEST_REGEX_NODE_TYPE = new RegexNodeType();
