@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,8 +22,9 @@ public class VariableExtractionNodeTest {
         private final int testInt = 420;
         private final boolean testBoolean = true;
         private final String testString = "tickles";
-        private final Collection<Integer> testCollection = List.of(0, 1, 2, 3);
+        private final Collection<Integer> testIntCollection = List.of(0, 1, 2, 3);
         private final Collection<String> testStrCollection = List.of("b", "r", "u", "h");
+        private final Collection<JsonObject> testJsonObjCollection = List.of(new JsonObject(), new JsonObject());
     }
 
     private static final Gson GSON = new Gson();
@@ -85,10 +87,10 @@ public class VariableExtractionNodeTest {
             .modifySetting("output_type", VariableExtractionNodeType.getReturnBoxFromType(DataType.INTEGER.listOf()));
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.JSONOBJECT.create(TEST_JSON_OBJECT),
-            "key", DataType.STRING.create("testCollection")
+            "key", DataType.STRING.create("testIntCollection")
         );
         var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, node.settings());
-        Assertions.assertEquals(result.get("output").join().value(), Optional.of(new TestJSONExtractionClass().testCollection));
+        Assertions.assertEquals(result.get("output").join().value(), Optional.of(new TestJSONExtractionClass().testIntCollection));
 
         node.modifySetting("output_type", VariableExtractionNodeType.getReturnBoxFromType(DataType.STRING.listOf()));
         Map<String, DataBox<?>> inputStr = Map.of(
@@ -97,6 +99,14 @@ public class VariableExtractionNodeTest {
         );
         var resultStr = BasicNodes.VARIABLE_EXTRACTION.compute(inputStr, node.settings());
         Assertions.assertEquals(resultStr.get("output").join().value(), Optional.of(new TestJSONExtractionClass().testStrCollection));
+
+        node.modifySetting("output_type", VariableExtractionNodeType.getReturnBoxFromType(DataType.JSONOBJECT.listOf()));
+        Map<String, DataBox<?>> inputJson = Map.of(
+            "input", DataType.JSONOBJECT.create(TEST_JSON_OBJECT),
+            "key", DataType.STRING.create("testJsonObjCollection")
+        );
+        var resultJson = BasicNodes.VARIABLE_EXTRACTION.compute(inputJson, node.settings());
+        Assertions.assertEquals(resultJson.get("output").join().value(), Optional.of(new TestJSONExtractionClass().testJsonObjCollection));
     }
 
     @Test

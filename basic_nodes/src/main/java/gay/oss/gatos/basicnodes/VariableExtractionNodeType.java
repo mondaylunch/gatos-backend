@@ -10,11 +10,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import org.jetbrains.annotations.Nullable;
 
 import gay.oss.gatos.core.data.DataBox;
 import gay.oss.gatos.core.data.DataType;
@@ -59,46 +59,46 @@ public class VariableExtractionNodeType extends NodeType.Process {
                 returnType.getDataType().optionalOf().create(Optional.empty()))
             );
         }
-        Map<String, CompletableFuture<DataBox<?>>> returnMap;
-        switch (returnType) {
-            case INTEGER -> returnMap = Map.of("output", CompletableFuture.completedFuture(
+        return switch (returnType) {
+            case INTEGER -> Map.of("output", CompletableFuture.completedFuture(
                 DataType.INTEGER.optionalOf().create(Optional.of(value.getAsInt()))));
-            case BOOLEAN -> returnMap = Map.of("output", CompletableFuture.completedFuture(
+            case BOOLEAN -> Map.of("output", CompletableFuture.completedFuture(
                 DataType.BOOLEAN.optionalOf().create(Optional.of(value.getAsBoolean()))));
-            case STRING -> returnMap = Map.of("output", CompletableFuture.completedFuture(
+            case STRING -> Map.of("output", CompletableFuture.completedFuture(
                 DataType.STRING.optionalOf().create(Optional.of(value.getAsString()))));
-            case JSONOBJECT -> returnMap = Map.of("output", CompletableFuture.completedFuture(
+            case JSONOBJECT -> Map.of("output", CompletableFuture.completedFuture(
                 DataType.JSONOBJECT.optionalOf().create(Optional.of(value.getAsJsonObject()))));
-            case LIST -> returnMap = Map.of("output", this.handleListReturn(returnType.getDataType(), value));
-            default -> returnMap = Map.of("output", CompletableFuture.completedFuture(
-                DataType.STRING.optionalOf().create(Optional.of(new Gson().toJson(value.toString())))));
-        }
-        return returnMap;
+            case INTEGER_LIST,
+                STRING_LIST,
+                BOOLEAN_LIST,
+                JSONOBJECT_LIST -> Map.of("output", this.handleListReturn(returnType.getDataType(), value));
+        };
     }
 
     private CompletableFuture handleListReturn(DataType dataType, JsonElement jsonElement) {
         List<Object> outputList = new ArrayList<>();
-        if (jsonElement instanceof JsonArray arr && arr.size() > 0 && arr.get(0).isJsonPrimitive()) {
-            arr.forEach(prim -> outputList.add(this.jsonPrimitiveToReturnableType(prim.getAsJsonPrimitive())));
-        } else if (jsonElement instanceof JsonPrimitive primitive) {
-            outputList.add(this.jsonPrimitiveToReturnableType(primitive));
+        if (jsonElement instanceof JsonArray arr && arr.size() > 0) {
+            arr.forEach(json -> outputList.add(this.jsonToReturnableType(json)));
+        } else {
+            outputList.add(this.jsonToReturnableType(jsonElement));
         }
         return CompletableFuture.completedFuture(dataType.optionalOf().create(
             Optional.of(outputList.stream().filter(Objects::nonNull).toList()))
         );
     }
 
-    private Object jsonPrimitiveToReturnableType(JsonPrimitive jsonPrimitive) {
-        if (jsonPrimitive.isNumber()) {
-            return jsonPrimitive.getAsInt();
-        } else if (jsonPrimitive.isBoolean()) {
-            return jsonPrimitive.getAsBoolean();
-        } else if (jsonPrimitive.isString()) {
-            return jsonPrimitive.getAsString();
-        } else if (jsonPrimitive.isJsonObject()) {
-            return jsonPrimitive.getAsJsonObject();
+    @Nullable
+    private Object jsonToReturnableType(JsonElement jsonElement) {
+        if (jsonElement instanceof JsonPrimitive prim) {
+            if (prim.isNumber()) {
+                return jsonElement.getAsInt();
+            } else if (prim.isBoolean()) {
+                return jsonElement.getAsBoolean();
+            } else if (prim.isString()) {
+                return jsonElement.getAsString();
+            }
         }
-        return null;
+        return jsonElement;
     }
 
     private enum ReturnType {
@@ -106,24 +106,23 @@ public class VariableExtractionNodeType extends NodeType.Process {
         BOOLEAN(DataType.BOOLEAN),
         STRING(DataType.STRING),
         JSONOBJECT(DataType.JSONOBJECT),
-        LIST(DataType.INTEGER.listOf(),
-            DataType.STRING.listOf(),
-            DataType.BOOLEAN.listOf(),
-            DataType.JSONOBJECT.listOf()
-        );
-        private final DataType[] dataType;
-        ReturnType(DataType... dataType) {
-            this.dataType = Arrays.copyOfRange(dataType, 0, 1);
+        INTEGER_LIST(DataType.INTEGER.listOf()),
+        STRING_LIST(DataType.STRING.listOf()),
+        BOOLEAN_LIST(DataType.BOOLEAN.listOf()),
+        JSONOBJECT_LIST(DataType.JSONOBJECT.listOf());
+        private final DataType dataType;
+        ReturnType(DataType dataType) {
+            this.dataType = dataType;
         }
 
         public DataType getDataType() {
-            return this.dataType[0];
+            return this.dataType;
         }
     }
 
     public static ReturnType getFromDataType(DataType dataType) {
         var type = Arrays.stream(ReturnType.values())
-            .filter(x -> Arrays.stream(x.dataType).toList().contains(dataType)).toList();
+            .filter(x -> x.dataType == dataType).toList();
         return type.size() > 0 ? type.get(0) : ReturnType.STRING;
     }
 
