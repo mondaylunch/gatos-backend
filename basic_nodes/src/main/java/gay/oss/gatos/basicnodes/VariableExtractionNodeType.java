@@ -26,7 +26,7 @@ public class VariableExtractionNodeType extends NodeType.Process {
     @Override
     public Map<String, DataBox<?>> settings() {
         return Map.of(
-            "output_type", RETURN_DATATYPE.create(ReturnType.DEFAULT)
+            "output_type", RETURN_DATATYPE.create(ReturnType.STRING)
         );
     }
 
@@ -40,8 +40,11 @@ public class VariableExtractionNodeType extends NodeType.Process {
 
     @Override
     public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
+        var returnDataType = !state.isEmpty()
+            ? ((ReturnType) state.get("output_type").value()).getDataType()
+            : DataType.DATATYPE;
         return Set.of(
-            new NodeConnector.Output<>(nodeId, "output", this.settings().get("output_type").type().optionalOf())
+            new NodeConnector.Output<>(nodeId, "output", returnDataType.optionalOf())
         );
     }
 
@@ -49,11 +52,11 @@ public class VariableExtractionNodeType extends NodeType.Process {
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
         var jsonInput = DataBox.get(inputs, "input", DataType.JSONOBJECT).orElse(new JsonObject());
         var keyStr = DataBox.get(inputs, "key", DataType.STRING).orElse("");
-        var returnType = !settings.isEmpty() ? (ReturnType) settings.get("output_type").value() : ReturnType.DEFAULT;
+        var returnType = !settings.isEmpty() ? (ReturnType) settings.get("output_type").value() : ReturnType.STRING;
         var value = jsonInput.get(keyStr);
         if (value == null) {
             return Map.of("output", CompletableFuture.completedFuture(
-                DataType.DATATYPE.optionalOf().create(Optional.empty()))
+                returnType.getDataType().optionalOf().create(Optional.empty()))
             );
         }
         Map<String, CompletableFuture<DataBox<?>>> returnMap;
@@ -107,8 +110,7 @@ public class VariableExtractionNodeType extends NodeType.Process {
             DataType.STRING.listOf(),
             DataType.BOOLEAN.listOf(),
             DataType.JSONOBJECT.listOf()
-        ),
-        DEFAULT;
+        );
         private final DataType[] dataType;
         ReturnType(DataType... dataType) {
             this.dataType = Arrays.copyOfRange(dataType, 0, 1);
@@ -122,10 +124,10 @@ public class VariableExtractionNodeType extends NodeType.Process {
     public static ReturnType getFromDataType(DataType dataType) {
         var type = Arrays.stream(ReturnType.values())
             .filter(x -> Arrays.stream(x.dataType).toList().contains(dataType)).toList();
-        return type.size() > 0 ? type.get(0) : ReturnType.DEFAULT;
+        return type.size() > 0 ? type.get(0) : ReturnType.STRING;
     }
 
     public static DataBox<ReturnType> getReturnBoxFromType(DataType dataType) {
-        return new DataType<ReturnType>("return_type").create(getFromDataType(dataType));
+        return RETURN_DATATYPE.create(getFromDataType(dataType));
     }
 }

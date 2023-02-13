@@ -22,6 +22,7 @@ public class VariableExtractionNodeTest {
         private final boolean testBoolean = true;
         private final String testString = "tickles";
         private final Collection<Integer> testCollection = List.of(0, 1, 2, 3);
+        private final Collection<String> testStrCollection = List.of("b", "r", "u", "h");
     }
 
     private static final Gson GSON = new Gson();
@@ -88,6 +89,14 @@ public class VariableExtractionNodeTest {
         );
         var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, node.settings());
         Assertions.assertEquals(result.get("output").join().value(), Optional.of(new TestJSONExtractionClass().testCollection));
+
+        node.modifySetting("output_type", VariableExtractionNodeType.getReturnBoxFromType(DataType.STRING.listOf()));
+        Map<String, DataBox<?>> inputStr = Map.of(
+            "input", DataType.JSONOBJECT.create(TEST_JSON_OBJECT),
+            "key", DataType.STRING.create("testStrCollection")
+        );
+        var resultStr = BasicNodes.VARIABLE_EXTRACTION.compute(inputStr, node.settings());
+        Assertions.assertEquals(resultStr.get("output").join().value(), Optional.of(new TestJSONExtractionClass().testStrCollection));
     }
 
     @Test
