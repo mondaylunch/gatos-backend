@@ -1,6 +1,7 @@
 package club.mondaylunch.gatos.basicnodes;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -44,20 +45,20 @@ public class RegexNodeType extends NodeType.Process {
         var word  = DataBox.get(inputs, "word",  DataType.STRING).orElseThrow();
         var matcher = regex.matcher(word);
 
+        if(!matcher.find()) return Map.of(
+            "isMatch",  CompletableFuture.completedFuture(DataType.BOOLEAN.create(false)),
+            "match",    CompletableFuture.completedFuture(DataType.STRING.create(null)),
+            "group",    CompletableFuture.completedFuture(DataType.STRING.listOf().create(null))
+        );
+
         return Map.of(
-            "isMatch",  CompletableFuture.completedFuture(DataType.BOOLEAN.create(
-                matcher.matches()
-            )),
-            "match",    CompletableFuture.completedFuture(DataType.STRING.create(
-                matcher.group(0)
-            )),
-            "group",    CompletableFuture.completedFuture(DataType.STRING.listOf().create(
-                getGroups(matcher)
-            ))
+            "isMatch",  CompletableFuture.completedFuture(DataType.BOOLEAN.create(true)),
+            "match",    CompletableFuture.completedFuture(DataType.STRING.create(matcher.group())),
+            "group",    CompletableFuture.completedFuture(DataType.STRING.listOf().create(getGroups(matcher)))
         );
     }
 
-    public ArrayList<String> getGroups(Matcher matcher) {
+    public List<String> getGroups(Matcher matcher) {
         int groups = matcher.groupCount();
         if(groups == 0) return null;
         ArrayList<String> lst = new ArrayList<String>();
