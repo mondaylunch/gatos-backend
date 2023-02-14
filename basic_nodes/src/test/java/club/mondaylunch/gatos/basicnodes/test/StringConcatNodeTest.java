@@ -17,8 +17,8 @@ public class StringConcatNodeTest {
     @Test
     public void areInputsCorrect() {
         var node = Node.create(BasicNodes.STRING_CONCAT);
-        Assertions.assertEquals(1, node.getInputs().size());
-        Assertions.assertTrue(node.getInputs().containsKey("input"));
+        Assertions.assertEquals(1, node.inputs().size());
+        Assertions.assertTrue(node.inputs().containsKey("input"));
     }
 
     @Test
@@ -44,7 +44,7 @@ public class StringConcatNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.STRING.listOf().create(TEST_LIST)
         );
-        var output = BasicNodes.STRING_CONCAT.compute(input, node.getSettings());
+        var output = BasicNodes.STRING_CONCAT.compute(input, node.settings());
         Assertions.assertEquals(output.get("output").join().value(), String.join(" amongus ", TEST_LIST));
     }
 }

@@ -16,8 +16,8 @@ public class StringLengthNodeTest {
     @Test
     public void areInputsCorrect() {
         var node = Node.create(BasicNodes.STRING_LENGTH);
-        Assertions.assertEquals(1, node.getInputs().size());
-        Assertions.assertTrue(node.getInputs().containsKey("input"));
+        Assertions.assertEquals(1, node.inputs().size());
+        Assertions.assertTrue(node.inputs().containsKey("input"));
     }
 
     @Test

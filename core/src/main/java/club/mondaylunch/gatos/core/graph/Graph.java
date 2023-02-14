@@ -67,7 +67,7 @@ public class Graph {
     public Graph(Collection<Node> nodes, Map<UUID, NodeMetadata> metas, Collection<NodeConnection<?>> connections) {
         this();
         for (var node : nodes) {
-            this.nodes.put(node.getId(), node);
+            this.nodes.put(node.id(), node);
         }
         this.metadataByNode.putAll(metas);
         connections.forEach(this::addConnection);
@@ -81,7 +81,7 @@ public class Graph {
      */
     public Node addNode(NodeType type) {
         var node = Node.create(type);
-        this.nodes.put(node.getId(), node);
+        this.nodes.put(node.id(), node);
         return node;
     }
 
@@ -174,8 +174,8 @@ public class Graph {
         }
 
         this.connections.add(connection);
-        this.getOrCreateConnectionsForNode(nodeFrom.getId()).add(connection);
-        this.getOrCreateConnectionsForNode(nodeTo.getId()).add(connection);
+        this.getOrCreateConnectionsForNode(nodeFrom.id()).add(connection);
+        this.getOrCreateConnectionsForNode(nodeTo.id()).add(connection);
     }
 
     /**
@@ -297,11 +297,11 @@ public class Graph {
             var node = this.nodes.get(nodeId);
             res.add(node);
 
-            if (!hasSeenInput && node.getType().category() == NodeCategory.START) {
+            if (!hasSeenInput && node.type().category() == NodeCategory.START) {
                 hasSeenInput = true;
             }
 
-            if (!hasSeenOutput && node.getType().category() == NodeCategory.END) {
+            if (!hasSeenOutput && node.type().category() == NodeCategory.END) {
                 hasSeenOutput = true;
             }
 
@@ -333,12 +333,12 @@ public class Graph {
      * @return whether the connection is valid for the given node
      */
     private static boolean isConnectionValid(Node node, NodeConnection<?> connection) {
-        if (connection.from().nodeId().equals(node.getId())) {
+        if (connection.from().nodeId().equals(node.id())) {
             return node.getOutputs().containsValue(connection.from());
         }
 
-        if (connection.to().nodeId().equals(node.getId())) {
-            return node.getInputs().containsValue(connection.to());
+        if (connection.to().nodeId().equals(node.id())) {
+            return node.inputs().containsValue(connection.to());
         }
 
         return false;

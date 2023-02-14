@@ -107,7 +107,7 @@ public final class Node {
      *
      * @return the UUID of this node
      */
-    public UUID getId() {
+    public UUID id() {
         return this.id;
     }
 
@@ -116,7 +116,7 @@ public final class Node {
      *
      * @return the type of this node
      */
-    public NodeType getType() {
+    public NodeType type() {
         return this.type;
     }
 
@@ -125,7 +125,7 @@ public final class Node {
      *
      * @return the settings of this node
      */
-    public @Unmodifiable Map<String, DataBox<?>> getSettings() {
+    public @Unmodifiable Map<String, DataBox<?>> settings() {
         return this.settings;
     }
 
@@ -161,7 +161,7 @@ public final class Node {
      *
      * @return the inputs of this node
      */
-    public @Unmodifiable Map<String, NodeConnector.Input<?>> getInputs() {
+    public @Unmodifiable Map<String, NodeConnector.Input<?>> inputs() {
         return this.inputs;
     }
 

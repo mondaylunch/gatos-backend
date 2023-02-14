@@ -17,8 +17,8 @@ public class StringContainsNodeTest {
     @Test
     public void areInputsCorrect() {
         var node = Node.create(BasicNodes.STRING_CONTAINS);
-        Assertions.assertEquals(1, node.getInputs().size());
-        Assertions.assertTrue(node.getInputs().containsKey("input"));
+        Assertions.assertEquals(1, node.inputs().size());
+        Assertions.assertTrue(node.inputs().containsKey("input"));
     }
 
     @Test
@@ -35,7 +35,7 @@ public class StringContainsNodeTest {
         Map<String, DataBox<?>> input0 = Map.of(
             "input", DataType.STRING.create(TEST_STR)
         );
-        var output0 = BasicNodes.STRING_CONTAINS.compute(input0, node.getSettings());
+        var output0 = BasicNodes.STRING_CONTAINS.compute(input0, node.settings());
         Assertions.assertTrue((boolean) output0.get("output").join().value());
     }
 
@@ -46,7 +46,7 @@ public class StringContainsNodeTest {
         Map<String, DataBox<?>> input1 = Map.of(
             "input", DataType.STRING.create(TEST_STR.toUpperCase())
         );
-        var output1 = BasicNodes.STRING_CONTAINS.compute(input1, node.getSettings());
+        var output1 = BasicNodes.STRING_CONTAINS.compute(input1, node.settings());
         Assertions.assertFalse((boolean) output1.get("output").join().value());
     }
 }
