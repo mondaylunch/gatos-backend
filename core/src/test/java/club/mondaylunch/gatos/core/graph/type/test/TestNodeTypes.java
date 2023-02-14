@@ -24,11 +24,6 @@ public class TestNodeTypes {
         }
 
         @Override
-        public String name() {
-            return "test_start";
-        }
-
-        @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
             return Set.of(new NodeConnector.Output<>(nodeId, "out", DataType.INTEGER));
         }
@@ -44,11 +39,6 @@ public class TestNodeTypes {
         @Override
         public Map<String, DataBox<?>> settings() {
             return Map.of();
-        }
-
-        @Override
-        public String name() {
-            return "test_process";
         }
 
         @Override
@@ -72,11 +62,6 @@ public class TestNodeTypes {
         @Override
         public Map<String, DataBox<?>> settings() {
             return Map.of();
-        }
-
-        @Override
-        public String name() {
-            return "test_end";
         }
 
         @Override
