@@ -41,10 +41,11 @@ public class VariableExtractionNodeType extends NodeType.Process {
     @Override
     public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
         var returnDataType = !state.isEmpty()
-            ? ((ReturnType) state.get("output_type").value()).getDataType()
-            : DataType.DATATYPE;
-        return Set.of(
-            new NodeConnector.Output<>(nodeId, "output", returnDataType.optionalOf())
+            ? ((ReturnType) state.get("output_type").value())
+            : ReturnType.STRING;
+        return returnDataType.isListType()
+            ? Set.of(new NodeConnector.Output<>(nodeId, "output", returnDataType.getDataType()))
+            : Set.of(new NodeConnector.Output<>(nodeId, "output", returnDataType.getDataType().optionalOf())
         );
     }
 
@@ -83,7 +84,7 @@ public class VariableExtractionNodeType extends NodeType.Process {
         } else {
             outputList.add(this.jsonToReturnableType(jsonElement));
         }
-        return CompletableFuture.completedFuture(dataType.optionalOf().create(Optional.of((T) outputList.stream().filter(Objects::nonNull).toList())));
+        return CompletableFuture.completedFuture(dataType.create((T) outputList.stream().filter(Objects::nonNull).toList()));
     }
 
     @Nullable
@@ -116,6 +117,10 @@ public class VariableExtractionNodeType extends NodeType.Process {
 
         public DataType<?> getDataType() {
             return this.dataType;
+        }
+
+        public boolean isListType() {
+            return List.of(INTEGER_LIST, STRING_LIST, BOOLEAN_LIST, JSONOBJECT_LIST).contains(this);
         }
     }
 

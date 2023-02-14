@@ -89,7 +89,7 @@ public class VariableExtractionNodeTest {
             "key", DataType.STRING.create("testIntCollection")
         );
         var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, node.settings());
-        Assertions.assertEquals(result.get("output").join().value(), Optional.of(new TestJSONExtractionClass().testIntCollection));
+        Assertions.assertEquals(result.get("output").join().value(), new TestJSONExtractionClass().testIntCollection);
 
         node.modifySetting("output_type", VariableExtractionNodeType.getReturnBoxFromType(DataType.STRING.listOf()));
         Map<String, DataBox<?>> inputStr = Map.of(
@@ -97,7 +97,7 @@ public class VariableExtractionNodeTest {
             "key", DataType.STRING.create("testStrCollection")
         );
         var resultStr = BasicNodes.VARIABLE_EXTRACTION.compute(inputStr, node.settings());
-        Assertions.assertEquals(resultStr.get("output").join().value(), Optional.of(new TestJSONExtractionClass().testStrCollection));
+        Assertions.assertEquals(resultStr.get("output").join().value(), new TestJSONExtractionClass().testStrCollection);
 
         node.modifySetting("output_type", VariableExtractionNodeType.getReturnBoxFromType(DataType.JSONOBJECT.listOf()));
         Map<String, DataBox<?>> inputJson = Map.of(
@@ -105,7 +105,7 @@ public class VariableExtractionNodeTest {
             "key", DataType.STRING.create("testJsonObjCollection")
         );
         var resultJson = BasicNodes.VARIABLE_EXTRACTION.compute(inputJson, node.settings());
-        Assertions.assertEquals(resultJson.get("output").join().value(), Optional.of(new TestJSONExtractionClass().testJsonObjCollection));
+        Assertions.assertEquals(resultJson.get("output").join().value(), new TestJSONExtractionClass().testJsonObjCollection);
     }
 
     @Test
@@ -117,7 +117,7 @@ public class VariableExtractionNodeTest {
             "key", DataType.STRING.create("testInt")
         );
         var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, node.settings());
-        Assertions.assertEquals(result.get("output").join().value(), Optional.of(List.of(new TestJSONExtractionClass().testInt)));
+        Assertions.assertEquals(result.get("output").join().value(), List.of(new TestJSONExtractionClass().testInt));
     }
 
     @Test
