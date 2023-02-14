@@ -75,16 +75,15 @@ public class VariableExtractionNodeType extends NodeType.Process {
         };
     }
 
-    private CompletableFuture handleListReturn(DataType dataType, JsonElement jsonElement) {
+    @SuppressWarnings("unchecked")
+    private <T> CompletableFuture<DataBox<?>> handleListReturn(DataType<T> dataType, JsonElement jsonElement) {
         List<Object> outputList = new ArrayList<>();
         if (jsonElement instanceof JsonArray arr && arr.size() > 0) {
             arr.forEach(json -> outputList.add(this.jsonToReturnableType(json)));
         } else {
             outputList.add(this.jsonToReturnableType(jsonElement));
         }
-        return CompletableFuture.completedFuture(dataType.optionalOf().create(
-            Optional.of(outputList.stream().filter(Objects::nonNull).toList()))
-        );
+        return CompletableFuture.completedFuture(dataType.optionalOf().create(Optional.of((T) outputList.stream().filter(Objects::nonNull).toList())));
     }
 
     @Nullable
@@ -110,23 +109,23 @@ public class VariableExtractionNodeType extends NodeType.Process {
         STRING_LIST(DataType.STRING.listOf()),
         BOOLEAN_LIST(DataType.BOOLEAN.listOf()),
         JSONOBJECT_LIST(DataType.JSONOBJECT.listOf());
-        private final DataType dataType;
-        ReturnType(DataType dataType) {
+        private final DataType<?> dataType;
+        ReturnType(DataType<?> dataType) {
             this.dataType = dataType;
         }
 
-        public DataType getDataType() {
+        public DataType<?> getDataType() {
             return this.dataType;
         }
     }
 
-    public static ReturnType getFromDataType(DataType dataType) {
+    public static ReturnType getFromDataType(DataType<?> dataType) {
         var type = Arrays.stream(ReturnType.values())
             .filter(x -> x.dataType == dataType).toList();
         return type.size() > 0 ? type.get(0) : ReturnType.STRING;
     }
 
-    public static DataBox<ReturnType> getReturnBoxFromType(DataType dataType) {
+    public static DataBox<ReturnType> getReturnBoxFromType(DataType<?> dataType) {
         return RETURN_DATATYPE.create(getFromDataType(dataType));
     }
 }
