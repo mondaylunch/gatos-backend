@@ -1,9 +1,10 @@
 package club.mondaylunch.gatos.core.codec;
 
-import club.mondaylunch.gatos.core.graph.Node;
 import org.bson.codecs.Codec;
 import org.bson.codecs.configuration.CodecProvider;
 import org.bson.codecs.configuration.CodecRegistry;
+
+import club.mondaylunch.gatos.core.graph.Node;
 
 public enum NodeCodecProvider implements CodecProvider {
 

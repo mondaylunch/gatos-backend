@@ -1,7 +1,5 @@
 package club.mondaylunch.gatos.core;
 
-import club.mondaylunch.gatos.core.codec.GraphCodecProvider;
-import club.mondaylunch.gatos.core.codec.NodeCodecProvider;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
@@ -18,6 +16,8 @@ import org.bson.conversions.Bson;
 
 import club.mondaylunch.gatos.core.codec.ClassModelRegistry;
 import club.mondaylunch.gatos.core.codec.DataTypeCodec;
+import club.mondaylunch.gatos.core.codec.GraphCodecProvider;
+import club.mondaylunch.gatos.core.codec.NodeCodecProvider;
 import club.mondaylunch.gatos.core.codec.NodeConnectionCodecProvider;
 import club.mondaylunch.gatos.core.codec.NodeConnectorCodecProvider;
 import club.mondaylunch.gatos.core.codec.NodeTypeCodec;
