@@ -1,6 +1,7 @@
 package club.mondaylunch.gatos.core.graph;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -10,13 +11,20 @@ import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Unmodifiable;
-
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
+import org.bson.BsonReader;
+import org.bson.BsonWriter;
+import org.bson.codecs.Codec;
+import org.bson.codecs.CollectionCodecProvider;
+import org.bson.codecs.DecoderContext;
+import org.bson.codecs.EncoderContext;
+import org.bson.codecs.MapCodecProvider;
+import org.bson.codecs.Parameterizable;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.jetbrains.annotations.Unmodifiable;
 
 /**
  * Represents a node in a flow graph.
@@ -35,11 +43,11 @@ public final class Node {
     private final @Unmodifiable Map<String, NodeConnector.Output<?>> outputs;
 
     private Node(
-            UUID id,
-            NodeType type,
-            Map<String, DataBox<?>> settings,
-            Set<NodeConnector.Input<?>> inputs,
-            Set<NodeConnector.Output<?>> outputs) {
+        UUID id,
+        NodeType type,
+        Map<String, DataBox<?>> settings,
+        Set<NodeConnector.Input<?>> inputs,
+        Set<NodeConnector.Output<?>> outputs) {
         this.id = id;
         this.type = type;
         this.settings = Map.copyOf(settings);
@@ -48,19 +56,8 @@ public final class Node {
     }
 
     /**
-     * Needed for deserialization.
-     */
-    @ApiStatus.Internal
-    public Node() {
-        this.id = null;
-        this.type = null;
-        this.settings = null;
-        this.inputs = null;
-        this.outputs = null;
-    }
-
-    /**
      * Create a new node with a given node type.
+     *
      * @param type the node type
      * @return the new node
      */
@@ -68,15 +65,16 @@ public final class Node {
         var defaultSettings = type.settings();
         var id = UUID.randomUUID();
         return new Node(
-                id,
-                type,
-                defaultSettings,
-                NodeType.inputsOrEmpty(type, id, defaultSettings),
-                NodeType.outputsOrEmpty(type, id, defaultSettings));
+            id,
+            type,
+            defaultSettings,
+            NodeType.inputsOrEmpty(type, id, defaultSettings),
+            NodeType.outputsOrEmpty(type, id, defaultSettings));
     }
 
     /**
      * Create a new node, the same as this one, but with a modified setting.
+     *
      * @param settingKey the key of the setting to modify
      * @param value      the new value of the setting
      * @param <T>        the type of the setting to modify
@@ -97,15 +95,16 @@ public final class Node {
         newSettings.put(settingKey, value);
 
         return new Node(
-                this.id,
-                this.type,
-                newSettings,
-                NodeType.inputsOrEmpty(this.type, this.id, newSettings),
-                NodeType.outputsOrEmpty(this.type, this.id, newSettings));
+            this.id,
+            this.type,
+            newSettings,
+            NodeType.inputsOrEmpty(this.type, this.id, newSettings),
+            NodeType.outputsOrEmpty(this.type, this.id, newSettings));
     }
 
     /**
      * Returns the UUID of this node.
+     *
      * @return the UUID of this node
      */
     public UUID getId() {
@@ -114,6 +113,7 @@ public final class Node {
 
     /**
      * Returns the type of this node.
+     *
      * @return the type of this node
      */
     public NodeType getType() {
@@ -131,6 +131,7 @@ public final class Node {
 
     /**
      * Retrieve a setting for a given key.
+     *
      * @param key  the setting key
      * @param type the datatype of the setting
      * @param <T>  the type of the setting
@@ -157,6 +158,7 @@ public final class Node {
 
     /**
      * Returns the inputs of this node.
+     *
      * @return the inputs of this node
      */
     public @Unmodifiable Map<String, NodeConnector.Input<?>> getInputs() {
@@ -165,6 +167,7 @@ public final class Node {
 
     /**
      * Possibly retrieves an input connector with the given name.
+     *
      * @param name the name of the connector
      * @return an Optional of the connector
      */
@@ -174,6 +177,7 @@ public final class Node {
 
     /**
      * Returns the outputs of this node.
+     *
      * @return the outputs of this node
      */
     public @Unmodifiable Map<String, NodeConnector.Output<?>> getOutputs() {
@@ -182,6 +186,7 @@ public final class Node {
 
     /**
      * Possibly retrieves an output connector with the given name.
+     *
      * @param name the name of the connector
      * @return an Optional of the connector
      */
@@ -201,10 +206,10 @@ public final class Node {
 
         var that = (Node) obj;
         return Objects.equals(this.id, that.id)
-                && Objects.equals(this.type, that.type)
-                && Objects.equals(this.settings, that.settings)
-                && Objects.equals(this.inputs, that.inputs)
-                && Objects.equals(this.outputs, that.outputs);
+            && Objects.equals(this.type, that.type)
+            && Objects.equals(this.settings, that.settings)
+            && Objects.equals(this.inputs, that.inputs)
+            && Objects.equals(this.outputs, that.outputs);
     }
 
     @Override
@@ -215,10 +220,91 @@ public final class Node {
     @Override
     public String toString() {
         return "Node[id=%s, type=%s, settings=%s, inputs=%s, outputs=%s]".formatted(
-                this.id,
-                this.type,
-                this.settings,
-                this.inputs,
-                this.outputs);
+            this.id,
+            this.type,
+            this.settings,
+            this.inputs,
+            this.outputs);
+    }
+
+    public static final class NodeCodec implements Codec<Node> {
+        private final CodecRegistry registry;
+
+        public NodeCodec(CodecRegistry registry) {
+            this.registry = registry;
+        }
+
+        @SuppressWarnings("unchecked")
+        private <T> Set<T> readSet(BsonReader reader, DecoderContext context, Class<? super T> clazz) {
+            var genericCodec = (Parameterizable) new CollectionCodecProvider().get(Set.class, this.registry);
+            var parameterizedCodec = (Codec<Set<T>>) genericCodec.parameterize(this.registry, List.of(clazz));
+            return context.decodeWithChildContext(parameterizedCodec, reader);
+        }
+
+        @SuppressWarnings("unchecked")
+        private <K, V> Map<K, V> readMap(BsonReader reader, DecoderContext context, Class<? super V> classV, Function<String, K> stringToKey) {
+            var genericCodec = (Parameterizable) new MapCodecProvider().get(Map.class, this.registry);
+            var parameterizedCodec = (Codec<Map<String, V>>) genericCodec.parameterize(this.registry, List.of(String.class, classV));
+            Map<String, V> stringToValueMap = context.decodeWithChildContext(parameterizedCodec, reader);
+            Map<K, V> res = new HashMap<>();
+            for (var entry : stringToValueMap.entrySet()) {
+                res.put(stringToKey.apply(entry.getKey()), entry.getValue());
+            }
+            return res;
+        }
+
+        @SuppressWarnings("unchecked")
+        private <T> void writeSet(BsonWriter reader, EncoderContext context, Class<? super T> clazz, Set<T> set) {
+            var genericCodec = (Parameterizable) new CollectionCodecProvider().get(Set.class, this.registry);
+            var parameterizedCodec = (Codec<Set<T>>) genericCodec.parameterize(this.registry, List.of(clazz));
+            context.encodeWithChildContext(parameterizedCodec, reader, set);
+        }
+
+        @SuppressWarnings("unchecked")
+        private <K, V> void writeMap(BsonWriter reader, EncoderContext context, Class<? super V> classV, Function<K, String> keyToString, Map<K, V> map) {
+            var genericCodec = (Parameterizable) new MapCodecProvider().get(Map.class, this.registry);
+            var parameterizedCodec = (Codec<Map<String, V>>) genericCodec.parameterize(this.registry, List.of(String.class, classV));
+            Map<String, V> toWrite = new HashMap<>();
+            for (var entry : map.entrySet()) {
+                toWrite.put(keyToString.apply(entry.getKey()), entry.getValue());
+            }
+            context.encodeWithChildContext(parameterizedCodec, reader, toWrite);
+        }
+
+        @Override
+        public Node decode(BsonReader reader, DecoderContext decoderContext) {
+            reader.readStartDocument();
+            reader.readName("id");
+            UUID id = decoderContext.decodeWithChildContext(this.registry.get(UUID.class), reader);
+            reader.readName("type");
+            NodeType type = decoderContext.decodeWithChildContext(this.registry.get(NodeType.class), reader);
+            reader.readName("settings");
+            Map<String, DataBox<?>> settings = this.readMap(reader, decoderContext, DataBox.class, Function.identity());
+            reader.readEndDocument();
+            return new Node(
+                id,
+                type,
+                settings,
+                NodeType.inputsOrEmpty(type, id, settings),
+                NodeType.outputsOrEmpty(type, id, settings)
+            );
+        }
+
+        @Override
+        public void encode(BsonWriter writer, Node value, EncoderContext encoderContext) {
+            writer.writeStartDocument();
+            writer.writeName("id");
+            encoderContext.encodeWithChildContext(this.registry.get(UUID.class), writer, value.id);
+            writer.writeName("type");
+            encoderContext.encodeWithChildContext(this.registry.get(NodeType.class), writer, value.type);
+            writer.writeName("settings");
+            this.writeMap(writer, encoderContext, DataBox.class, Function.identity(), value.settings);
+            writer.writeEndDocument();
+        }
+
+        @Override
+        public Class<Node> getEncoderClass() {
+            return Node.class;
+        }
     }
 }
