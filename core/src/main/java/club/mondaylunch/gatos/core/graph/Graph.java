@@ -2,6 +2,7 @@ package club.mondaylunch.gatos.core.graph;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,13 +12,20 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
-import org.bson.codecs.pojo.annotations.BsonIgnore;
-import org.jetbrains.annotations.ApiStatus;
+import org.bson.BsonReader;
+import org.bson.BsonWriter;
+import org.bson.codecs.Codec;
+import org.bson.codecs.CollectionCodecProvider;
+import org.bson.codecs.DecoderContext;
+import org.bson.codecs.EncoderContext;
+import org.bson.codecs.MapCodecProvider;
+import org.bson.codecs.Parameterizable;
+import org.bson.codecs.configuration.CodecRegistry;
 import org.jetbrains.annotations.Nullable;
 
-import club.mondaylunch.gatos.core.codec.DatabaseSerializable;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.type.NodeCategory;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
@@ -34,12 +42,11 @@ import club.mondaylunch.gatos.core.graph.type.NodeType;
  * In addition, {@link NodeMetadata extra metadata} is stored per-node.
  * </p>
  */
-public class Graph implements DatabaseSerializable {
+public class Graph {
 
     /**
      * The nodes of this graph.
      */
-    @BsonIgnore
     private final Map<UUID, Node> nodes = new HashMap<>();
     /**
      * The edges of this graph.
@@ -48,24 +55,23 @@ public class Graph implements DatabaseSerializable {
     /**
      * The edges of this graph, easily retrievable by their associated nodes' UUIDs.
      */
-    @BsonIgnore
     private final Map<UUID, Set<NodeConnection<?>>> connectionsByNode = new HashMap<>();
 
     /**
      * The metadata of each node in the graph.
      */
-    @BsonIgnore
     private final Map<UUID, NodeMetadata> metadataByNode = new HashMap<>();
 
-    /**
-     * The serialized representation of {@link #nodes}.
-     */
-    private final Set<Node> serializableNodes = new HashSet<>();
+    public Graph() {}
 
-    /**
-     * The serialized representation of {@link #connections}.
-     */
-    private final Map<String, NodeMetadata> serializableMetadata = new HashMap<>();
+    public Graph(Collection<Node> nodes, Map<UUID, NodeMetadata> metas, Collection<NodeConnection<?>> connections) {
+        this();
+        for (var node : nodes) {
+            this.nodes.put(node.getId(), node);
+        }
+        this.metadataByNode.putAll(metas);
+        connections.forEach(this::addConnection);
+    }
 
     /**
      * Adds a new Node to the graph of the given type. The new node is returned.
@@ -268,7 +274,6 @@ public class Graph implements DatabaseSerializable {
      *
      * @return a topological sort of this graph
      */
-    @BsonIgnore
     public Optional<List<Node>> getExecutionOrder() {
         Set<UUID> relevantNodes = new HashSet<>(this.nodes.keySet());
         relevantNodes.removeIf(n -> this.getConnectionsForNode(n).isEmpty());
@@ -357,50 +362,6 @@ public class Graph implements DatabaseSerializable {
         return this.connections.size();
     }
 
-    /**
-     * Needed so that {@link #serializableNodes} will be serialized automatically.
-     *
-     * @return the serializable nodes.
-     */
-    @SuppressWarnings("unused")
-    @ApiStatus.Internal
-    public Set<Node> getSerializableNodes() {
-        return this.serializableNodes;
-    }
-
-    /**
-     * Needed so that {@link #serializableMetadata} will be serialized automatically.
-     *
-     * @return the serializable metadata.
-     */
-    @SuppressWarnings("unused")
-    @ApiStatus.Internal
-    public Map<String, NodeMetadata> getSerializableMetadata() {
-        return this.serializableMetadata;
-    }
-
-    @Override
-    public void beforeSerialization() {
-        this.serializableNodes.clear();
-        this.serializableNodes.addAll(this.nodes.values());
-        this.serializableMetadata.clear();
-        for (var entry : this.metadataByNode.entrySet()) {
-            this.serializableMetadata.put(entry.getKey().toString(), entry.getValue());
-        }
-    }
-
-    @Override
-    public void afterDeserialization() {
-        for (var node : this.serializableNodes) {
-            this.nodes.put(node.getId(), node);
-        }
-        this.serializableNodes.clear();
-        for (var entry : this.serializableMetadata.entrySet()) {
-            this.metadataByNode.put(UUID.fromString(entry.getKey()), entry.getValue());
-        }
-        this.serializableMetadata.clear();
-    }
-
     @Override
     public int hashCode() {
         return Objects.hash(
@@ -431,5 +392,80 @@ public class Graph implements DatabaseSerializable {
             + ", connections=" + this.connections
             + ", metadataByNode=" + this.metadataByNode
             + '}';
+    }
+
+    public static final class GraphCodec implements Codec<Graph> {
+        private final CodecRegistry registry;
+
+        public GraphCodec(CodecRegistry registry) {
+            this.registry = registry;
+        }
+
+        @SuppressWarnings("unchecked")
+        private <T> Set<T> readSet(BsonReader reader, DecoderContext context, Class<? super T> clazz) {
+            var genericCodec = (Parameterizable) new CollectionCodecProvider().get(Set.class, this.registry);
+            var parameterizedCodec = (Codec<Set<T>>) genericCodec.parameterize(this.registry, List.of(clazz));
+            return context.decodeWithChildContext(parameterizedCodec, reader);
+        }
+
+        @SuppressWarnings("unchecked")
+        private <K, V> Map<K, V> readMap(BsonReader reader, DecoderContext context, Class<V> classV, Function<String, K> stringToKey) {
+            var genericCodec = (Parameterizable) new MapCodecProvider().get(Map.class, this.registry);
+            var parameterizedCodec = (Codec<Map<String, V>>) genericCodec.parameterize(this.registry, List.of(String.class, classV));
+            Map<String, V> stringToValueMap = context.decodeWithChildContext(parameterizedCodec, reader);
+            Map<K, V> res = new HashMap<>();
+            for (var entry : stringToValueMap.entrySet()) {
+                res.put(stringToKey.apply(entry.getKey()), entry.getValue());
+            }
+            return res;
+        }
+
+        @SuppressWarnings("unchecked")
+        private <T> void writeSet(BsonWriter reader, EncoderContext context, Class<? super T> clazz, Set<T> set) {
+            var genericCodec = (Parameterizable) new CollectionCodecProvider().get(Set.class, this.registry);
+            var parameterizedCodec = (Codec<Set<T>>) genericCodec.parameterize(this.registry, List.of(clazz));
+            context.encodeWithChildContext(parameterizedCodec, reader, set);
+        }
+
+        @SuppressWarnings("unchecked")
+        private <K, V> void writeMap(BsonWriter reader, EncoderContext context, Class<V> classV, Function<K, String> keyToString, Map<K, V> map) {
+            var genericCodec = (Parameterizable) new MapCodecProvider().get(Map.class, this.registry);
+            var parameterizedCodec = (Codec<Map<String, V>>) genericCodec.parameterize(this.registry, List.of(String.class, classV));
+            Map<String, V> toWrite = new HashMap<>();
+            for (var entry : map.entrySet()) {
+                toWrite.put(keyToString.apply(entry.getKey()), entry.getValue());
+            }
+            context.encodeWithChildContext(parameterizedCodec, reader, toWrite);
+        }
+
+        @Override
+        public Graph decode(BsonReader reader, DecoderContext decoderContext) {
+            reader.readStartDocument();
+            reader.readName("nodes");
+            Set<Node> nodes = this.readSet(reader, decoderContext, Node.class);
+            reader.readName("connections");
+            Set<NodeConnection<?>> connections = this.readSet(reader, decoderContext, NodeConnection.class);
+            reader.readName("metadata");
+            Map<UUID, NodeMetadata> metadata = this.readMap(reader, decoderContext, NodeMetadata.class, UUID::fromString);
+            reader.readEndDocument();
+            return new Graph(nodes, metadata, connections);
+        }
+
+        @Override
+        public void encode(BsonWriter writer, Graph value, EncoderContext encoderContext) {
+            writer.writeStartDocument();
+            writer.writeName("nodes");
+            this.writeSet(writer, encoderContext, Node.class, Set.copyOf(value.nodes.values()));
+            writer.writeName("connections");
+            this.writeSet(writer, encoderContext, NodeConnection.class, value.connections);
+            writer.writeName("metadata");
+            this.writeMap(writer, encoderContext, NodeMetadata.class, UUID::toString, value.metadataByNode);
+            writer.writeEndDocument();
+        }
+
+        @Override
+        public Class<Graph> getEncoderClass() {
+            return Graph.class;
+        }
     }
 }

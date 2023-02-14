@@ -1,5 +1,6 @@
 package club.mondaylunch.gatos.core;
 
+import club.mondaylunch.gatos.core.codec.GraphCodecProvider;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
@@ -68,7 +69,8 @@ public enum Database {
             ),
             CodecRegistries.fromProviders(
                 NodeConnectorCodecProvider.INSTANCE,
-                NodeConnectionCodecProvider.INSTANCE
+                NodeConnectionCodecProvider.INSTANCE,
+                GraphCodecProvider.INSTANCE
             ),
             ClassModelRegistry.createCodecRegistry(),
             MongoClientSettings.getDefaultCodecRegistry()
