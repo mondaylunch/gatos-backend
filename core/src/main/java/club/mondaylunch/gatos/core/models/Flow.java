@@ -108,12 +108,4 @@ public class Flow extends BaseModel {
     public Graph getGraph() {
         return this.graph;
     }
-
-    @Override
-    public void beforeSerialization() {
-    }
-
-    @Override
-    public void afterDeserialization() {
-    }
 }

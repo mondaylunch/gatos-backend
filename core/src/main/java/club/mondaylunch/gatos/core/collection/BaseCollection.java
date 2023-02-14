@@ -57,7 +57,6 @@ public class BaseCollection<T extends BaseModel> {
         if (obj.getId() == null) {
             obj.setId(UUID.randomUUID());
         }
-        obj.beforeSerialization();
         this.getCollection().insertOne(obj);
     }
 
@@ -68,11 +67,7 @@ public class BaseCollection<T extends BaseModel> {
      * @return The POJO.
      */
     public T get(UUID id) {
-        T object = this.getCollection().find(idFilter(id)).first();
-        if (object != null) {
-            object.afterDeserialization();
-        }
-        return object;
+        return this.getCollection().find(idFilter(id)).first();
     }
 
     /**
@@ -85,7 +80,6 @@ public class BaseCollection<T extends BaseModel> {
     public List<T> get(String field, Object value) {
         List<T> list = new ArrayList<>();
         for (T obj : this.getCollection().find(eq(field, value))) {
-            obj.afterDeserialization();
             list.add(obj);
         }
         return list;

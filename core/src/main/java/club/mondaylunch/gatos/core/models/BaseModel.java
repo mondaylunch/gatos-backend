@@ -5,12 +5,10 @@ import java.util.UUID;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
-import club.mondaylunch.gatos.core.codec.DatabaseSerializable;
-
 /**
  * Class describing common properties for all database models.
  */
-public class BaseModel implements DatabaseSerializable {
+public class BaseModel {
 
     @BsonId
     @BsonProperty("_id")
@@ -39,14 +37,6 @@ public class BaseModel implements DatabaseSerializable {
      */
     public void setId(UUID uuid) {
         this.id = uuid;
-    }
-
-    @Override
-    public void beforeSerialization() {
-    }
-
-    @Override
-    public void afterDeserialization() {
     }
 
     @Override
