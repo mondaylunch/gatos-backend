@@ -36,18 +36,18 @@ public class GraphTest {
     public void canRemoveNodeFromGraph() {
         var graph = new Graph();
         var node = graph.addNode(TEST_NODE_TYPE);
-        graph.removeNode(node.getId());
+        graph.removeNode(node.id());
         Assertions.assertFalse(graph.containsNode(node));
-        Assertions.assertFalse(graph.containsNode(node.getId()));
+        Assertions.assertFalse(graph.containsNode(node.id()));
     }
 
     @Test
     public void canModifyNode() {
         var graph = new Graph();
         var node = graph.addNode(TEST_NODE_TYPE);
-        var modifiedNode = graph.modifyNode(node.getId(), n -> n.modifySetting("setting_1", DataType.INTEGER.create(100)));
+        var modifiedNode = graph.modifyNode(node.id(), n -> n.modifySetting("setting_1", DataType.INTEGER.create(100)));
         Assertions.assertFalse(graph.containsNode(node));
-        Assertions.assertTrue(graph.containsNode(node.getId()));
+        Assertions.assertTrue(graph.containsNode(node.id()));
         Assertions.assertTrue(graph.containsNode(modifiedNode));
         Assertions.assertEquals(100, modifiedNode.getSetting("setting_1", DataType.INTEGER).value());
     }
@@ -66,7 +66,7 @@ public class GraphTest {
         var graph = new Graph();
         var node = graph.addNode(TEST_NODE_TYPE);
         Assertions.assertThrows(NullPointerException.class, () -> {
-            graph.modifyNode(node.getId(), n -> null);
+            graph.modifyNode(node.id(), n -> null);
         });
     }
 
@@ -81,8 +81,8 @@ public class GraphTest {
 
         graph.addConnection(conn.get());
 
-        Assertions.assertTrue(graph.getConnectionsForNode(node1.getId()).contains(conn.get()));
-        Assertions.assertTrue(graph.getConnectionsForNode(node2.getId()).contains(conn.get()));
+        Assertions.assertTrue(graph.getConnectionsForNode(node1.id()).contains(conn.get()));
+        Assertions.assertTrue(graph.getConnectionsForNode(node2.id()).contains(conn.get()));
     }
 
     @Test
@@ -138,8 +138,8 @@ public class GraphTest {
         graph.addConnection(conn.get());
         graph.removeConnection(conn.get());
 
-        Assertions.assertFalse(graph.getConnectionsForNode(node1.getId()).contains(conn.get()));
-        Assertions.assertFalse(graph.getConnectionsForNode(node2.getId()).contains(conn.get()));
+        Assertions.assertFalse(graph.getConnectionsForNode(node1.id()).contains(conn.get()));
+        Assertions.assertFalse(graph.getConnectionsForNode(node2.id()).contains(conn.get()));
     }
 
     @Test
@@ -153,10 +153,10 @@ public class GraphTest {
 
         graph.addConnection(conn.get());
 
-        graph.removeNode(node1.getId());
+        graph.removeNode(node1.id());
 
-        Assertions.assertFalse(graph.getConnectionsForNode(node1.getId()).contains(conn.get()));
-        Assertions.assertFalse(graph.getConnectionsForNode(node2.getId()).contains(conn.get()));
+        Assertions.assertFalse(graph.getConnectionsForNode(node1.id()).contains(conn.get()));
+        Assertions.assertFalse(graph.getConnectionsForNode(node2.id()).contains(conn.get()));
     }
 
     @Test
@@ -170,17 +170,17 @@ public class GraphTest {
 
         graph.addConnection(conn.get());
 
-        graph.removeNode(node2.getId());
+        graph.removeNode(node2.id());
 
-        Assertions.assertFalse(graph.getConnectionsForNode(node1.getId()).contains(conn.get()));
-        Assertions.assertFalse(graph.getConnectionsForNode(node2.getId()).contains(conn.get()));
+        Assertions.assertFalse(graph.getConnectionsForNode(node1.id()).contains(conn.get()));
+        Assertions.assertFalse(graph.getConnectionsForNode(node2.id()).contains(conn.get()));
     }
 
     @Test
     public void canAccessMetadata() {
         var graph = new Graph();
         var node = graph.addNode(TEST_NODE_TYPE);
-        var metadata = graph.getOrCreateMetadataForNode(node.getId());
+        var metadata = graph.getOrCreateMetadataForNode(node.id());
         Assertions.assertNotNull(metadata);
         Assertions.assertEquals(new NodeMetadata(0f, 0f), metadata);
     }
@@ -189,9 +189,9 @@ public class GraphTest {
     public void canModifyMetadata() {
         var graph = new Graph();
         var node = graph.addNode(TEST_NODE_TYPE);
-        var res = graph.modifyMetadata(node.getId(), meta -> meta.withX(10f).withY(20f));
+        var res = graph.modifyMetadata(node.id(), meta -> meta.withX(10f).withY(20f));
         Assertions.assertEquals(new NodeMetadata(10f, 20f), res);
-        Assertions.assertEquals(new NodeMetadata(10f, 20f), graph.getOrCreateMetadataForNode(node.getId()));
+        Assertions.assertEquals(new NodeMetadata(10f, 20f), graph.getOrCreateMetadataForNode(node.id()));
     }
 
     @Test
@@ -199,7 +199,7 @@ public class GraphTest {
         var graph = new Graph();
         var node = graph.addNode(TEST_NODE_TYPE);
         Assertions.assertThrows(NullPointerException.class, () -> {
-            graph.modifyMetadata(node.getId(), n -> null);
+            graph.modifyMetadata(node.id(), n -> null);
         });
     }
 
@@ -207,9 +207,9 @@ public class GraphTest {
     public void removingNodeRemovesMetadata() {
         var graph = new Graph();
         var node = graph.addNode(TEST_NODE_TYPE);
-        var res = graph.modifyMetadata(node.getId(), meta -> meta.withX(10f).withY(20f));
-        graph.removeNode(node.getId());
-        Assertions.assertNotEquals(res, graph.getOrCreateMetadataForNode(node.getId()));
+        var res = graph.modifyMetadata(node.id(), meta -> meta.withX(10f).withY(20f));
+        graph.removeNode(node.id());
+        Assertions.assertNotEquals(res, graph.getOrCreateMetadataForNode(node.id()));
     }
 
     @Test

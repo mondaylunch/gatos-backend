@@ -111,11 +111,9 @@ public class Flow extends BaseModel {
 
     @Override
     public void beforeSerialization() {
-        this.graph.beforeSerialization();
     }
 
     @Override
     public void afterDeserialization() {
-        this.graph.afterDeserialization();
     }
 }

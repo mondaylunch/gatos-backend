@@ -37,11 +37,11 @@ public class GraphExecutor {
         this.connections = List.copyOf(connections);
         this.nodeDependencies = nodes.stream().collect(Collectors.toMap(
                 Function.identity(),
-                n -> n.getInputs().values().stream().flatMap(
+                n -> n.inputs().values().stream().flatMap(
                         connector -> this.connections.stream().filter(connection -> connection.to().equals(connector)))
                         .toList()));
-        this.nonEndNodes = nodes.stream().filter(n -> n.getType() instanceof NodeType.WithOutputs).toList();
-        this.endNodes = nodes.stream().filter(n -> n.getType().category() == NodeCategory.END).toList();
+        this.nonEndNodes = nodes.stream().filter(n -> n.type() instanceof NodeType.WithOutputs).toList();
+        this.endNodes = nodes.stream().filter(n -> n.type().category() == NodeCategory.END).toList();
     }
 
     /**
@@ -59,7 +59,7 @@ public class GraphExecutor {
             }
             CompletableFuture.allOf(this.endNodes.stream().map(node -> {
                 var inputs = this.collectInputsForNode(node, results);
-                return ((NodeType.End) node.getType()).compute(inputs, node.getSettings());
+                return ((NodeType.End) node.type()).compute(inputs, node.settings());
             }).toArray(CompletableFuture[]::new)).join();
         };
     }
@@ -97,8 +97,8 @@ public class GraphExecutor {
             Map<String, DataBox<?>> inputs) {
         Map<NodeConnection<?>, CompletableFuture<DataBox<?>>> resultsByConnection = new HashMap<>();
         Map<String, CompletableFuture<DataBox<?>>> resultsByConnectorName = node
-                .getType() instanceof NodeType.WithOutputs outputs
-                        ? outputs.compute(inputs, node.getSettings())
+                .type() instanceof NodeType.WithOutputs outputs
+                        ? outputs.compute(inputs, node.settings())
                         : Map.of();
         for (var entry : resultsByConnectorName.entrySet()) {
             for (var conn : this.getOutputConnectionsByName(node, entry.getKey())) {

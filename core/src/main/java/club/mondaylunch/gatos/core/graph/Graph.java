@@ -2,6 +2,7 @@ package club.mondaylunch.gatos.core.graph;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,11 +14,15 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.UnaryOperator;
 
-import org.bson.codecs.pojo.annotations.BsonIgnore;
-import org.jetbrains.annotations.ApiStatus;
+import org.bson.BsonReader;
+import org.bson.BsonWriter;
+import org.bson.codecs.Codec;
+import org.bson.codecs.DecoderContext;
+import org.bson.codecs.EncoderContext;
+import org.bson.codecs.configuration.CodecRegistry;
 import org.jetbrains.annotations.Nullable;
 
-import club.mondaylunch.gatos.core.codec.DatabaseSerializable;
+import club.mondaylunch.gatos.core.codec.SerializationUtils;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.type.NodeCategory;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
@@ -34,12 +39,11 @@ import club.mondaylunch.gatos.core.graph.type.NodeType;
  * In addition, {@link NodeMetadata extra metadata} is stored per-node.
  * </p>
  */
-public class Graph implements DatabaseSerializable {
+public class Graph {
 
     /**
      * The nodes of this graph.
      */
-    @BsonIgnore
     private final Map<UUID, Node> nodes = new HashMap<>();
     /**
      * The edges of this graph.
@@ -48,24 +52,23 @@ public class Graph implements DatabaseSerializable {
     /**
      * The edges of this graph, easily retrievable by their associated nodes' UUIDs.
      */
-    @BsonIgnore
     private final Map<UUID, Set<NodeConnection<?>>> connectionsByNode = new HashMap<>();
 
     /**
      * The metadata of each node in the graph.
      */
-    @BsonIgnore
     private final Map<UUID, NodeMetadata> metadataByNode = new HashMap<>();
 
-    /**
-     * The serialized representation of {@link #nodes}.
-     */
-    private final Set<Node> serializableNodes = new HashSet<>();
+    public Graph() {}
 
-    /**
-     * The serialized representation of {@link #connections}.
-     */
-    private final Map<String, NodeMetadata> serializableMetadata = new HashMap<>();
+    public Graph(Collection<Node> nodes, Map<UUID, NodeMetadata> metas, Collection<NodeConnection<?>> connections) {
+        this();
+        for (var node : nodes) {
+            this.nodes.put(node.id(), node);
+        }
+        this.metadataByNode.putAll(metas);
+        connections.forEach(this::addConnection);
+    }
 
     /**
      * Adds a new Node to the graph of the given type. The new node is returned.
@@ -75,7 +78,7 @@ public class Graph implements DatabaseSerializable {
      */
     public Node addNode(NodeType type) {
         var node = Node.create(type);
-        this.nodes.put(node.getId(), node);
+        this.nodes.put(node.id(), node);
         return node;
     }
 
@@ -168,8 +171,8 @@ public class Graph implements DatabaseSerializable {
         }
 
         this.connections.add(connection);
-        this.getOrCreateConnectionsForNode(nodeFrom.getId()).add(connection);
-        this.getOrCreateConnectionsForNode(nodeTo.getId()).add(connection);
+        this.getOrCreateConnectionsForNode(nodeFrom.id()).add(connection);
+        this.getOrCreateConnectionsForNode(nodeTo.id()).add(connection);
     }
 
     /**
@@ -268,7 +271,6 @@ public class Graph implements DatabaseSerializable {
      *
      * @return a topological sort of this graph
      */
-    @BsonIgnore
     public Optional<List<Node>> getExecutionOrder() {
         Set<UUID> relevantNodes = new HashSet<>(this.nodes.keySet());
         relevantNodes.removeIf(n -> this.getConnectionsForNode(n).isEmpty());
@@ -292,11 +294,11 @@ public class Graph implements DatabaseSerializable {
             var node = this.nodes.get(nodeId);
             res.add(node);
 
-            if (!hasSeenInput && node.getType().category() == NodeCategory.START) {
+            if (!hasSeenInput && node.type().category() == NodeCategory.START) {
                 hasSeenInput = true;
             }
 
-            if (!hasSeenOutput && node.getType().category() == NodeCategory.END) {
+            if (!hasSeenOutput && node.type().category() == NodeCategory.END) {
                 hasSeenOutput = true;
             }
 
@@ -328,12 +330,12 @@ public class Graph implements DatabaseSerializable {
      * @return whether the connection is valid for the given node
      */
     private static boolean isConnectionValid(Node node, NodeConnection<?> connection) {
-        if (connection.from().nodeId().equals(node.getId())) {
+        if (connection.from().nodeId().equals(node.id())) {
             return node.getOutputs().containsValue(connection.from());
         }
 
-        if (connection.to().nodeId().equals(node.getId())) {
-            return node.getInputs().containsValue(connection.to());
+        if (connection.to().nodeId().equals(node.id())) {
+            return node.inputs().containsValue(connection.to());
         }
 
         return false;
@@ -355,50 +357,6 @@ public class Graph implements DatabaseSerializable {
      */
     public int connectionCount() {
         return this.connections.size();
-    }
-
-    /**
-     * Needed so that {@link #serializableNodes} will be serialized automatically.
-     *
-     * @return the serializable nodes.
-     */
-    @SuppressWarnings("unused")
-    @ApiStatus.Internal
-    public Set<Node> getSerializableNodes() {
-        return this.serializableNodes;
-    }
-
-    /**
-     * Needed so that {@link #serializableMetadata} will be serialized automatically.
-     *
-     * @return the serializable metadata.
-     */
-    @SuppressWarnings("unused")
-    @ApiStatus.Internal
-    public Map<String, NodeMetadata> getSerializableMetadata() {
-        return this.serializableMetadata;
-    }
-
-    @Override
-    public void beforeSerialization() {
-        this.serializableNodes.clear();
-        this.serializableNodes.addAll(this.nodes.values());
-        this.serializableMetadata.clear();
-        for (var entry : this.metadataByNode.entrySet()) {
-            this.serializableMetadata.put(entry.getKey().toString(), entry.getValue());
-        }
-    }
-
-    @Override
-    public void afterDeserialization() {
-        for (var node : this.serializableNodes) {
-            this.nodes.put(node.getId(), node);
-        }
-        this.serializableNodes.clear();
-        for (var entry : this.serializableMetadata.entrySet()) {
-            this.metadataByNode.put(UUID.fromString(entry.getKey()), entry.getValue());
-        }
-        this.serializableMetadata.clear();
     }
 
     @Override
@@ -431,5 +389,43 @@ public class Graph implements DatabaseSerializable {
             + ", connections=" + this.connections
             + ", metadataByNode=" + this.metadataByNode
             + '}';
+    }
+
+    public static final class GraphCodec implements Codec<Graph> {
+        private final CodecRegistry registry;
+
+        public GraphCodec(CodecRegistry registry) {
+            this.registry = registry;
+        }
+
+        @Override
+        public Graph decode(BsonReader reader, DecoderContext decoderContext) {
+            reader.readStartDocument();
+            reader.readName("nodes");
+            Set<Node> nodes = SerializationUtils.readSet(reader, decoderContext, Node.class, this.registry);
+            reader.readName("connections");
+            Set<NodeConnection<?>> connections = SerializationUtils.readSet(reader, decoderContext, NodeConnection.class, this.registry);
+            reader.readName("metadata");
+            Map<UUID, NodeMetadata> metadata = SerializationUtils.readMap(reader, decoderContext, NodeMetadata.class, UUID::fromString, this.registry);
+            reader.readEndDocument();
+            return new Graph(nodes, metadata, connections);
+        }
+
+        @Override
+        public void encode(BsonWriter writer, Graph value, EncoderContext encoderContext) {
+            writer.writeStartDocument();
+            writer.writeName("nodes");
+            SerializationUtils.writeSet(writer, encoderContext, Node.class, this.registry, Set.copyOf(value.nodes.values()));
+            writer.writeName("connections");
+            SerializationUtils.writeSet(writer, encoderContext, NodeConnection.class, this.registry, value.connections);
+            writer.writeName("metadata");
+            SerializationUtils.writeMap(writer, encoderContext, NodeMetadata.class, UUID::toString, this.registry, value.metadataByNode);
+            writer.writeEndDocument();
+        }
+
+        @Override
+        public Class<Graph> getEncoderClass() {
+            return Graph.class;
+        }
     }
 }

@@ -17,19 +17,19 @@ public class StringInterpolationNodeTest {
     public void hasCorrectInputs() {
         var node = Node.create(BasicNodes.STRING_INTERPOLATION)
                 .modifySetting("template", DataType.STRING.create(TEST_TEMPLATE_STRING));
-        Assertions.assertEquals(6, node.getInputs().size());
+        Assertions.assertEquals(6, node.inputs().size());
     }
 
     @Test
     public void paramNamesAreCorrect() {
         var node = Node.create(BasicNodes.STRING_INTERPOLATION)
                 .modifySetting("template", DataType.STRING.create(TEST_TEMPLATE_STRING));
-        Assertions.assertTrue(node.getInputs().containsKey("Placeholder 1"));
-        Assertions.assertTrue(node.getInputs().containsKey("template_param_1"));
-        Assertions.assertTrue(node.getInputs().containsKey("a thing"));
-        Assertions.assertTrue(node.getInputs().containsKey("Placeholder 4"));
-        Assertions.assertTrue(node.getInputs().containsKey("Placeholder 5"));
-        Assertions.assertTrue(node.getInputs().containsKey("Placeholder 6"));
+        Assertions.assertTrue(node.inputs().containsKey("Placeholder 1"));
+        Assertions.assertTrue(node.inputs().containsKey("template_param_1"));
+        Assertions.assertTrue(node.inputs().containsKey("a thing"));
+        Assertions.assertTrue(node.inputs().containsKey("Placeholder 4"));
+        Assertions.assertTrue(node.inputs().containsKey("Placeholder 5"));
+        Assertions.assertTrue(node.inputs().containsKey("Placeholder 6"));
     }
 
     @Test
@@ -50,7 +50,7 @@ public class StringInterpolationNodeTest {
                 "Placeholder 4", DataType.STRING.create("template substitution"),
                 "Placeholder 5", DataType.STRING.create("work correctly?"),
                 "Placeholder 6", DataType.STRING.create("This one shouldn't:"));
-        var result = (String) BasicNodes.STRING_INTERPOLATION.compute(inputs, node.getSettings()).get("result")
+        var result = (String) BasicNodes.STRING_INTERPOLATION.compute(inputs, node.settings()).get("result")
                 .join()
                 .value();
         Assertions.assertEquals(

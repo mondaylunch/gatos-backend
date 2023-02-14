@@ -101,7 +101,7 @@ public class GraphSerializationTest {
         Node node1 = graph.addNode(TestNodeTypes.START);
         Node node2 = graph.addNode(TestNodeTypes.PROCESS);
         Node node3 = graph.addNode(TestNodeTypes.END);
-        NodeMetadata metadata = graph.modifyMetadata(node1.getId(), nodeMetadata -> nodeMetadata.withX(1));
+        NodeMetadata metadata = graph.modifyMetadata(node1.id(), nodeMetadata -> nodeMetadata.withX(1));
         Assertions.assertEquals(1, metadata.xPos());
         Flow.objects.insert(flow);
         assertFlowCount(1);
@@ -114,10 +114,10 @@ public class GraphSerializationTest {
         Assertions.assertTrue(graph.containsNode(node1));
         Assertions.assertTrue(graph.containsNode(node2));
         Assertions.assertTrue(graph.containsNode(node3));
-        Assertions.assertEquals(metadata, retrievedGraph.getOrCreateMetadataForNode(node1.getId()));
+        Assertions.assertEquals(metadata, retrievedGraph.getOrCreateMetadataForNode(node1.id()));
         NodeMetadata defaultMetadata = new NodeMetadata(0, 0);
-        Assertions.assertEquals(defaultMetadata, retrievedGraph.getOrCreateMetadataForNode(node2.getId()));
-        Assertions.assertEquals(defaultMetadata, retrievedGraph.getOrCreateMetadataForNode(node3.getId()));
+        Assertions.assertEquals(defaultMetadata, retrievedGraph.getOrCreateMetadataForNode(node2.id()));
+        Assertions.assertEquals(defaultMetadata, retrievedGraph.getOrCreateMetadataForNode(node3.id()));
     }
 
     private static Flow createFlow() {
