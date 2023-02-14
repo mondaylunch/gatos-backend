@@ -17,9 +17,14 @@ public class VariableRemappingNodeType extends NodeType.Process {
     }
 
     @Override
+    public String name() {
+        return "variable_remapping";
+    }
+
+    @Override
     public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
         return Set.of(
-                new NodeConnector.Input<>(nodeId, "input", DataType.JSONOBJECT),
+                new NodeConnector.Input<>(nodeId, "input", DataType.JSON_OBJECT),
                 new NodeConnector.Input<>(nodeId, "oldKey", DataType.STRING),
                 new NodeConnector.Input<>(nodeId, "newKey", DataType.STRING));
     }
@@ -27,22 +32,22 @@ public class VariableRemappingNodeType extends NodeType.Process {
     @Override
     public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
         return Set.of(
-                new NodeConnector.Output<>(nodeId, "output", DataType.JSONOBJECT));
+                new NodeConnector.Output<>(nodeId, "output", DataType.JSON_OBJECT));
     }
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
             Map<String, DataBox<?>> settings) {
-        var jsonInput = DataBox.get(inputs, "input", DataType.JSONOBJECT).orElse(null);
+        var jsonInput = DataBox.get(inputs, "input", DataType.JSON_OBJECT).orElse(null);
         var oldKeyStr = DataBox.get(inputs, "oldKey", DataType.STRING).orElse(null);
         var newKeyStr = DataBox.get(inputs, "newKey", DataType.STRING).orElse(null);
         if (jsonInput == null || oldKeyStr == null || newKeyStr == null || oldKeyStr.equals(newKeyStr)
                 || jsonInput.get(oldKeyStr) == null) {
-            return Map.of("output", CompletableFuture.completedFuture(DataType.JSONOBJECT.create(jsonInput)));
+            return Map.of("output", CompletableFuture.completedFuture(DataType.JSON_OBJECT.create(jsonInput)));
         }
         var value = jsonInput.get(oldKeyStr);
         jsonInput.add(newKeyStr, jsonInput.remove(oldKeyStr));
         return Map.of(
-                "output", CompletableFuture.completedFuture(DataType.JSONOBJECT.create(jsonInput)));
+                "output", CompletableFuture.completedFuture(DataType.JSON_OBJECT.create(jsonInput)));
     }
 }

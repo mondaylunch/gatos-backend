@@ -32,7 +32,7 @@ public class NodeTest {
     @Test
     public void canGetOutputs() {
         var node = Node.create(TEST_NODE_TYPE);
-        Assertions.assertTrue(node.outputs().containsKey("out"));
+        Assertions.assertTrue(node.getOutputs().containsKey("out"));
     }
 
     @Test
@@ -118,6 +118,11 @@ public class NodeTest {
             return Map.of(
                     "setting_1", DataType.INTEGER.create(0),
                     "setting_2", DataType.BOOLEAN.create(false));
+        }
+
+        @Override
+        public String name() {
+            return "";
         }
 
         @Override

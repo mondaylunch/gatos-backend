@@ -46,6 +46,13 @@ public interface NodeType {
     Map<String, DataBox<?>> settings();
 
     /**
+     * The unique name of this node type.
+     *
+     * @return the unique name of this node type.
+     */
+    String name();
+
+    /**
      * Extended by node types which have input connectors.
      */
     @ApiStatus.NonExtendable

@@ -13,11 +13,11 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Updates;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.conversions.Bson;
 import org.jetbrains.annotations.Nullable;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Updates;
 
 import club.mondaylunch.gatos.core.Database;
 import club.mondaylunch.gatos.core.models.BaseModel;
@@ -144,11 +144,11 @@ public class BaseCollection<T extends BaseModel> {
      */
     private static List<Bson> getNonNullUpdates(Object obj) {
         return createPropertyDescriptorStream(obj.getClass())
-                .filter(BaseCollection::hasGetter)
-                .map(descriptor -> getField(descriptor, obj))
-                .filter(Objects::nonNull)
-                .map(BaseCollection::createUpdate)
-                .toList();
+            .filter(BaseCollection::hasGetter)
+            .map(descriptor -> getField(descriptor, obj))
+            .filter(Objects::nonNull)
+            .map(BaseCollection::createUpdate)
+            .toList();
     }
 
     /**
@@ -172,7 +172,7 @@ public class BaseCollection<T extends BaseModel> {
      *
      * @param descriptor The {@code PropertyDescriptor}.
      * @return {@code true} if the {@code PropertyDescriptor} has a getter,
-     *         {@code false} otherwise.
+     * {@code false} otherwise.
      */
     private static boolean hasGetter(PropertyDescriptor descriptor) {
         return descriptor.getReadMethod() != null && !descriptor.getName().equals("id");

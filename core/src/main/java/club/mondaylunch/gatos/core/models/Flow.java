@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
 import club.mondaylunch.gatos.core.collection.FlowCollection;
+import club.mondaylunch.gatos.core.graph.Graph;
 
 /**
  * POJO for flows.
@@ -12,6 +13,14 @@ import club.mondaylunch.gatos.core.collection.FlowCollection;
 public class Flow extends BaseModel {
 
     public static final FlowCollection objects = new FlowCollection();
+
+    private final Graph graph = new Graph();
+
+    public Flow(UUID id, String name, UUID authorId) {
+        super(id);
+        this.name = name;
+        this.authorId = authorId;
+    }
 
     public Flow(String name, UUID authorId) {
         this.name = name;
@@ -89,5 +98,14 @@ public class Flow extends BaseModel {
      */
     public void setAuthorId(UUID authorId) {
         this.authorId = authorId;
+    }
+
+    /**
+     * Get the graph.
+     *
+     * @return the graph.
+     */
+    public Graph getGraph() {
+        return this.graph;
     }
 }

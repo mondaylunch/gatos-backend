@@ -35,8 +35,8 @@ public class StringInterpolationNodeTest {
     @Test
     public void hasOutput() {
         var node = Node.create(BasicNodes.STRING_INTERPOLATION);
-        Assertions.assertEquals(1, node.outputs().size());
-        Assertions.assertTrue(node.outputs().containsKey("result"));
+        Assertions.assertEquals(1, node.getOutputs().size());
+        Assertions.assertTrue(node.getOutputs().containsKey("result"));
     }
 
     @Test

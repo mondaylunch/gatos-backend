@@ -378,6 +378,11 @@ public class GraphTest {
         }
 
         @Override
+        public String name() {
+            return "";
+        }
+
+        @Override
         public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
                 Map<String, DataBox<?>> settings) {
             return Map.of();
@@ -397,6 +402,11 @@ public class GraphTest {
         }
 
         @Override
+        public String name() {
+            return "";
+        }
+
+        @Override
         public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
                 Map<String, DataBox<?>> settings) {
             return Map.of();
@@ -413,6 +423,11 @@ public class GraphTest {
         @Override
         public Map<String, DataBox<?>> settings() {
             return Map.of();
+        }
+
+        @Override
+        public String name() {
+            return "";
         }
 
         @Override

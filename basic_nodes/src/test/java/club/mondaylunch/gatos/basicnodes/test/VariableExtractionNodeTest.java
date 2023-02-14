@@ -40,14 +40,14 @@ public class VariableExtractionNodeTest {
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.VARIABLE_EXTRACTION);
-        Assertions.assertEquals(1, node.outputs().size());
-        Assertions.assertTrue(node.outputs().containsKey("output"));
+        Assertions.assertEquals(1, node.getOutputs().size());
+        Assertions.assertTrue(node.getOutputs().containsKey("output"));
     }
 
     @Test
     public void correctlyExtractsInt() {
         Map<String, DataBox<?>> input = Map.of(
-                "input", DataType.JSONOBJECT.create(TEST_JSON_OBJECT),
+                "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
                 "key", DataType.STRING.create("testInt"));
         var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, Map.of());
         Assertions.assertTrue(result.get("output").join().value() instanceof JsonPrimitive json
@@ -57,7 +57,7 @@ public class VariableExtractionNodeTest {
     @Test
     public void correctlyExtractsBoolean() {
         Map<String, DataBox<?>> input = Map.of(
-                "input", DataType.JSONOBJECT.create(TEST_JSON_OBJECT),
+                "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
                 "key", DataType.STRING.create("testBoolean"));
         var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, Map.of());
         Assertions.assertTrue(result.get("output").join().value() instanceof JsonPrimitive json
@@ -67,7 +67,7 @@ public class VariableExtractionNodeTest {
     @Test
     public void correctlyExtractsString() {
         Map<String, DataBox<?>> input = Map.of(
-                "input", DataType.JSONOBJECT.create(TEST_JSON_OBJECT),
+                "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
                 "key", DataType.STRING.create("testString"));
         var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, Map.of());
         Assertions.assertTrue(result.get("output").join().value() instanceof JsonPrimitive json
@@ -77,7 +77,7 @@ public class VariableExtractionNodeTest {
     @Test
     public void correctlyExtractsCollection() {
         Map<String, DataBox<?>> input = Map.of(
-                "input", DataType.JSONOBJECT.create(TEST_JSON_OBJECT),
+                "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
                 "key", DataType.STRING.create("testCollection"));
         var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, Map.of());
         var expectedResult = new JsonArray();
@@ -90,7 +90,7 @@ public class VariableExtractionNodeTest {
     @Test
     public void extractMissingValuesAsNull() {
         Map<String, DataBox<?>> input0 = Map.of(
-                "input", DataType.JSONOBJECT.create(TEST_JSON_OBJECT),
+                "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
                 "key", DataType.STRING.create("notAValidKey"));
         var result0 = BasicNodes.VARIABLE_EXTRACTION.compute(input0, Map.of());
         Assertions.assertEquals(result0.get("output").join().value(), JsonNull.INSTANCE);
@@ -101,7 +101,7 @@ public class VariableExtractionNodeTest {
         Assertions.assertEquals(result1.get("output").join().value(), JsonNull.INSTANCE);
 
         Map<String, DataBox<?>> input2 = Map.of(
-                "input", DataType.JSONOBJECT.create(TEST_JSON_OBJECT));
+                "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT));
         var result2 = BasicNodes.VARIABLE_EXTRACTION.compute(input2, Map.of());
         Assertions.assertEquals(result2.get("output").join().value(), JsonNull.INSTANCE);
     }
