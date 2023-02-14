@@ -1,7 +1,6 @@
 package club.mondaylunch.gatos.core.graph;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -11,6 +10,7 @@ import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
+import club.mondaylunch.gatos.core.codec.SerializationUtils;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
@@ -18,11 +18,8 @@ import club.mondaylunch.gatos.core.graph.type.NodeType;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
 import org.bson.codecs.Codec;
-import org.bson.codecs.CollectionCodecProvider;
 import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
-import org.bson.codecs.MapCodecProvider;
-import org.bson.codecs.Parameterizable;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -234,43 +231,6 @@ public final class Node {
             this.registry = registry;
         }
 
-        @SuppressWarnings("unchecked")
-        private <T> Set<T> readSet(BsonReader reader, DecoderContext context, Class<? super T> clazz) {
-            var genericCodec = (Parameterizable) new CollectionCodecProvider().get(Set.class, this.registry);
-            var parameterizedCodec = (Codec<Set<T>>) genericCodec.parameterize(this.registry, List.of(clazz));
-            return context.decodeWithChildContext(parameterizedCodec, reader);
-        }
-
-        @SuppressWarnings("unchecked")
-        private <K, V> Map<K, V> readMap(BsonReader reader, DecoderContext context, Class<? super V> classV, Function<String, K> stringToKey) {
-            var genericCodec = (Parameterizable) new MapCodecProvider().get(Map.class, this.registry);
-            var parameterizedCodec = (Codec<Map<String, V>>) genericCodec.parameterize(this.registry, List.of(String.class, classV));
-            Map<String, V> stringToValueMap = context.decodeWithChildContext(parameterizedCodec, reader);
-            Map<K, V> res = new HashMap<>();
-            for (var entry : stringToValueMap.entrySet()) {
-                res.put(stringToKey.apply(entry.getKey()), entry.getValue());
-            }
-            return res;
-        }
-
-        @SuppressWarnings("unchecked")
-        private <T> void writeSet(BsonWriter reader, EncoderContext context, Class<? super T> clazz, Set<T> set) {
-            var genericCodec = (Parameterizable) new CollectionCodecProvider().get(Set.class, this.registry);
-            var parameterizedCodec = (Codec<Set<T>>) genericCodec.parameterize(this.registry, List.of(clazz));
-            context.encodeWithChildContext(parameterizedCodec, reader, set);
-        }
-
-        @SuppressWarnings("unchecked")
-        private <K, V> void writeMap(BsonWriter reader, EncoderContext context, Class<? super V> classV, Function<K, String> keyToString, Map<K, V> map) {
-            var genericCodec = (Parameterizable) new MapCodecProvider().get(Map.class, this.registry);
-            var parameterizedCodec = (Codec<Map<String, V>>) genericCodec.parameterize(this.registry, List.of(String.class, classV));
-            Map<String, V> toWrite = new HashMap<>();
-            for (var entry : map.entrySet()) {
-                toWrite.put(keyToString.apply(entry.getKey()), entry.getValue());
-            }
-            context.encodeWithChildContext(parameterizedCodec, reader, toWrite);
-        }
-
         @Override
         public Node decode(BsonReader reader, DecoderContext decoderContext) {
             reader.readStartDocument();
@@ -279,7 +239,7 @@ public final class Node {
             reader.readName("type");
             NodeType type = decoderContext.decodeWithChildContext(this.registry.get(NodeType.class), reader);
             reader.readName("settings");
-            Map<String, DataBox<?>> settings = this.readMap(reader, decoderContext, DataBox.class, Function.identity());
+            Map<String, DataBox<?>> settings = SerializationUtils.readMap(reader, decoderContext, DataBox.class, Function.identity(), this.registry);
             reader.readEndDocument();
             return new Node(
                 id,
@@ -298,7 +258,7 @@ public final class Node {
             writer.writeName("type");
             encoderContext.encodeWithChildContext(this.registry.get(NodeType.class), writer, value.type);
             writer.writeName("settings");
-            this.writeMap(writer, encoderContext, DataBox.class, Function.identity(), value.settings);
+            SerializationUtils.writeMap(writer, encoderContext, DataBox.class, Function.identity(), this.registry, value.settings);
             writer.writeEndDocument();
         }
 

@@ -15,6 +15,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
+import club.mondaylunch.gatos.core.codec.SerializationUtils;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
 import org.bson.codecs.Codec;
@@ -401,52 +402,15 @@ public class Graph {
             this.registry = registry;
         }
 
-        @SuppressWarnings("unchecked")
-        private <T> Set<T> readSet(BsonReader reader, DecoderContext context, Class<? super T> clazz) {
-            var genericCodec = (Parameterizable) new CollectionCodecProvider().get(Set.class, this.registry);
-            var parameterizedCodec = (Codec<Set<T>>) genericCodec.parameterize(this.registry, List.of(clazz));
-            return context.decodeWithChildContext(parameterizedCodec, reader);
-        }
-
-        @SuppressWarnings("unchecked")
-        private <K, V> Map<K, V> readMap(BsonReader reader, DecoderContext context, Class<V> classV, Function<String, K> stringToKey) {
-            var genericCodec = (Parameterizable) new MapCodecProvider().get(Map.class, this.registry);
-            var parameterizedCodec = (Codec<Map<String, V>>) genericCodec.parameterize(this.registry, List.of(String.class, classV));
-            Map<String, V> stringToValueMap = context.decodeWithChildContext(parameterizedCodec, reader);
-            Map<K, V> res = new HashMap<>();
-            for (var entry : stringToValueMap.entrySet()) {
-                res.put(stringToKey.apply(entry.getKey()), entry.getValue());
-            }
-            return res;
-        }
-
-        @SuppressWarnings("unchecked")
-        private <T> void writeSet(BsonWriter reader, EncoderContext context, Class<? super T> clazz, Set<T> set) {
-            var genericCodec = (Parameterizable) new CollectionCodecProvider().get(Set.class, this.registry);
-            var parameterizedCodec = (Codec<Set<T>>) genericCodec.parameterize(this.registry, List.of(clazz));
-            context.encodeWithChildContext(parameterizedCodec, reader, set);
-        }
-
-        @SuppressWarnings("unchecked")
-        private <K, V> void writeMap(BsonWriter reader, EncoderContext context, Class<V> classV, Function<K, String> keyToString, Map<K, V> map) {
-            var genericCodec = (Parameterizable) new MapCodecProvider().get(Map.class, this.registry);
-            var parameterizedCodec = (Codec<Map<String, V>>) genericCodec.parameterize(this.registry, List.of(String.class, classV));
-            Map<String, V> toWrite = new HashMap<>();
-            for (var entry : map.entrySet()) {
-                toWrite.put(keyToString.apply(entry.getKey()), entry.getValue());
-            }
-            context.encodeWithChildContext(parameterizedCodec, reader, toWrite);
-        }
-
         @Override
         public Graph decode(BsonReader reader, DecoderContext decoderContext) {
             reader.readStartDocument();
             reader.readName("nodes");
-            Set<Node> nodes = this.readSet(reader, decoderContext, Node.class);
+            Set<Node> nodes = SerializationUtils.readSet(reader, decoderContext, Node.class, this.registry);
             reader.readName("connections");
-            Set<NodeConnection<?>> connections = this.readSet(reader, decoderContext, NodeConnection.class);
+            Set<NodeConnection<?>> connections = SerializationUtils.readSet(reader, decoderContext, NodeConnection.class, this.registry);
             reader.readName("metadata");
-            Map<UUID, NodeMetadata> metadata = this.readMap(reader, decoderContext, NodeMetadata.class, UUID::fromString);
+            Map<UUID, NodeMetadata> metadata = SerializationUtils.readMap(reader, decoderContext, NodeMetadata.class, UUID::fromString, this.registry);
             reader.readEndDocument();
             return new Graph(nodes, metadata, connections);
         }
@@ -455,11 +419,11 @@ public class Graph {
         public void encode(BsonWriter writer, Graph value, EncoderContext encoderContext) {
             writer.writeStartDocument();
             writer.writeName("nodes");
-            this.writeSet(writer, encoderContext, Node.class, Set.copyOf(value.nodes.values()));
+            SerializationUtils.writeSet(writer, encoderContext, Node.class, this.registry, Set.copyOf(value.nodes.values()));
             writer.writeName("connections");
-            this.writeSet(writer, encoderContext, NodeConnection.class, value.connections);
+            SerializationUtils.writeSet(writer, encoderContext, NodeConnection.class, this.registry, value.connections);
             writer.writeName("metadata");
-            this.writeMap(writer, encoderContext, NodeMetadata.class, UUID::toString, value.metadataByNode);
+            SerializationUtils.writeMap(writer, encoderContext, NodeMetadata.class, UUID::toString, this.registry, value.metadataByNode);
             writer.writeEndDocument();
         }
 
