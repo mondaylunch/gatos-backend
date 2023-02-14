@@ -93,6 +93,14 @@ public class Registry<T> {
     }
 
     /**
+     * Clears this registry, making it empty. You probably only want to use this in tests.
+     */
+    public void clear() {
+        this.map.clear();
+        this.reverseMap.clear();
+    }
+
+    /**
      * A registry that holds registries, that also allows lookup by class.
      */
     public static class RegistryRegistry extends Registry<Registry<?>> {
@@ -106,6 +114,12 @@ public class Registry<T> {
         public <E extends Registry<?>> E register(@NotNull String name, @NotNull E value) {
             this.registriesByClass.put(value.getClazz(), value);
             return super.register(name, value);
+        }
+
+        @Override
+        public void clear() {
+            super.clear();
+            this.registriesByClass.clear();
         }
 
         /**
