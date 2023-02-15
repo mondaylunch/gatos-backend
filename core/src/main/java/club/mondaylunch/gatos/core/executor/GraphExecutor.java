@@ -10,13 +10,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.jetbrains.annotations.Unmodifiable;
-
 import club.mondaylunch.gatos.core.data.DataBox;
+import club.mondaylunch.gatos.core.data.DataTypeConversions;
 import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.type.NodeCategory;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
+import org.jetbrains.annotations.Unmodifiable;
 
 /**
  * Handles execution of a {@link club.mondaylunch.gatos.core.graph.Graph flow
@@ -80,7 +80,7 @@ public class GraphExecutor {
         for (var dep : this.nodeDependencies.get(node)) {
             var resForDep = allResults.get(dep);
             var depInputName = dep.to().name();
-            inputs.put(depInputName, resForDep.join());
+            inputs.put(depInputName, DataTypeConversions.convert(resForDep.join(), dep.to().type()));
         }
 
         return inputs;
@@ -118,7 +118,7 @@ public class GraphExecutor {
      */
     private Iterable<NodeConnection<?>> getOutputConnectionsByName(Node node, String name) {
         return node.getOutputWithName(name).stream()
-                .flatMap(c -> this.connections.stream().filter(a -> a.from().equals(c)))
+                .flatMap(c -> this.connections.stream().filter(a -> a.from().isCompatible(c)))
                 .toList();
     }
 }
