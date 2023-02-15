@@ -4,8 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+//TODO automatically handle transitive conversions?
 /**
- * Manages conversions between {@link DataType DataTypes}.
+ * Manages conversions between {@link DataType DataTypes}. Conversions should only be registered in here if <strong>they will never fail</strong>.
+ * <p>For example, Number -> String is a reasonable conversion, as all numbers can be represented as strings. String -> Number is not,
+ * as not all strings are valid numbers.</p>
  */
 public final class Conversions {
     private static final Map<ConversionPair, Function<?, ?>> MAP = new HashMap<>();
