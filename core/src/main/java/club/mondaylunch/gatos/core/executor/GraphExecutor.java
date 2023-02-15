@@ -11,7 +11,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import club.mondaylunch.gatos.core.data.DataBox;
-import club.mondaylunch.gatos.core.data.DataTypeConversions;
+import club.mondaylunch.gatos.core.data.Conversions;
 import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.type.NodeCategory;
@@ -80,7 +80,7 @@ public class GraphExecutor {
         for (var dep : this.nodeDependencies.get(node)) {
             var resForDep = allResults.get(dep);
             var depInputName = dep.to().name();
-            inputs.put(depInputName, DataTypeConversions.convert(resForDep.join(), dep.to().type()));
+            inputs.put(depInputName, Conversions.convert(resForDep.join(), dep.to().type()));
         }
 
         return inputs;

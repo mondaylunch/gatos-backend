@@ -15,7 +15,6 @@ import java.util.UUID;
 import java.util.function.UnaryOperator;
 
 import club.mondaylunch.gatos.core.codec.SerializationUtils;
-import club.mondaylunch.gatos.core.data.DataTypeConversions;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.type.NodeCategory;
 import club.mondaylunch.gatos.core.graph.type.NodeType;

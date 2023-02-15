@@ -4,7 +4,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import club.mondaylunch.gatos.core.data.DataType;
-import club.mondaylunch.gatos.core.data.DataTypeConversions;
+import club.mondaylunch.gatos.core.data.Conversions;
 
 /**
  * Represents an input or output on a node.
@@ -104,7 +104,7 @@ public abstract sealed class NodeConnector<T> {
         public boolean isCompatible(Output<?> other) {
             return this.nodeId().equals(other.nodeId())
                 && this.name().equals(other.name())
-                && DataTypeConversions.canConvert(this.type(), other.type());
+                && Conversions.canConvert(this.type(), other.type());
         }
     }
 }

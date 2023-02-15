@@ -7,7 +7,7 @@ import java.util.function.Function;
 /**
  * Manages conversions between {@link DataType DataTypes}.
  */
-public final class DataTypeConversions {
+public final class Conversions {
     private static final Map<ConversionPair, Function<?, ?>> MAP = new HashMap<>();
 
     /**
@@ -57,7 +57,7 @@ public final class DataTypeConversions {
         return typeB.create(result);
     }
 
-    private DataTypeConversions() {}
+    private Conversions() {}
 
     private record ConversionPair(DataType<?> a, DataType<?> b) {
     }

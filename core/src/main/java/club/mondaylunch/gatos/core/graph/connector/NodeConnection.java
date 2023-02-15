@@ -3,7 +3,7 @@ package club.mondaylunch.gatos.core.graph.connector;
 import java.util.Optional;
 
 import club.mondaylunch.gatos.core.data.DataType;
-import club.mondaylunch.gatos.core.data.DataTypeConversions;
+import club.mondaylunch.gatos.core.data.Conversions;
 import club.mondaylunch.gatos.core.graph.Node;
 
 /**
@@ -27,7 +27,7 @@ public record NodeConnection<T>(
 
         var from = fromOpt.get();
         var to = toOpt.get();
-        if (!DataTypeConversions.canConvert(from.type(), to.type()) || !to.type().equals(type)) {
+        if (!Conversions.canConvert(from.type(), to.type()) || !to.type().equals(type)) {
             return Optional.empty();
         }
 
