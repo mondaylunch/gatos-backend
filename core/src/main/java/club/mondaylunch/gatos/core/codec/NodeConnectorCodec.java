@@ -31,7 +31,7 @@ public class NodeConnectorCodec implements Codec<NodeConnector<?>> {
         reader.readStartDocument();
         UUID nodeId = decoderContext.decodeWithChildContext(uuidCodec, reader);
         String name = reader.readString();
-        DataType<?> dataType = decoderContext.decodeWithChildContext(DataTypeCodec.INSTANCE, reader);
+        DataType<?> dataType = decoderContext.decodeWithChildContext(this.registry.get(DataType.class), reader);
         reader.readEndDocument();
         return this.createNodeConnector(nodeId, name, dataType);
     }
@@ -45,7 +45,7 @@ public class NodeConnectorCodec implements Codec<NodeConnector<?>> {
         writer.writeName("name");
         writer.writeString(value.name());
         writer.writeName("type");
-        encoderContext.encodeWithChildContext(DataTypeCodec.INSTANCE, writer, value.type());
+        encoderContext.encodeWithChildContext(this.registry.get(DataType.class), writer, value.type());
         writer.writeEndDocument();
     }
 

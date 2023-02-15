@@ -11,7 +11,6 @@ import club.mondaylunch.gatos.core.codec.ClassModelRegistry;
 import club.mondaylunch.gatos.core.Database;
 import club.mondaylunch.gatos.core.collection.BaseCollection;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
-import club.mondaylunch.gatos.core.graph.type.NodeTypeRegistry;
 import club.mondaylunch.gatos.core.graph.type.test.TestNodeTypes;
 import club.mondaylunch.gatos.core.models.BaseModel;
 
@@ -23,10 +22,7 @@ public class NodeTypeCodecTest {
             NodeTypeContainerContainer.class
         );
         Database.refreshCodecRegistry();
-
-        NodeTypeRegistry.register(TestNodeTypes.START);
-        NodeTypeRegistry.register(TestNodeTypes.PROCESS);
-        NodeTypeRegistry.register(TestNodeTypes.END);
+        new TestNodeTypes(); // classloading
     }
 
     private static final BaseCollection<NodeTypeContainer> CONTAINER_COLLECTION = new BaseCollection<>("nodeTypeContainers", NodeTypeContainer.class);

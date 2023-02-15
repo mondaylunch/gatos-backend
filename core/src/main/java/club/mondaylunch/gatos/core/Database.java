@@ -15,12 +15,11 @@ import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
 
 import club.mondaylunch.gatos.core.codec.ClassModelRegistry;
-import club.mondaylunch.gatos.core.codec.DataTypeCodec;
 import club.mondaylunch.gatos.core.codec.GraphCodecProvider;
 import club.mondaylunch.gatos.core.codec.NodeCodecProvider;
 import club.mondaylunch.gatos.core.codec.NodeConnectionCodecProvider;
 import club.mondaylunch.gatos.core.codec.NodeConnectorCodecProvider;
-import club.mondaylunch.gatos.core.codec.NodeTypeCodec;
+import club.mondaylunch.gatos.core.codec.RegistryObjectCodec;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.Node;
@@ -64,15 +63,12 @@ public enum Database {
 
         // Create the registry
         return CodecRegistries.fromRegistries(
-            CodecRegistries.fromCodecs(
-                NodeTypeCodec.INSTANCE,
-                DataTypeCodec.INSTANCE
-            ),
             CodecRegistries.fromProviders(
                 NodeConnectorCodecProvider.INSTANCE,
                 NodeConnectionCodecProvider.INSTANCE,
                 GraphCodecProvider.INSTANCE,
-                NodeCodecProvider.INSTANCE
+                NodeCodecProvider.INSTANCE,
+                RegistryObjectCodec.Provider.INSTANCE
             ),
             ClassModelRegistry.createCodecRegistry(),
             MongoClientSettings.getDefaultCodecRegistry()
