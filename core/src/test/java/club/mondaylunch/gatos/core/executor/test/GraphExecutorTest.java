@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
@@ -183,11 +184,70 @@ public class GraphExecutorTest {
         Assertions.assertEquals(48, result2.get());
     }
 
+    @Test
+    public void complexGraphWithMultiConnectAndTypeConversionComputesCorrectly() {
+        var graph = new Graph();
+        AtomicInteger result1 = new AtomicInteger();
+        var output1 = graph.addNode(new OutputIntNodeType(result1));
+        AtomicReference<String> result2 = new AtomicReference<>("");
+        var output2 = graph.addNode(new OutputStringNodeType(result2));
+
+        var inputs = IntStream.of(2, 4, 8, 16, 2)
+            .mapToObj(i -> {
+                var input = graph.addNode(INPUT_NUM);
+                return graph.modifyNode(input.id(),
+                    node -> node.modifySetting("value", DataType.NUMBER.create((double) i)));
+            })
+            .toList();
+
+        var adder1 = graph.addNode(ADD_NUMS_2INPUT);
+        var adder2 = graph.addNode(ADD_NUMS_2INPUT);
+        var adder3 = graph.addNode(ADD_NUMS_2INPUT);
+        var adder4 = graph.addNode(ADD_NUMS_2INPUT);
+        var adder5 = graph.addNode(ADD_NUMS_2INPUT);
+
+        connectInt(graph, inputs.get(1), "out", adder1, "in1");
+        connectInt(graph, inputs.get(2), "out", adder1, "in2");
+
+        connectInt(graph, inputs.get(3), "out", adder2, "in1");
+        connectInt(graph, inputs.get(4), "out", adder2, "in2");
+
+        connectInt(graph, adder1, "out", adder3, "in1");
+        connectInt(graph, adder2, "out", adder3, "in2");
+
+        connectInt(graph, adder3, "out", adder4, "in1");
+        connectInt(graph, inputs.get(0), "out", adder4, "in2");
+
+        connectInt(graph, adder4, "out", output1, "in");
+
+        connectInt(graph, adder4, "out", adder5, "in1");
+        connectInt(graph, inputs.get(3), "out", adder5, "in2");
+
+        connectString(graph, adder5, "out", output2, "in");
+
+        var executionOrderedNodes = graph.getExecutionOrder();
+        Assertions.assertTrue(executionOrderedNodes.isPresent());
+        var graphExecutor = new GraphExecutor(executionOrderedNodes.get(), graph.getConnections());
+
+        CompletableFuture.runAsync(graphExecutor.execute()).join();
+        Assertions.assertEquals(32, result1.get());
+        Assertions.assertEquals("48", result2.get());
+    }
+
     private static void connectInt(Graph graph, Node a, String connectorA, Node b, String connectorB) {
         var conn = NodeConnection.createConnection(
                 a, connectorA,
                 b, connectorB,
                 DataType.NUMBER);
+        Assertions.assertTrue(conn.isPresent());
+        graph.addConnection(conn.get());
+    }
+
+    private static void connectString(Graph graph, Node a, String connectorA, Node b, String connectorB) {
+        var conn = NodeConnection.createConnection(
+            a, connectorA,
+            b, connectorB,
+            DataType.STRING);
         Assertions.assertTrue(conn.isPresent());
         graph.addConnection(conn.get());
     }
@@ -335,6 +395,34 @@ public class GraphExecutorTest {
         @Override
         public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
             this.result.set(DataBox.get(inputs, "in", DataType.NUMBER).orElseThrow().intValue());
+            return CompletableFuture.runAsync(() -> {
+            });
+        }
+    }
+
+    private static final class OutputStringNodeType extends NodeType.End {
+        public final AtomicReference<String> result;
+
+        // obviously outside of tests we would not be instantiating node types multiple
+        // times...
+        private OutputStringNodeType(AtomicReference<String> result) {
+            this.result = result;
+        }
+
+        @Override
+        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
+            return Set.of(
+                new NodeConnector.Input<>(nodeId, "in", DataType.STRING));
+        }
+
+        @Override
+        public Map<String, DataBox<?>> settings() {
+            return Map.of();
+        }
+
+        @Override
+        public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+            this.result.set(DataBox.get(inputs, "in", DataType.STRING).orElseThrow());
             return CompletableFuture.runAsync(() -> {
             });
         }
