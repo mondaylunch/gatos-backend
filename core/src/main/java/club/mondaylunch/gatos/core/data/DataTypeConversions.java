@@ -29,7 +29,7 @@ public final class DataTypeConversions {
      * @return  whether there is a conversion between the two
      */
     public static boolean canConvert(DataType<?> a, DataType<?> b) {
-        return MAP.containsKey(new ConversionPair(a, b));
+        return a.equals(b) || MAP.containsKey(new ConversionPair(a, b));
     }
 
     /**
@@ -40,8 +40,11 @@ public final class DataTypeConversions {
      * @param <B>       the second type
      * @return          the converted DataBox
      */
+    @SuppressWarnings("unchecked")
     public static <A, B> DataBox<B> convert(DataBox<A> a, DataType<B> typeB) {
-        @SuppressWarnings("unchecked")
+        if (a.type().equals(typeB)) {
+            return (DataBox<B>) a;
+        }
         var func = (Function<A, B>) MAP.get(new ConversionPair(a.type(), typeB));
         if (func == null) {
             throw new ConversionException("Cannot convert %s to %s".formatted(a.type(), typeB));
