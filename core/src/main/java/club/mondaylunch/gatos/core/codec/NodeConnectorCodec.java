@@ -15,18 +15,18 @@ import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 /**
  * Needed to avoid errors with generics with the default codec.
  */
-public class NodeConnectorCodec implements Codec<NodeConnector<?>> {
+public class NodeConnectorCodec<T extends NodeConnector<?>> implements Codec<T> {
 
     private final CodecRegistry registry;
-    private final Class<?> type;
+    private final Class<? super T> type;
 
-    public NodeConnectorCodec(CodecRegistry registry, Class<?> type) {
+    public NodeConnectorCodec(CodecRegistry registry, Class<? super T> type) {
         this.registry = registry;
         this.type = type;
     }
 
     @Override
-    public NodeConnector<?> decode(BsonReader reader, DecoderContext decoderContext) {
+    public T decode(BsonReader reader, DecoderContext decoderContext) {
         Codec<UUID> uuidCodec = this.registry.get(UUID.class);
         reader.readStartDocument();
         UUID nodeId = decoderContext.decodeWithChildContext(uuidCodec, reader);
@@ -37,7 +37,7 @@ public class NodeConnectorCodec implements Codec<NodeConnector<?>> {
     }
 
     @Override
-    public void encode(BsonWriter writer, NodeConnector<?> value, EncoderContext encoderContext) {
+    public void encode(BsonWriter writer, T value, EncoderContext encoderContext) {
         Codec<UUID> uuidCodec = this.registry.get(UUID.class);
         writer.writeStartDocument();
         writer.writeName("nodeId");
@@ -51,15 +51,16 @@ public class NodeConnectorCodec implements Codec<NodeConnector<?>> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Class<NodeConnector<?>> getEncoderClass() {
-        return (Class<NodeConnector<?>>) (Object) NodeConnector.class;
+    public Class<T> getEncoderClass() {
+        return (Class<T>) this.type;
     }
 
-    private NodeConnector<?> createNodeConnector(UUID nodeId, String name, DataType<?> dataType) {
+    @SuppressWarnings("unchecked")
+    private T createNodeConnector(UUID nodeId, String name, DataType<?> dataType) {
         if (this.type == NodeConnector.Input.class) {
-            return new NodeConnector.Input<>(nodeId, name, dataType);
+            return (T) new NodeConnector.Input<>(nodeId, name, dataType);
         } else if (this.type == NodeConnector.Output.class) {
-            return new NodeConnector.Output<>(nodeId, name, dataType);
+            return (T) new NodeConnector.Output<>(nodeId, name, dataType);
         } else {
             throw new IllegalArgumentException("Unknown node connector type: " + this.type);
         }

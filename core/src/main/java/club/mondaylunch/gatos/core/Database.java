@@ -14,12 +14,13 @@ import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
 
+import club.mondaylunch.gatos.core.codec.ByClassCodecProvider;
+import club.mondaylunch.gatos.core.codec.NodeConnectionCodec;
+import club.mondaylunch.gatos.core.codec.NodeConnectorCodec;
+import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
+import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.codec.ClassModelRegistry;
 import club.mondaylunch.gatos.core.codec.DataTypeCodec;
-import club.mondaylunch.gatos.core.codec.GraphCodecProvider;
-import club.mondaylunch.gatos.core.codec.NodeCodecProvider;
-import club.mondaylunch.gatos.core.codec.NodeConnectionCodecProvider;
-import club.mondaylunch.gatos.core.codec.NodeConnectorCodecProvider;
 import club.mondaylunch.gatos.core.codec.NodeTypeCodec;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.graph.Graph;
@@ -69,10 +70,11 @@ public enum Database {
                 DataTypeCodec.INSTANCE
             ),
             CodecRegistries.fromProviders(
-                NodeConnectorCodecProvider.INSTANCE,
-                NodeConnectionCodecProvider.INSTANCE,
-                GraphCodecProvider.INSTANCE,
-                NodeCodecProvider.INSTANCE
+                new ByClassCodecProvider<>(NodeConnection.class, NodeConnectionCodec::new),
+                new ByClassCodecProvider<NodeConnector.Input<?>>(NodeConnector.Input.class, r -> new NodeConnectorCodec<>(r, NodeConnector.Input.class)),
+                new ByClassCodecProvider<NodeConnector.Output<?>>(NodeConnector.Output.class, r -> new NodeConnectorCodec<>(r, NodeConnector.Output.class)),
+                new ByClassCodecProvider<>(Graph.class, Graph.GraphCodec::new),
+                new ByClassCodecProvider<>(Node.class, Node.NodeCodec::new)
             ),
             ClassModelRegistry.createCodecRegistry(),
             MongoClientSettings.getDefaultCodecRegistry()
