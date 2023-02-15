@@ -26,7 +26,7 @@ public class RegexTest {
             "regex", DataType.STRING.create("a"),
             "word", DataType.STRING.create("a")
         );
-        var output = TEST_REGEX_NODE_TYPE.compute(input, Map.of());
+        var output = TEST_REGEX_NODE_TYPE.compute(input, input);
         Assertions.assertEquals(true, output.get("isMatch").join().value());
     }
 
@@ -36,7 +36,7 @@ public class RegexTest {
             "regex", DataType.STRING.create("https://"),
             "word", DataType.STRING.create("https://my.website.co.uk")
         );
-        var output = TEST_REGEX_NODE_TYPE.compute(input, Map.of());
+        var output = TEST_REGEX_NODE_TYPE.compute(input, input);
         Assertions.assertEquals(true, output.get("isMatch").join().value());
     }
 
@@ -46,7 +46,7 @@ public class RegexTest {
             "regex", DataType.STRING.create("^https?://"),
             "word", DataType.STRING.create("totally a real website")
         );
-        var output = TEST_REGEX_NODE_TYPE.compute(input, Map.of());
+        var output = TEST_REGEX_NODE_TYPE.compute(input, input);
         Assertions.assertEquals(false, output.get("isMatch").join().value());
     }
 
@@ -56,9 +56,41 @@ public class RegexTest {
             "regex", DataType.STRING.create("Hello"),
             "word", DataType.STRING.create("Hello")
         );
-        var output = TEST_REGEX_NODE_TYPE.compute(input, Map.of());
+        var output = TEST_REGEX_NODE_TYPE.compute(input, input);
         Assertions.assertEquals(true, output.get("isMatch").join().value());
         Assertions.assertEquals("Hello", output.get("match").join().value());
+    }
+
+    @Test
+    public void matchesBoolStringList() {
+        Map<String, DataBox<?>> input = Map.of(
+            "regex", DataType.STRING.create("H(e)(l)lo"),
+            "word", DataType.STRING.create("Hello")
+        );
+        var output = TEST_REGEX_NODE_TYPE.compute(input, input);
+        Assertions.assertEquals(true, output.get("isMatch").join().value());
+        Assertions.assertEquals("Hello", output.get("match").join().value());
+        ArrayList<String> expected = new ArrayList<String>();
+        expected.add("e"); expected.add("l");
+        Assertions.assertEquals(expected, output.get("group").join().value());
+    }
+
+    @Test
+    public void correctlyGetGroups() {
+        Map<String, DataBox<?>> input = Map.of(
+            "regex", DataType.STRING.create("(1)(2)"),
+            "word", DataType.STRING.create("12")
+        );
+
+        // TODO: remove debug print statement
+        var output = TEST_REGEX_NODE_TYPE.compute(input, input);
+
+        System.out.println(output.keySet().toString());
+
+        Assertions.assertTrue(output.containsKey("group 1"));
+        Assertions.assertEquals("1", output.get("group 1").join().value());
+        Assertions.assertTrue(output.containsKey("group 2"));
+        Assertions.assertEquals("2", output.get("group 2").join().value());
     }
 
     @Test
@@ -67,11 +99,18 @@ public class RegexTest {
             "regex", DataType.STRING.create("H(e)(l)lo"),
             "word", DataType.STRING.create("Hello")
         );
-        var output = TEST_REGEX_NODE_TYPE.compute(input, Map.of());
+        var output = TEST_REGEX_NODE_TYPE.compute(input, input);
+        
         Assertions.assertEquals(true, output.get("isMatch").join().value());
         Assertions.assertEquals("Hello", output.get("match").join().value());
+        
         ArrayList<String> expected = new ArrayList<String>();
         expected.add("e"); expected.add("l");
         Assertions.assertEquals(expected, output.get("group").join().value());
+        
+        Assertions.assertTrue(output.containsKey("group 1"));
+        Assertions.assertEquals("e", output.get("group 1").join().value());
+        Assertions.assertTrue(output.containsKey("group 2"));
+        Assertions.assertEquals("l", output.get("group 2").join().value());
     }
 }
