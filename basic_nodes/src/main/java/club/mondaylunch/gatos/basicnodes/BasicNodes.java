@@ -15,4 +15,6 @@ public final class BasicNodes {
         .register(new StringContainsNodeType());
     public static final StringConcatNodeType STRING_CONCAT = NodeTypeRegistry
         .register(new StringConcatNodeType());
+    public static final ListLengthNodeType LIST_LENGTH = NodeTypeRegistry
+        .register(new ListLengthNodeType());
 }

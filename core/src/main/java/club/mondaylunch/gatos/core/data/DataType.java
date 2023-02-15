@@ -17,6 +17,7 @@ public final class DataType<T> {
     public static final DataType<String> STRING = DataTypeRegistry.register(new DataType<>("string"));
     public static final DataType<JsonObject> JSON_OBJECT = DataTypeRegistry.register(new DataType<>("jsonobject"));
     public static final DataType<JsonElement> JSON_ELEMENT = DataTypeRegistry.register(new DataType<>("jsonelement"));
+    public static final DataType<List> LIST = DataTypeRegistry.register(new DataType<>("list"));
     private final String name;
     private DataType<Optional<T>> optionalType = null;
     private DataType<List<T>> listType = null;
