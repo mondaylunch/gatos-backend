@@ -18,6 +18,13 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
     public static final DataType<String> STRING = register("string");
     public static final DataType<JsonObject> JSON_OBJECT = register("json_object");
     public static final DataType<DataType<?>> DATA_TYPE = register("data_type");
+    static {
+        Conversions.register(NUMBER, STRING, Object::toString);
+        Conversions.register(BOOLEAN, STRING, Object::toString);
+        Conversions.register(JSON_OBJECT, STRING, Object::toString);
+        Conversions.register(DATA_TYPE, STRING, Object::toString);
+    }
+
     private final String name;
 
     /**
