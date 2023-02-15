@@ -11,7 +11,7 @@ import club.mondaylunch.gatos.core.Registry;
 /**
  * A type of value which can be stored in a {@link DataBox}.
  */
-public final class DataType<T> {
+public sealed class DataType<T> permits ListDataType, OptionalDataType {
     public static final Registry<DataType<?>> REGISTRY = Registry.create("data_type", DataType.class);
     public static final DataType<Integer> INTEGER = register("integer");
     public static final DataType<Boolean> BOOLEAN = register("boolean");
@@ -19,13 +19,11 @@ public final class DataType<T> {
     public static final DataType<JsonObject> JSON_OBJECT = register("json_object");
     public static final DataType<DataType<?>> DATA_TYPE = register("data_type");
     private final String name;
-    private DataType<Optional<T>> optionalType = null;
-    private DataType<List<T>> listType = null;
 
     /**
      * @param name the name for the type this represents
      */
-    private DataType(String name) {
+    protected DataType(String name) {
         this.name = name;
     }
 
@@ -54,22 +52,34 @@ public final class DataType<T> {
      * Returns the DataType for a list that holds data of this type.
      * @return the DataType for a list that holds data of this type
      */
+    @SuppressWarnings("unchecked")
     public DataType<List<T>> listOf() {
-        if (this.listType == null) {
-            this.listType = new DataType<>("list$" + this.name());
+        String listName = ListDataType.makeName(this);
+        Optional<DataType<?>> listType = REGISTRY.get(listName);
+        if (listType.isPresent()) {
+            return (DataType<List<T>>) listType.get();
+        } else {
+            var newListType = new ListDataType<>(this);
+            REGISTRY.register(newListType.name(), newListType);
+            return newListType;
         }
-        return this.listType;
     }
 
     /**
      * Returns the DataType for an optional that holds data of this type.
      * @return the DataType for an optional that holds data of this type
      */
+    @SuppressWarnings("unchecked")
     public DataType<Optional<T>> optionalOf() {
-        if (this.optionalType == null) {
-            this.optionalType = new DataType<>("optional$" + this.name());
+        String optionalName = OptionalDataType.makeName(this);
+        Optional<DataType<?>> optionalType = REGISTRY.get(optionalName);
+        if (optionalType.isPresent()) {
+            return (DataType<Optional<T>>) optionalType.get();
+        } else {
+            var newOptionalType = new OptionalDataType<>(this);
+            REGISTRY.register(newOptionalType.name(), newOptionalType);
+            return newOptionalType;
         }
-        return this.optionalType;
     }
 
     @Override
