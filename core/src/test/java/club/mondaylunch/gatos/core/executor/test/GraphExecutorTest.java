@@ -231,7 +231,7 @@ public class GraphExecutorTest {
 
         CompletableFuture.runAsync(graphExecutor.execute()).join();
         Assertions.assertEquals(32, result1.get());
-        Assertions.assertEquals("48", result2.get());
+        Assertions.assertEquals("48.0", result2.get());
     }
 
     private static void connectInt(Graph graph, Node a, String connectorA, Node b, String connectorB) {

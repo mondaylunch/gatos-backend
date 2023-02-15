@@ -118,7 +118,7 @@ public class GraphExecutor {
      */
     private Iterable<NodeConnection<?>> getOutputConnectionsByName(Node node, String name) {
         return node.getOutputWithName(name).stream()
-                .flatMap(c -> this.connections.stream().filter(a -> a.from().isCompatible(c)))
+                .flatMap(c -> this.connections.stream().filter(a -> c.isCompatible(a.from())))
                 .toList();
     }
 }
