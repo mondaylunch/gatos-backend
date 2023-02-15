@@ -13,7 +13,7 @@ import club.mondaylunch.gatos.core.Registry;
  */
 public sealed class DataType<T> permits ListDataType, OptionalDataType {
     public static final Registry<DataType<?>> REGISTRY = Registry.create("data_type", DataType.class);
-    public static final DataType<Integer> INTEGER = register("integer");
+    public static final DataType<Double> NUMBER = register("number");
     public static final DataType<Boolean> BOOLEAN = register("boolean");
     public static final DataType<String> STRING = register("string");
     public static final DataType<JsonObject> JSON_OBJECT = register("json_object");

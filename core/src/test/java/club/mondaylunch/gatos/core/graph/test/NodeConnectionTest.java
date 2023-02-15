@@ -23,7 +23,7 @@ public class NodeConnectionTest {
         var node1 = Node.create(TEST_NODE_TYPE);
         var node2 = Node.create(TEST_NODE_TYPE);
 
-        var conn = NodeConnection.createConnection(node1, "out", node2, "in", DataType.INTEGER);
+        var conn = NodeConnection.createConnection(node1, "out", node2, "in", DataType.NUMBER);
         Assertions.assertTrue(conn.isPresent());
     }
 
@@ -32,10 +32,10 @@ public class NodeConnectionTest {
         var node1 = Node.create(TEST_NODE_TYPE);
         var node2 = Node.create(TEST_NODE_TYPE);
 
-        var conn = NodeConnection.createConnection(node1, "invalid", node2, "in", DataType.INTEGER);
+        var conn = NodeConnection.createConnection(node1, "invalid", node2, "in", DataType.NUMBER);
         Assertions.assertTrue(conn.isEmpty());
 
-        conn = NodeConnection.createConnection(node1, "out", node2, "invalid", DataType.INTEGER);
+        conn = NodeConnection.createConnection(node1, "out", node2, "invalid", DataType.NUMBER);
         Assertions.assertTrue(conn.isEmpty());
     }
 
@@ -61,13 +61,13 @@ public class NodeConnectionTest {
         @Override
         public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
             return Set.of(
-                    new NodeConnector.Input<>(nodeId, "in", DataType.INTEGER));
+                    new NodeConnector.Input<>(nodeId, "in", DataType.NUMBER));
         }
 
         @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
             return Set.of(
-                    new NodeConnector.Output<>(nodeId, "out", DataType.INTEGER),
+                    new NodeConnector.Output<>(nodeId, "out", DataType.NUMBER),
                     new NodeConnector.Output<>(nodeId, "out_2", DataType.BOOLEAN));
         }
 

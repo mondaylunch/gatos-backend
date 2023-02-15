@@ -76,8 +76,8 @@ public class GraphSerializationTest {
         Node node1 = graph.addNode(TestNodeTypes.START);
         Node node2 = graph.addNode(TestNodeTypes.PROCESS);
         Node node3 = graph.addNode(TestNodeTypes.END);
-        var connection1 = NodeConnection.createConnection(node1, "out", node2, "in", DataType.INTEGER);
-        var connection2 = NodeConnection.createConnection(node2, "out", node3, "in", DataType.INTEGER);
+        var connection1 = NodeConnection.createConnection(node1, "out", node2, "in", DataType.NUMBER);
+        var connection2 = NodeConnection.createConnection(node2, "out", node3, "in", DataType.NUMBER);
         graph.addConnection(connection1.orElseThrow());
         graph.addConnection(connection2.orElseThrow());
         Flow.objects.insert(flow);
