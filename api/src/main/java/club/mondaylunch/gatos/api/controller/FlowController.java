@@ -5,6 +5,9 @@ import java.util.UUID;
 
 import javax.validation.Valid;
 
+import club.mondaylunch.gatos.api.repository.FlowRepository;
+import club.mondaylunch.gatos.api.repository.LoginRepository;
+import club.mondaylunch.gatos.core.models.Flow;
 import org.hibernate.validator.constraints.Length;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,10 +20,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import club.mondaylunch.gatos.api.repository.FlowRepository;
-import club.mondaylunch.gatos.api.repository.LoginRepository;
-import club.mondaylunch.gatos.core.models.Flow;
-
 @RestController
 @RequestMapping("api/v1/flows")
 public class FlowController {
@@ -32,14 +31,24 @@ public class FlowController {
         this.flowRepository = flowRepository;
     }
 
+    private record BasicFlowInfo(UUID id, String name, String description, UUID authorId) {
+
+        BasicFlowInfo(Flow flow) {
+            this(flow.getId(), flow.getName(), flow.getDescription(), flow.getAuthorId());
+        }
+    }
+
     @GetMapping("list")
-    public List<Flow> getFlows(@RequestHeader("x-auth-token") String token) {
+    public List<BasicFlowInfo> getFlows(@RequestHeader("x-auth-token") String token) {
         var user = this.userRepository.authenticateUser(token);
-        return Flow.objects.get("author_id", user.getId());
+        return Flow.objects.get("author_id", user.getId())
+            .stream()
+            .map(BasicFlowInfo::new)
+            .toList();
     }
 
     private record BodyAddFlow(
-            @NotNull @Length(min = 1, max = 32) String name, String description) {
+        @NotNull @Length(min = 1, max = 32) String name, String description) {
     }
 
     @PostMapping
@@ -56,12 +65,12 @@ public class FlowController {
     }
 
     private record BodyUpdateFlow(
-            @NotNull @Length(min = 1, max = 32) String name, String description) {
+        @NotNull @Length(min = 1, max = 32) String name, String description) {
     }
 
     @PatchMapping("{flowId}")
     public Flow updateFlow(@RequestHeader("x-auth-token") String token, @PathVariable UUID flowId,
-            @Valid @RequestBody BodyUpdateFlow data) {
+                           @Valid @RequestBody BodyUpdateFlow data) {
         var user = this.userRepository.authenticateUser(token);
         var flow = this.flowRepository.getFlow(user, flowId);
 
