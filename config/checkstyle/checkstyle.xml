@@ -9,12 +9,6 @@
 
     <module name="NewlineAtEndOfFile"/>
 
-    <!-- disallow trailing whitespace -->
-    <module name="RegexpSingleline">
-        <property name="format" value="\s+$"/>
-        <property name="message" value="trailing whitespace"/>
-    </module>
-
     <!-- note: RegexpMultiline shows nicer messages than Regexp, but has to be outside TreeWalker -->
     <!-- disallow multiple consecutive blank lines -->
     <module name="RegexpMultiline">
