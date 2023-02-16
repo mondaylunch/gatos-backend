@@ -5,9 +5,6 @@ import java.util.UUID;
 
 import javax.validation.Valid;
 
-import club.mondaylunch.gatos.api.repository.FlowRepository;
-import club.mondaylunch.gatos.api.repository.LoginRepository;
-import club.mondaylunch.gatos.core.models.Flow;
 import org.hibernate.validator.constraints.Length;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import club.mondaylunch.gatos.api.repository.FlowRepository;
+import club.mondaylunch.gatos.api.repository.LoginRepository;
+import club.mondaylunch.gatos.core.models.Flow;
 
 @RestController
 @RequestMapping("api/v1/flows")
