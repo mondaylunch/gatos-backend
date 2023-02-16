@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class ConversionsTest {
-    private static final DataType<Foo> FOO_TYPE = DataType.register("foo");
-    private static final DataType<Bar> BAR_TYPE = DataType.register("bar");
-    private static final DataType<Baz> BAZ_TYPE = DataType.register("baz");
+    private static final DataType<Foo> FOO_TYPE = DataType.register("foo", Foo.class);
+    private static final DataType<Bar> BAR_TYPE = DataType.register("bar", Bar.class);
+    private static final DataType<Baz> BAZ_TYPE = DataType.register("baz", Baz.class);
 
     @Test
     public void canRegisterConversion() {

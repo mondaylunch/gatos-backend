@@ -1,6 +1,8 @@
 package club.mondaylunch.gatos.core.graph.type.test;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -20,7 +22,9 @@ public class TestNodeTypes {
 
         @Override
         public Map<String, DataBox<?>> settings() {
-            return Map.of();
+            return Map.of(
+                "setting", DataType.NUMBER.create(0.0)
+            );
         }
 
         @Override
@@ -38,7 +42,9 @@ public class TestNodeTypes {
 
         @Override
         public Map<String, DataBox<?>> settings() {
-            return Map.of();
+            return Map.of(
+                "setting", DataType.NUMBER.listOf().create(List.of(20.0, 3.0))
+            );
         }
 
         @Override
@@ -61,7 +67,9 @@ public class TestNodeTypes {
 
         @Override
         public Map<String, DataBox<?>> settings() {
-            return Map.of();
+            return Map.of(
+                "setting", DataType.NUMBER.optionalOf().create(Optional.of(1.5))
+            );
         }
 
         @Override
