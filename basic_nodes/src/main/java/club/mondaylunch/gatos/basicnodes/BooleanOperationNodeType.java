@@ -35,8 +35,8 @@ public class BooleanOperationNodeType extends NodeType.Process {
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
-        boolean a       = DataBox.get(inputs,   "inputA",           DataType.BOOLEAN).orElseThrow();
-        boolean b       = DataBox.get(inputs,   "inputB",           DataType.BOOLEAN).orElseThrow();
+        boolean a = DataBox.get(inputs, "inputA", DataType.BOOLEAN).orElseThrow();
+        boolean b = DataBox.get(inputs, "inputB", DataType.BOOLEAN).orElseThrow();
 
         boolean result = switch(DataBox.get(settings, "config", DataType.STRING).orElseThrow()) {
             case "or"   -> a | b;
