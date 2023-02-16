@@ -1,17 +1,16 @@
 package club.mondaylunch.gatos.core.data;
 
-import java.util.List;
 import java.util.Optional;
 
 public final class OptionalDataType<T> extends DataType<Optional<T>> {
-    public static final DataType<Optional<?>> GENERIC_OPTIONAL = DataType.register("optional");
+    public static final DataType<Optional<?>> GENERIC_OPTIONAL = DataType.register("optional", Optional.class);
     private final DataType<T> contains;
 
     /**
      * @param contains the datatype that this optional will contain
      */
     public OptionalDataType(DataType<T> contains) {
-        super(makeName(contains));
+        super(makeName(contains), Optional.class);
         this.contains = contains;
         Conversions.register(this, GENERIC_OPTIONAL, $ -> $);
     }

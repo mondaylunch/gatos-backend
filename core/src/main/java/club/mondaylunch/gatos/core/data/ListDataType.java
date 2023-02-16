@@ -3,14 +3,14 @@ package club.mondaylunch.gatos.core.data;
 import java.util.List;
 
 public final class ListDataType<T> extends DataType<List<T>> {
-    public static final DataType<List<?>> GENERIC_LIST = DataType.register("list");
+    public static final DataType<List<?>> GENERIC_LIST = DataType.register("list", List.class);
     private final DataType<T> contains;
 
     /**
      * @param contains the datatype that this list will contain
      */
     public ListDataType(DataType<T> contains) {
-        super(makeName(contains));
+        super(makeName(contains), List.class);
         this.contains = contains;
         Conversions.register(this, GENERIC_LIST, $ -> $);
     }

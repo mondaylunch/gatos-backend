@@ -13,11 +13,11 @@ import club.mondaylunch.gatos.core.Registry;
  */
 public sealed class DataType<T> permits ListDataType, OptionalDataType {
     public static final Registry<DataType<?>> REGISTRY = Registry.create("data_type", DataType.class);
-    public static final DataType<Double> NUMBER = register("number");
-    public static final DataType<Boolean> BOOLEAN = register("boolean");
-    public static final DataType<String> STRING = register("string");
-    public static final DataType<JsonObject> JSON_OBJECT = register("json_object");
-    public static final DataType<DataType<?>> DATA_TYPE = register("data_type");
+    public static final DataType<Double> NUMBER = register("number", Double.class);
+    public static final DataType<Boolean> BOOLEAN = register("boolean", Boolean.class);
+    public static final DataType<String> STRING = register("string", String.class);
+    public static final DataType<JsonObject> JSON_OBJECT = register("json_object", JsonObject.class);
+    public static final DataType<DataType<?>> DATA_TYPE = register("data_type", DataType.class);
     static {
         Conversions.register(NUMBER, STRING, Object::toString);
         Conversions.register(BOOLEAN, STRING, Object::toString);
@@ -26,16 +26,20 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
     }
 
     private final String name;
+    private final Class<? super T> clazz;
 
     /**
-     * @param name the name for the type this represents
+     * Creates a new DataType.
+     * @param name  the name for the type this represents
+     * @param clazz the class for this type
      */
-    protected DataType(String name) {
+    protected DataType(String name, Class<? super T> clazz) {
         this.name = name;
+        this.clazz = clazz;
     }
 
-    public static <T> DataType<T> register(String name) {
-        return REGISTRY.register(name, new DataType<>(name));
+    public static <T> DataType<T> register(String name, Class<? super T> clazz) {
+        return REGISTRY.register(name, new DataType<>(name, clazz));
     }
 
     /**
@@ -49,10 +53,18 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
 
     /**
      * The unique name of this data type.
-     * @return the unique name of this data type.
+     * @return the unique name of this data type
      */
     public String name() {
         return this.name;
+    }
+
+    /**
+     * The class of this data type.
+     * @return  the class of this data type
+     */
+    public Class<? super T> clazz() {
+        return this.clazz;
     }
 
     /**
