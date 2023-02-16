@@ -4,16 +4,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import club.mondaylunch.gatos.core.Database;
 import club.mondaylunch.gatos.core.codec.ClassModelRegistry;
 import club.mondaylunch.gatos.core.collection.BaseCollection;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.models.BaseModel;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 public class DataBoxCodecTest {
 
@@ -58,7 +59,7 @@ public class DataBoxCodecTest {
             DataType.STRING.create("fhg;ksghuierhdkfglds"),
             DataType.BOOLEAN.optionalOf().create(Optional.empty()),
             DataType.BOOLEAN.optionalOf().create(Optional.of(true)),
-            DataType.STRING.listOf().create(List.of("foo","fhqwghads", "bar")),
+            DataType.STRING.listOf().create(List.of("foo", "fhqwghads", "bar")),
             DataType.STRING.listOf().create(List.of())
         );
     }

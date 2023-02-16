@@ -1,10 +1,11 @@
 package club.mondaylunch.gatos.core.data.test;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.data.ListDataType;
 import club.mondaylunch.gatos.core.data.OptionalDataType;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 public class DataTypeTest {
     @Test

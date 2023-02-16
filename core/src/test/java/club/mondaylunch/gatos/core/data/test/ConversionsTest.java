@@ -1,9 +1,10 @@
 package club.mondaylunch.gatos.core.data.test;
 
-import club.mondaylunch.gatos.core.data.Conversions;
-import club.mondaylunch.gatos.core.data.DataType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import club.mondaylunch.gatos.core.data.Conversions;
+import club.mondaylunch.gatos.core.data.DataType;
 
 public class ConversionsTest {
     private static final DataType<Foo> FOO_TYPE = DataType.register("foo", Foo.class);
