@@ -69,6 +69,21 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
 
+    @Test
+    public void canGetSpecificFlow() throws Exception {
+        Flow flow = createFlow(user);
+        Flow.objects.insert(flow);
+        ResultActions result = this.mockMvc
+            .perform(MockMvcRequestBuilders.get(ENDPOINT + "/" + flow.getId())
+                .header("x-auth-token", this.user.getAuthToken())
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        compareFields(OBJECT_EXPRESSION_PREFIX, result,
+            Map.entry("name", flow.getName()),
+            Map.entry("authorId", flow.getAuthorId())
+        );
+    }
+
     /// --- ADD FLOW ---
 
     @Test

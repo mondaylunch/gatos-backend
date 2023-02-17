@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import club.mondaylunch.gatos.api.repository.FlowRepository;
 import club.mondaylunch.gatos.api.repository.LoginRepository;
 import club.mondaylunch.gatos.core.models.Flow;
+import club.mondaylunch.gatos.core.models.User;
 
 @RestController
 @RequestMapping("api/v1/flows")
@@ -46,6 +47,12 @@ public class FlowController {
             .stream()
             .map(BasicFlowInfo::new)
             .toList();
+    }
+
+    @GetMapping("{flowId}")
+    public Flow getFlow(@PathVariable("flowId") UUID flowId, @RequestHeader("x-auth-token") String token) {
+        User user = this.userRepository.authenticateUser(token);
+        return this.flowRepository.getFlow(user, flowId);
     }
 
     private record BodyAddFlow(
