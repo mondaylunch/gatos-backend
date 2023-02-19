@@ -20,7 +20,10 @@ public class BooleanOperationNodeType extends NodeType.Process {
     }
 
     @Override
-    public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
+    public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
+        if(DataBox.get(settings, "config", DataType.STRING).orElseThrow().equals("not"))
+            return Set.of(new NodeConnector.Input<>(nodeId, "input", DataType.BOOLEAN));
+
         return Set.of(
                 new NodeConnector.Input<>(nodeId, "inputA", DataType.BOOLEAN),
                 new NodeConnector.Input<>(nodeId, "inputB", DataType.BOOLEAN)
@@ -28,17 +31,23 @@ public class BooleanOperationNodeType extends NodeType.Process {
     }
 
     @Override
-    public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
+    public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings) {
         return Set.of(
                 new NodeConnector.Output<>(nodeId, "result", DataType.BOOLEAN));
     }
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+        String config = DataBox.get(settings, "config", DataType.STRING).orElseThrow();
+        if(config.equals("not"))
+            return Map.of("result", CompletableFuture.completedFuture(DataType.BOOLEAN.create(
+                !DataBox.get(inputs, "input", DataType.BOOLEAN).orElseThrow()
+            )));
+
         boolean a = DataBox.get(inputs, "inputA", DataType.BOOLEAN).orElseThrow();
         boolean b = DataBox.get(inputs, "inputB", DataType.BOOLEAN).orElseThrow();
 
-        boolean result = switch(DataBox.get(settings, "config", DataType.STRING).orElseThrow()) {
+        boolean result = switch(config) {
             case "or"   -> a | b;
             case "and"  -> a & b;
             case "xor"  -> a ^ b;
