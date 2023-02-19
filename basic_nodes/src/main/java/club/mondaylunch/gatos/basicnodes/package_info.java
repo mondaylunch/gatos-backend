@@ -1,1 +1,1 @@
-package gay.oss.gatos.basicnodes;
+package club.mondaylunch.gatos.basicnodes;

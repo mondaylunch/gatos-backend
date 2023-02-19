@@ -1,17 +1,9 @@
-package gay.oss.gatos.api.exceptions;
+package club.mondaylunch.gatos.api.exceptions;
 
-import java.util.HashMap;
-
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-public class EmailAlreadyInUseException extends Exception {
-
-    public static HashMap<String, String> getErrorAsJSON() {
-        HashMap<String, String> error = new HashMap<>();
-        error.put("error", "Email Already In Use");
-        return error;
-    }
+@ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Email Already In Use")
+public class EmailAlreadyInUseException extends RuntimeException {
 
 }

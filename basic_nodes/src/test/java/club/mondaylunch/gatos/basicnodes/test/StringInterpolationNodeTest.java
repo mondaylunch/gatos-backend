@@ -1,14 +1,14 @@
-package gay.oss.gatos.basicnodes.test;
+package club.mondaylunch.gatos.basicnodes.test;
 
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import gay.oss.gatos.basicnodes.BasicNodes;
-import gay.oss.gatos.core.data.DataBox;
-import gay.oss.gatos.core.data.DataType;
-import gay.oss.gatos.core.graph.Node;
+import club.mondaylunch.gatos.basicnodes.BasicNodes;
+import club.mondaylunch.gatos.core.data.DataBox;
+import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.graph.Node;
 
 public class StringInterpolationNodeTest {
     private static final String TEST_TEMPLATE_STRING = "{} {template_param_1} - {a thing} {} {} {} \\{not one}";
@@ -35,8 +35,8 @@ public class StringInterpolationNodeTest {
     @Test
     public void hasOutput() {
         var node = Node.create(BasicNodes.STRING_INTERPOLATION);
-        Assertions.assertEquals(1, node.outputs().size());
-        Assertions.assertTrue(node.outputs().containsKey("result"));
+        Assertions.assertEquals(1, node.getOutputs().size());
+        Assertions.assertTrue(node.getOutputs().containsKey("result"));
     }
 
     @Test
@@ -49,9 +49,12 @@ public class StringInterpolationNodeTest {
             "a thing", DataType.STRING.create("did the"),
             "Placeholder 4", DataType.STRING.create("template substitution"),
             "Placeholder 5", DataType.STRING.create("work correctly?"),
-            "Placeholder 6", DataType.STRING.create("This one shouldn't:")
-        );
-        var result = (String) BasicNodes.STRING_INTERPOLATION.compute(inputs, node.settings()).get("result").join().value();
-        Assertions.assertEquals("This is a test node - did the template substitution work correctly? This one shouldn't: \\{not one}", result);
+            "Placeholder 6", DataType.STRING.create("This one shouldn't:"));
+        var result = (String) BasicNodes.STRING_INTERPOLATION.compute(inputs, node.settings()).get("result")
+            .join()
+            .value();
+        Assertions.assertEquals(
+            "This is a test node - did the template substitution work correctly? This one shouldn't: \\{not one}",
+            result);
     }
 }

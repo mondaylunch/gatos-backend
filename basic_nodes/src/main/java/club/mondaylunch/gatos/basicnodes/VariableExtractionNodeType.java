@@ -1,4 +1,4 @@
-package gay.oss.gatos.basicnodes;
+package club.mondaylunch.gatos.basicnodes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,13 +16,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.jetbrains.annotations.Nullable;
 
-import gay.oss.gatos.core.data.DataBox;
-import gay.oss.gatos.core.data.DataType;
-import gay.oss.gatos.core.graph.connector.NodeConnector;
-import gay.oss.gatos.core.graph.type.NodeType;
+import club.mondaylunch.gatos.core.data.DataBox;
+import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
+import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 public class VariableExtractionNodeType extends NodeType.Process {
-    private static final DataType<ReturnType> RETURN_DATATYPE = new DataType<>("return_type");
+    private static final DataType<ReturnType> RETURN_DATATYPE = DataType.register("return_type");
     @Override
     public Map<String, DataBox<?>> settings() {
         return Map.of(
@@ -33,7 +33,7 @@ public class VariableExtractionNodeType extends NodeType.Process {
     @Override
     public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
         return Set.of(
-            new NodeConnector.Input<>(nodeId, "input", DataType.JSONOBJECT),
+            new NodeConnector.Input<>(nodeId, "input", DataType.JSON_OBJECT),
             new NodeConnector.Input<>(nodeId, "key", DataType.STRING)
         );
     }
@@ -51,7 +51,7 @@ public class VariableExtractionNodeType extends NodeType.Process {
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
-        var jsonInput = DataBox.get(inputs, "input", DataType.JSONOBJECT).orElse(new JsonObject());
+        var jsonInput = DataBox.get(inputs, "input", DataType.JSON_OBJECT).orElse(new JsonObject());
         var keyStr = DataBox.get(inputs, "key", DataType.STRING).orElse("");
         var returnType = !settings.isEmpty() ? (ReturnType) settings.get("output_type").value() : ReturnType.STRING;
         var value = jsonInput.get(keyStr);
@@ -67,12 +67,12 @@ public class VariableExtractionNodeType extends NodeType.Process {
                 DataType.BOOLEAN.optionalOf().create(Optional.of(value.getAsBoolean()))));
             case STRING -> Map.of("output", CompletableFuture.completedFuture(
                 DataType.STRING.optionalOf().create(Optional.of(value.getAsString()))));
-            case JSONOBJECT -> Map.of("output", CompletableFuture.completedFuture(
-                DataType.JSONOBJECT.optionalOf().create(Optional.of(value.getAsJsonObject()))));
+            case JSON_OBJECT -> Map.of("output", CompletableFuture.completedFuture(
+                DataType.JSON_OBJECT.optionalOf().create(Optional.of(value.getAsJsonObject()))));
             case INTEGER_LIST,
                 STRING_LIST,
                 BOOLEAN_LIST,
-                JSONOBJECT_LIST -> Map.of("output", this.handleListReturn(returnType.getDataType(), value));
+                JSON_OBJECT_LIST -> Map.of("output", this.handleListReturn(returnType.getDataType(), value));
         };
     }
 
@@ -105,11 +105,11 @@ public class VariableExtractionNodeType extends NodeType.Process {
         INTEGER(DataType.INTEGER),
         BOOLEAN(DataType.BOOLEAN),
         STRING(DataType.STRING),
-        JSONOBJECT(DataType.JSONOBJECT),
+        JSON_OBJECT(DataType.JSON_OBJECT),
         INTEGER_LIST(DataType.INTEGER.listOf()),
         STRING_LIST(DataType.STRING.listOf()),
         BOOLEAN_LIST(DataType.BOOLEAN.listOf()),
-        JSONOBJECT_LIST(DataType.JSONOBJECT.listOf());
+        JSON_OBJECT_LIST(DataType.JSON_OBJECT.listOf());
         private final DataType<?> dataType;
         ReturnType(DataType<?> dataType) {
             this.dataType = dataType;
@@ -120,7 +120,7 @@ public class VariableExtractionNodeType extends NodeType.Process {
         }
 
         public boolean isListType() {
-            return List.of(INTEGER_LIST, STRING_LIST, BOOLEAN_LIST, JSONOBJECT_LIST).contains(this);
+            return List.of(INTEGER_LIST, STRING_LIST, BOOLEAN_LIST, JSON_OBJECT_LIST).contains(this);
         }
     }
 

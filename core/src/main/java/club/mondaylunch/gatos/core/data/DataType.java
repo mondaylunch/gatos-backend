@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import club.mondaylunch.gatos.core.Registry;
@@ -13,12 +12,12 @@ import club.mondaylunch.gatos.core.Registry;
  * A type of value which can be stored in a {@link DataBox}.
  */
 public final class DataType<T> {
-    public static final Registry<DataType<?>> REGISTRY = Registry.create("data_Type", DataType.class);
+    public static final Registry<DataType<?>> REGISTRY = Registry.create("data_type", DataType.class);
     public static final DataType<Integer> INTEGER = register("integer");
     public static final DataType<Boolean> BOOLEAN = register("boolean");
     public static final DataType<String> STRING = register("string");
-    public static final DataType<JsonObject> JSON_OBJECT = register("jsonobject");
-    public static final DataType<JsonElement> JSON_ELEMENT = register("jsonelement");
+    public static final DataType<JsonObject> JSON_OBJECT = register("json_object");
+    public static final DataType<DataType<?>> DATA_TYPE = register("data_type");
     private final String name;
     private DataType<Optional<T>> optionalType = null;
     private DataType<List<T>> listType = null;
