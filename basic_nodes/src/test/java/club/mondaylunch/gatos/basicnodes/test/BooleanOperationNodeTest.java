@@ -7,17 +7,19 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
+import club.mondaylunch.gatos.basicnodes.BooleanOperationNodeType;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.Node;
 
 public class BooleanOperationNodeTest {
-    private static final Node OR        = Node.create(BasicNodes.BOOL_OP).modifySetting("mode", DataType.STRING.create("or"));
-    private static final Node AND       = Node.create(BasicNodes.BOOL_OP).modifySetting("mode", DataType.STRING.create("and"));
-    private static final Node XOR       = Node.create(BasicNodes.BOOL_OP).modifySetting("mode", DataType.STRING.create("xor"));
-    private static final Node NOT       = Node.create(BasicNodes.BOOL_OP).modifySetting("mode", DataType.STRING.create("not"));
+    private static final Node OR    = Node.create(BasicNodes.BOOL_OP).modifySetting("mode", BooleanOperationNodeType.BOOL_OPERATION_MODE.create(BooleanOperationNodeType.Mode.OR));
+    private static final Node AND   = Node.create(BasicNodes.BOOL_OP).modifySetting("mode", BooleanOperationNodeType.BOOL_OPERATION_MODE.create(BooleanOperationNodeType.Mode.AND));
+    private static final Node XOR   = Node.create(BasicNodes.BOOL_OP).modifySetting("mode", BooleanOperationNodeType.BOOL_OPERATION_MODE.create(BooleanOperationNodeType.Mode.XOR));
+    private static final Node NOT   = Node.create(BasicNodes.BOOL_OP).modifySetting("mode", BooleanOperationNodeType.BOOL_OPERATION_MODE.create(BooleanOperationNodeType.Mode.NOT));
 
     @Test
     public void canAddNodeToGraph() {

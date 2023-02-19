@@ -12,16 +12,18 @@ import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 public class BooleanOperationNodeType extends NodeType.Process {
 
+    public static final DataType<Mode> BOOL_OPERATION_MODE = DataType.register("booloperationmode");
+
     @Override
     public Map<String, DataBox<?>> settings() {
         return Map.of(
-                "config", DataType.STRING.create("")
+                "mode", BOOL_OPERATION_MODE.create(Mode.NOT)
         );
     }
 
     @Override
     public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
-        if(DataBox.get(settings, "mode", DataType.STRING).orElseThrow().equals("not"))
+        if(DataBox.get(settings, "mode", BOOL_OPERATION_MODE).orElseThrow().equals(Mode.NOT))
             return Set.of(new NodeConnector.Input<>(nodeId, "input", DataType.BOOLEAN));
 
         return Set.of(
@@ -38,8 +40,8 @@ public class BooleanOperationNodeType extends NodeType.Process {
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
-        String config = DataBox.get(settings, "mode", DataType.STRING).orElseThrow();
-        if(config.equals("not"))
+        Mode mode = DataBox.get(settings, "mode", BOOL_OPERATION_MODE).orElseThrow();
+        if(mode.equals(Mode.NOT))
             return Map.of("output", CompletableFuture.completedFuture(DataType.BOOLEAN.create(
                 !DataBox.get(inputs, "input", DataType.BOOLEAN).orElseThrow()
             )));
@@ -47,13 +49,37 @@ public class BooleanOperationNodeType extends NodeType.Process {
         boolean a = DataBox.get(inputs, "inputA", DataType.BOOLEAN).orElseThrow();
         boolean b = DataBox.get(inputs, "inputB", DataType.BOOLEAN).orElseThrow();
 
-        boolean result = switch(config) {
-            case "or"   -> a | b;
-            case "and"  -> a & b;
-            case "xor"  -> a ^ b;
-            default     -> false;
-        };
+        boolean result = mode.apply(a, b);
 
         return Map.of("output", CompletableFuture.completedFuture(DataType.BOOLEAN.create(result)));
     }
+
+    public enum Mode {
+        OR("or") {
+            @Override public boolean apply(boolean a, boolean b) { return a | b; }
+        },
+        AND("and") {
+            @Override public boolean apply(boolean a, boolean b) { return a & b; }
+        },
+        XOR("xor") {
+            @Override public boolean apply(boolean a, boolean b) { return a ^ b; }
+        },
+        NOT("not") {
+            public boolean apply(boolean a) { return apply(a, false); }
+            @Override public boolean apply(boolean a, boolean b) { return !a; }
+        };
+
+        private final String op;
+
+        Mode(String op) {
+            this.op = op;
+        }
+
+        @Override
+        public String toString() {
+            return this.op;
+        }
+        public abstract boolean apply(boolean a, boolean b);
+    }
+
 }
