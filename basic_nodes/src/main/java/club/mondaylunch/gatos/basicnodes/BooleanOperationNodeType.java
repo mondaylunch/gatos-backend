@@ -21,7 +21,7 @@ public class BooleanOperationNodeType extends NodeType.Process {
 
     @Override
     public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
-        if(DataBox.get(settings, "config", DataType.STRING).orElseThrow().equals("not"))
+        if(DataBox.get(settings, "mode", DataType.STRING).orElseThrow().equals("not"))
             return Set.of(new NodeConnector.Input<>(nodeId, "input", DataType.BOOLEAN));
 
         return Set.of(
@@ -38,7 +38,7 @@ public class BooleanOperationNodeType extends NodeType.Process {
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
-        String config = DataBox.get(settings, "config", DataType.STRING).orElseThrow();
+        String config = DataBox.get(settings, "mode", DataType.STRING).orElseThrow();
         if(config.equals("not"))
             return Map.of("output", CompletableFuture.completedFuture(DataType.BOOLEAN.create(
                 !DataBox.get(inputs, "input", DataType.BOOLEAN).orElseThrow()
