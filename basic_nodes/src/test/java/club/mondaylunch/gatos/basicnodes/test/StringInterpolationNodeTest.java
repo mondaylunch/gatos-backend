@@ -16,14 +16,14 @@ public class StringInterpolationNodeTest {
     @Test
     public void hasCorrectInputs() {
         var node = Node.create(BasicNodes.STRING_INTERPOLATION)
-                .modifySetting("template", DataType.STRING.create(TEST_TEMPLATE_STRING));
+            .modifySetting("template", DataType.STRING.create(TEST_TEMPLATE_STRING));
         Assertions.assertEquals(6, node.inputs().size());
     }
 
     @Test
     public void paramNamesAreCorrect() {
         var node = Node.create(BasicNodes.STRING_INTERPOLATION)
-                .modifySetting("template", DataType.STRING.create(TEST_TEMPLATE_STRING));
+            .modifySetting("template", DataType.STRING.create(TEST_TEMPLATE_STRING));
         Assertions.assertTrue(node.inputs().containsKey("Placeholder 1"));
         Assertions.assertTrue(node.inputs().containsKey("template_param_1"));
         Assertions.assertTrue(node.inputs().containsKey("a thing"));
@@ -42,19 +42,19 @@ public class StringInterpolationNodeTest {
     @Test
     public void computesCorrectly() {
         var node = Node.create(BasicNodes.STRING_INTERPOLATION)
-                .modifySetting("template", DataType.STRING.create(TEST_TEMPLATE_STRING));
+            .modifySetting("template", DataType.STRING.create(TEST_TEMPLATE_STRING));
         Map<String, DataBox<?>> inputs = Map.of(
-                "Placeholder 1", DataType.STRING.create("This is a"),
-                "template_param_1", DataType.STRING.create("test node"),
-                "a thing", DataType.STRING.create("did the"),
-                "Placeholder 4", DataType.STRING.create("template substitution"),
-                "Placeholder 5", DataType.STRING.create("work correctly?"),
-                "Placeholder 6", DataType.STRING.create("This one shouldn't:"));
+            "Placeholder 1", DataType.STRING.create("This is a"),
+            "template_param_1", DataType.STRING.create("test node"),
+            "a thing", DataType.STRING.create("did the"),
+            "Placeholder 4", DataType.STRING.create("template substitution"),
+            "Placeholder 5", DataType.STRING.create("work correctly?"),
+            "Placeholder 6", DataType.STRING.create("This one shouldn't:"));
         var result = (String) BasicNodes.STRING_INTERPOLATION.compute(inputs, node.settings()).get("result")
-                .join()
-                .value();
+            .join()
+            .value();
         Assertions.assertEquals(
-                "This is a test node - did the template substitution work correctly? This one shouldn't: \\{not one}",
-                result);
+            "This is a test node - did the template substitution work correctly? This one shouldn't: \\{not one}",
+            result);
     }
 }

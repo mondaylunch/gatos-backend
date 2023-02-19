@@ -32,8 +32,8 @@ public class LoginController {
     }
 
     private record BodyAuthenticate(
-            @NotNull @Email String email,
-            @NotNull @Length(min = 8) String password) {
+        @NotNull @Email String email,
+        @NotNull @Length(min = 8) String password) {
     }
 
     @PostMapping("/authenticate")
