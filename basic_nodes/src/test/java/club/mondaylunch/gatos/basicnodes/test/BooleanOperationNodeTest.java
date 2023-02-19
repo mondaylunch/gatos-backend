@@ -17,12 +17,28 @@ public class BooleanOperationNodeTest {
     private static final Node OR        = Node.create(BasicNodes.BOOL_OP).modifySetting("config", DataType.STRING.create("or"));
     private static final Node AND       = Node.create(BasicNodes.BOOL_OP).modifySetting("config", DataType.STRING.create("and"));
     private static final Node XOR       = Node.create(BasicNodes.BOOL_OP).modifySetting("config", DataType.STRING.create("xor"));
+    private static final Node NOT       = Node.create(BasicNodes.BOOL_OP).modifySetting("config", DataType.STRING.create("not"));
 
     @Test
     public void canAddNodeToGraph() {
         var graph = new Graph();
         var node = graph.addNode(BasicNodes.BOOL_OP);
         Assertions.assertTrue(graph.containsNode(node));
+    }
+
+    @Test
+    public void correctlyResolvesNegation() {
+        Map<String, DataBox<?>> inputs = Map.of(
+            "input", DataType.BOOLEAN.create(true)
+        );
+        boolean result = (boolean) BasicNodes.BOOL_OP.compute(inputs, NOT.settings()).get("result").join().value();
+        assertFalse(result);
+
+        inputs = Map.of(
+            "input", DataType.BOOLEAN.create(false)
+        );
+        result = (boolean) BasicNodes.BOOL_OP.compute(inputs, NOT.settings()).get("result").join().value();
+        assertTrue(result);
     }
 
     @Test
