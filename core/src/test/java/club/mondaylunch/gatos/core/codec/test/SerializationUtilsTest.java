@@ -12,6 +12,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import club.mondaylunch.gatos.core.codec.SerializationUtils;
 import club.mondaylunch.gatos.core.data.DataType;
@@ -21,7 +22,6 @@ import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 import club.mondaylunch.gatos.core.graph.type.test.TestNodeTypes;
 import club.mondaylunch.gatos.core.models.Flow;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 
 public class SerializationUtilsTest {
 
