@@ -79,11 +79,9 @@ public class BaseCollection<T extends BaseModel> {
      * @return a {@code List} of POJOs.
      */
     public List<T> get(String field, Object value) {
-        List<T> list = new ArrayList<>();
-        for (T obj : this.getCollection().find(eq(field, value))) {
-            list.add(obj);
-        }
-        return list;
+        return this.getCollection()
+            .find(eq(field, value))
+            .into(new ArrayList<>());
     }
 
     /**
