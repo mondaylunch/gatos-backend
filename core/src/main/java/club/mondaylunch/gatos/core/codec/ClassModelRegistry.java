@@ -46,6 +46,6 @@ public class ClassModelRegistry {
      * @return The codec provider.
      */
     private static CodecProvider createCodecProvider() {
-        return PojoCodecProvider.builder().register(registry.values().toArray(new ClassModel<?>[0])).build();
+        return PojoCodecProvider.builder().register(registry.values().toArray(ClassModel[]::new)).build();
     }
 }
