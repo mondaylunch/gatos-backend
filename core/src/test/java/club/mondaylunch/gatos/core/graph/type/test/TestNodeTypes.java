@@ -25,7 +25,7 @@ public class TestNodeTypes {
 
         @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
-            return Set.of(new NodeConnector.Output<>(nodeId, "out", DataType.INTEGER));
+            return Set.of(new NodeConnector.Output<>(nodeId, "start_output", DataType.INTEGER));
         }
 
         @Override
@@ -43,12 +43,12 @@ public class TestNodeTypes {
 
         @Override
         public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
-            return Set.of(new NodeConnector.Input<>(nodeId, "in", DataType.INTEGER));
+            return Set.of(new NodeConnector.Input<>(nodeId, "process_input", DataType.INTEGER));
         }
 
         @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
-            return Set.of(new NodeConnector.Output<>(nodeId, "out", DataType.INTEGER));
+            return Set.of(new NodeConnector.Output<>(nodeId, "process_output", DataType.INTEGER));
         }
 
         @Override
@@ -66,7 +66,7 @@ public class TestNodeTypes {
 
         @Override
         public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
-            return Set.of(new NodeConnector.Input<>(nodeId, "in", DataType.INTEGER));
+            return Set.of(new NodeConnector.Input<>(nodeId, "end_input", DataType.INTEGER));
         }
 
         @Override
