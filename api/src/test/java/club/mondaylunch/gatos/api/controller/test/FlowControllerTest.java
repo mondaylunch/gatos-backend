@@ -97,7 +97,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
                 .content(flowJson))
                 .andExpect(MockMvcResultMatchers.status().isOk());
         this.assertFlowCount(1);
-        result = compareFields(OBJECT_EXPRESSION_PREFIX, result,
+        compareFields(OBJECT_EXPRESSION_PREFIX, result,
                 Map.entry("name", flow.getName()),
                 Map.entry("authorId", this.user.getId()));
     }
@@ -301,13 +301,13 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
             Flow.objects.insert(flow);
             flows.add(flow);
         }
-        ResultActions result = this.getFlows(this.user, flowCount);
+        ResultActions result = this.getFlows(flowCount);
         for (int i = 0; i < flowCount; i++) {
             result = compareFlow(flows.get(i), i, result);
         }
     }
 
-    private ResultActions getFlows(User user, int expectedFlowCount) throws Exception {
+    private ResultActions getFlows(int expectedFlowCount) throws Exception {
         return this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/list")
                 .header("x-auth-token", this.user.getAuthToken()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
