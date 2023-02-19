@@ -65,7 +65,7 @@ public class FlowCollectionTest {
     public void cannotHaveDuplicateId() {
         String flowName = "Test Flow";
         UUID authorId = UUID.randomUUID();
-        Flow flow = new Flow(flowName, authorId);
+        Flow flow = new Flow(UUID.randomUUID(), flowName, authorId);
         Flow.objects.insert(flow);
         this.assertFlowCountChange(1);
         Assertions.assertThrows(MongoWriteException.class, () -> Flow.objects.insert(flow));
@@ -74,9 +74,9 @@ public class FlowCollectionTest {
     @Test
     public void canHaveDuplicateName() {
         String flowName = "Test Flow";
-        Flow flow = new Flow(flowName, UUID.randomUUID());
+        Flow flow = new Flow(UUID.randomUUID(), flowName, UUID.randomUUID());
         Flow.objects.insert(flow);
-        Flow flow2 = new Flow(flowName, UUID.randomUUID());
+        Flow flow2 = new Flow(UUID.randomUUID(), flowName, UUID.randomUUID());
         Assertions.assertDoesNotThrow(() -> Flow.objects.insert(flow2));
         this.assertFlowCountChange(2);
     }
@@ -84,9 +84,9 @@ public class FlowCollectionTest {
     @Test
     public void canHaveDuplicateAuthorId() {
         UUID authorId = UUID.randomUUID();
-        Flow flow = new Flow("Test Flow", authorId);
+        Flow flow = new Flow(UUID.randomUUID(), "Test Flow", authorId);
         Flow.objects.insert(flow);
-        Flow flow2 = new Flow("Test Flow 2", authorId);
+        Flow flow2 = new Flow(UUID.randomUUID(), "Test Flow 2", authorId);
         Assertions.assertDoesNotThrow(() -> Flow.objects.insert(flow2));
         this.assertFlowCountChange(2);
     }
@@ -160,6 +160,6 @@ public class FlowCollectionTest {
     }
 
     private static Flow createFlow() {
-        return new Flow("Test Flow", UUID.randomUUID());
+        return new Flow(UUID.randomUUID(), "Test Flow", UUID.randomUUID());
     }
 }

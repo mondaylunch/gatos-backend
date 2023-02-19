@@ -285,7 +285,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
     }
 
     private static Flow createFlow(User author) {
-        return new Flow("Test Flow", author.getId());
+        return new Flow(UUID.randomUUID(), "Test Flow", author.getId());
     }
 
     private static Flow getFlow(ResultActions result) throws Exception {
@@ -297,7 +297,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
     private void testGetFlows(int flowCount) throws Exception {
         List<Flow> flows = new ArrayList<>();
         for (int i = 0; i < flowCount; i++) {
-            Flow flow = new Flow("Test Flow " + i, this.user.getId());
+            Flow flow = new Flow(UUID.randomUUID(), "Test Flow " + i, this.user.getId());
             Flow.objects.insert(flow);
             flows.add(flow);
         }

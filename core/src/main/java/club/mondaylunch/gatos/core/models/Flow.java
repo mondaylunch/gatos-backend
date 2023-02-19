@@ -38,11 +38,6 @@ public class Flow extends BaseModel {
         this.authorId = authorId;
     }
 
-    public Flow(String name, UUID authorId) {
-        this.name = name;
-        this.authorId = authorId;
-    }
-
     public Flow() {
     }
 
