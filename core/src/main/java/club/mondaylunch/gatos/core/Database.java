@@ -20,11 +20,6 @@ import club.mondaylunch.gatos.core.codec.NodeCodecProvider;
 import club.mondaylunch.gatos.core.codec.NodeConnectionCodecProvider;
 import club.mondaylunch.gatos.core.codec.NodeConnectorCodecProvider;
 import club.mondaylunch.gatos.core.codec.RegistryObjectCodec;
-import club.mondaylunch.gatos.core.data.DataBox;
-import club.mondaylunch.gatos.core.graph.Graph;
-import club.mondaylunch.gatos.core.graph.Node;
-import club.mondaylunch.gatos.core.models.Flow;
-import club.mondaylunch.gatos.core.models.User;
 
 /**
  * Singleton instance of the MongoDB client.
@@ -58,9 +53,6 @@ public enum Database {
         // Documentation:
         // https://www.mongodb.com/docs/drivers/java/sync/current/fundamentals/data-formats/pojo-customization/#customize-a-pojocodecprovider
 
-        // Register classes
-        registerClassModels();
-
         // Create the registry
         return CodecRegistries.fromRegistries(
             CodecRegistries.fromProviders(
@@ -70,8 +62,8 @@ public enum Database {
                 NodeCodecProvider.INSTANCE,
                 RegistryObjectCodec.Provider.INSTANCE
             ),
-            ClassModelRegistry.createCodecRegistry(),
-            MongoClientSettings.getDefaultCodecRegistry()
+            MongoClientSettings.getDefaultCodecRegistry(),
+            ClassModelRegistry.createCodecRegistry()
         );
     }
 
@@ -117,15 +109,5 @@ public enum Database {
      */
     public static <TDocument> MongoCollection<TDocument> getCollection(String name, Class<TDocument> cls) {
         return getDatabase().getCollection(name, cls);
-    }
-
-    private static void registerClassModels() {
-        ClassModelRegistry.register(
-            User.class,
-            Flow.class,
-            Graph.class,
-            Node.class,
-            DataBox.class
-        );
     }
 }
