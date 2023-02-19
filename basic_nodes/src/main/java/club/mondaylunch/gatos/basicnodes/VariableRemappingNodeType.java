@@ -5,11 +5,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import com.google.gson.JsonObject;
+
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
-import com.google.gson.JsonObject;
 
 public class VariableRemappingNodeType extends NodeType.Process {
     @Override

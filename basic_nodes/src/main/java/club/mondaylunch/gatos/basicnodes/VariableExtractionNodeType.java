@@ -10,15 +10,16 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import club.mondaylunch.gatos.core.data.DataBox;
-import club.mondaylunch.gatos.core.data.DataType;
-import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
-import club.mondaylunch.gatos.core.graph.type.NodeType;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.jetbrains.annotations.Nullable;
+
+import club.mondaylunch.gatos.core.data.DataBox;
+import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
+import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 public class VariableExtractionNodeType extends NodeType.Process {
     private static final DataType<ReturnType> RETURN_DATATYPE = new DataType<>("return_type");
