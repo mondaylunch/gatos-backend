@@ -14,6 +14,13 @@ public class BaseModel {
     @BsonProperty("_id")
     private UUID id;
 
+    public BaseModel(UUID id) {
+        this.id = id;
+    }
+
+    public BaseModel() {
+    }
+
     /**
      * Get model's UUID.
      *

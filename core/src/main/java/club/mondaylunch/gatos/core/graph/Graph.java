@@ -2,18 +2,27 @@ package club.mondaylunch.gatos.core.graph;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.UnaryOperator;
 
+import org.bson.BsonReader;
+import org.bson.BsonWriter;
+import org.bson.codecs.Codec;
+import org.bson.codecs.DecoderContext;
+import org.bson.codecs.EncoderContext;
+import org.bson.codecs.configuration.CodecRegistry;
 import org.jetbrains.annotations.Nullable;
 
+import club.mondaylunch.gatos.core.codec.SerializationUtils;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.type.NodeCategory;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
@@ -31,6 +40,7 @@ import club.mondaylunch.gatos.core.graph.type.NodeType;
  * </p>
  */
 public class Graph {
+
     /**
      * The nodes of this graph.
      */
@@ -49,8 +59,20 @@ public class Graph {
      */
     private final Map<UUID, NodeMetadata> metadataByNode = new HashMap<>();
 
+    public Graph() {}
+
+    public Graph(Collection<Node> nodes, Map<UUID, NodeMetadata> metas, Collection<NodeConnection<?>> connections) {
+        this();
+        for (var node : nodes) {
+            this.nodes.put(node.id(), node);
+        }
+        this.metadataByNode.putAll(metas);
+        connections.forEach(this::addConnection);
+    }
+
     /**
      * Adds a new Node to the graph of the given type. The new node is returned.
+     *
      * @param type the type of node to add
      * @return the new node
      */
@@ -62,6 +84,7 @@ public class Graph {
 
     /**
      * Modifies, using the given unary operator, the node with a given UUID.
+     *
      * @param id   the UUID of the node to change
      * @param func the unary operator giving the new node state from the old
      * @return the modified node
@@ -90,6 +113,7 @@ public class Graph {
 
     /**
      * Removes the node with the given UUID, if it exists.
+     *
      * @param id the UUID of the node to remove
      */
     public void removeNode(UUID id) {
@@ -105,6 +129,7 @@ public class Graph {
 
     /**
      * Whether this <em>exact</em> node exists in the graph.
+     *
      * @param node the node
      * @return whether this node exists in the graph
      */
@@ -114,6 +139,7 @@ public class Graph {
 
     /**
      * Returns whether this graph has a node with the given UUID.
+     *
      * @param id the UUID
      * @return whether there is a node with the given UUID
      */
@@ -123,6 +149,7 @@ public class Graph {
 
     /**
      * Adds a new node connection between connectors of two existing nodes.
+     *
      * @param connection the connection to add
      * @throws IllegalArgumentException if the node connection has a null node at
      *                                  either end
@@ -140,7 +167,7 @@ public class Graph {
         }
         if (this.connections.stream().anyMatch(conn -> conn.to().equals(connection.to()))) {
             throw new IllegalArgumentException(
-                    "Node connection cannot be to a connector which is already part of a connection.");
+                "Node connection cannot be to a connector which is already part of a connection.");
         }
 
         this.connections.add(connection);
@@ -150,6 +177,7 @@ public class Graph {
 
     /**
      * Removes a node connection, if it exists.
+     *
      * @param connection the connection to remove
      */
     public void removeConnection(NodeConnection<?> connection) {
@@ -160,6 +188,7 @@ public class Graph {
 
     /**
      * Returns a copy of the set of all connections in this graph.
+     *
      * @return the connections in this graph
      */
     public Set<NodeConnection<?>> getConnections() {
@@ -169,6 +198,7 @@ public class Graph {
     /**
      * Retrieves all connections associated with a node UUID. Returns an empty set
      * if there is no node with the given UUID.
+     *
      * @param nodeId the node UUID
      * @return all connections associated with the node with the UUID
      */
@@ -184,6 +214,7 @@ public class Graph {
      * {@link #connections} can cause invalid state!</strong>
      * Use {@link #getConnectionsForNode(UUID)} where possible.
      * </p>
+     *
      * @param nodeId the node UUID
      * @return the set of connections associated with the node with the UUID
      */
@@ -194,6 +225,7 @@ public class Graph {
     /**
      * Gets the metadata for a node with the given UUID. Creates default metadata if
      * there is none specified.
+     *
      * @param nodeId the node UUID
      * @return the metadata for the node with the UUID
      */
@@ -204,6 +236,7 @@ public class Graph {
     /**
      * Modifies, using the given unary operator, the metadata for the node with a
      * given UUID.
+     *
      * @param nodeId the UUID of the node to change
      * @param func   the unary operator giving the new node metadata from the old
      * @return the modified metadata
@@ -235,6 +268,7 @@ public class Graph {
      * Performs a topological sort on this graph. Ignores nodes with no connections.
      * If the graph is not
      * {@link #validate() valid}, this will return an empty Optional.
+     *
      * @return a topological sort of this graph
      */
     public Optional<List<Node>> getExecutionOrder() {
@@ -273,7 +307,7 @@ public class Graph {
                     visitedConnections.add(conn);
                     UUID to = conn.to().nodeId();
                     if (this.getConnectionsForNode(to).stream()
-                            .noneMatch(c -> !visitedConnections.contains(c) && c.to().nodeId() == to)) {
+                        .noneMatch(c -> !visitedConnections.contains(c) && c.to().nodeId() == to)) {
                         nodesWithoutIncoming.add(to);
                     }
                 }
@@ -297,7 +331,7 @@ public class Graph {
      */
     private static boolean isConnectionValid(Node node, NodeConnection<?> connection) {
         if (connection.from().nodeId().equals(node.id())) {
-            return node.outputs().containsValue(connection.from());
+            return node.getOutputs().containsValue(connection.from());
         }
 
         if (connection.to().nodeId().equals(node.id())) {
@@ -305,5 +339,93 @@ public class Graph {
         }
 
         return false;
+    }
+
+    /**
+     * Gets the number of nodes in this graph.
+     *
+     * @return the number of nodes
+     */
+    public int nodeCount() {
+        return this.nodes.size();
+    }
+
+    /**
+     * Gets the number of connections in this graph.
+     *
+     * @return the number of connections
+     */
+    public int connectionCount() {
+        return this.connections.size();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+            this.nodes,
+            this.connections,
+            this.metadataByNode
+        );
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        } else if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        } else {
+            Graph graph = (Graph) obj;
+            return Objects.equals(this.nodes, graph.nodes)
+                && Objects.equals(this.connections, graph.connections)
+                && Objects.equals(this.metadataByNode, graph.metadataByNode);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Graph{"
+            + "nodes=" + this.nodes
+            + ", connections=" + this.connections
+            + ", metadataByNode=" + this.metadataByNode
+            + '}';
+    }
+
+    public static final class GraphCodec implements Codec<Graph> {
+        private final CodecRegistry registry;
+
+        public GraphCodec(CodecRegistry registry) {
+            this.registry = registry;
+        }
+
+        @Override
+        public Graph decode(BsonReader reader, DecoderContext decoderContext) {
+            reader.readStartDocument();
+            reader.readName("nodes");
+            Set<Node> nodes = SerializationUtils.readSet(reader, decoderContext, Node.class, this.registry);
+            reader.readName("connections");
+            Set<NodeConnection<?>> connections = SerializationUtils.readSet(reader, decoderContext, NodeConnection.class, this.registry);
+            reader.readName("metadata");
+            Map<UUID, NodeMetadata> metadata = SerializationUtils.readMap(reader, decoderContext, NodeMetadata.class, UUID::fromString, this.registry);
+            reader.readEndDocument();
+            return new Graph(nodes, metadata, connections);
+        }
+
+        @Override
+        public void encode(BsonWriter writer, Graph value, EncoderContext encoderContext) {
+            writer.writeStartDocument();
+            writer.writeName("nodes");
+            SerializationUtils.writeSet(writer, encoderContext, Node.class, this.registry, Set.copyOf(value.nodes.values()));
+            writer.writeName("connections");
+            SerializationUtils.writeSet(writer, encoderContext, NodeConnection.class, this.registry, value.connections);
+            writer.writeName("metadata");
+            SerializationUtils.writeMap(writer, encoderContext, NodeMetadata.class, UUID::toString, this.registry, value.metadataByNode);
+            writer.writeEndDocument();
+        }
+
+        @Override
+        public Class<Graph> getEncoderClass() {
+            return Graph.class;
+        }
     }
 }

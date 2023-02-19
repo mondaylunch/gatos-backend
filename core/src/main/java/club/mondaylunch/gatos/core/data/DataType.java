@@ -7,15 +7,18 @@ import java.util.Optional;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import club.mondaylunch.gatos.core.Registry;
+
 /**
  * A type of value which can be stored in a {@link DataBox}.
  */
 public final class DataType<T> {
-    public static final DataType<Integer> INTEGER = new DataType<>("integer");
-    public static final DataType<Boolean> BOOLEAN = new DataType<>("boolean");
-    public static final DataType<String> STRING = new DataType<>("string");
-    public static final DataType<JsonObject> JSONOBJECT = new DataType<>("jsonobject");
-    public static final DataType<JsonElement> JSONELEMENT = new DataType<>("jsonelement");
+    public static final Registry<DataType<?>> REGISTRY = Registry.create("data_Type", DataType.class);
+    public static final DataType<Integer> INTEGER = register("integer");
+    public static final DataType<Boolean> BOOLEAN = register("boolean");
+    public static final DataType<String> STRING = register("string");
+    public static final DataType<JsonObject> JSON_OBJECT = register("jsonobject");
+    public static final DataType<JsonElement> JSON_ELEMENT = register("jsonelement");
     private final String name;
     private DataType<Optional<T>> optionalType = null;
     private DataType<List<T>> listType = null;
@@ -23,8 +26,12 @@ public final class DataType<T> {
     /**
      * @param name the name for the type this represents
      */
-    public DataType(String name) {
+    private DataType(String name) {
         this.name = name;
+    }
+
+    public static <T> DataType<T> register(String name) {
+        return REGISTRY.register(name, new DataType<>(name));
     }
 
     /**
@@ -37,8 +44,8 @@ public final class DataType<T> {
     }
 
     /**
-     * Returns the name for the type this represents.
-     * @return the name for the type this represents
+     * The unique name of this data type.
+     * @return the unique name of this data type.
      */
     public String name() {
         return this.name;

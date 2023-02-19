@@ -1,28 +1,28 @@
 package club.mondaylunch.gatos.core;
 
-import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
-import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
-
-import java.util.List;
-
-import org.bson.BsonDocument;
-import org.bson.BsonInt64;
-import org.bson.Document;
-import org.bson.UuidRepresentation;
-import org.bson.codecs.configuration.CodecProvider;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.codecs.pojo.ClassModel;
-import org.bson.codecs.pojo.Conventions;
-import org.bson.codecs.pojo.PojoCodecProvider;
-import org.bson.conversions.Bson;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import org.bson.BsonDocument;
+import org.bson.BsonInt64;
+import org.bson.Document;
+import org.bson.UuidRepresentation;
+import org.bson.codecs.configuration.CodecRegistries;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.conversions.Bson;
 
+import club.mondaylunch.gatos.core.codec.ClassModelRegistry;
+import club.mondaylunch.gatos.core.codec.GraphCodecProvider;
+import club.mondaylunch.gatos.core.codec.NodeCodecProvider;
+import club.mondaylunch.gatos.core.codec.NodeConnectionCodecProvider;
+import club.mondaylunch.gatos.core.codec.NodeConnectorCodecProvider;
+import club.mondaylunch.gatos.core.codec.RegistryObjectCodec;
+import club.mondaylunch.gatos.core.data.DataBox;
+import club.mondaylunch.gatos.core.graph.Graph;
+import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.models.Flow;
 import club.mondaylunch.gatos.core.models.User;
 
@@ -34,7 +34,7 @@ public enum Database {
     INSTANCE;
 
     private final MongoClient client = createClient();
-    private final CodecRegistry codecRegistry = createRegistry();
+    private CodecRegistry codecRegistry = createRegistry();
 
     /**
      * Configure the MongoDB driver.
@@ -43,8 +43,8 @@ public enum Database {
         // Configure the connection settings
         ConnectionString connectionString = new ConnectionString(Environment.getMongoUri());
         MongoClientSettings mongoClientSettings = MongoClientSettings.builder()
-                .uuidRepresentation(UuidRepresentation.STANDARD)
-                .applyConnectionString(connectionString).build();
+            .uuidRepresentation(UuidRepresentation.STANDARD)
+            .applyConnectionString(connectionString).build();
 
         // Build the client
         return MongoClients.create(mongoClientSettings);
@@ -57,15 +57,29 @@ public enum Database {
         // Create ClassModel for every single model
         // Documentation:
         // https://www.mongodb.com/docs/drivers/java/sync/current/fundamentals/data-formats/pojo-customization/#customize-a-pojocodecprovider
-        ClassModel<User> userModel = ClassModel.builder(User.class)
-                .conventions(List.of(Conventions.ANNOTATION_CONVENTION)).build();
 
-        ClassModel<Flow> flowModel = ClassModel.builder(Flow.class)
-                .conventions(List.of(Conventions.ANNOTATION_CONVENTION)).build();
+        // Register classes
+        registerClassModels();
 
-        // Register classes and create the registry
-        CodecProvider pojoCodecProvider = PojoCodecProvider.builder().register(userModel, flowModel).build();
-        return fromRegistries(getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
+        // Create the registry
+        return CodecRegistries.fromRegistries(
+            CodecRegistries.fromProviders(
+                NodeConnectorCodecProvider.INSTANCE,
+                NodeConnectionCodecProvider.INSTANCE,
+                GraphCodecProvider.INSTANCE,
+                NodeCodecProvider.INSTANCE,
+                RegistryObjectCodec.Provider.INSTANCE
+            ),
+            ClassModelRegistry.createCodecRegistry(),
+            MongoClientSettings.getDefaultCodecRegistry()
+        );
+    }
+
+    /**
+     * Refresh the codec registry with any new changes.
+     */
+    public static void refreshCodecRegistry() {
+        INSTANCE.codecRegistry = createRegistry();
     }
 
     /**
@@ -84,7 +98,7 @@ public enum Database {
      */
     public static MongoDatabase getDatabase() {
         return INSTANCE.client.getDatabase(Environment.isJUnitTest() ? "gatos-testdb" : "gatos")
-                .withCodecRegistry(INSTANCE.codecRegistry);
+            .withCodecRegistry(INSTANCE.codecRegistry);
     }
 
     /**
@@ -103,5 +117,15 @@ public enum Database {
      */
     public static <TDocument> MongoCollection<TDocument> getCollection(String name, Class<TDocument> cls) {
         return getDatabase().getCollection(name, cls);
+    }
+
+    private static void registerClassModels() {
+        ClassModelRegistry.register(
+            User.class,
+            Flow.class,
+            Graph.class,
+            Node.class,
+            DataBox.class
+        );
     }
 }

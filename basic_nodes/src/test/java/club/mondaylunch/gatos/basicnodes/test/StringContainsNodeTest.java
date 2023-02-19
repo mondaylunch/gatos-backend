@@ -24,8 +24,8 @@ public class StringContainsNodeTest {
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.STRING_CONTAINS);
-        Assertions.assertEquals(1, node.outputs().size());
-        Assertions.assertTrue(node.outputs().containsKey("output"));
+        Assertions.assertEquals(1, node.getOutputs().size());
+        Assertions.assertTrue(node.getOutputs().containsKey("output"));
     }
 
     @Test
