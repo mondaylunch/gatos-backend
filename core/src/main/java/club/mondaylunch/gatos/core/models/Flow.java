@@ -14,22 +14,6 @@ public class Flow extends BaseModel {
 
     public static final FlowCollection objects = new FlowCollection();
 
-    private final Graph graph = new Graph();
-
-    public Flow(UUID id, String name, UUID authorId) {
-        super(id);
-        this.name = name;
-        this.authorId = authorId;
-    }
-
-    public Flow(String name, UUID authorId) {
-        this.name = name;
-        this.authorId = authorId;
-    }
-
-    public Flow() {
-    }
-
     /**
      * Display name.
      */
@@ -45,6 +29,22 @@ public class Flow extends BaseModel {
      */
     @BsonProperty("author_id")
     private UUID authorId;
+
+    private Graph graph = new Graph();
+
+    public Flow(UUID id, String name, UUID authorId) {
+        super(id);
+        this.name = name;
+        this.authorId = authorId;
+    }
+
+    public Flow(String name, UUID authorId) {
+        this.name = name;
+        this.authorId = authorId;
+    }
+
+    public Flow() {
+    }
 
     /**
      * Get the display name.
@@ -107,5 +107,14 @@ public class Flow extends BaseModel {
      */
     public Graph getGraph() {
         return this.graph;
+    }
+
+    /**
+     * Set the graph.
+     *
+     * @param graph the graph.
+     */
+    public void setGraph(Graph graph) {
+        this.graph = graph;
     }
 }
