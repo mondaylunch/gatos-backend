@@ -36,10 +36,10 @@ public class MathNodeType extends NodeType.Process {
         Number b = DataBox.get(inputs, "inputB", DataType.INTEGER).orElseThrow();
 
         Number result = switch (DataBox.get(settings, "config", DataType.STRING).orElseThrow()) {
-            case "+" -> operation(a, b, Operator.ADDITION);
-            case "-" -> operation(a, b, Operator.SUBTRACTION);
-            case "*" -> operation(a, b, Operator.MULTIPLICATION);
-            case "/" -> operation(a, b, Operator.DIVISION);
+            case "+" -> this.operation(a, b, Operator.ADDITION);
+            case "-" -> this.operation(a, b, Operator.SUBTRACTION);
+            case "*" -> this.operation(a, b, Operator.MULTIPLICATION);
+            case "/" -> this.operation(a, b, Operator.DIVISION);
             default -> 0;
         };
 
@@ -48,39 +48,39 @@ public class MathNodeType extends NodeType.Process {
 
     public enum Operator {
         ADDITION("+") {
-            @Override public int apply(int a, int b)          {   return a + b;   }
-            @Override public long apply(long a, long b)       {   return a + b;   }
-            @Override public float apply(float a, float b)    {   return a + b;   }
-            @Override public double apply(double a, double b) {   return a + b;   }
+            @Override public int apply(int a, int b)          { return a + b; }
+            @Override public long apply(long a, long b)       { return a + b; }
+            @Override public float apply(float a, float b)    { return a + b; }
+            @Override public double apply(double a, double b) { return a + b; }
         },
         SUBTRACTION("-") {
-            @Override public int apply(int a, int b)          {   return a - b;   }
-            @Override public long apply(long a, long b)       {   return a - b;   }
-            @Override public float apply(float a, float b)    {   return a - b;   }
-            @Override public double apply(double a, double b) {   return a - b;   }
+            @Override public int apply(int a, int b)          { return a - b; }
+            @Override public long apply(long a, long b)       { return a - b; }
+            @Override public float apply(float a, float b)    { return a - b; }
+            @Override public double apply(double a, double b) { return a - b; }
         },
         MULTIPLICATION("*") {
-            @Override public int apply(int a, int b)          {   return a * b;   }
-            @Override public long apply(long a, long b)       {   return a * b;   }
-            @Override public float apply(float a, float b)    {   return a * b;   }
-            @Override public double apply(double a, double b) {   return a * b;   }
+            @Override public int apply(int a, int b)          { return a * b; }
+            @Override public long apply(long a, long b)       { return a * b; }
+            @Override public float apply(float a, float b)    { return a * b; }
+            @Override public double apply(double a, double b) { return a * b; }
         },
         DIVISION("/") {
-            @Override public int apply(int a, int b)          {   return a / b;   }
-            @Override public long apply(long a, long b)       {   return a / b;   }
-            @Override public float apply(float a, float b)    {   return a / b;   }
-            @Override public double apply(double a, double b) {   return a / b;   }
+            @Override public int apply(int a, int b)          { return a / b; }
+            @Override public long apply(long a, long b)       { return a / b; }
+            @Override public float apply(float a, float b)    { return a / b; }
+            @Override public double apply(double a, double b) { return a / b; }
         };
 
         private final String op;
 
-        private Operator(String op) {
+        Operator(String op) {
             this.op = op;
         }
 
         @Override
         public String toString() {
-            return op;
+            return this.op;
         }
 
         public abstract int apply(int x1, int x2);
@@ -92,13 +92,14 @@ public class MathNodeType extends NodeType.Process {
     public Number operation(Number a, Number b, Operator op) {
         if(a instanceof Double || b instanceof Double) {
             return op.apply(a.doubleValue(), b.doubleValue());
-        } else
-        if(a instanceof Float || b instanceof Float) {
+        }
+        else if(a instanceof Float || b instanceof Float) {
             return op.apply(a.floatValue(), b.floatValue());
-        } else
-        if(a instanceof Long || b instanceof Long) {
+        }
+        else if(a instanceof Long || b instanceof Long) {
             return op.apply(a.longValue(), b.longValue());
-        } else {    // must be int
+        }
+        else {    // must be int
             return op.apply(a.intValue(), b.intValue());
         }
     }
