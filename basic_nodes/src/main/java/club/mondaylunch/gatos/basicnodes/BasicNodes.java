@@ -15,6 +15,6 @@ public final class BasicNodes {
         .register("string_contains", new StringContainsNodeType());
     public static final StringConcatNodeType STRING_CONCAT = NodeType.REGISTRY
         .register("string_concat", new StringConcatNodeType());
-    public static final BooleanOperationNodeType BOOL_OP = NodeTypeRegistry
+    public static final BooleanOperationNodeType BOOL_OP = NodeType.REGISTRY
         .register("boolean_operation", new BooleanOperationNodeType());
 }
