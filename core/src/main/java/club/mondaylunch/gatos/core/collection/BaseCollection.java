@@ -14,6 +14,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.conversions.Bson;
@@ -67,7 +68,7 @@ public class BaseCollection<T extends BaseModel> {
      * @return The POJO.
      */
     public T get(UUID id) {
-        return this.getCollection().find(idFilter(id)).first();
+        return this.getCollection().find(Filters.eq(id)).first();
     }
 
     /**
@@ -96,7 +97,7 @@ public class BaseCollection<T extends BaseModel> {
     public T update(UUID id, T obj) {
         List<Bson> updates = getNonNullUpdates(obj);
         if (!updates.isEmpty()) {
-            this.getCollection().updateOne(idFilter(id), Updates.combine(updates));
+            this.getCollection().updateOne(Filters.eq(id), Updates.combine(updates));
         }
         return this.get(id);
     }
@@ -107,7 +108,7 @@ public class BaseCollection<T extends BaseModel> {
      * @param id The ID of the document to delete.
      */
     public void delete(UUID id) {
-        this.getCollection().deleteOne(idFilter(id));
+        this.getCollection().deleteOne(Filters.eq(id));
     }
 
     /**
@@ -124,16 +125,6 @@ public class BaseCollection<T extends BaseModel> {
      */
     public long size() {
         return this.getCollection().countDocuments();
-    }
-
-    /**
-     * Creates an ID filter.
-     *
-     * @param id The ID to filter by.
-     * @return The filter.
-     */
-    protected static Bson idFilter(UUID id) {
-        return eq("_id", id);
     }
 
     /**
