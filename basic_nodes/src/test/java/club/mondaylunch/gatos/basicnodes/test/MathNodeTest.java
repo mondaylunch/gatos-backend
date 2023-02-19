@@ -6,16 +6,17 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
+import club.mondaylunch.gatos.basicnodes.MathNodeType;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.Node;
 
 public class MathNodeTest {
-    private static final Node ADD = Node.create(BasicNodes.MATH).modifySetting("config", DataType.STRING.create("+"));
-    private static final Node SUB = Node.create(BasicNodes.MATH).modifySetting("config", DataType.STRING.create("-"));
-    private static final Node MLT = Node.create(BasicNodes.MATH).modifySetting("config", DataType.STRING.create("*"));
-    private static final Node DIV = Node.create(BasicNodes.MATH).modifySetting("config", DataType.STRING.create("/"));
+    private static final Node ADD = Node.create(BasicNodes.MATH).modifySetting("operator", MathNodeType.MATHEMATICAL_OPERATOR.create(MathNodeType.Operator.ADDITION));
+    private static final Node SUB = Node.create(BasicNodes.MATH).modifySetting("operator", MathNodeType.MATHEMATICAL_OPERATOR.create(MathNodeType.Operator.SUBTRACTION));
+    private static final Node MLT = Node.create(BasicNodes.MATH).modifySetting("operator", MathNodeType.MATHEMATICAL_OPERATOR.create(MathNodeType.Operator.MULTIPLICATION));
+    private static final Node DIV = Node.create(BasicNodes.MATH).modifySetting("operator", MathNodeType.MATHEMATICAL_OPERATOR.create(MathNodeType.Operator.DIVISION));
 
     @Test
     public void canAddNodeToGraph() {
