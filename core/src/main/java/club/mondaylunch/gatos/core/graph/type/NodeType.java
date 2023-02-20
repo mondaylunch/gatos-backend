@@ -7,6 +7,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.jetbrains.annotations.ApiStatus;
 
+import club.mondaylunch.gatos.core.Registry;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 
@@ -34,6 +35,11 @@ import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 @ApiStatus.NonExtendable
 public interface NodeType {
     /**
+     * The Node Type registry.
+     */
+    Registry<NodeType> REGISTRY = Registry.create("node_type", NodeType.class);
+
+    /**
      * Returns the category this node type belongs to.
      * @return the category this node type belongs to
      */
@@ -44,13 +50,6 @@ public interface NodeType {
      * @return the settings for a node of this type
      */
     Map<String, DataBox<?>> settings();
-
-    /**
-     * The unique name of this node type.
-     *
-     * @return the unique name of this node type.
-     */
-    String name();
 
     /**
      * Extended by node types which have input connectors.

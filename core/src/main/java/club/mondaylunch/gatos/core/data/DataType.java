@@ -4,20 +4,22 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import club.mondaylunch.gatos.core.Registry;
 
 /**
  * A type of value which can be stored in a {@link DataBox}.
  */
 public final class DataType<T> {
 
-    public static final DataType<Integer> INTEGER = DataTypeRegistry.register(new DataType<>("integer"));
-    public static final DataType<Boolean> BOOLEAN = DataTypeRegistry.register(new DataType<>("boolean"));
-    public static final DataType<String> STRING = DataTypeRegistry.register(new DataType<>("string"));
-    public static final DataType<JsonObject> JSON_OBJECT = DataTypeRegistry.register(new DataType<>("jsonobject"));
-    public static final DataType<JsonElement> JSON_ELEMENT = DataTypeRegistry.register(new DataType<>("jsonelement"));
-    public static final DataType<List> LIST = DataTypeRegistry.register(new DataType<>("list"));
+    public static final Registry<DataType<?>> REGISTRY = Registry.create("data_type", DataType.class);
+    public static final DataType<Integer> INTEGER = register("integer");
+    public static final DataType<Boolean> BOOLEAN = register("boolean");
+    public static final DataType<String> STRING = register("string");
+    public static final DataType<JsonObject> JSON_OBJECT = register("json_object");
+    public static final DataType<DataType<?>> DATA_TYPE = register("data_type");
+    public static final DataType<List> LIST = register("list");
     private final String name;
     private DataType<Optional<T>> optionalType = null;
     private DataType<List<T>> listType = null;
@@ -25,8 +27,12 @@ public final class DataType<T> {
     /**
      * @param name the name for the type this represents
      */
-    public DataType(String name) {
+    private DataType(String name) {
         this.name = name;
+    }
+
+    public static <T> DataType<T> register(String name) {
+        return REGISTRY.register(name, new DataType<>(name));
     }
 
     /**

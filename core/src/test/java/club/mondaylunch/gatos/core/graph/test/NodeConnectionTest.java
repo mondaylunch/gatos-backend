@@ -77,11 +77,6 @@ public class NodeConnectionTest {
         }
 
         @Override
-        public String name() {
-            return "";
-        }
-
-        @Override
         public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
                 Map<String, DataBox<?>> settings) {
             return Map.of();

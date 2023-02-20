@@ -9,24 +9,18 @@ import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
-import club.mondaylunch.gatos.core.graph.type.NodeTypeRegistry;
 
 public class TestNodeTypes {
 
-    public static final NodeType.Start START = NodeTypeRegistry.register(new TestStartNodeType());
-    public static final NodeType.Process PROCESS = NodeTypeRegistry.register(new TestProcessNodeType());
-    public static final NodeType.End END = NodeTypeRegistry.register(new TestEndNodeType());
+    public static final NodeType.Start START = NodeType.REGISTRY.register("test_start", new TestStartNodeType());
+    public static final NodeType.Process PROCESS = NodeType.REGISTRY.register("test_process", new TestProcessNodeType());
+    public static final NodeType.End END = NodeType.REGISTRY.register("test_end", new TestEndNodeType());
 
     private static class TestStartNodeType extends NodeType.Start {
 
         @Override
         public Map<String, DataBox<?>> settings() {
             return Map.of();
-        }
-
-        @Override
-        public String name() {
-            return "test_start";
         }
 
         @Override
@@ -45,11 +39,6 @@ public class TestNodeTypes {
         @Override
         public Map<String, DataBox<?>> settings() {
             return Map.of();
-        }
-
-        @Override
-        public String name() {
-            return "test_process";
         }
 
         @Override
@@ -73,11 +62,6 @@ public class TestNodeTypes {
         @Override
         public Map<String, DataBox<?>> settings() {
             return Map.of();
-        }
-
-        @Override
-        public String name() {
-            return "test_end";
         }
 
         @Override
