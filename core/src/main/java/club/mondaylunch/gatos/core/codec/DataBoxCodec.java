@@ -27,24 +27,23 @@ public class DataBoxCodec implements Codec<DataBox<?>> {
 
     @Override
     public DataBox<?> decode(BsonReader reader, DecoderContext decoderContext) {
-        reader.readStartDocument();
-        reader.readName("type");
-        DataType<?> type = decoderContext.decodeWithChildContext(this.registry.get(DataType.class), reader);
-        reader.readName("value");
-        var value = this.decodeValue(reader, type, decoderContext);
-        reader.readEndDocument();
-        return value;
+        return SerializationUtils.readDocument(reader, () -> {
+            reader.readName("type");
+            DataType<?> type = decoderContext.decodeWithChildContext(this.registry.get(DataType.class), reader);
+            reader.readName("value");
+            return this.decodeValue(reader, type, decoderContext);
+        });
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void encode(BsonWriter writer, DataBox<?> value, EncoderContext encoderContext) {
-        writer.writeStartDocument();
-        writer.writeName("type");
-        encoderContext.encodeWithChildContext((Codec<DataType<?>>) this.registry.get(value.type().getClass()), writer, value.type());
-        writer.writeName("value");
-        this.encodeValue(writer, value, encoderContext);
-        writer.writeEndDocument();
+        SerializationUtils.writeDocument(writer, () -> {
+            writer.writeName("type");
+            encoderContext.encodeWithChildContext((Codec<DataType<?>>) this.registry.get(value.type().getClass()), writer, value.type());
+            writer.writeName("value");
+            this.encodeValue(writer, value, encoderContext);
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -55,14 +54,14 @@ public class DataBoxCodec implements Codec<DataBox<?>> {
                 .parameterize(this.registry, List.of(listType.contains().clazz()));
             encoderContext.encodeWithChildContext((Encoder<Object>) encoder, writer, box.value());
         } else if (type instanceof OptionalDataType<?> optType) {
-            writer.writeStartDocument();
-            writer.writeName("present");
-            ((Optional<?>) box.value()).ifPresentOrElse(value -> {
-                writer.writeBoolean(true);
-                writer.writeName("value");
-                encoderContext.encodeWithChildContext((Encoder<Object>) this.registry.get(optType.contains().clazz()), writer, value);
-            }, () -> writer.writeBoolean(false));
-            writer.writeEndDocument();
+            SerializationUtils.writeDocument(writer, () -> {
+                writer.writeName("present");
+                ((Optional<?>) box.value()).ifPresentOrElse(value -> {
+                    writer.writeBoolean(true);
+                    writer.writeName("value");
+                    encoderContext.encodeWithChildContext((Encoder<Object>) this.registry.get(optType.contains().clazz()), writer, value);
+                }, () -> writer.writeBoolean(false));
+            });
         } else {
             encoderContext.encodeWithChildContext((Encoder<Object>) this.registry.get(type.clazz()), writer, box.value());
         }
@@ -76,18 +75,16 @@ public class DataBoxCodec implements Codec<DataBox<?>> {
             return ((DataType<T>) type).create((T) decoderContext.decodeWithChildContext(codec, reader));
         } else if (type instanceof OptionalDataType<?> optType) {
             var codec = this.registry.get(optType.contains().clazz());
-            reader.readStartDocument();
-            reader.readName("present");
-            boolean isPresent = reader.readBoolean();
-            DataBox<?> result;
-            if (isPresent) {
-                reader.readName("value");
-                result = ((DataType<Optional<T>>) type).create(Optional.ofNullable((T) decoderContext.decodeWithChildContext(codec, reader)));
-            } else {
-                result = ((DataType<Optional<T>>) type).create(Optional.empty());
-            }
-            reader.readEndDocument();
-            return result;
+            return SerializationUtils.readDocument(reader, () -> {
+                reader.readName("present");
+                boolean isPresent = reader.readBoolean();
+                if (isPresent) {
+                    reader.readName("value");
+                    return ((DataType<Optional<T>>) type).create(Optional.ofNullable((T) decoderContext.decodeWithChildContext(codec, reader)));
+                } else {
+                    return ((DataType<Optional<T>>) type).create(Optional.empty());
+                }
+            });
         } else {
             var codec = this.registry.get(type.clazz());
             return ((DataType<T>) type).create((T) decoderContext.decodeWithChildContext(codec, reader));
