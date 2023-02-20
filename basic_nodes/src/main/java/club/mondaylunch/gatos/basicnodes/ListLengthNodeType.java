@@ -21,11 +21,6 @@ public class ListLengthNodeType extends NodeType.Process {
     }
 
     @Override
-    public String name() {
-        return "list_length";
-    }
-
-    @Override
     public Set<Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
         return Set.of(
             new NodeConnector.Input<>(nodeId, "input", DataType.LIST));
