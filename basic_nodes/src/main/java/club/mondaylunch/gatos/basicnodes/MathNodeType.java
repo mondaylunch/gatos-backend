@@ -46,22 +46,10 @@ public class MathNodeType extends NodeType.Process {
     }
 
     public enum Operator {
-        ADDITION("+") {
-            @Override public int apply(int a, int b)          { return a + b; }
-            @Override public double apply(double a, double b) { return a + b; }
-        },
-        SUBTRACTION("-") {
-            @Override public int apply(int a, int b)          { return a - b; }
-            @Override public double apply(double a, double b) { return a - b; }
-        },
-        MULTIPLICATION("*") {
-            @Override public int apply(int a, int b)          { return a * b; }
-            @Override public double apply(double a, double b) { return a * b; }
-        },
-        DIVISION("/") {
-            @Override public int apply(int a, int b)          { return a / b; }
-            @Override public double apply(double a, double b) { return a / b; }
-        };
+        ADDITION("+") {         @Override public double apply(double a, double b) { return a + b; }},
+        SUBTRACTION("-") {      @Override public double apply(double a, double b) { return a - b; }},
+        MULTIPLICATION("*") {   @Override public double apply(double a, double b) { return a * b; }},
+        DIVISION("/") {         @Override public double apply(double a, double b) { return a / b; }};
 
         private final String op;
 
@@ -74,7 +62,6 @@ public class MathNodeType extends NodeType.Process {
             return this.op;
         }
 
-        public abstract int apply(int a, int b);
         public abstract double apply(double a, double b);
     }
 }
