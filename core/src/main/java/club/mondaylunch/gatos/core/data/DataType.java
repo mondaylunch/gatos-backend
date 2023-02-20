@@ -13,6 +13,7 @@ import club.mondaylunch.gatos.core.Registry;
  */
 public sealed class DataType<T> permits ListDataType, OptionalDataType {
     public static final Registry<DataType<?>> REGISTRY = Registry.create("data_type", DataType.class);
+    public static final DataType<Object> ANY = register("any", Object.class);
     public static final DataType<Double> NUMBER = register("number", Double.class);
     public static final DataType<Boolean> BOOLEAN = register("boolean", Boolean.class);
     public static final DataType<String> STRING = register("string", String.class);
@@ -36,6 +37,7 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
     protected DataType(String name, Class<? super T> clazz) {
         this.name = name;
         this.clazz = clazz;
+        Conversions.register(this, ANY, $ -> $);
     }
 
     public static <T> DataType<T> register(String name, Class<? super T> clazz) {
