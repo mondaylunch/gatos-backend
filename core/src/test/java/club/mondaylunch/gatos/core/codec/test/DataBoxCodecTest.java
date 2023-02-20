@@ -87,7 +87,7 @@ public class DataBoxCodecTest {
         Assertions.assertNotNull(retrievedContainerContainer);
         DataBoxContainer retrievedContainer = retrievedContainerContainer.dataBoxContainer;
         Assertions.assertNotNull(retrievedContainer);
-        Assertions.assertSame(dataBox, retrievedContainer.dataBox);
+        Assertions.assertEquals(dataBox, retrievedContainer.dataBox);
     }
 
     private static UUID insertDataBoxContainer(DataBox<?> dataBox) {
@@ -107,7 +107,7 @@ public class DataBoxCodecTest {
             assertContainerCount(inserted);
             DataBoxContainer retrievedContainer = CONTAINER_COLLECTION.get(id);
             Assertions.assertNotNull(retrievedContainer);
-            Assertions.assertSame(dataBox, retrievedContainer.dataBox);
+            Assertions.assertEquals(dataBox, retrievedContainer.dataBox);
         }
     }
 

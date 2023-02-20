@@ -50,20 +50,22 @@ public class DataBoxCodec implements Codec<DataBox<?>> {
     @SuppressWarnings("unchecked")
     private void encodeValue(BsonWriter writer, DataBox<?> box, EncoderContext encoderContext) {
         DataType<?> type = box.type();
-        Encoder<?> encoder;
-        Object toEncode;
         if (type instanceof ListDataType<?> listType) {
-            encoder = ((Parameterizable) new CollectionCodecProvider().get(listType.clazz(), this.registry))
+            var encoder = ((Parameterizable) new CollectionCodecProvider().get(listType.clazz(), this.registry))
                 .parameterize(this.registry, List.of(listType.contains().clazz()));
-            toEncode = box.value();
+            encoderContext.encodeWithChildContext((Encoder<Object>) encoder, writer, box.value());
         } else if (type instanceof OptionalDataType<?> optType) {
-            encoder = this.registry.get(optType.contains().clazz());
-            toEncode = ((Optional<?>) box.value()).orElse(null);
+            writer.writeStartDocument();
+            writer.writeName("present");
+            ((Optional<?>) box.value()).ifPresentOrElse(value -> {
+                writer.writeBoolean(true);
+                writer.writeName("value");
+                encoderContext.encodeWithChildContext((Encoder<Object>) this.registry.get(optType.contains().clazz()), writer, value);
+            }, () -> writer.writeBoolean(false));
+            writer.writeEndDocument();
         } else {
-            encoder = this.registry.get(type.clazz());
-            toEncode = box.value();
+            encoderContext.encodeWithChildContext((Encoder<Object>) this.registry.get(type.clazz()), writer, box.value());
         }
-        encoderContext.encodeWithChildContext((Encoder<Object>) encoder, writer, toEncode);
     }
 
     @SuppressWarnings("unchecked")
@@ -74,7 +76,18 @@ public class DataBoxCodec implements Codec<DataBox<?>> {
             return ((DataType<T>) type).create((T) decoderContext.decodeWithChildContext(codec, reader));
         } else if (type instanceof OptionalDataType<?> optType) {
             var codec = this.registry.get(optType.contains().clazz());
-            return ((DataType<Optional<T>>) type).create(Optional.ofNullable((T) decoderContext.decodeWithChildContext(codec, reader)));
+            reader.readStartDocument();
+            reader.readName("present");
+            boolean isPresent = reader.readBoolean();
+            DataBox<?> result;
+            if (isPresent) {
+                reader.readName("value");
+                result = ((DataType<Optional<T>>) type).create(Optional.ofNullable((T) decoderContext.decodeWithChildContext(codec, reader)));
+            } else {
+                result = ((DataType<Optional<T>>) type).create(Optional.empty());
+            }
+            reader.readEndDocument();
+            return result;
         } else {
             var codec = this.registry.get(type.clazz());
             return ((DataType<T>) type).create((T) decoderContext.decodeWithChildContext(codec, reader));
