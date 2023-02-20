@@ -31,7 +31,9 @@ public class DataBoxCodec implements Codec<DataBox<?>> {
         reader.readName("type");
         DataType<?> type = decoderContext.decodeWithChildContext(this.registry.get(DataType.class), reader);
         reader.readName("value");
-        return this.decodeValue(reader, type, decoderContext);
+        var value = this.decodeValue(reader, type, decoderContext);
+        reader.readEndDocument();
+        return value;
     }
 
     @SuppressWarnings("unchecked")
