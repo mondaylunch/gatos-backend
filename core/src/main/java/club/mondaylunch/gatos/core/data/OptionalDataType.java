@@ -16,7 +16,7 @@ public final class OptionalDataType<T> extends DataType<Optional<T>> {
     }
 
     /**
-     * Creates the name for the optional type that holds a given type
+     * Creates the name for the optional type that holds a given type.
      * @param type  the type
      * @return      the name of an optional type for the type
      */
@@ -25,7 +25,7 @@ public final class OptionalDataType<T> extends DataType<Optional<T>> {
     }
 
     /**
-     * Gets the datatype this datatype is specialised for
+     * Gets the datatype this datatype is specialised for.
      * @return the datatype held by optionals of this type
      */
     public DataType<T> contains() {

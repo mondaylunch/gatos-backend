@@ -10,13 +10,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import club.mondaylunch.gatos.core.data.DataBox;
+import org.jetbrains.annotations.Unmodifiable;
+
 import club.mondaylunch.gatos.core.data.Conversions;
+import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.type.NodeCategory;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
-import org.jetbrains.annotations.Unmodifiable;
 
 /**
  * Handles execution of a {@link club.mondaylunch.gatos.core.graph.Graph flow

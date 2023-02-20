@@ -16,7 +16,7 @@ public final class ListDataType<T> extends DataType<List<T>> {
     }
 
     /**
-     * Creates the name for the list type that holds a given type
+     * Creates the name for the list type that holds a given type.
      * @param type  the type
      * @return      the name of a list type for the type
      */
@@ -25,7 +25,7 @@ public final class ListDataType<T> extends DataType<List<T>> {
     }
 
     /**
-     * Gets the datatype this datatype is specialised for
+     * Gets the datatype this datatype is specialised for.
      * @return the datatype held by lists of this type
      */
     public DataType<T> contains() {

@@ -14,10 +14,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.UnaryOperator;
 
-import club.mondaylunch.gatos.core.codec.SerializationUtils;
-import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
-import club.mondaylunch.gatos.core.graph.type.NodeCategory;
-import club.mondaylunch.gatos.core.graph.type.NodeType;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
 import org.bson.codecs.Codec;
@@ -25,6 +21,11 @@ import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.jetbrains.annotations.Nullable;
+
+import club.mondaylunch.gatos.core.codec.SerializationUtils;
+import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
+import club.mondaylunch.gatos.core.graph.type.NodeCategory;
+import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 /**
  * A flow graph.
