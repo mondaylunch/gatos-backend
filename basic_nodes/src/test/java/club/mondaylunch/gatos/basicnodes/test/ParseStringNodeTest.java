@@ -48,4 +48,13 @@ public class ParseStringNodeTest {
         output = (int) BasicNodes.PARSE_STRING.compute(input, Map.of()).get("output").join().value();
         Assertions.assertEquals(11, output);
     }
+
+    @Test
+    public void correctlyParsesCommaSeperatedInt() {
+        Map<String, DataBox<?>> input = Map.of(
+            "input", DataType.STRING.create("11,111")
+        );
+        int output = (int) BasicNodes.PARSE_STRING.compute(input, Map.of()).get("output").join().value();
+        Assertions.assertEquals(11111, output);
+    }
 }
