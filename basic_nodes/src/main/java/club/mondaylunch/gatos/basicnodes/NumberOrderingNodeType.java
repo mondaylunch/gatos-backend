@@ -12,7 +12,7 @@ import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 public class NumberOrderingNodeType extends NodeType.Process {
 
-    private static final DataType<Mode> NUMBER_ORDERING_MODE = DataType.register("number_ordering_type");
+    public static final DataType<Mode> NUMBER_ORDERING_MODE = DataType.register("number_ordering_type");
 
     @Override
     public Map<String, DataBox<?>> settings() {
