@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
 import club.mondaylunch.gatos.core.data.DataBox;
-import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.data.ListDataType;
 import club.mondaylunch.gatos.core.graph.Node;
 
 public class ListLengthNodeTest {
@@ -34,7 +34,7 @@ public class ListLengthNodeTest {
     @Test
     public void correctlyEvaluatesEmptyArrayListsLength() {
         Map<String, DataBox<?>> inputWithArrayList = Map.of(
-            "input", DataType.LIST.create(TEST_EMPTY_ARRAY_LIST)
+            "input", ListDataType.GENERIC_LIST.create(TEST_EMPTY_ARRAY_LIST)
         );
         var outputWithArrayList = BasicNodes.LIST_LENGTH.compute(inputWithArrayList, Map.of());
         Assertions.assertEquals(0.0, outputWithArrayList.get("output").join().value());
@@ -43,7 +43,7 @@ public class ListLengthNodeTest {
     @Test
     public void correctlyEvaluatesEmptyLinkedListsLength() {
         Map<String, DataBox<?>> inputWithLinkedList = Map.of(
-            "input", DataType.LIST.create(TEST_EMPTY_LINKED_LIST)
+            "input", ListDataType.GENERIC_LIST.create(TEST_EMPTY_LINKED_LIST)
         );
         var outputWithLinkedList = BasicNodes.LIST_LENGTH.compute(inputWithLinkedList, Map.of());
         Assertions.assertEquals(0.0, outputWithLinkedList.get("output").join().value());
@@ -58,7 +58,7 @@ public class ListLengthNodeTest {
         }
 
         Map<String, DataBox<?>> inputWithArrayList = Map.of(
-            "input", DataType.LIST.create(testArrayList)
+            "input", ListDataType.GENERIC_LIST.create(testArrayList)
         );
         var outputWithArrayList = BasicNodes.LIST_LENGTH.compute(inputWithArrayList, Map.of());
         Assertions.assertEquals(10.0, outputWithArrayList.get("output").join().value());
@@ -68,7 +68,7 @@ public class ListLengthNodeTest {
     public void correctlyEvaluatesNonEmptyLinkedListsLength() {
         List<String> testLinkedList = new LinkedList<>();
         Map<String, DataBox<?>> inputWithLinkedList = Map.of(
-            "input", DataType.LIST.create(testLinkedList)
+            "input", ListDataType.GENERIC_LIST.create(testLinkedList)
         );
         for (int i = 0; i < 10; i++) {
             testLinkedList.add("test");
