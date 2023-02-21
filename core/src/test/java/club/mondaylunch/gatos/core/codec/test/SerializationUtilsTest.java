@@ -57,27 +57,23 @@ public class SerializationUtilsTest {
         JSONAssert.assertEquals(expectedJson, actualJson, JSONCompareMode.NON_EXTENSIBLE);
     }
 
-    private static Node createNode(NodeType type, UUID id) {
-        try {
-            Constructor<Node> nodeConstructor = Node.class.getDeclaredConstructor(
-                UUID.class,
-                NodeType.class,
-                Map.class,
-                Set.class,
-                Set.class
-            );
-            nodeConstructor.setAccessible(true);
-            var defaultSettings = type.settings();
-            return nodeConstructor.newInstance(
-                id,
-                type,
-                defaultSettings,
-                NodeType.inputsOrEmpty(type, id, defaultSettings),
-                NodeType.outputsOrEmpty(type, id, defaultSettings)
-            );
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    private static Node createNode(NodeType type, UUID id) throws Exception {
+        Constructor<Node> nodeConstructor = Node.class.getDeclaredConstructor(
+            UUID.class,
+            NodeType.class,
+            Map.class,
+            Set.class,
+            Set.class
+        );
+        nodeConstructor.setAccessible(true);
+        var defaultSettings = type.settings();
+        return nodeConstructor.newInstance(
+            id,
+            type,
+            defaultSettings,
+            NodeType.inputsOrEmpty(type, id, defaultSettings),
+            NodeType.outputsOrEmpty(type, id, defaultSettings)
+        );
     }
 
     @SuppressWarnings("SameParameterValue")
