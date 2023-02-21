@@ -17,7 +17,9 @@ import club.mondaylunch.gatos.core.graph.Node;
 
 public class NumberOrderingNodeTest {
     private static final DataBox<Double> LOW = DataType.NUMBER.create( (double) -9999999);
+    private static final DataBox<Double> DCL = DataType.NUMBER.create( (double) -0.9999999);
     private static final DataBox<Double> MED = DataType.NUMBER.create( (double) 0);
+    private static final DataBox<Double> DCH = DataType.NUMBER.create( (double) 0.9999999);
     private static final DataBox<Double> HIGH = DataType.NUMBER.create( (double) 9999999);
 
     private static final Node GT    = Node.create(BasicNodes.NUMBER_ORDERING).modifySetting("mode", NumberOrderingNodeType.NUMBER_ORDERING_MODE.create(NumberOrderingNodeType.Mode.GREATERTHAN));
@@ -60,6 +62,12 @@ public class NumberOrderingNodeTest {
             "inputB", HIGH
         );        
         assertFalse((boolean) BasicNodes.NUMBER_ORDERING.compute(inputs, GT.settings()).get("output").join().value());
+        
+        inputs = Map.of(
+            "inputA", LOW,
+            "inputB", DCL
+        );        
+        assertFalse((boolean) BasicNodes.NUMBER_ORDERING.compute(inputs, GT.settings()).get("output").join().value());
     }
 
     @Test
@@ -73,6 +81,18 @@ public class NumberOrderingNodeTest {
         inputs = Map.of(
             "inputA", LOW,
             "inputB", HIGH
+        );        
+        assertTrue((boolean) BasicNodes.NUMBER_ORDERING.compute(inputs, LT.settings()).get("output").join().value());
+
+        inputs = Map.of(
+            "inputA", DCL,
+            "inputB", HIGH
+        );        
+        assertTrue((boolean) BasicNodes.NUMBER_ORDERING.compute(inputs, LT.settings()).get("output").join().value());
+
+        inputs = Map.of(
+            "inputA", MED,
+            "inputB", DCH
         );        
         assertTrue((boolean) BasicNodes.NUMBER_ORDERING.compute(inputs, LT.settings()).get("output").join().value());
     }
@@ -96,6 +116,12 @@ public class NumberOrderingNodeTest {
             "inputB", MED
         );        
         assertTrue((boolean) BasicNodes.NUMBER_ORDERING.compute(inputs, GTEQ.settings()).get("output").join().value());
+
+        inputs = Map.of(
+            "inputA", DCH,
+            "inputB", DCH
+        );        
+        assertTrue((boolean) BasicNodes.NUMBER_ORDERING.compute(inputs, GTEQ.settings()).get("output").join().value());
     }
 
     @Test
@@ -117,5 +143,11 @@ public class NumberOrderingNodeTest {
             "inputB", MED
         );        
         assertTrue((boolean) BasicNodes.NUMBER_ORDERING.compute(inputs, LTEQ.settings()).get("output").join().value());
+
+        inputs = Map.of(
+            "inputA", DCL,
+            "inputB", DCL
+        );        
+        assertTrue((boolean) BasicNodes.NUMBER_ORDERING.compute(inputs, GTEQ.settings()).get("output").join().value());
     }
 }
