@@ -31,18 +31,16 @@ public class ParseStringNodeType extends NodeType.Process {
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
         var inputString = DataBox.get(inputs, "input", DataType.STRING).orElse("");
-        int result = 0;
+        double result = 0;
         if(inputString.contains(",")) {
             var groups = inputString.split(",");
             var j = groups.length - 1;
-            for(int i = 0; i <= j; i++) result += Integer.parseInt(groups[j - i]) * Math.pow(10, i*3);
+            for(int i = 0; i <= j; i++) result += Double.parseDouble(groups[j - i]) * Math.pow(10, i*3);
         }
-        else result = Integer.parseInt(inputString);
+        else result = Double.parseDouble(inputString);
         
         return Map.of(
-            "output", CompletableFuture.completedFuture(DataType.INTEGER.create(
-                result
-            ))
+            "output", CompletableFuture.completedFuture(DataType.INTEGER.create((int) result))
         );
     }
 }
