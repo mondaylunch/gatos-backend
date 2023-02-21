@@ -1,24 +1,45 @@
 {
   "_id": "269e8442-05b9-4981-a9cb-c780a42cba30",
   "name": "Test Flow",
-  "description": "",
+  "description": "This is a test flow",
   "author_id": "166d8840-322d-4d9e-9967-cb5be6d49af2",
   "graph": {
     "nodes": [
       {
         "id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
         "type": "test_start",
-        "settings": {}
+        "settings": {
+          "setting": {
+            "type": "number",
+            "value": 0.0
+          }
+        }
       },
       {
         "id": "6f8de627-706d-4817-8921-73bff23006a8",
         "type": "test_process",
-        "settings": {}
+        "settings": {
+          "setting": {
+            "type": "list$number",
+            "value": [
+              20.0,
+              3.0
+            ]
+          }
+        }
       },
       {
         "id": "b15f484f-4345-4f30-9162-5210b4ff1433",
         "type": "test_end",
-        "settings": {}
+        "settings": {
+          "setting": {
+            "type": "optional$number",
+            "value": {
+              "present": true,
+              "value": 1.5
+            }
+          }
+        }
       }
     ],
     "connections": [
@@ -26,24 +47,24 @@
         "output": {
           "nodeId": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
           "name": "start_output",
-          "type": "integer"
+          "type": "number"
         },
         "input": {
           "nodeId": "6f8de627-706d-4817-8921-73bff23006a8",
           "name": "process_input",
-          "type": "integer"
+          "type": "number"
         }
       },
       {
         "output": {
           "nodeId": "6f8de627-706d-4817-8921-73bff23006a8",
           "name": "process_output",
-          "type": "integer"
+          "type": "number"
         },
         "input": {
           "nodeId": "b15f484f-4345-4f30-9162-5210b4ff1433",
           "name": "end_input",
-          "type": "integer"
+          "type": "number"
         }
       }
     ],

@@ -30,6 +30,7 @@ public class SerializationUtilsTest {
         UUID id = UUID.fromString("269e8442-05b9-4981-a9cb-c780a42cba30");
         UUID authorId = UUID.fromString("166d8840-322d-4d9e-9967-cb5be6d49af2");
         Flow flow = new Flow(id, "Test Flow", authorId);
+        flow.setDescription("This is a test flow");
 
         UUID startId = UUID.fromString("9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd");
         Node start = createNode(TestNodeTypes.START, startId);
@@ -52,6 +53,7 @@ public class SerializationUtilsTest {
 
         String expectedJson = readString("test-flow.json");
         String actualJson = SerializationUtils.toJson(flow);
+        System.out.println(actualJson);
         JSONAssert.assertEquals(expectedJson, actualJson, JSONCompareMode.NON_EXTENSIBLE);
     }
 
