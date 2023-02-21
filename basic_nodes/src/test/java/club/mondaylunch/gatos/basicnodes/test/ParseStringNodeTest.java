@@ -39,13 +39,13 @@ public class ParseStringNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.STRING.create("1")
         );
-        int output = (int) BasicNodes.PARSE_STRING.compute(input, Map.of()).get("output").join().value();
+        double output = (double) BasicNodes.PARSE_STRING.compute(input, Map.of()).get("output").join().value();
         Assertions.assertEquals(1, output);
         
         input = Map.of(
             "input", DataType.STRING.create("11")
         );
-        output = (int) BasicNodes.PARSE_STRING.compute(input, Map.of()).get("output").join().value();
+        output = (double) BasicNodes.PARSE_STRING.compute(input, Map.of()).get("output").join().value();
         Assertions.assertEquals(11, output);
     }
 
@@ -54,7 +54,7 @@ public class ParseStringNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.STRING.create("11,111")
         );
-        int output = (int) BasicNodes.PARSE_STRING.compute(input, Map.of()).get("output").join().value();
+        double output = (double) BasicNodes.PARSE_STRING.compute(input, Map.of()).get("output").join().value();
         Assertions.assertEquals(11111, output);
     }
 }

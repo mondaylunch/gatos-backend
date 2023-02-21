@@ -25,7 +25,7 @@ public class ParseStringNodeType extends NodeType.Process {
     @Override
     public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
         return Set.of(
-            new NodeConnector.Output<>(nodeId, "output", DataType.INTEGER));
+            new NodeConnector.Output<>(nodeId, "output", DataType.NUMBER));
     }
 
     @Override
@@ -40,7 +40,7 @@ public class ParseStringNodeType extends NodeType.Process {
         else result = Double.parseDouble(inputString);
         
         return Map.of(
-            "output", CompletableFuture.completedFuture(DataType.INTEGER.create((int) result))
+            "output", CompletableFuture.completedFuture(DataType.NUMBER.create(result))
         );
     }
 }
