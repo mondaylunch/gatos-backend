@@ -15,4 +15,6 @@ public final class BasicNodes {
         .register("string_contains", new StringContainsNodeType());
     public static final StringConcatNodeType STRING_CONCAT = NodeType.REGISTRY
         .register("string_concat", new StringConcatNodeType());
+    public static final NumberOrderingNodeType NUMBER_ORDERING = NodeType.REGISTRY
+        .register("number_ordering", new NumberOrderingNodeType());
 }
