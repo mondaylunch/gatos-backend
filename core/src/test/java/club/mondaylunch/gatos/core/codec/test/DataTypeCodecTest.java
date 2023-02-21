@@ -35,13 +35,13 @@ public class DataTypeCodecTest {
 
     @Test
     public void canInsertDataTypeContainer() {
-        assertInsertDataTypeContainers(DataType.INTEGER);
+        assertInsertDataTypeContainers(DataType.NUMBER);
     }
 
     @Test
     public void canInsertMultipleDataTypeContainers() {
         assertInsertDataTypeContainers(
-            DataType.INTEGER,
+            DataType.NUMBER,
             DataType.BOOLEAN,
             DataType.STRING
         );
@@ -50,10 +50,10 @@ public class DataTypeCodecTest {
     @Test
     public void canInsertDataTypeContainersWithDuplicates() {
         assertInsertDataTypeContainers(
-            DataType.INTEGER,
+            DataType.NUMBER,
             DataType.BOOLEAN,
             DataType.STRING,
-            DataType.INTEGER,
+            DataType.NUMBER,
             DataType.BOOLEAN,
             DataType.STRING
         );
@@ -62,7 +62,7 @@ public class DataTypeCodecTest {
     @Test
     public void canInsertNestedContainer() {
         UUID id = UUID.randomUUID();
-        DataType<?> dataType = DataType.INTEGER;
+        DataType<?> dataType = DataType.NUMBER;
         DataTypeContainer container = new DataTypeContainer(UUID.randomUUID(), dataType);
         DataTypeContainerContainer containerContainer = new DataTypeContainerContainer(id, container);
         CONTAINER_CONTAINER_COLLECTION.insert(containerContainer);

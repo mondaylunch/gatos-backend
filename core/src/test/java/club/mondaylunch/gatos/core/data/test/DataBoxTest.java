@@ -12,14 +12,14 @@ import club.mondaylunch.gatos.core.data.DataType;
 public class DataBoxTest {
     @Test
     public void canCreateDataBox() {
-        var box = DataType.INTEGER.create(5);
+        var box = DataType.NUMBER.create(5.);
         Assertions.assertEquals(5, box.value());
     }
 
     @Test
     public void canMakeNewBoxWithValue() {
-        var box = DataType.INTEGER.create(5);
-        var newBox = box.withValue(10);
+        var box = DataType.NUMBER.create(5.);
+        var newBox = box.withValue(10.);
         Assertions.assertEquals(10, newBox.value());
         Assertions.assertEquals(5, box.value());
     }
@@ -27,9 +27,9 @@ public class DataBoxTest {
     @Test
     public void canGetValueFromMap() {
         Map<String, DataBox<?>> boxes = new HashMap<>();
-        boxes.put("my_int", DataType.INTEGER.create(10));
+        boxes.put("my_num", DataType.NUMBER.create(10.));
 
-        var box = DataBox.get(boxes, "my_int", DataType.INTEGER);
+        var box = DataBox.get(boxes, "my_num", DataType.NUMBER);
         Assertions.assertTrue(box.isPresent());
         Assertions.assertEquals(10, box.get());
     }
@@ -38,7 +38,7 @@ public class DataBoxTest {
     public void missingValueFromMapGivesEmpty() {
         Map<String, DataBox<?>> boxes = new HashMap<>();
 
-        var box = DataBox.get(boxes, "my_int", DataType.INTEGER);
+        var box = DataBox.get(boxes, "my_num", DataType.NUMBER);
         Assertions.assertFalse(box.isPresent());
     }
 
@@ -47,7 +47,7 @@ public class DataBoxTest {
         Map<String, DataBox<?>> boxes = new HashMap<>();
         boxes.put("my_int", DataType.BOOLEAN.create(false)); // lies!!!
 
-        var box = DataBox.get(boxes, "my_int", DataType.INTEGER);
+        var box = DataBox.get(boxes, "my_num", DataType.NUMBER);
         Assertions.assertFalse(box.isPresent());
     }
 }
