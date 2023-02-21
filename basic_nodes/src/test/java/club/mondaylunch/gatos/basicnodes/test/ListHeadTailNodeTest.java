@@ -4,13 +4,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.data.ListDataType;
 import club.mondaylunch.gatos.core.graph.Node;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 public class ListHeadTailNodeTest {
     private static final List<Number> TEST_NUM_LIST = List.of(0, 0, 1.765, 6.969, 4.20F);
