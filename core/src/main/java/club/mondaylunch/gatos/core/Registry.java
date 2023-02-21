@@ -8,7 +8,7 @@ import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 
 public class Registry<T> {
-    public static final RegistryRegistry REGISTRIES = new RegistryRegistry();
+    public static final Registry<Registry<?>> REGISTRIES = new Registry<>(Registry.class);
     private final Map<String, T> map = new HashMap<>();
     private final Map<T, String> reverseMap = new HashMap<>();
     private final Class<? super T> clazz;
@@ -101,36 +101,16 @@ public class Registry<T> {
     }
 
     /**
-     * A registry that holds registries, that also allows lookup by class.
+     * Find a registry that holds values of a given class.
+     * @param clazz the class
+     * @param <T>   the type
+     * @return      a registry that holds the type given, or empty
      */
-    public static class RegistryRegistry extends Registry<Registry<?>> {
-        private final Map<Class<?>, Registry<?>> registriesByClass = new HashMap<>();
-
-        private RegistryRegistry() {
-            super(Registry.class);
-        }
-
-        @Override
-        public <E extends Registry<?>> E register(@NotNull String name, @NotNull E value) {
-            this.registriesByClass.put(value.getClazz(), value);
-            return super.register(name, value);
-        }
-
-        @Override
-        public void clear() {
-            super.clear();
-            this.registriesByClass.clear();
-        }
-
-        /**
-         * Gets a registry by the class of the objects it holds.
-         * @param clazz the class held by the wanted registry
-         * @param <E>   the type held by the wanted registry
-         * @return      the registry that holds objects of the given class
-         */
-        @SuppressWarnings("unchecked")
-        public <E> Optional<Registry<E>> getByClass(Class<E> clazz) {
-            return Optional.ofNullable((Registry<E>) this.registriesByClass.get(clazz));
-        }
+    @SuppressWarnings("unchecked")
+    public static <T, R> Optional<Registry<R>> getRegistryByClass(Class<T> clazz) {
+        return REGISTRIES.getValues().stream()
+            .filter(r -> r.getClazz().isAssignableFrom(clazz))
+            .map(r -> (Registry<R>) r)
+            .findAny();
     }
 }

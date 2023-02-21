@@ -33,13 +33,13 @@ public class StringLengthNodeTest {
             "input", DataType.STRING.create(TEST_STR)
         );
         var output = BasicNodes.STRING_LENGTH.compute(input, Map.of());
-        Assertions.assertEquals(output.get("output").join().value(), 44);
+        Assertions.assertEquals(44.0, output.get("output").join().value());
     }
 
     @Test
     public void correctlyBehavesForIncorrectInputs() {
         Map<String, DataBox<?>> input0 = Map.of();
         var output0 = BasicNodes.STRING_LENGTH.compute(input0, Map.of());
-        Assertions.assertEquals(output0.get("output").join().value(), 0);
+        Assertions.assertEquals(0.0, output0.get("output").join().value());
     }
 }
