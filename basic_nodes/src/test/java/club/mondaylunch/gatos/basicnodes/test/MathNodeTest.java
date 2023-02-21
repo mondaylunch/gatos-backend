@@ -26,6 +26,21 @@ public class MathNodeTest {
     }
 
     @Test
+    public void areInputsCorrect() {
+        var node = Node.create(BasicNodes.MATH);
+        Assertions.assertEquals(2, node.inputs().size());
+        Assertions.assertTrue(node.inputs().containsKey("inputA"));
+        Assertions.assertTrue(node.inputs().containsKey("inputB"));
+    }
+
+    @Test
+    public void areOutputsCorrect() {
+        var node = Node.create(BasicNodes.MATH);
+        Assertions.assertEquals(1, node.getOutputs().size());
+        Assertions.assertTrue(node.getOutputs().containsKey("output"));
+    }
+
+    @Test
     public void integerAddition() {        
         Map<String, DataBox<?>> inputs = Map.of(
                 "inputA", DataType.INTEGER.create(10),
