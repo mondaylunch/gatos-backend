@@ -13,16 +13,23 @@ import club.mondaylunch.gatos.core.graph.Node;
 public class ParseStringNodeTest {
 
     @Test
+    public void canAddNodeToGraph() {
+        var graph = new Graph();
+        var node = graph.addNode(BasicNodes.PARSE_STRING);
+        Assertions.assertTrue(graph.containsNode(node));
+    }
+
+    @Test
     public void areInputsCorrect() {
         var node = Node.create(BasicNodes.PARSE_STRING);
-        Assertions.assertEquals(1, node.inputs().size());
+        Assertions.assertEquals(node.inputs().size(), 1);
         Assertions.assertTrue(node.inputs().containsKey("input"));
     }
 
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.STRING_LENGTH);
-        Assertions.assertEquals(1, node.getOutputs().size());
+        Assertions.assertEquals(node.getOutputs().size(), 1);
         Assertions.assertTrue(node.getOutputs().containsKey("output"));
     }
 
@@ -31,7 +38,19 @@ public class ParseStringNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.STRING.create("1")
         );
-        var output = BasicNodes.STRING_LENGTH.compute(input, Map.of());
-        Assertions.assertEquals(output.get("output").join().value(), 1);
+        int output = (int) BasicNodes.STRING_LENGTH.compute(input, Map.of()).get("output").join().value();
+        Assertions.assertEquals(1, output);
+        
+        input = Map.of(
+            "input", DataType.STRING.create("11")
+        );
+        output =BasicNodes.STRING_LENGTH.compute(input, Map.of()).get("output").join().value();
+        Assertions.assertEquals(11, output);
+
+        input = Map.of(
+            "input", DataType.STRING.create("11,111")
+        );
+        output = BasicNodes.STRING_LENGTH.compute(input, Map.of()).get("output").join().value();
+        Assertions.assertEquals(11111, output);
     }
 }
