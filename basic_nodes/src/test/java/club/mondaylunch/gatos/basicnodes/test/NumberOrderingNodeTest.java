@@ -16,9 +16,9 @@ import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.Node;
 
 public class NumberOrderingNodeTest {
-    private static final DataBox<Integer> LOW = DataType.INTEGER.create(-9999999);
-    private static final DataBox<Integer> MED = DataType.INTEGER.create(0);
-    private static final DataBox<Integer> HIGH = DataType.INTEGER.create(9999999);
+    private static final DataBox<Double> LOW = DataType.NUMBER.create( (double) -9999999);
+    private static final DataBox<Double> MED = DataType.NUMBER.create( (double) 0);
+    private static final DataBox<Double> HIGH = DataType.NUMBER.create( (double) 9999999);
 
     private static final Node GT    = Node.create(BasicNodes.NUMBER_ORDERING).modifySetting("mode", NumberOrderingNodeType.NUMBER_ORDERING_MODE.create(NumberOrderingNodeType.Mode.GREATERTHAN));
     private static final Node LT    = Node.create(BasicNodes.NUMBER_ORDERING).modifySetting("mode", NumberOrderingNodeType.NUMBER_ORDERING_MODE.create(NumberOrderingNodeType.Mode.LESSTHAN));
