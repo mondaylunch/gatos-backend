@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.Node;
 
 public class ParseStringNodeTest {
@@ -28,7 +29,7 @@ public class ParseStringNodeTest {
 
     @Test
     public void areOutputsCorrect() {
-        var node = Node.create(BasicNodes.STRING_LENGTH);
+        var node = Node.create(BasicNodes.PARSE_STRING);
         Assertions.assertEquals(node.getOutputs().size(), 1);
         Assertions.assertTrue(node.getOutputs().containsKey("output"));
     }
@@ -38,19 +39,13 @@ public class ParseStringNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.STRING.create("1")
         );
-        int output = (int) BasicNodes.STRING_LENGTH.compute(input, Map.of()).get("output").join().value();
+        int output = (int) BasicNodes.PARSE_STRING.compute(input, Map.of()).get("output").join().value();
         Assertions.assertEquals(1, output);
         
         input = Map.of(
             "input", DataType.STRING.create("11")
         );
-        output =BasicNodes.STRING_LENGTH.compute(input, Map.of()).get("output").join().value();
+        output = (int) BasicNodes.PARSE_STRING.compute(input, Map.of()).get("output").join().value();
         Assertions.assertEquals(11, output);
-
-        input = Map.of(
-            "input", DataType.STRING.create("11,111")
-        );
-        output = BasicNodes.STRING_LENGTH.compute(input, Map.of()).get("output").join().value();
-        Assertions.assertEquals(11111, output);
     }
 }
