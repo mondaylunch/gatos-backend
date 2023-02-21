@@ -12,7 +12,6 @@ import java.util.function.ToIntFunction;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import club.mondaylunch.gatos.core.data.DataType;
@@ -52,15 +51,6 @@ public class RegexNodeType extends NodeType.Process {
             new NodeConnector.Input<>(nodeId, "word",   DataType.STRING)
         );
     }
-
-    /*@Override
-    public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings) {
-        return Set.of(
-            new NodeConnector.Output<>(nodeId, "isMatch",   DataType.BOOLEAN),
-            new NodeConnector.Output<>(nodeId, "match",     DataType.STRING),
-            new NodeConnector.Output<>(nodeId, "group",     DataType.STRING.listOf())
-        );
-    }*/
 
     @Override
     public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings) {
@@ -118,17 +108,6 @@ public class RegexNodeType extends NodeType.Process {
 
             return mapOut;
         }
-
-        /*AtomicInteger i = new AtomicInteger(0);
-        Map<String, CompletableFuture<DataBox<?>>> dynamicGroupOut = matcher.results().toList().stream().map(
-            match -> {i.getAndIncrement();
-            return Map.of(
-                DataBox.get(inputs, getNameForPlaceholder($ -> i.get(), match), DataType.STRING).orElse(""),
-                CompletableFuture.completedFuture(DataType.STRING.create(match.toString()))
-            );
-            });*/
-
-        
 
         Map<String, CompletableFuture<DataBox<?>>> mapOut = Map.of(
             "isMatch",  CompletableFuture.completedFuture(DataType.BOOLEAN.create(true)),
