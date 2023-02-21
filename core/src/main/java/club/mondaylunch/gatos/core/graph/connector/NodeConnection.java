@@ -3,6 +3,7 @@ package club.mondaylunch.gatos.core.graph.connector;
 import java.util.Optional;
 
 import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.data.Conversions;
 import club.mondaylunch.gatos.core.graph.Node;
 
 /**
@@ -26,13 +27,13 @@ public record NodeConnection<T>(
 
         var from = fromOpt.get();
         var to = toOpt.get();
-        if (!from.type().equals(to.type()) || !from.type().equals(type)) {
+        if (!Conversions.canConvert(from.type(), to.type()) || !to.type().equals(type)) {
             return Optional.empty();
         }
 
         // We know this cast succeeds because of the check above
         // noinspection unchecked
-        var conn = new NodeConnection<T>((NodeConnector.Output<T>) from, (NodeConnector.Input<T>) to);
+        var conn = new NodeConnection<T>(from.withType(type), (NodeConnector.Input<T>) to);
         return Optional.of(conn);
     }
 }

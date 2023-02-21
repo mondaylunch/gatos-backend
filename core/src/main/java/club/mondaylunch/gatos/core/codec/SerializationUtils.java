@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
@@ -96,6 +97,41 @@ public final class SerializationUtils {
             toWrite.put(keyToString.apply(entry.getKey()), entry.getValue());
         }
         context.encodeWithChildContext(parameterizedCodec, writer, toWrite);
+    }
+
+    /**
+     * Writes the start & end points of a BSON document and runs the provided runnable between them.
+     * @param writer    the BSON writer
+     * @param function  the function to run
+     */
+    public static void writeDocument(BsonWriter writer, Runnable function) {
+        writer.writeStartDocument();
+        function.run();
+        writer.writeEndDocument();
+    }
+
+    /**
+     * Reads the start & end points of a BSON document and runs the provided runnable between them.
+     * @param reader    the BSON reader
+     * @param function  the function to run
+     */
+    public static void readDocument(BsonReader reader, Runnable function) {
+        reader.readStartDocument();
+        function.run();
+        reader.readEndDocument();
+    }
+
+    /**
+     * Reads the start & end points of a BSON document and runs the provided function between them.
+     * @param reader    the BSON reader
+     * @param function  the function to run
+     * @return          the result of the function
+     */
+    public static <T> T readDocument(BsonReader reader, Supplier<T> function) {
+        reader.readStartDocument();
+        var res = function.get();
+        reader.readEndDocument();
+        return res;
     }
 
     private SerializationUtils() {}

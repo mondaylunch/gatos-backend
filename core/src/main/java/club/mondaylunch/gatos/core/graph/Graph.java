@@ -331,11 +331,13 @@ public class Graph {
      */
     private static boolean isConnectionValid(Node node, NodeConnection<?> connection) {
         if (connection.from().nodeId().equals(node.id())) {
-            return node.getOutputs().containsValue(connection.from());
+            return node.getOutputWithName(connection.from().name()).map(it ->
+                it.isCompatible(connection.from())
+            ).orElse(false);
         }
 
         if (connection.to().nodeId().equals(node.id())) {
-            return node.inputs().containsValue(connection.to());
+            return node.getInputWithName(connection.to().name()).map(connection.to()::equals).orElse(false);
         }
 
         return false;
