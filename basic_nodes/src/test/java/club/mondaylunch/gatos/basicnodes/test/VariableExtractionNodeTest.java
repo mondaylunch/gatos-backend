@@ -3,31 +3,31 @@ package club.mondaylunch.gatos.basicnodes.test;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
+import club.mondaylunch.gatos.basicnodes.VariableExtractionNodeType;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Node;
 
 public class VariableExtractionNodeTest {
     private static final class TestJSONExtractionClass {
-        private final int testInt = 420;
+        private final double testNumber = 420;
         private final boolean testBoolean = true;
         private final String testString = "tickles";
-        private final Collection<Integer> testCollection = List.of(0, 1, 2, 3);
+        private final Collection<Double> testNumberCollection = List.of(0., 1., 2., 3.);
+        private final Collection<String> testStrCollection = List.of("b", "r", "u", "h");
+        private final Collection<JsonObject> testJsonObjCollection = List.of(new JsonObject(), new JsonObject());
     }
 
     private static final Gson GSON = new Gson();
-    private static final JsonObject TEST_JSON_OBJECT = GSON.fromJson(GSON.toJson(new TestJSONExtractionClass()),
-            JsonObject.class);
+    private static final JsonObject TEST_JSON_OBJECT = GSON.fromJson(GSON.toJson(new TestJSONExtractionClass()), JsonObject.class);
 
     @Test
     public void areInputsCorrect() {
@@ -45,64 +45,101 @@ public class VariableExtractionNodeTest {
     }
 
     @Test
-    public void correctlyExtractsInt() {
+    public void correctlyExtractsNumber() {
+        var node = Node.create(BasicNodes.VARIABLE_EXTRACTION)
+            .modifySetting("output_type", VariableExtractionNodeType.getReturnBoxFromType(DataType.NUMBER));
         Map<String, DataBox<?>> input = Map.of(
-                "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
-                "key", DataType.STRING.create("testInt"));
-        var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, Map.of());
-        Assertions.assertTrue(result.get("output").join().value() instanceof JsonPrimitive json
-                && json.isNumber() && json.getAsInt() == 420);
+            "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
+            "key", DataType.STRING.create("testNumber")
+        );
+        var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, node.settings());
+        Assertions.assertEquals(Optional.of(new TestJSONExtractionClass().testNumber), result.get("output").join().value());
     }
 
     @Test
     public void correctlyExtractsBoolean() {
+        var node = Node.create(BasicNodes.VARIABLE_EXTRACTION)
+            .modifySetting("output_type", VariableExtractionNodeType.getReturnBoxFromType(DataType.BOOLEAN));
         Map<String, DataBox<?>> input = Map.of(
-                "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
-                "key", DataType.STRING.create("testBoolean"));
-        var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, Map.of());
-        Assertions.assertTrue(result.get("output").join().value() instanceof JsonPrimitive json
-                && json.isBoolean() && json.getAsBoolean());
+            "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
+            "key", DataType.STRING.create("testBoolean")
+        );
+        var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, node.settings());
+        Assertions.assertEquals(Optional.of(new TestJSONExtractionClass().testBoolean), result.get("output").join().value());
     }
 
     @Test
     public void correctlyExtractsString() {
+        var node = Node.create(BasicNodes.VARIABLE_EXTRACTION)
+            .modifySetting("output_type", VariableExtractionNodeType.getReturnBoxFromType(DataType.STRING));
         Map<String, DataBox<?>> input = Map.of(
-                "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
-                "key", DataType.STRING.create("testString"));
-        var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, Map.of());
-        Assertions.assertTrue(result.get("output").join().value() instanceof JsonPrimitive json
-                && json.isString() && json.getAsString().equals("tickles"));
+            "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
+            "key", DataType.STRING.create("testString")
+        );
+        var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, node.settings());
+        Assertions.assertEquals(Optional.of(new TestJSONExtractionClass().testString), result.get("output").join().value());
     }
 
     @Test
     public void correctlyExtractsCollection() {
+        var node = Node.create(BasicNodes.VARIABLE_EXTRACTION)
+            .modifySetting("output_type", VariableExtractionNodeType.getReturnBoxFromType(DataType.NUMBER.listOf()));
         Map<String, DataBox<?>> input = Map.of(
-                "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
-                "key", DataType.STRING.create("testCollection"));
-        var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, Map.of());
-        var expectedResult = new JsonArray();
-        for (int i = 0; i < 4; ++i) {
-            expectedResult.add(i);
-        }
-        Assertions.assertEquals(result.get("output").join().value(), expectedResult);
+            "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
+            "key", DataType.STRING.create("testNumberCollection")
+        );
+        var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, node.settings());
+        Assertions.assertEquals(new TestJSONExtractionClass().testNumberCollection, result.get("output").join().value());
+
+        node.modifySetting("output_type", VariableExtractionNodeType.getReturnBoxFromType(DataType.STRING.listOf()));
+        Map<String, DataBox<?>> inputStr = Map.of(
+            "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
+            "key", DataType.STRING.create("testStrCollection")
+        );
+        var resultStr = BasicNodes.VARIABLE_EXTRACTION.compute(inputStr, node.settings());
+        Assertions.assertEquals(new TestJSONExtractionClass().testStrCollection, resultStr.get("output").join().value());
+
+        node.modifySetting("output_type", VariableExtractionNodeType.getReturnBoxFromType(DataType.JSON_OBJECT.listOf()));
+        Map<String, DataBox<?>> inputJson = Map.of(
+            "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
+            "key", DataType.STRING.create("testJsonObjCollection")
+        );
+        var resultJson = BasicNodes.VARIABLE_EXTRACTION.compute(inputJson, node.settings());
+        Assertions.assertEquals(new TestJSONExtractionClass().testJsonObjCollection, resultJson.get("output").join().value());
     }
 
     @Test
-    public void extractMissingValuesAsNull() {
+    public void correctlyExtractsIndividualAsCollection() {
+        var node = Node.create(BasicNodes.VARIABLE_EXTRACTION)
+            .modifySetting("output_type", VariableExtractionNodeType.getReturnBoxFromType(DataType.NUMBER.listOf()));
+        Map<String, DataBox<?>> input = Map.of(
+            "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
+            "key", DataType.STRING.create("testNumber")
+        );
+        var result = BasicNodes.VARIABLE_EXTRACTION.compute(input, node.settings());
+        Assertions.assertEquals(List.of(new TestJSONExtractionClass().testNumber), result.get("output").join().value());
+    }
+
+    @Test
+    public void extractMissingValuesAsEmpty() {
+        var node = Node.create(BasicNodes.VARIABLE_EXTRACTION);
         Map<String, DataBox<?>> input0 = Map.of(
-                "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
-                "key", DataType.STRING.create("notAValidKey"));
-        var result0 = BasicNodes.VARIABLE_EXTRACTION.compute(input0, Map.of());
-        Assertions.assertEquals(result0.get("output").join().value(), JsonNull.INSTANCE);
+            "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
+            "key", DataType.STRING.create("notAValidKey")
+        );
+        var result0 = BasicNodes.VARIABLE_EXTRACTION.compute(input0, node.settings());
+        Assertions.assertEquals(Optional.empty(), result0.get("output").join().value());
 
         Map<String, DataBox<?>> input1 = Map.of(
-                "key", DataType.STRING.create("testInt"));
-        var result1 = BasicNodes.VARIABLE_EXTRACTION.compute(input1, Map.of());
-        Assertions.assertEquals(result1.get("output").join().value(), JsonNull.INSTANCE);
+            "key", DataType.STRING.create("testNumber")
+        );
+        var result1 = BasicNodes.VARIABLE_EXTRACTION.compute(input1, node.settings());
+        Assertions.assertEquals(Optional.empty(), result1.get("output").join().value());
 
         Map<String, DataBox<?>> input2 = Map.of(
-                "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT));
-        var result2 = BasicNodes.VARIABLE_EXTRACTION.compute(input2, Map.of());
-        Assertions.assertEquals(result2.get("output").join().value(), JsonNull.INSTANCE);
+            "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT)
+        );
+        var result2 = BasicNodes.VARIABLE_EXTRACTION.compute(input2, node.settings());
+        Assertions.assertEquals(Optional.empty(), result2.get("output").join().value());
     }
 }
