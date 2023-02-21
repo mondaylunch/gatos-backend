@@ -15,6 +15,7 @@ import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
 
 import club.mondaylunch.gatos.core.codec.ClassModelRegistry;
+import club.mondaylunch.gatos.core.codec.DataBoxCodecProvider;
 import club.mondaylunch.gatos.core.codec.GraphCodecProvider;
 import club.mondaylunch.gatos.core.codec.NodeCodecProvider;
 import club.mondaylunch.gatos.core.codec.NodeConnectionCodecProvider;
@@ -68,7 +69,8 @@ public enum Database {
                 NodeConnectionCodecProvider.INSTANCE,
                 GraphCodecProvider.INSTANCE,
                 NodeCodecProvider.INSTANCE,
-                RegistryObjectCodec.Provider.INSTANCE
+                RegistryObjectCodec.Provider.INSTANCE,
+                DataBoxCodecProvider.INSTANCE
             ),
             ClassModelRegistry.createCodecRegistry(),
             MongoClientSettings.getDefaultCodecRegistry()

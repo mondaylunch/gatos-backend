@@ -46,7 +46,7 @@ public class RegistryObjectCodec<T> implements Codec<T> {
 
         @Override
         public <T> Codec<T> get(Class<T> clazz, CodecRegistry registry) {
-            return Registry.REGISTRIES.getByClass(clazz).map(RegistryObjectCodec::new).orElse(null);
+            return (Codec<T>) Registry.getRegistryByClass(clazz).map(RegistryObjectCodec::new).orElse(null);
         }
     }
 }

@@ -22,7 +22,7 @@ import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 public class VariableExtractionNodeType extends NodeType.Process {
-    private static final DataType<ReturnType> RETURN_DATATYPE = DataType.register("return_type");
+    private static final DataType<ReturnType> RETURN_DATATYPE = DataType.register("return_type", ReturnType.class);
     @Override
     public Map<String, DataBox<?>> settings() {
         return Map.of(
@@ -40,9 +40,7 @@ public class VariableExtractionNodeType extends NodeType.Process {
 
     @Override
     public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
-        var returnDataType = !state.isEmpty()
-            ? ((ReturnType) state.get("output_type").value())
-            : ReturnType.STRING;
+        var returnDataType = DataBox.get(state, "output_type", RETURN_DATATYPE).orElse(ReturnType.STRING);
         return returnDataType.isListType()
             ? Set.of(new NodeConnector.Output<>(nodeId, "output", returnDataType.getDataType()))
             : Set.of(new NodeConnector.Output<>(nodeId, "output", returnDataType.getDataType().optionalOf())
@@ -61,15 +59,15 @@ public class VariableExtractionNodeType extends NodeType.Process {
             );
         }
         return switch (returnType) {
-            case INTEGER -> Map.of("output", CompletableFuture.completedFuture(
-                DataType.INTEGER.optionalOf().create(Optional.of(value.getAsInt()))));
+            case NUMBER -> Map.of("output", CompletableFuture.completedFuture(
+                DataType.NUMBER.optionalOf().create(Optional.of(value.getAsDouble()))));
             case BOOLEAN -> Map.of("output", CompletableFuture.completedFuture(
                 DataType.BOOLEAN.optionalOf().create(Optional.of(value.getAsBoolean()))));
             case STRING -> Map.of("output", CompletableFuture.completedFuture(
                 DataType.STRING.optionalOf().create(Optional.of(value.getAsString()))));
             case JSON_OBJECT -> Map.of("output", CompletableFuture.completedFuture(
                 DataType.JSON_OBJECT.optionalOf().create(Optional.of(value.getAsJsonObject()))));
-            case INTEGER_LIST,
+            case NUMBER_LIST,
                 STRING_LIST,
                 BOOLEAN_LIST,
                 JSON_OBJECT_LIST -> Map.of("output", this.handleListReturn(returnType.getDataType(), value));
@@ -91,7 +89,7 @@ public class VariableExtractionNodeType extends NodeType.Process {
     private Object jsonToReturnableType(JsonElement jsonElement) {
         if (jsonElement instanceof JsonPrimitive prim) {
             if (prim.isNumber()) {
-                return jsonElement.getAsInt();
+                return jsonElement.getAsDouble();
             } else if (prim.isBoolean()) {
                 return jsonElement.getAsBoolean();
             } else if (prim.isString()) {
@@ -102,11 +100,11 @@ public class VariableExtractionNodeType extends NodeType.Process {
     }
 
     private enum ReturnType {
-        INTEGER(DataType.INTEGER),
+        NUMBER(DataType.NUMBER),
         BOOLEAN(DataType.BOOLEAN),
         STRING(DataType.STRING),
         JSON_OBJECT(DataType.JSON_OBJECT),
-        INTEGER_LIST(DataType.INTEGER.listOf()),
+        NUMBER_LIST(DataType.NUMBER.listOf()),
         STRING_LIST(DataType.STRING.listOf()),
         BOOLEAN_LIST(DataType.BOOLEAN.listOf()),
         JSON_OBJECT_LIST(DataType.JSON_OBJECT.listOf());
@@ -120,7 +118,7 @@ public class VariableExtractionNodeType extends NodeType.Process {
         }
 
         public boolean isListType() {
-            return List.of(INTEGER_LIST, STRING_LIST, BOOLEAN_LIST, JSON_OBJECT_LIST).contains(this);
+            return List.of(NUMBER_LIST, STRING_LIST, BOOLEAN_LIST, JSON_OBJECT_LIST).contains(this);
         }
     }
 
