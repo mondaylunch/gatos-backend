@@ -55,4 +55,31 @@ public class ListHeadTailNodeTest {
         Assertions.assertEquals(TEST_NUM_LIST.get(TEST_NUM_LIST.size() - 1), output.get("output_first").join().value());
         Assertions.assertEquals(TEST_NUM_LIST.subList(0, TEST_NUM_LIST.size() - 1), output.get("output_rest").join().value());
     }
+
+    @Test
+    public void correctlyExtractsSizeOneLists() {
+        var node = Node.create(BasicNodes.LIST_HEADTAIL);
+        Map<String, DataBox<?>> input = Map.of(
+            "input", ListDataType.GENERIC_LIST.create(TEST_STR_LIST)
+        );
+        var output = BasicNodes.LIST_HEADTAIL.compute(input, node.settings());
+        Assertions.assertEquals(TEST_STR_LIST.get(0), output.get("output_first").join().value());
+        Assertions.assertEquals(List.of(), output.get("output_rest").join().value());
+
+        node.modifySetting("head_mode", DataType.BOOLEAN.create(false));
+        var output1 = BasicNodes.LIST_HEADTAIL.compute(input, node.settings());
+        Assertions.assertEquals(TEST_STR_LIST.get(0), output1.get("output_first").join().value());
+        Assertions.assertEquals(List.of(), output1.get("output_rest").join().value());
+    }
+
+    @Test
+    public void correctlyReturnsNullForEmptyLists() {
+        var node = Node.create(BasicNodes.LIST_HEADTAIL);
+        Map<String, DataBox<?>> input = Map.of(
+            "input", ListDataType.GENERIC_LIST.create(TEST_EMPTY_LIST)
+        );
+        var output = BasicNodes.LIST_HEADTAIL.compute(input, node.settings());
+        Assertions.assertNull(output.get("output_first").join().value());
+        Assertions.assertNull(output.get("output_rest").join().value());
+    }
 }

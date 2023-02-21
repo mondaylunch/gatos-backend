@@ -45,15 +45,14 @@ public class ListHeadTailNodeType extends NodeType.Process {
             );
         }
         var shouldExtractHead = DataBox.get(settings, "head_mode", DataType.BOOLEAN).orElse(true);
-        var extractionIndex = shouldExtractHead ? 0 : inputList.size() - 1;
+        var lastIndex = inputList.size() - 1;
+        var extractionIndex = shouldExtractHead ? 0 : lastIndex;
+        var subListOffset = shouldExtractHead ? 1 : 0;
         return Map.of(
-            "output_first", CompletableFuture.completedFuture(DataType.ANY.create(inputList.get(extractionIndex))),
-            "output_rest", CompletableFuture.completedFuture(ListDataType.ANY.create(inputList.subList(
-                shouldExtractHead ? 1 : 0,
-                shouldExtractHead ? inputList.size() : inputList.size() - 1)))
+            "output_first", CompletableFuture.completedFuture(DataType.ANY.create(
+                inputList.get(extractionIndex))),
+            "output_rest", CompletableFuture.completedFuture(ListDataType.ANY.create(
+                inputList.subList(subListOffset, lastIndex + subListOffset)))
         );
-        // indexes 0-9
-        // head: 0, [1-9]
-        // tail: 9, [0-8]
     }
 }
