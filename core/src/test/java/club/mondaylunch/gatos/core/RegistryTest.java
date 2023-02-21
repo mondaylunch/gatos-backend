@@ -18,7 +18,7 @@ public class RegistryTest {
     @Test
     public void testRegistryProperlyCreated() {
         Assertions.assertEquals(Foo.class, FOO_REGISTRY.getClazz());
-        Assertions.assertEquals(FOO_REGISTRY, Registry.REGISTRIES.getByClass(Foo.class).orElseThrow());
+        Assertions.assertEquals(FOO_REGISTRY, Registry.getRegistryByClass(Foo.class).orElseThrow());
         Assertions.assertEquals(FOO_REGISTRY, Registry.REGISTRIES.get("foo").orElseThrow());
         Assertions.assertEquals("foo", Registry.REGISTRIES.getName(FOO_REGISTRY).orElse(null));
     }

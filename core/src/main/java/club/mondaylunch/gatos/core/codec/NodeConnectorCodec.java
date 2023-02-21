@@ -28,25 +28,25 @@ public class NodeConnectorCodec implements Codec<NodeConnector<?>> {
     @Override
     public NodeConnector<?> decode(BsonReader reader, DecoderContext decoderContext) {
         Codec<UUID> uuidCodec = this.registry.get(UUID.class);
-        reader.readStartDocument();
-        UUID nodeId = decoderContext.decodeWithChildContext(uuidCodec, reader);
-        String name = reader.readString();
-        DataType<?> dataType = decoderContext.decodeWithChildContext(this.registry.get(DataType.class), reader);
-        reader.readEndDocument();
-        return this.createNodeConnector(nodeId, name, dataType);
+        return SerializationUtils.readDocument(reader, () -> {
+            UUID nodeId = decoderContext.decodeWithChildContext(uuidCodec, reader);
+            String name = reader.readString();
+            DataType<?> dataType = decoderContext.decodeWithChildContext(this.registry.get(DataType.class), reader);
+            return this.createNodeConnector(nodeId, name, dataType);
+        });
     }
 
     @Override
     public void encode(BsonWriter writer, NodeConnector<?> value, EncoderContext encoderContext) {
         Codec<UUID> uuidCodec = this.registry.get(UUID.class);
-        writer.writeStartDocument();
-        writer.writeName("nodeId");
-        encoderContext.encodeWithChildContext(uuidCodec, writer, value.nodeId());
-        writer.writeName("name");
-        writer.writeString(value.name());
-        writer.writeName("type");
-        encoderContext.encodeWithChildContext(this.registry.get(DataType.class), writer, value.type());
-        writer.writeEndDocument();
+        SerializationUtils.writeDocument(writer, () -> {
+            writer.writeName("nodeId");
+            encoderContext.encodeWithChildContext(uuidCodec, writer, value.nodeId());
+            writer.writeName("name");
+            writer.writeString(value.name());
+            writer.writeName("type");
+            encoderContext.encodeWithChildContext(this.registry.get(DataType.class), writer, value.type());
+        });
     }
 
     @SuppressWarnings("unchecked")
