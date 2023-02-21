@@ -57,4 +57,22 @@ public class ParseStringNodeTest {
         double output = (double) BasicNodes.PARSE_STRING.compute(input, Map.of()).get("output").join().value();
         Assertions.assertEquals(11111, output);
     }
+
+    @Test
+    public void correctlyParsesDouble() {
+        Map<String, DataBox<?>> input = Map.of(
+            "input", DataType.STRING.create("11.11")
+        );
+        double output = (double) BasicNodes.PARSE_STRING.compute(input, Map.of()).get("output").join().value();
+        Assertions.assertEquals(11.11, output);
+    }
+
+    @Test
+    public void correctlyParsesCommaSeperatedDouble() {
+        Map<String, DataBox<?>> input = Map.of(
+            "input", DataType.STRING.create("11,111.11")
+        );
+        double output = (double) BasicNodes.PARSE_STRING.compute(input, Map.of()).get("output").join().value();
+        Assertions.assertEquals(11111.11, output);
+    }
 }
