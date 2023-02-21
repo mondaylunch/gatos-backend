@@ -12,7 +12,7 @@ import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 public class MathNodeType extends NodeType.Process {
 
-    public static final DataType<Operator> MATHEMATICAL_OPERATOR = DataType.register("mathematicaloperator");
+    public static final DataType<Operator> MATHEMATICAL_OPERATOR = DataType.register("mathematicaloperator", Operator.class);
 
     @Override
     public Map<String, DataBox<?>> settings() {
@@ -22,27 +22,27 @@ public class MathNodeType extends NodeType.Process {
     @Override
     public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
         return Set.of(
-            new NodeConnector.Input<>(nodeId, "inputA", DataType.INTEGER),
-            new NodeConnector.Input<>(nodeId, "inputB", DataType.INTEGER)
+            new NodeConnector.Input<>(nodeId, "inputA", DataType.NUMBER),
+            new NodeConnector.Input<>(nodeId, "inputB", DataType.NUMBER)
         );
     }
 
     @Override
     public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings) {
         return Set.of(
-            new NodeConnector.Output<>(nodeId, "output", DataType.INTEGER));
+            new NodeConnector.Output<>(nodeId, "output", DataType.NUMBER));
     }
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
-        double a = DataBox.get(inputs, "inputA", DataType.INTEGER).orElseThrow();
-        double b = DataBox.get(inputs, "inputB", DataType.INTEGER).orElseThrow();
+        double a = DataBox.get(inputs, "inputA", DataType.NUMBER).orElseThrow();
+        double b = DataBox.get(inputs, "inputB", DataType.NUMBER).orElseThrow();
 
         Operator op = DataBox.get(settings, "operator", MATHEMATICAL_OPERATOR).orElseThrow();
 
         double result = op.apply(a, b);
 
-        return Map.of("output", CompletableFuture.completedFuture(DataType.INTEGER.create((int) result)));
+        return Map.of("output", CompletableFuture.completedFuture(DataType.NUMBER.create(result)));
     }
 
     public enum Operator {
