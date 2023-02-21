@@ -43,8 +43,8 @@ public class SerializationUtilsTest {
         Graph graph = new Graph(List.of(start, process, end), Map.of(), List.of());
         flow.setGraph(graph);
 
-        var startToProcess = NodeConnection.createConnection(start, "start_output", process, "process_input", DataType.INTEGER);
-        var processToEnd = NodeConnection.createConnection(process, "process_output", end, "end_input", DataType.INTEGER);
+        var startToProcess = NodeConnection.createConnection(start, "start_output", process, "process_input", DataType.NUMBER);
+        var processToEnd = NodeConnection.createConnection(process, "process_output", end, "end_input", DataType.NUMBER);
         graph.addConnection(startToProcess.orElseThrow());
         graph.addConnection(processToEnd.orElseThrow());
 
