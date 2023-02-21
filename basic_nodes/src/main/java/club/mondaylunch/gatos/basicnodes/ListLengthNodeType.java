@@ -29,13 +29,13 @@ public class ListLengthNodeType extends NodeType.Process {
     @Override
     public Set<Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
         return Set.of(
-            new NodeConnector.Output<>(nodeId, "output", DataType.INTEGER));
+            new NodeConnector.Output<>(nodeId, "output", DataType.NUMBER));
     }
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
         var inputList = DataBox.get(inputs, "input", DataType.LIST).orElse(new ArrayList<>());
-        return Map.of("output", CompletableFuture.completedFuture(DataType.INTEGER.create(inputList.size())));
+        return Map.of("output", CompletableFuture.completedFuture(DataType.NUMBER.create((double) inputList.size())));
     }
 
 }
