@@ -60,7 +60,7 @@ public class FlowController {
     }
 
     @PostMapping
-    public Flow addFlow(@RequestHeader("x-auth-token") String token, @Valid @RequestBody BodyAddFlow data) {
+    public BasicFlowInfo addFlow(@RequestHeader("x-auth-token") String token, @Valid @RequestBody BodyAddFlow data) {
         var user = this.userRepository.authenticateUser(token);
 
         Flow flow = new Flow();
@@ -69,7 +69,7 @@ public class FlowController {
         flow.setDescription(data.description);
 
         Flow.objects.insert(flow);
-        return flow;
+        return new BasicFlowInfo(flow);
     }
 
     private record BodyUpdateFlow(
@@ -77,7 +77,7 @@ public class FlowController {
     }
 
     @PatchMapping("{flowId}")
-    public Flow updateFlow(@RequestHeader("x-auth-token") String token, @PathVariable UUID flowId,
+    public BasicFlowInfo updateFlow(@RequestHeader("x-auth-token") String token, @PathVariable UUID flowId,
                            @Valid @RequestBody BodyUpdateFlow data) {
         var user = this.userRepository.authenticateUser(token);
         var flow = this.flowRepository.getFlow(user, flowId);
@@ -86,7 +86,8 @@ public class FlowController {
         partial.setName(data.name);
         partial.setDescription(data.description);
 
-        return Flow.objects.update(flow.getId(), partial);
+        var updated = Flow.objects.update(flow.getId(), partial);
+        return new BasicFlowInfo(updated);
     }
 
     @DeleteMapping("{flowId}")
