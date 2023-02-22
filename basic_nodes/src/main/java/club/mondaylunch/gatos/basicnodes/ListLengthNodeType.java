@@ -22,13 +22,13 @@ public class ListLengthNodeType extends NodeType.Process {
     }
 
     @Override
-    public Set<Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
+    public Set<Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
         return Set.of(
             new NodeConnector.Input<>(nodeId, "input", ListDataType.GENERIC_LIST));
     }
 
     @Override
-    public Set<Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
+    public Set<Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         return Set.of(
             new NodeConnector.Output<>(nodeId, "output", DataType.NUMBER));
     }
