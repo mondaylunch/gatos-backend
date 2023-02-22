@@ -1,8 +1,10 @@
 package club.mondaylunch.gatos.api.controller.test;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.jayway.jsonpath.JsonPath;
@@ -20,8 +22,16 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import club.mondaylunch.gatos.api.BaseMvcTest;
 import club.mondaylunch.gatos.api.helpers.UserCreationHelper;
+import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.graph.Graph;
+import club.mondaylunch.gatos.core.graph.Node;
+import club.mondaylunch.gatos.core.graph.NodeMetadata;
+import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
+import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
+import club.mondaylunch.gatos.core.graph.type.NodeType;
 import club.mondaylunch.gatos.core.models.Flow;
 import club.mondaylunch.gatos.core.models.User;
+import club.mondaylunch.gatos.testshared.graph.type.test.TestNodeTypes;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -71,7 +81,22 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
 
     @Test
     public void canGetSpecificFlow() throws Exception {
-        Flow flow = createFlow(this.user);
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+
+        // List<Node> nodes = new ArrayList<>();
+
+        var start = graph.addNode(TestNodeTypes.START);
+        var process = graph.addNode(TestNodeTypes.PROCESS);
+        var end = graph.addNode(TestNodeTypes.END);
+
+        var startToProcess = NodeConnection.createConnection(start, "start_output", process, "process_input", DataType.NUMBER);
+        var processToEnd = NodeConnection.createConnection(process, "process_output", end, "end_input", DataType.NUMBER);
+        graph.addConnection(startToProcess.orElseThrow());
+        graph.addConnection(processToEnd.orElseThrow());
+
+        graph.modifyMetadata(start.id(), nodeMetadata -> nodeMetadata.withX(1));
+
         Flow.objects.insert(flow);
         ResultActions result = this.mockMvc
             .perform(MockMvcRequestBuilders.get(ENDPOINT + "/" + flow.getId())
@@ -82,6 +107,18 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
             Map.entry("name", flow.getName()),
             Map.entry("author_id", flow.getAuthorId())
         );
+
+        var nodesField = Graph.class.getDeclaredField("nodes");
+        nodesField.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        var nodes = (Map<UUID, Node>) nodesField.get(graph);
+        compareNodes(nodes.values(), result);
+        compareConnections(graph.getConnections(), result);
+        var metaDataField = Graph.class.getDeclaredField("metadataByNode");
+        metaDataField.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        var metadataByNode = (Map<UUID, NodeMetadata>) metaDataField.get(graph);
+        compareMetadataByNode(metadataByNode, result);
     }
 
     /// --- ADD FLOW ---
@@ -322,9 +359,131 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         Assertions.assertEquals(oldFlow.getAuthorId(), newFlow.getAuthorId());
     }
 
-    private static ResultActions compareFlow(Flow flow, int index, ResultActions result) throws Exception {
+    private static ResultActions compareFlow(Flow flow, int index, ResultActions result) {
         return compareFields(objectArrayExpressionPrefix(index), result,
             Map.entry("name", flow.getName()),
             Map.entry("author_id", flow.getAuthorId()));
+    }
+
+    private static <T> void compareUnordered(
+        Collection<T> elements,
+        ResultActions result,
+        UnorderedComparator<T> comparator,
+        String ignoredErrorMessageStart
+    ) {
+        List<Integer> indexes = new ArrayList<>();
+        for (int i = 0; i < elements.size(); i++) {
+            indexes.add(i);
+        }
+        for (var element : elements) {
+            var indexIterator = indexes.listIterator();
+            while (indexIterator.hasNext()) {
+                var index = indexIterator.next();
+                try {
+                    comparator.compare(element, index, result);
+                    indexIterator.remove();
+                    break;
+                } catch (AssertionError e) {
+                    if (!e.getMessage().startsWith(ignoredErrorMessageStart)) {
+                        throw e;
+                    }
+                }
+            }
+        }
+        if (!indexes.isEmpty()) {
+            throw new AssertionError("Could not find elements with indexes " + indexes);
+        }
+    }
+
+    private static void compareNodes(Collection<Node> nodes, ResultActions result) {
+        compareUnordered(
+            nodes,
+            result,
+            FlowControllerTest::compareNode,
+            "JSON path \"$.graph.nodes["
+        );
+    }
+
+    private static void compareNode(Node node, int index, ResultActions result) {
+        var prefix = OBJECT_EXPRESSION_PREFIX + "graph.nodes[" + index + "].";
+        compareFields(prefix, result,
+            Map.entry("id", node.id()),
+            Map.entry("type", NodeType.REGISTRY.getName(node.type()).orElseThrow())
+        );
+        var settingsPrefix = prefix + "settings.";
+        for (var setting : node.settings().entrySet()) {
+            var name = setting.getKey();
+            var dataBox = setting.getValue();
+            var type = dataBox.type();
+            var value = dataBox.value();
+            compareFields(settingsPrefix + name + '.', result,
+                Map.entry("type", DataType.REGISTRY.getName(type).orElseThrow())
+            );
+            if (value instanceof Optional<?> optional) {
+                compareFields(settingsPrefix + name + ".value.", result,
+                    Map.entry("present", optional.isPresent())
+                );
+                optional.ifPresent(optionalValue ->
+                    compareFields(settingsPrefix + name + ".value.", result,
+                        Map.entry("value", optionalValue)
+                    )
+                );
+            } else {
+                compareFields(settingsPrefix + name + '.', result,
+                    Map.entry("value", value)
+                );
+            }
+        }
+    }
+
+    private static void compareConnections(Collection<NodeConnection<?>> connections, ResultActions result) {
+        compareUnordered(
+            connections,
+            result,
+            FlowControllerTest::compareConnection,
+            "JSON path \"$.graph.connections["
+        );
+    }
+
+    private static void compareConnection(NodeConnection<?> connection, int index, ResultActions result) {
+        var prefix = OBJECT_EXPRESSION_PREFIX + "graph.connections[" + index + "].";
+        compareConnector(connection.from(), prefix, result);
+        compareConnector(connection.to(), prefix, result);
+    }
+
+    private static void compareConnector(NodeConnector<?> connector, String expressionPrefix, ResultActions result) {
+        Class<?> connectorClass = connector.getClass();
+        String type;
+        if (connectorClass == NodeConnector.Input.class) {
+            type = "input";
+        } else if (connectorClass == NodeConnector.Output.class) {
+            type = "output";
+        } else {
+            throw new IllegalArgumentException("Unknown connector class " + connectorClass);
+        }
+        compareFields(expressionPrefix + type + '.', result,
+            Map.entry("nodeId", connector.nodeId()),
+            Map.entry("name", connector.name()),
+            Map.entry("type", connector.type().name())
+        );
+    }
+
+    private static void compareMetadataByNode(Map<UUID, NodeMetadata> metadataByNode, ResultActions result) {
+        var prefix = OBJECT_EXPRESSION_PREFIX + "graph.metadata.";
+        for (var metaData : metadataByNode.entrySet()) {
+            compareMetadata(metaData.getKey(), metaData.getValue(), prefix, result);
+        }
+    }
+
+    private static void compareMetadata(UUID nodeId, NodeMetadata metadata, String expressionPrefix, ResultActions result) {
+        compareFields(expressionPrefix + nodeId + '.', result,
+            Map.entry("xPos", (double) metadata.xPos()),
+            Map.entry("yPos", (double) metadata.yPos())
+        );
+    }
+
+    @FunctionalInterface
+    private interface UnorderedComparator<T> {
+        void compare(T expected, int index, ResultActions result);
     }
 }
