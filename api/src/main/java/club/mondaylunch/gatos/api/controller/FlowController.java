@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.Length;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -54,10 +55,10 @@ public class FlowController {
             .toList();
     }
 
-    @GetMapping("{flowId}")
-    public Flow getFlow(@PathVariable("flowId") UUID flowId, @RequestHeader("x-auth-token") String token) {
+    @GetMapping(value = "{flowId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getFlow(@PathVariable("flowId") UUID flowId, @RequestHeader("x-auth-token") String token) {
         User user = this.userRepository.authenticateUser(token);
-        return this.flowRepository.getFlow(user, flowId);
+        return this.flowRepository.getFlow(user, flowId).toJson();
     }
 
     private record BodyAddFlow(
