@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import club.mondaylunch.gatos.core.collection.BaseCollection;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
-import club.mondaylunch.gatos.core.graph.type.test.TestNodeTypes;
+import club.mondaylunch.gatos.testshared.graph.type.test.TestNodeTypes;
 import club.mondaylunch.gatos.core.models.BaseModel;
 
 public class NodeTypeCodecTest {

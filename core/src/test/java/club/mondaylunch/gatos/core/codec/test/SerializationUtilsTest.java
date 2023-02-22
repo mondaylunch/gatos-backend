@@ -19,7 +19,7 @@ import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
-import club.mondaylunch.gatos.core.graph.type.test.TestNodeTypes;
+import club.mondaylunch.gatos.testshared.graph.type.test.TestNodeTypes;
 import club.mondaylunch.gatos.core.models.Flow;
 
 public class SerializationUtilsTest {

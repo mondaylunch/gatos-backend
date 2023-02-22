@@ -20,6 +20,8 @@ dependencies {
     implementation group: "com.fasterxml.jackson.core", name: "jackson-databind", version: "2.14.2"
 
 	// Tests
+    testImplementation project(":test_shared")
+
 	testImplementation(platform('org.junit:junit-bom:5.9.2'))
 	testImplementation 'org.junit.jupiter:junit-jupiter'
 

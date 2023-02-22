@@ -1,4 +1,4 @@
-package club.mondaylunch.gatos.core.graph.type.test;
+package club.mondaylunch.gatos.testshared.graph.type.test;
 
 import java.util.List;
 import java.util.Map;
