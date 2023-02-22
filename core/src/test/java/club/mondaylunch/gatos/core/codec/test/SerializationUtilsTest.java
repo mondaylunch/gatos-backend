@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
-import club.mondaylunch.gatos.core.codec.SerializationUtils;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.Node;
@@ -52,7 +51,7 @@ public class SerializationUtilsTest {
         graph.modifyMetadata(start.id(), nodeMetadata -> nodeMetadata.withX(1));
 
         String expectedJson = readString("test-flow.json");
-        String actualJson = SerializationUtils.toJson(flow);
+        String actualJson = flow.toJson();
         System.out.println(actualJson);
         JSONAssert.assertEquals(expectedJson, actualJson, JSONCompareMode.NON_EXTENSIBLE);
     }

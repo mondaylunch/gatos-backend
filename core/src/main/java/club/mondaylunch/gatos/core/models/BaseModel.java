@@ -5,6 +5,8 @@ import java.util.UUID;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
+import club.mondaylunch.gatos.core.codec.SerializationUtils;
+
 /**
  * Class describing common properties for all database models.
  */
@@ -37,6 +39,10 @@ public class BaseModel {
      */
     public void setId(UUID uuid) {
         this.id = uuid;
+    }
+
+    public String toJson() {
+        return SerializationUtils.toJson(this);
     }
 
     @Override
