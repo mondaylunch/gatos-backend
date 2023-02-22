@@ -2,6 +2,7 @@ package club.mondaylunch.gatos.core.models;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
@@ -14,6 +15,7 @@ public class BaseModel {
 
     @BsonId
     @BsonProperty("_id")
+    @JsonProperty("_id")
     private UUID id;
 
     public BaseModel(UUID id) {

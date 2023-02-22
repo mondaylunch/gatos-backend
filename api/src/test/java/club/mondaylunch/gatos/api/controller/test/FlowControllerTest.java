@@ -80,7 +80,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
             .andExpect(MockMvcResultMatchers.status().isOk());
         compareFields(OBJECT_EXPRESSION_PREFIX, result,
             Map.entry("name", flow.getName()),
-            Map.entry("authorId", flow.getAuthorId())
+            Map.entry("author_id", flow.getAuthorId())
         );
     }
 
@@ -99,7 +99,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         this.assertFlowCount(1);
         compareFields(OBJECT_EXPRESSION_PREFIX, result,
             Map.entry("name", flow.getName()),
-            Map.entry("authorId", this.user.getId()));
+            Map.entry("author_id", this.user.getId()));
     }
 
     @Test
@@ -178,7 +178,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         this.assertFlowCount(1);
         result = compareFields(OBJECT_EXPRESSION_PREFIX, result,
             Map.entry("name", update.getName()),
-            Map.entry("authorId", flow.getAuthorId()));
+            Map.entry("author_id", flow.getAuthorId()));
         Flow newFlow = getFlow(result);
         Assertions.assertNotNull(newFlow);
         Assertions.assertEquals(update.getName(), newFlow.getName());
@@ -290,7 +290,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
 
     private static Flow getFlow(ResultActions result) throws Exception {
         String responseJson = result.andReturn().getResponse().getContentAsString();
-        UUID flowId = UUID.fromString(JsonPath.read(responseJson, "$.id"));
+        UUID flowId = UUID.fromString(JsonPath.read(responseJson, "$._id"));
         return Flow.objects.get(flowId);
     }
 
@@ -325,6 +325,6 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
     private static ResultActions compareFlow(Flow flow, int index, ResultActions result) throws Exception {
         return compareFields(objectArrayExpressionPrefix(index), result,
             Map.entry("name", flow.getName()),
-            Map.entry("authorId", flow.getAuthorId()));
+            Map.entry("author_id", flow.getAuthorId()));
     }
 }

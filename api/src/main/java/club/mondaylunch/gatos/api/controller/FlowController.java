@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.Length;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,8 +34,12 @@ public class FlowController {
         this.flowRepository = flowRepository;
     }
 
-    private record BasicFlowInfo(UUID id, String name, String description, UUID authorId) {
-
+    private record BasicFlowInfo(
+        @JsonProperty("_id") UUID id,
+        String name,
+        String description,
+        @JsonProperty("author_id") UUID authorId
+    ) {
         BasicFlowInfo(Flow flow) {
             this(flow.getId(), flow.getName(), flow.getDescription(), flow.getAuthorId());
         }

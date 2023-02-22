@@ -1,5 +1,6 @@
 package club.mondaylunch.gatos.core.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 
@@ -16,6 +17,7 @@ public class User extends BaseModel {
     private String email;
     private String password;
     @BsonProperty("auth_token")
+    @JsonProperty("auth_token")
     private String authToken;
 
     /**

@@ -2,6 +2,7 @@ package club.mondaylunch.gatos.core.models;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
 import club.mondaylunch.gatos.core.collection.FlowCollection;
@@ -28,6 +29,7 @@ public class Flow extends BaseModel {
      * UUID of the user who owns this flow.
      */
     @BsonProperty("author_id")
+    @JsonProperty("author_id")
     private UUID authorId;
 
     private Graph graph = new Graph();
