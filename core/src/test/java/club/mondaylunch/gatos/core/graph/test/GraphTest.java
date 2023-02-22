@@ -7,13 +7,13 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import club.mondaylunch.gatos.core.data.OptionalDataType;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.data.OptionalDataType;
 import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.NodeMetadata;
@@ -454,7 +454,7 @@ public class GraphTest {
             if (inputOptType == OptionalDataType.GENERIC_OPTIONAL) {
                 outType = DataType.ANY;
             } else {
-                outType = ((OptionalDataType<?>)inputOptType).contains();
+                outType = ((OptionalDataType<?>) inputOptType).contains();
             }
             return Set.of(
                 new NodeConnector.Output<>(nodeId, "out", outType));
