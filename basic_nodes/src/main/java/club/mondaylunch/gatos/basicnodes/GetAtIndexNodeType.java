@@ -30,7 +30,8 @@ public class GetAtIndexNodeType extends NodeType.Process {
     }
 
     @Override
-    public Set<Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
+    public Set<Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+        // TODO Auto-generated method stub
         return Set.of(
                 new NodeConnector.Output<>(nodeId, "output", DataType.ANY));
     }
