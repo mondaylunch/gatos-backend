@@ -22,7 +22,7 @@ public class GetAtIndexNodeType extends NodeType.Process {
     }
 
     @Override
-    public Set<Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
+    public Set<Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
         return Set.of(
             new NodeConnector.Input<>(nodeId, "input", ListDataType.GENERIC_LIST),
             new NodeConnector.Input<>(nodeId, "index", DataType.NUMBER)
