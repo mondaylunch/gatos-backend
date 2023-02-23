@@ -1,5 +1,6 @@
 package club.mondaylunch.gatos.basicnodes;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -31,16 +32,16 @@ public class GetAtIndexNodeType extends NodeType.Process {
     @Override
     public Set<Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
         return Set.of(
-                new NodeConnector.Output<>(nodeId, "result", DataType.ANY));
+                new NodeConnector.Output<>(nodeId, "output", DataType.ANY));
     }
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
-        var inputList = DataBox.get(inputs, "input", ListDataType.GENERIC_LIST).orElse(null);
+        var inputList = DataBox.get(inputs, "input", ListDataType.GENERIC_LIST).orElse(new ArrayList());
         Double inputIndex = DataBox.get(inputs, "index", DataType.NUMBER).orElse(0.0);
         int index = inputIndex.intValue();
 
-        if (inputList == null) {
+        if (inputList.isEmpty()) {
             return Map.of("output", CompletableFuture.completedFuture(DataType.ANY.create(null)));
         } else {
             return Map.of("output", CompletableFuture.completedFuture(DataType.ANY.create(inputList.get(index))));
