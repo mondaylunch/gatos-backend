@@ -31,14 +31,13 @@ public class GetAtIndexNodeType extends NodeType.Process {
 
     @Override
     public Set<Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        // TODO Auto-generated method stub
         return Set.of(
                 new NodeConnector.Output<>(nodeId, "output", DataType.ANY));
     }
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
-        var inputList = DataBox.get(inputs, "input", ListDataType.GENERIC_LIST).orElse(new ArrayList());
+        var inputList = DataBox.get(inputs, "input", ListDataType.GENERIC_LIST).orElse(new ArrayList<>());
         Double inputIndex = DataBox.get(inputs, "index", DataType.NUMBER).orElse(0.0);
         int index = inputIndex.intValue();
 
