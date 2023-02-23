@@ -36,7 +36,7 @@ public class StringInterpolationNodeTest {
     public void hasOutput() {
         var node = Node.create(BasicNodes.STRING_INTERPOLATION);
         Assertions.assertEquals(1, node.getOutputs().size());
-        Assertions.assertTrue(node.getOutputs().containsKey("result"));
+        Assertions.assertTrue(node.getOutputs().containsKey("output"));
     }
 
     @Test
@@ -50,7 +50,7 @@ public class StringInterpolationNodeTest {
             "Placeholder 4", DataType.STRING.create("template substitution"),
             "Placeholder 5", DataType.STRING.create("work correctly?"),
             "Placeholder 6", DataType.STRING.create("This one shouldn't:"));
-        var result = (String) BasicNodes.STRING_INTERPOLATION.compute(inputs, node.settings()).get("result")
+        var result = (String) BasicNodes.STRING_INTERPOLATION.compute(inputs, node.settings()).get("output")
             .join()
             .value();
         Assertions.assertEquals(
