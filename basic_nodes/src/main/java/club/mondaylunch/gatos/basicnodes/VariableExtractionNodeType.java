@@ -31,7 +31,7 @@ public class VariableExtractionNodeType extends NodeType.Process {
     }
 
     @Override
-    public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
+    public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
         return Set.of(
             new NodeConnector.Input<>(nodeId, "input", DataType.JSON_OBJECT),
             new NodeConnector.Input<>(nodeId, "key", DataType.STRING)
@@ -39,8 +39,8 @@ public class VariableExtractionNodeType extends NodeType.Process {
     }
 
     @Override
-    public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
-        var returnDataType = DataBox.get(state, "output_type", RETURN_DATATYPE).orElse(ReturnType.STRING);
+    public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+        var returnDataType = DataBox.get(settings, "output_type", RETURN_DATATYPE).orElse(ReturnType.STRING);
         return returnDataType.isListType()
             ? Set.of(new NodeConnector.Output<>(nodeId, "output", returnDataType.getDataType()))
             : Set.of(new NodeConnector.Output<>(nodeId, "output", returnDataType.getDataType().optionalOf())

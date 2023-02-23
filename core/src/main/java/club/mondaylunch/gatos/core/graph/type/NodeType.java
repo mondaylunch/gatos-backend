@@ -9,6 +9,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 import club.mondaylunch.gatos.core.Registry;
 import club.mondaylunch.gatos.core.data.DataBox;
+import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 
 /**
@@ -57,12 +58,12 @@ public interface NodeType {
     @ApiStatus.NonExtendable
     interface WithInputs {
         /**
-         * The input connectors of a node with a given UUID & settings state.
+         * The input connectors of a node with a given UUID & settings.
          * @param nodeId the node UUID
-         * @param state  the node settings
+         * @param settings  the node settings
          * @return the input connectors of the node
          */
-        Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state);
+        Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings);
     }
 
     /**
@@ -71,12 +72,13 @@ public interface NodeType {
     @ApiStatus.NonExtendable
     interface WithOutputs {
         /**
-         * The output connectors of a node with a given UUID & settings state.
+         * The output connectors of a node with a given UUID, settings, & input connections.
          * @param nodeId the node UUID
-         * @param state  the node settings
+         * @param settings  the node settings
+         * @param inputTypes what type of output connector the input connectors to this node are connected to, if any
          * @return the output connectors of the node
          */
-        Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state);
+        Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes);
 
         /**
          * (Asynchronously) compute the outputs of this node in a map of output
@@ -133,11 +135,11 @@ public interface NodeType {
      * inputs.
      * @param type  the node type
      * @param id    the UUID of the node these inputs are for
-     * @param state the settings state of the node these inputs are for
+     * @param settings the settings of the node these inputs are for
      * @return the inputs, or empty
      */
-    static Set<NodeConnector.Input<?>> inputsOrEmpty(NodeType type, UUID id, Map<String, DataBox<?>> state) {
-        return type instanceof WithInputs inputType ? inputType.inputs(id, state) : Set.of();
+    static Set<NodeConnector.Input<?>> inputsOrEmpty(NodeType type, UUID id, Map<String, DataBox<?>> settings) {
+        return type instanceof WithInputs inputType ? inputType.inputs(id, settings) : Set.of();
     }
 
     /**
@@ -145,10 +147,11 @@ public interface NodeType {
      * outputs.
      * @param type  the node type
      * @param id    the UUID of the node these outputs are for
-     * @param state the settings state of the node these outputs are for
+     * @param settings the settings of the node these outputs are for
+     * @param inputTypes what type of output connector the input connectors to the node are connected to, if any
      * @return the outputs, or empty
      */
-    static Set<NodeConnector.Output<?>> outputsOrEmpty(NodeType type, UUID id, Map<String, DataBox<?>> state) {
-        return type instanceof WithOutputs outputType ? outputType.outputs(id, state) : Set.of();
+    static Set<NodeConnector.Output<?>> outputsOrEmpty(NodeType type, UUID id, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+        return type instanceof WithOutputs outputType ? outputType.outputs(id, settings, inputTypes) : Set.of();
     }
 }
