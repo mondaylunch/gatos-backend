@@ -11,6 +11,7 @@ import club.mondaylunch.gatos.basicnodes.BasicNodes;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.data.ListDataType;
+import club.mondaylunch.gatos.core.data.OptionalDataType;
 import club.mondaylunch.gatos.core.graph.Node;
 
 public class GetAtIndexNodeTest {
@@ -37,7 +38,7 @@ public class GetAtIndexNodeTest {
             "index", DataType.NUMBER.create(0.0)
         );
         var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of());
-        Assertions.assertEquals(null, output.get("output").join().value());
+        Assertions.assertEquals(OptionalDataType.GENERIC_OPTIONAL, output.get("output").join().value());
     }
 
     @Test
@@ -60,9 +61,9 @@ public class GetAtIndexNodeTest {
 
         var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of());
         Assertions.assertEquals(0, output.get("output").join().value());
+        Assertions.assertEquals(output.get("output").join().type(), DataType.NUMBER);
 
         var output2 = BasicNodes.GET_AT_INDEX.compute(input2, Map.of());
         Assertions.assertEquals(1, output2.get("output").join().value());
-
     }
 }
