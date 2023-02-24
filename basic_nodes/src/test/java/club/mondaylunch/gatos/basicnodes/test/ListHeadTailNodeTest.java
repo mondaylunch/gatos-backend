@@ -21,7 +21,7 @@ public class ListHeadTailNodeTest {
     @Test
     public void areInputsCorrect() {
         var node = Node.create(BasicNodes.LIST_HEADTAIL);
-        Assertions.assertEquals(1, node.inputs().size());
+        Assertions.assertEquals(2, node.inputs().size());
         Assertions.assertTrue(node.inputs().containsKey("input"));
     }
 

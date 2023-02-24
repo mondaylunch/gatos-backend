@@ -9,6 +9,7 @@ import java.util.concurrent.CompletableFuture;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.data.ListDataType;
+import club.mondaylunch.gatos.core.data.OptionalDataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
@@ -23,14 +24,21 @@ public class ListHeadTailNodeType extends NodeType.Process {
     @Override
     public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
         return Set.of(
-            new NodeConnector.Input<>(nodeId, "input", ListDataType.GENERIC_LIST)
+            new NodeConnector.Input<>(nodeId, "input", ListDataType.GENERIC_LIST),
+            new NodeConnector.Input<>(nodeId, "in", OptionalDataType.GENERIC_OPTIONAL)
         );
     }
 
     @Override
-    public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
+    public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+        var outputType = inputTypes.getOrDefault("in", OptionalDataType.GENERIC_OPTIONAL);
+        if (outputType == OptionalDataType.GENERIC_OPTIONAL) {
+            outputType = DataType.ANY;
+        } else {
+            outputType = ((OptionalDataType<?>) outputType).contains();
+        }
         return Set.of(
-            new NodeConnector.Output<>(nodeId, "output_first", DataType.ANY),
+            new NodeConnector.Output<>(nodeId, "output_first", outputType),
             new NodeConnector.Output<>(nodeId, "output_rest", ListDataType.GENERIC_LIST)
         );
     }
@@ -41,7 +49,7 @@ public class ListHeadTailNodeType extends NodeType.Process {
         if (inputList.isEmpty()) {
             return Map.of(
                 "output_first", CompletableFuture.completedFuture(DataType.ANY.create(null)),
-                "output_rest", CompletableFuture.completedFuture(ListDataType.ANY.create(null))
+                "output_rest", CompletableFuture.completedFuture(ListDataType.GENERIC_LIST.create(null))
             );
         }
         var shouldExtractHead = DataBox.get(settings, "head_mode", DataType.BOOLEAN).orElse(true);
@@ -51,7 +59,7 @@ public class ListHeadTailNodeType extends NodeType.Process {
         return Map.of(
             "output_first", CompletableFuture.completedFuture(DataType.ANY.create(
                 inputList.get(extractionIndex))),
-            "output_rest", CompletableFuture.completedFuture(ListDataType.ANY.create(
+            "output_rest", CompletableFuture.completedFuture(ListDataType.GENERIC_LIST.create(
                 inputList.subList(subListOffset, lastIndex + subListOffset)))
         );
     }
