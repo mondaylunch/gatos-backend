@@ -13,7 +13,8 @@
             "type": "number",
             "value": 0.0
           }
-        }
+        },
+        "inputTypes": {}
       },
       {
         "id": "6f8de627-706d-4817-8921-73bff23006a8",
@@ -26,6 +27,9 @@
               3.0
             ]
           }
+        },
+        "inputTypes": {
+          "process_input": "number"
         }
       },
       {
@@ -39,6 +43,9 @@
               "value": 1.5
             }
           }
+        },
+        "inputTypes": {
+          "end_input": "number"
         }
       }
     ],
