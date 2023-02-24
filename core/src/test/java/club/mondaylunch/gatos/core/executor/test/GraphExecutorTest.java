@@ -254,13 +254,13 @@ public class GraphExecutorTest {
 
     private static final class AddNumNodeType extends NodeType.Process {
         @Override
-        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
+        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
             return Set.of(
                     new NodeConnector.Input<>(nodeId, "in", DataType.NUMBER));
         }
 
         @Override
-        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
+        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
                     new NodeConnector.Output<>(nodeId, "out", DataType.NUMBER));
         }
@@ -283,14 +283,14 @@ public class GraphExecutorTest {
 
     private static final class AddNumTwoInputNodeType extends NodeType.Process {
         @Override
-        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
+        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
             return Set.of(
                     new NodeConnector.Input<>(nodeId, "in1", DataType.NUMBER),
                     new NodeConnector.Input<>(nodeId, "in2", DataType.NUMBER));
         }
 
         @Override
-        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
+        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
                     new NodeConnector.Output<>(nodeId, "out", DataType.NUMBER));
         }
@@ -312,13 +312,13 @@ public class GraphExecutorTest {
 
     private static final class SlowlyAddNumNodeType extends NodeType.Process {
         @Override
-        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
+        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
             return Set.of(
                     new NodeConnector.Input<>(nodeId, "in", DataType.NUMBER));
         }
 
         @Override
-        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
+        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
                     new NodeConnector.Output<>(nodeId, "out", DataType.NUMBER));
         }
@@ -352,7 +352,7 @@ public class GraphExecutorTest {
 
     private static final class InputNumNodeType extends NodeType.Start {
         @Override
-        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
+        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
                     new NodeConnector.Output<>(nodeId, "out", DataType.NUMBER));
         }
@@ -382,7 +382,7 @@ public class GraphExecutorTest {
         }
 
         @Override
-        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
+        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
             return Set.of(
                     new NodeConnector.Input<>(nodeId, "in", DataType.NUMBER));
         }
@@ -410,7 +410,7 @@ public class GraphExecutorTest {
         }
 
         @Override
-        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
+        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
             return Set.of(
                 new NodeConnector.Input<>(nodeId, "in", DataType.STRING));
         }

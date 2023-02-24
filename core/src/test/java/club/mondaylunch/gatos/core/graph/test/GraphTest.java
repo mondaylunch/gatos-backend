@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.data.OptionalDataType;
 import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.NodeMetadata;
@@ -24,6 +25,8 @@ public class GraphTest {
     private static final NodeType TEST_NODE_TYPE = new TestNodeType();
     private static final NodeType INPUT_NODE_TYPE = new TestInputNodeType();
     private static final NodeType OUTPUT_NODE_TYPE = new TestOutputNodeType();
+    private static final NodeType TEST_VARYING_OUTPUT_NODE_TYPE = new TestVaryingOutputNodeType();
+    private static final NodeType TEST_STRING_OPT_START_NODE_TYPE = new TestStringOptStartDataType();
 
     @Test
     public void canAddNodeToGraph() {
@@ -174,6 +177,21 @@ public class GraphTest {
 
         Assertions.assertFalse(graph.getConnectionsForNode(node1.id()).contains(conn.get()));
         Assertions.assertFalse(graph.getConnectionsForNode(node2.id()).contains(conn.get()));
+    }
+
+    @Test
+    public void makingConnectionWithSpecificTypeChangesOutputType() {
+        var graph = new Graph();
+        var node1 = graph.addNode(TEST_STRING_OPT_START_NODE_TYPE);
+        var node2 = graph.addNode(TEST_VARYING_OUTPUT_NODE_TYPE);
+
+        Assertions.assertEquals(DataType.ANY, node2.getOutputs().get("out").type());
+        var conn = NodeConnection.createConnection(node1, "out", node2, "in", OptionalDataType.GENERIC_OPTIONAL);
+        Assertions.assertTrue(conn.isPresent());
+        graph.addConnection(conn.get());
+        Assertions.assertEquals(DataType.STRING, graph.getNode(node2.id()).orElseThrow().getOutputs().get("out").type());
+        graph.removeConnection(conn.get());
+        Assertions.assertEquals(DataType.ANY, graph.getNode(node2.id()).orElseThrow().getOutputs().get("out").type());
     }
 
     @Test
@@ -360,13 +378,13 @@ public class GraphTest {
 
     private static final class TestNodeType extends NodeType.Process {
         @Override
-        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
+        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
             return Set.of(
                     new NodeConnector.Input<>(nodeId, "in", DataType.NUMBER));
         }
 
         @Override
-        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
+        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
                     new NodeConnector.Output<>(nodeId, "out", DataType.NUMBER));
         }
@@ -386,7 +404,7 @@ public class GraphTest {
 
     private static final class TestInputNodeType extends NodeType.Start {
         @Override
-        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
+        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
                     new NodeConnector.Output<>(nodeId, "out", DataType.NUMBER));
         }
@@ -405,7 +423,7 @@ public class GraphTest {
 
     private static final class TestOutputNodeType extends NodeType.End {
         @Override
-        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
+        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
             return Set.of(
                     new NodeConnector.Input<>(nodeId, "in", DataType.NUMBER));
         }
@@ -419,6 +437,56 @@ public class GraphTest {
         public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
             return CompletableFuture.runAsync(() -> {
             });
+        }
+    }
+
+    private static final class TestVaryingOutputNodeType extends NodeType.Process {
+        @Override
+        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
+            return Set.of(
+                new NodeConnector.Input<>(nodeId, "in", OptionalDataType.GENERIC_OPTIONAL));
+        }
+
+        @Override
+        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+            var inputOptType = inputTypes.getOrDefault("in", OptionalDataType.GENERIC_OPTIONAL);
+            DataType<?> outType;
+            if (inputOptType == OptionalDataType.GENERIC_OPTIONAL) {
+                outType = DataType.ANY;
+            } else {
+                outType = ((OptionalDataType<?>) inputOptType).contains();
+            }
+            return Set.of(
+                new NodeConnector.Output<>(nodeId, "out", outType));
+        }
+
+        @Override
+        public Map<String, DataBox<?>> settings() {
+            return Map.of();
+        }
+
+        @Override
+        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
+                                                                  Map<String, DataBox<?>> settings) {
+            return Map.of();
+        }
+    }
+
+    private static final class TestStringOptStartDataType extends NodeType.Start {
+        @Override
+        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+            return Set.of(new NodeConnector.Output<>(nodeId, "out", DataType.STRING.optionalOf()));
+        }
+
+        @Override
+        public Map<String, DataBox<?>> settings() {
+            return Map.of();
+        }
+
+        @Override
+        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
+                                                                  Map<String, DataBox<?>> settings) {
+            return Map.of();
         }
     }
 }

@@ -18,13 +18,13 @@ public class StringConcatNodeType extends NodeType.Process {
     }
 
     @Override
-    public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
+    public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
         return Set.of(
             new NodeConnector.Input<>(nodeId, "input", DataType.STRING.listOf()));
     }
 
     @Override
-    public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
+    public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         return Set.of(
             new NodeConnector.Output<>(nodeId, "output", DataType.STRING));
     }
