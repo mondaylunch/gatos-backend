@@ -52,7 +52,6 @@ public class SerializationUtilsTest {
 
         String expectedJson = readString("test-flow.json");
         String actualJson = flow.toJson();
-        System.out.println(actualJson);
         JSONAssert.assertEquals(expectedJson, actualJson, JSONCompareMode.NON_EXTENSIBLE);
     }
 
@@ -62,7 +61,8 @@ public class SerializationUtilsTest {
             NodeType.class,
             Map.class,
             Set.class,
-            Set.class
+            Set.class,
+            Map.class
         );
         nodeConstructor.setAccessible(true);
         var defaultSettings = type.settings();
@@ -71,7 +71,8 @@ public class SerializationUtilsTest {
             type,
             defaultSettings,
             NodeType.inputsOrEmpty(type, id, defaultSettings),
-            NodeType.outputsOrEmpty(type, id, defaultSettings)
+            NodeType.outputsOrEmpty(type, id, defaultSettings, Map.of()),
+            Map.of()
         );
     }
 
