@@ -91,6 +91,7 @@ public class FlowController {
         Flow partial = new Flow();
         partial.setName(data.name);
         partial.setDescription(data.description);
+        partial.setGraph(null);
 
         var updated = Flow.objects.update(flow.getId(), partial);
         return new BasicFlowInfo(updated);
