@@ -70,7 +70,7 @@ public final class Node {
             id,
             type,
             defaultSettings,
-            NodeType.inputsOrEmpty(type, id, defaultSettings),
+            NodeType.inputsOrEmpty(type, id, defaultSettings, Map.of()),
             NodeType.outputsOrEmpty(type, id, defaultSettings, Map.of()),
             Map.of());
     }
@@ -95,7 +95,7 @@ public final class Node {
 
         var newSettings = new HashMap<>(this.settings);
         newSettings.put(settingKey, value);
-        var newInputs = NodeType.inputsOrEmpty(this.type, this.id, newSettings);
+        var newInputs = NodeType.inputsOrEmpty(this.type, this.id, newSettings, this.inputTypes);
         var newInputTypes = filterValidInputTypes(this.inputTypes, newInputs.stream().collect(Collectors.toMap(NodeConnector::name, Function.identity())));
         return new Node(
             this.id,
@@ -214,6 +214,14 @@ public final class Node {
         return Optional.ofNullable(this.outputs.get(name));
     }
 
+    /**
+     * Returns the types on the other end of the connections of each input connector.
+     * @return the input datatypes
+     */
+    public Map<String, DataType<?>> inputTypes() {
+        return this.inputTypes;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) {
@@ -279,7 +287,7 @@ public final class Node {
                 Map<String, DataBox<?>> settings = SerializationUtils.readMap(reader, decoderContext, DataBox.class, Function.identity(), this.registry);
                 reader.readName("inputTypes");
                 Map<String, DataType<?>> inputTypes = SerializationUtils.readMap(reader, decoderContext, DataType.class, Function.identity(), this.registry);
-                var inputs = NodeType.inputsOrEmpty(type, id, settings);
+                var inputs = NodeType.inputsOrEmpty(type, id, settings, inputTypes);
                 return new Node(
                     id,
                     type,

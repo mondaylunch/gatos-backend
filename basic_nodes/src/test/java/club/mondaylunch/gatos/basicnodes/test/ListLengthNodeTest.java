@@ -36,7 +36,7 @@ public class ListLengthNodeTest {
         Map<String, DataBox<?>> inputWithArrayList = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_EMPTY_ARRAY_LIST)
         );
-        var outputWithArrayList = BasicNodes.LIST_LENGTH.compute(inputWithArrayList, Map.of());
+        var outputWithArrayList = BasicNodes.LIST_LENGTH.compute(inputWithArrayList, Map.of(), Map.of());
         Assertions.assertEquals(0.0, outputWithArrayList.get("output").join().value());
     }
 
@@ -45,7 +45,7 @@ public class ListLengthNodeTest {
         Map<String, DataBox<?>> inputWithLinkedList = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_EMPTY_LINKED_LIST)
         );
-        var outputWithLinkedList = BasicNodes.LIST_LENGTH.compute(inputWithLinkedList, Map.of());
+        var outputWithLinkedList = BasicNodes.LIST_LENGTH.compute(inputWithLinkedList, Map.of(), Map.of());
         Assertions.assertEquals(0.0, outputWithLinkedList.get("output").join().value());
     }
 
@@ -60,7 +60,7 @@ public class ListLengthNodeTest {
         Map<String, DataBox<?>> inputWithArrayList = Map.of(
             "input", ListDataType.GENERIC_LIST.create(testArrayList)
         );
-        var outputWithArrayList = BasicNodes.LIST_LENGTH.compute(inputWithArrayList, Map.of());
+        var outputWithArrayList = BasicNodes.LIST_LENGTH.compute(inputWithArrayList, Map.of(), Map.of());
         Assertions.assertEquals(10.0, outputWithArrayList.get("output").join().value());
     }
 
@@ -73,14 +73,14 @@ public class ListLengthNodeTest {
         for (int i = 0; i < 10; i++) {
             testLinkedList.add("test");
         }
-        var outputWithLinkedList = BasicNodes.LIST_LENGTH.compute(inputWithLinkedList, Map.of());
+        var outputWithLinkedList = BasicNodes.LIST_LENGTH.compute(inputWithLinkedList, Map.of(), Map.of());
         Assertions.assertEquals(10.0, outputWithLinkedList.get("output").join().value());
     }
 
     @Test
     public void correctlyBehavesForIncorrectInputs() {
         Map<String, DataBox<?>> input0 = Map.of();
-        var output0 = BasicNodes.LIST_LENGTH.compute(input0, Map.of());
+        var output0 = BasicNodes.LIST_LENGTH.compute(input0, Map.of(), Map.of());
         Assertions.assertEquals(0.0, output0.get("output").join().value());
     }
 }
