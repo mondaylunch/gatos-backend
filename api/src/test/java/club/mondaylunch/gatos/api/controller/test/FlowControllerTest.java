@@ -84,8 +84,6 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         var flow = createFlow(this.user);
         var graph = flow.getGraph();
 
-        // List<Node> nodes = new ArrayList<>();
-
         var start = graph.addNode(TestNodeTypes.START);
         var process = graph.addNode(TestNodeTypes.PROCESS);
         var end = graph.addNode(TestNodeTypes.END);
