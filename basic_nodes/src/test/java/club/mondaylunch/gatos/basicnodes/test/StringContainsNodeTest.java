@@ -35,7 +35,7 @@ public class StringContainsNodeTest {
         Map<String, DataBox<?>> input0 = Map.of(
             "input", DataType.STRING.create(TEST_STR)
         );
-        var output0 = BasicNodes.STRING_CONTAINS.compute(input0, node.settings());
+        var output0 = BasicNodes.STRING_CONTAINS.compute(input0, node.settings(), Map.of());
         Assertions.assertTrue((boolean) output0.get("output").join().value());
     }
 
@@ -46,7 +46,7 @@ public class StringContainsNodeTest {
         Map<String, DataBox<?>> input1 = Map.of(
             "input", DataType.STRING.create(TEST_STR.toUpperCase())
         );
-        var output1 = BasicNodes.STRING_CONTAINS.compute(input1, node.settings());
+        var output1 = BasicNodes.STRING_CONTAINS.compute(input1, node.settings(), Map.of());
         Assertions.assertFalse((boolean) output1.get("output").join().value());
     }
 }

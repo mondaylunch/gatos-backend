@@ -27,7 +27,7 @@ public class StringInterpolationNodeType extends NodeType.Process {
     }
 
     @Override
-    public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
+    public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         String template = DataBox.get(settings, "template", DataType.STRING).orElse("");
         var matcher = PLACEHOLDER_PATTERN.matcher(template);
         var matches = matcher.results().toList();
@@ -46,7 +46,7 @@ public class StringInterpolationNodeType extends NodeType.Process {
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
-            Map<String, DataBox<?>> settings) {
+            Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         String template = DataBox.get(settings, "template", DataType.STRING).orElse("");
         var matcher = PLACEHOLDER_PATTERN.matcher(template);
         AtomicInteger i = new AtomicInteger(0);
