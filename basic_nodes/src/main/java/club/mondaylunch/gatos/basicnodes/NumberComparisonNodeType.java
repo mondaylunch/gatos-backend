@@ -10,7 +10,7 @@ import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
-public class NumberOrderingNodeType extends NodeType.Process {
+public class NumberComparisonNodeType extends NodeType.Process {
 
     public static final DataType<Mode> NUMBER_ORDERING_MODE = DataType.register("number_ordering_type", Mode.class);
 
