@@ -37,7 +37,7 @@ public class GetAtIndexNodeTest {
             "input", ListDataType.GENERIC_LIST.create(new ArrayList<>()),
             "index", DataType.NUMBER.create(0.0)
         );
-        var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of());
+        var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), Map.of());
         Assertions.assertEquals(OptionalDataType.GENERIC_OPTIONAL, output.get("output").join().value());
     }
 
@@ -58,12 +58,16 @@ public class GetAtIndexNodeTest {
             "input", ListDataType.GENERIC_LIST.create(testArrayList),
             "index", DataType.NUMBER.create(1.0)
         );
+        
+        Map<String, DataType<?>> inputTypes = Map.of(
+            "input_type", DataType.NUMBER
+        );
 
-        var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of());
+        var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), inputTypes);
         Assertions.assertEquals(0, output.get("output").join().value());
         Assertions.assertEquals(output.get("output").join().type(), DataType.NUMBER);
 
-        var output2 = BasicNodes.GET_AT_INDEX.compute(input2, Map.of());
+        var output2 = BasicNodes.GET_AT_INDEX.compute(input2, Map.of(), inputTypes);
         Assertions.assertEquals(1, output2.get("output").join().value());
     }
 }
