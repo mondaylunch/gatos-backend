@@ -2,6 +2,7 @@ package club.mondaylunch.gatos.core.models;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
 import club.mondaylunch.gatos.core.collection.FlowCollection;
@@ -13,22 +14,6 @@ import club.mondaylunch.gatos.core.graph.Graph;
 public class Flow extends BaseModel {
 
     public static final FlowCollection objects = new FlowCollection();
-
-    private final Graph graph = new Graph();
-
-    public Flow(UUID id, String name, UUID authorId) {
-        super(id);
-        this.name = name;
-        this.authorId = authorId;
-    }
-
-    public Flow(String name, UUID authorId) {
-        this.name = name;
-        this.authorId = authorId;
-    }
-
-    public Flow() {
-    }
 
     /**
      * Display name.
@@ -44,7 +29,19 @@ public class Flow extends BaseModel {
      * UUID of the user who owns this flow.
      */
     @BsonProperty("author_id")
+    @JsonProperty("author_id")
     private UUID authorId;
+
+    private Graph graph = new Graph();
+
+    public Flow(UUID id, String name, UUID authorId) {
+        super(id);
+        this.name = name;
+        this.authorId = authorId;
+    }
+
+    public Flow() {
+    }
 
     /**
      * Get the display name.
@@ -107,5 +104,14 @@ public class Flow extends BaseModel {
      */
     public Graph getGraph() {
         return this.graph;
+    }
+
+    /**
+     * Set the graph.
+     *
+     * @param graph the graph.
+     */
+    public void setGraph(Graph graph) {
+        this.graph = graph;
     }
 }

@@ -1,4 +1,4 @@
-package club.mondaylunch.gatos.core.graph.type.test;
+package club.mondaylunch.gatos.testshared.graph.type.test;
 
 import java.util.List;
 import java.util.Map;
@@ -29,7 +29,7 @@ public class TestNodeTypes {
 
         @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-            return Set.of(new NodeConnector.Output<>(nodeId, "out", DataType.NUMBER));
+            return Set.of(new NodeConnector.Output<>(nodeId, "start_output", DataType.NUMBER));
         }
 
         @Override
@@ -49,12 +49,12 @@ public class TestNodeTypes {
 
         @Override
         public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-            return Set.of(new NodeConnector.Input<>(nodeId, "in", DataType.NUMBER));
+            return Set.of(new NodeConnector.Input<>(nodeId, "process_input", DataType.NUMBER));
         }
 
         @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-            return Set.of(new NodeConnector.Output<>(nodeId, "out", DataType.NUMBER));
+            return Set.of(new NodeConnector.Output<>(nodeId, "process_output", DataType.NUMBER));
         }
 
         @Override
@@ -74,7 +74,7 @@ public class TestNodeTypes {
 
         @Override
         public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-            return Set.of(new NodeConnector.Input<>(nodeId, "in", DataType.NUMBER));
+            return Set.of(new NodeConnector.Input<>(nodeId, "end_input", DataType.NUMBER));
         }
 
         @Override
