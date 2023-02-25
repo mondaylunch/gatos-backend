@@ -18,5 +18,5 @@ public final class BasicNodes {
     public static final ListLengthNodeType LIST_LENGTH = NodeType.REGISTRY
         .register("list_length", new ListLengthNodeType());
     public static final GetAtIndexNodeType GET_AT_INDEX = NodeType.REGISTRY
-    .register("get_at_index", new GetAtIndexNodeType());
+        .register("get_at_index", new GetAtIndexNodeType());
 }
