@@ -21,4 +21,7 @@ public final class BasicNodes {
         .register("boolean_operation", new BooleanOperationNodeType());
     public static final ListLengthNodeType LIST_LENGTH = NodeType.REGISTRY
         .register("list_length", new ListLengthNodeType());
+
+    public static final OptionalOrElseNodeType OPTIONAL_OR_ELSE = NodeType.REGISTRY
+        .register("optional_or_else", new OptionalOrElseNodeType());
 }
