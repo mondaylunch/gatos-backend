@@ -7,23 +7,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import club.mondaylunch.gatos.core.codec.ClassModelRegistry;
-import club.mondaylunch.gatos.core.Database;
 import club.mondaylunch.gatos.core.collection.BaseCollection;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
-import club.mondaylunch.gatos.core.graph.type.test.TestNodeTypes;
+import club.mondaylunch.gatos.testshared.graph.type.test.TestNodeTypes;
 import club.mondaylunch.gatos.core.models.BaseModel;
 
 public class NodeTypeCodecTest {
-
-    static {
-        ClassModelRegistry.register(
-            NodeTypeContainer.class,
-            NodeTypeContainerContainer.class
-        );
-        Database.refreshCodecRegistry();
-        new TestNodeTypes(); // classloading
-    }
 
     private static final BaseCollection<NodeTypeContainer> CONTAINER_COLLECTION = new BaseCollection<>("nodeTypeContainers", NodeTypeContainer.class);
     private static final BaseCollection<NodeTypeContainerContainer> CONTAINER_CONTAINER_COLLECTION = new BaseCollection<>("nodeTypeContainerContainers", NodeTypeContainerContainer.class);
