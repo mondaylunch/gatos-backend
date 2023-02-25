@@ -58,12 +58,13 @@ public interface NodeType {
     @ApiStatus.NonExtendable
     interface WithInputs {
         /**
-         * The input connectors of a node with a given UUID & settings.
+         * The input connectors of a node with a given UUID, settings, & current input connections (if any).
          * @param nodeId the node UUID
          * @param settings  the node settings
+         * @param inputTypes what type of output connector the input connectors to this node are connected to, if any
          * @return the input connectors of the node
          */
-        Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings);
+        Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes);
     }
 
     /**
@@ -85,10 +86,11 @@ public interface NodeType {
          * connector name to value.
          * @param inputs   a map of input connector name to value
          * @param settings a map of node settings
+         * @param inputTypes what type of output connector the input connectors to this node are connected to, if any
          * @return a CompletableFuture of each output in a map by name
          */
         Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
-                Map<String, DataBox<?>> settings);
+                Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes);
     }
 
     /**
@@ -138,8 +140,8 @@ public interface NodeType {
      * @param settings the settings of the node these inputs are for
      * @return the inputs, or empty
      */
-    static Set<NodeConnector.Input<?>> inputsOrEmpty(NodeType type, UUID id, Map<String, DataBox<?>> settings) {
-        return type instanceof WithInputs inputType ? inputType.inputs(id, settings) : Set.of();
+    static Set<NodeConnector.Input<?>> inputsOrEmpty(NodeType type, UUID id, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+        return type instanceof WithInputs inputType ? inputType.inputs(id, settings, inputTypes) : Set.of();
     }
 
     /**
