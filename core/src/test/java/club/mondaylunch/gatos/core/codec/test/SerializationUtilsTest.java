@@ -70,7 +70,7 @@ public class SerializationUtilsTest {
             id,
             type,
             defaultSettings,
-            NodeType.inputsOrEmpty(type, id, defaultSettings),
+            NodeType.inputsOrEmpty(type, id, defaultSettings, Map.of()),
             NodeType.outputsOrEmpty(type, id, defaultSettings, Map.of()),
             Map.of()
         );
