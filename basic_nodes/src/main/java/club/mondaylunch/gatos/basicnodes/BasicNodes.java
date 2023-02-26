@@ -17,6 +17,6 @@ public final class BasicNodes {
         .register("string_concat", new StringConcatNodeType());
     public static final ListLengthNodeType LIST_LENGTH = NodeType.REGISTRY
         .register("list_length", new ListLengthNodeType());
-    public static final ListLengthNodeType EQUALS = NodeType.REGISTRY
-        .register("equals", new ListLengthNodeType());
+    public static final EqualsNodeType EQUALS = NodeType.REGISTRY
+        .register("equals", new EqualsNodeType());
 }
