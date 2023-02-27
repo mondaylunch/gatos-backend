@@ -20,7 +20,7 @@ public class MathNodeType extends NodeType.Process {
     }
 
     @Override
-    public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
+    public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         return Set.of(
             new NodeConnector.Input<>(nodeId, "inputA", DataType.NUMBER),
             new NodeConnector.Input<>(nodeId, "inputB", DataType.NUMBER)
@@ -28,13 +28,13 @@ public class MathNodeType extends NodeType.Process {
     }
 
     @Override
-    public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings) {
+    public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         return Set.of(
             new NodeConnector.Output<>(nodeId, "output", DataType.NUMBER));
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         double a = DataBox.get(inputs, "inputA", DataType.NUMBER).orElseThrow();
         double b = DataBox.get(inputs, "inputB", DataType.NUMBER).orElseThrow();
 
@@ -46,10 +46,18 @@ public class MathNodeType extends NodeType.Process {
     }
 
     public enum Operator {
-        ADDITION("+") {         @Override public double apply(double a, double b) { return a + b; }},
-        SUBTRACTION("-") {      @Override public double apply(double a, double b) { return a - b; }},
-        MULTIPLICATION("*") {   @Override public double apply(double a, double b) { return a * b; }},
-        DIVISION("/") {         @Override public double apply(double a, double b) { return a / b; }};
+        ADDITION("+") { @Override public double apply(double a, double b) {
+                return a + b; }
+        },
+        SUBTRACTION("-") { @Override public double apply(double a, double b) {
+                return a - b; }
+        },
+        MULTIPLICATION("*") { @Override public double apply(double a, double b) {
+                return a * b; }
+        },
+        DIVISION("/") { @Override public double apply(double a, double b) {
+                return a / b; }
+        };
 
         private final String op;
 
