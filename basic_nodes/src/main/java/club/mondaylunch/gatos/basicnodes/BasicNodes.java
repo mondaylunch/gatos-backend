@@ -23,4 +23,6 @@ public final class BasicNodes {
         .register("list_length", new ListLengthNodeType());
     public static final EqualsNodeType EQUALS = NodeType.REGISTRY
         .register("equals", new EqualsNodeType());
+    public static final HTTPRequestNodeType HTTP_REQUEST = NodeType.REGISTRY
+        .register("http_request", new HTTPRequestNodeType());
 }
