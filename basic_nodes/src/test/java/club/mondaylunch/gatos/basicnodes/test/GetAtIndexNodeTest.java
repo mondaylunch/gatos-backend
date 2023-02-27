@@ -13,7 +13,10 @@ import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.data.ListDataType;
 import club.mondaylunch.gatos.core.data.OptionalDataType;
+import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.Node;
+import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
+import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 
 public class GetAtIndexNodeTest {
 
@@ -140,8 +143,17 @@ public class GetAtIndexNodeTest {
 
     @Test
     public void correctlyEvaluatesLinkedNodesInGraph() {
+        List<Node> nodeList = new ArrayList<>();
         var firstNode = Node.create(BasicNodes.GET_AT_INDEX);
         var secondNode = Node.create(BasicNodes.GET_AT_INDEX);
+        nodeList.add(firstNode);
+        nodeList.add(secondNode);
+
+        List<NodeConnection<?>> connectionsList = new ArrayList<>();
+        var connection = NodeConnection.createConnection(firstNode, "output", secondNode, "input", DataType.NUMBER);
+        connectionsList.add(connection.get());
+        Graph graph = new Graph(nodeList, Map.of(), connectionsList);
+        Assertions.assertEquals(graph.getNode(secondNode.id()).get().getOutputWithName("output"), DataType.NUMBER);
     }
 
 }
