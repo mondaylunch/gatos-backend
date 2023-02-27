@@ -7,12 +7,28 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Node;
 
 public class EqualsNodeTest {
+
+    private static final class TestEqualsNodeFirstJSON {
+        private final String firstKey = "Doctor";
+        private final String secondKey = "Jeroen";
+        private final String thirdKey = "Keppens";
+    }
+    private static final class TestEqualsNodeSecondJSON {
+        private final String firstKey = "Doctor";
+        private final String secondKey = "Keppens";
+    }
+
+    private static final Gson GSON = new Gson();
+
     @Test
     public void areInputsCorrect() {
         var node = Node.create(BasicNodes.EQUALS);
@@ -146,4 +162,41 @@ public class EqualsNodeTest {
         var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
         Assertions.assertEquals(false, output.get("output").join().value());
     }
+
+    @Test
+    public void identifiesEqualJSON() {
+        JsonObject TEST_JSON_OBJECT_1 = GSON.fromJson(GSON.toJson(new TestEqualsNodeFirstJSON()), JsonObject.class);
+        JsonObject TEST_JSON_OBJECT_2 = GSON.fromJson(GSON.toJson(new TestEqualsNodeSecondJSON()), JsonObject.class);
+
+        Map<String, DataBox<?>> input_1 = Map.of(
+            "first_object", DataType.ANY.create(TEST_JSON_OBJECT_1),
+            "second_object", DataType.ANY.create(TEST_JSON_OBJECT_1)
+        );
+        
+        Map<String, DataBox<?>> input_2 = Map.of(
+            "first_object", DataType.ANY.create(TEST_JSON_OBJECT_2),
+            "second_object", DataType.ANY.create(TEST_JSON_OBJECT_2)
+        );
+
+        var output_1 = BasicNodes.EQUALS.compute(input_1, Map.of(), Map.of());
+        Assertions.assertEquals(true, output_1.get("output").join().value());
+
+        var output_2 = BasicNodes.EQUALS.compute(input_2, Map.of(), Map.of());
+        Assertions.assertEquals(true, output_2.get("output").join().value());
+    }
+
+    @Test
+    public void identifiesNotEqualJSON() {
+        JsonObject TEST_JSON_OBJECT_1 = GSON.fromJson(GSON.toJson(new TestEqualsNodeFirstJSON()), JsonObject.class);
+        JsonObject TEST_JSON_OBJECT_2 = GSON.fromJson(GSON.toJson(new TestEqualsNodeSecondJSON()), JsonObject.class);
+
+        Map<String, DataBox<?>> input = Map.of(
+            "first_object", DataType.ANY.create(TEST_JSON_OBJECT_1),
+            "second_object", DataType.ANY.create(TEST_JSON_OBJECT_2)
+        );
+
+        var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
+        Assertions.assertEquals(false, output.get("output").join().value());
+    }
+
 }
