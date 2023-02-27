@@ -8,7 +8,7 @@ Start the API:
 ./gradlew :api:bootRun
 ```
 
-To run and generate a run configuration for the backend in IntelliJ you can open `api/src/main/java/gay/oss/gatos/api/ApiApplication.java` and press the play button.
+To run and generate a run configuration for the backend in IntelliJ you can open `api/src/main/java/club/mondaylunch/gatos/api/ApiApplication.java` and press the play button.
 
 Navigate to http://localhost:4390
 
@@ -18,4 +18,4 @@ Navigate to http://localhost:4390
 ./gradlew :api:test
 ```
 
-To run and generate a run configuration for the backend tests in IntelliJ right-click the `api/src/test` folder and select `Run 'All Tests'`.
+To run and generate a run configuration for the backend tests in IntelliJ, `ctrl` click all the `test` folders in all the modules, right-click one of them, and select `Run 'All Tests'`.

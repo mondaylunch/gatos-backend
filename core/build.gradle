@@ -16,9 +16,16 @@ dependencies {
     // GSON
     implementation 'com.google.code.gson:gson:2.10.1'
 
+    // Jackson
+    implementation group: "com.fasterxml.jackson.core", name: "jackson-databind", version: "2.14.2"
+
 	// Tests
+    testImplementation project(":test_shared")
+
 	testImplementation(platform('org.junit:junit-bom:5.9.2'))
 	testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    testImplementation("org.skyscreamer:jsonassert:1.5.1")
 }
 
 tasks.named('test') {

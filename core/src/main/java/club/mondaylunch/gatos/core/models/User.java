@@ -1,5 +1,6 @@
 package club.mondaylunch.gatos.core.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 
@@ -16,6 +17,7 @@ public class User extends BaseModel {
     private String email;
     private String password;
     @BsonProperty("auth_token")
+    @JsonProperty("auth_token")
     private String authToken;
 
     /**
@@ -57,7 +59,7 @@ public class User extends BaseModel {
     /**
      * Set the username.
      *
-     * @param String username
+     * @param username The username
      */
     public void setUsername(String username) {
         this.username = username;
@@ -66,7 +68,7 @@ public class User extends BaseModel {
     /**
      * Set the email.
      *
-     * @param String email
+     * @param email The email
      */
     public void setEmail(String email) {
         this.email = email;
@@ -75,7 +77,7 @@ public class User extends BaseModel {
     /**
      * Set the password.
      *
-     * @param String hashed password
+     * @param passwordHash The password hash
      */
     public void setPassword(String passwordHash) {
         this.password = passwordHash;
@@ -84,7 +86,7 @@ public class User extends BaseModel {
     /**
      * Set the auth token.
      *
-     * @param String Auth token
+     * @param authToken The authentication token
      */
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
@@ -93,12 +95,11 @@ public class User extends BaseModel {
     /**
      * Hash and set the password.
      *
-     * @param String password
+     * @param plaintextPassword The plaintext password
      */
     public void hashPlaintextPassword(String plaintextPassword) {
         Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
-        String hash = encoder.encode(plaintextPassword);
-        this.password = hash;
+        this.password = encoder.encode(plaintextPassword);
     }
 
     /**

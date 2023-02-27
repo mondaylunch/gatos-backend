@@ -5,7 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
+import org.bson.BsonDocument;
+import org.bson.BsonDocumentWriter;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
 import org.bson.codecs.Codec;
@@ -14,12 +17,17 @@ import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
 import org.bson.codecs.MapCodecProvider;
 import org.bson.codecs.Parameterizable;
+import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
+
+import club.mondaylunch.gatos.core.Database;
 
 /**
  * Holds utility methods for serialization.
  */
 public final class SerializationUtils {
+
+    private static final CodecRegistry JSON_CODEC_REGISTRY = createRegistry();
 
     /**
      * Reads a set from BSON.
@@ -96,6 +104,65 @@ public final class SerializationUtils {
             toWrite.put(keyToString.apply(entry.getKey()), entry.getValue());
         }
         context.encodeWithChildContext(parameterizedCodec, writer, toWrite);
+    }
+
+    /**
+     * Writes the start & end points of a BSON document and runs the provided runnable between them.
+     * @param writer    the BSON writer
+     * @param function  the function to run
+     */
+    public static void writeDocument(BsonWriter writer, Runnable function) {
+        writer.writeStartDocument();
+        function.run();
+        writer.writeEndDocument();
+    }
+
+    /**
+     * Reads the start & end points of a BSON document and runs the provided runnable between them.
+     * @param reader    the BSON reader
+     * @param function  the function to run
+     */
+    public static void readDocument(BsonReader reader, Runnable function) {
+        reader.readStartDocument();
+        function.run();
+        reader.readEndDocument();
+    }
+
+    /**
+     * Reads the start & end points of a BSON document and runs the provided function between them.
+     * @param reader    the BSON reader
+     * @param function  the function to run
+     * @return          the result of the function
+     */
+    public static <T> T readDocument(BsonReader reader, Supplier<T> function) {
+        reader.readStartDocument();
+        var res = function.get();
+        reader.readEndDocument();
+        return res;
+    }
+
+    /**
+     * Serializes an object to JSON.
+     *
+     * @param object The object to serialize
+     * @return The JSON representation of the object
+     */
+    public static String toJson(Object object) {
+        BsonDocument document = new BsonDocument();
+        try (BsonDocumentWriter writer = new BsonDocumentWriter(document)) {
+            @SuppressWarnings("unchecked")
+            Codec<Object> codec = (Codec<Object>) JSON_CODEC_REGISTRY.get(object.getClass());
+            EncoderContext context = EncoderContext.builder().build();
+            codec.encode(writer, object, context);
+            return document.toJson();
+        }
+    }
+
+    private static CodecRegistry createRegistry() {
+        return CodecRegistries.fromRegistries(
+            CodecRegistries.fromCodecs(UuidStringCodec.INSTANCE),
+            Database.getCodecRegistry()
+        );
     }
 
     private SerializationUtils() {}

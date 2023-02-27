@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
@@ -24,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import club.mondaylunch.gatos.core.codec.SerializationUtils;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
+import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeCategory;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
@@ -128,6 +130,15 @@ public class Graph {
     }
 
     /**
+     * Gets the node with a given UUID from the graph, if it exists.
+     * @param id    the UUID of the graph
+     * @return      the node with the UUID, or empty
+     */
+    public Optional<Node> getNode(UUID id) {
+        return Optional.ofNullable(this.nodes.get(id));
+    }
+
+    /**
      * Whether this <em>exact</em> node exists in the graph.
      *
      * @param node the node
@@ -172,7 +183,11 @@ public class Graph {
 
         this.connections.add(connection);
         this.getOrCreateConnectionsForNode(nodeFrom.id()).add(connection);
-        this.getOrCreateConnectionsForNode(nodeTo.id()).add(connection);
+        var destinationNodeConnections = this.getOrCreateConnectionsForNode(nodeTo.id());
+        destinationNodeConnections.add(connection);
+        this.modifyNode(nodeTo.id(), n -> n.updateInputTypes(destinationNodeConnections.stream()
+                .filter(c -> c.to().nodeId().equals(nodeTo.id()))
+            .collect(Collectors.toMap(c -> c.to().name(), c -> this.getCanonicalConnector(c.from()).type()))));
     }
 
     /**
@@ -183,7 +198,13 @@ public class Graph {
     public void removeConnection(NodeConnection<?> connection) {
         this.connections.remove(connection);
         this.getOrCreateConnectionsForNode(connection.from().nodeId()).remove(connection);
-        this.getOrCreateConnectionsForNode(connection.to().nodeId()).remove(connection);
+        var destinationNodeConnections = this.getOrCreateConnectionsForNode(connection.to().nodeId());
+        destinationNodeConnections.remove(connection);
+        if (this.containsNode(connection.to().nodeId())) {
+            this.modifyNode(connection.to().nodeId(), n -> n.updateInputTypes(destinationNodeConnections.stream()
+                    .filter(c -> c.to().nodeId().equals(connection.to().nodeId()))
+                .collect(Collectors.toMap(c -> c.to().name(), c -> this.getCanonicalConnector(c.from()).type()))));
+        }
     }
 
     /**
@@ -220,6 +241,16 @@ public class Graph {
      */
     private Set<NodeConnection<?>> getOrCreateConnectionsForNode(UUID nodeId) {
         return this.connectionsByNode.computeIfAbsent(nodeId, $ -> new HashSet<>());
+    }
+
+    /**
+     * For an output connector which may have a modified type, gets the connector with the 'true' type.
+     * If the connector does not exist, this method throws an exception.
+     * @param derivedConnector  the connector to find the canonical representation of
+     * @return  the canonical representation of the connector
+     */
+    private NodeConnector.Output<?> getCanonicalConnector(NodeConnector.Output<?> derivedConnector) {
+        return this.nodes.get(derivedConnector.nodeId()).getOutputWithName(derivedConnector.name()).orElseThrow();
     }
 
     /**
@@ -331,11 +362,13 @@ public class Graph {
      */
     private static boolean isConnectionValid(Node node, NodeConnection<?> connection) {
         if (connection.from().nodeId().equals(node.id())) {
-            return node.getOutputs().containsValue(connection.from());
+            return node.getOutputWithName(connection.from().name()).map(it ->
+                it.isCompatible(connection.from())
+            ).orElse(false);
         }
 
         if (connection.to().nodeId().equals(node.id())) {
-            return node.inputs().containsValue(connection.to());
+            return node.getInputWithName(connection.to().name()).map(connection.to()::equals).orElse(false);
         }
 
         return false;
@@ -400,27 +433,27 @@ public class Graph {
 
         @Override
         public Graph decode(BsonReader reader, DecoderContext decoderContext) {
-            reader.readStartDocument();
-            reader.readName("nodes");
-            Set<Node> nodes = SerializationUtils.readSet(reader, decoderContext, Node.class, this.registry);
-            reader.readName("connections");
-            Set<NodeConnection<?>> connections = SerializationUtils.readSet(reader, decoderContext, NodeConnection.class, this.registry);
-            reader.readName("metadata");
-            Map<UUID, NodeMetadata> metadata = SerializationUtils.readMap(reader, decoderContext, NodeMetadata.class, UUID::fromString, this.registry);
-            reader.readEndDocument();
-            return new Graph(nodes, metadata, connections);
+            return SerializationUtils.readDocument(reader, () -> {
+                reader.readName("nodes");
+                Set<Node> nodes = SerializationUtils.readSet(reader, decoderContext, Node.class, this.registry);
+                reader.readName("connections");
+                Set<NodeConnection<?>> connections = SerializationUtils.readSet(reader, decoderContext, NodeConnection.class, this.registry);
+                reader.readName("metadata");
+                Map<UUID, NodeMetadata> metadata = SerializationUtils.readMap(reader, decoderContext, NodeMetadata.class, UUID::fromString, this.registry);
+                return new Graph(nodes, metadata, connections);
+            });
         }
 
         @Override
         public void encode(BsonWriter writer, Graph value, EncoderContext encoderContext) {
-            writer.writeStartDocument();
-            writer.writeName("nodes");
-            SerializationUtils.writeSet(writer, encoderContext, Node.class, this.registry, Set.copyOf(value.nodes.values()));
-            writer.writeName("connections");
-            SerializationUtils.writeSet(writer, encoderContext, NodeConnection.class, this.registry, value.connections);
-            writer.writeName("metadata");
-            SerializationUtils.writeMap(writer, encoderContext, NodeMetadata.class, UUID::toString, this.registry, value.metadataByNode);
-            writer.writeEndDocument();
+            SerializationUtils.writeDocument(writer, () -> {
+                writer.writeName("nodes");
+                SerializationUtils.writeSet(writer, encoderContext, Node.class, this.registry, Set.copyOf(value.nodes.values()));
+                writer.writeName("connections");
+                SerializationUtils.writeSet(writer, encoderContext, NodeConnection.class, this.registry, value.connections);
+                writer.writeName("metadata");
+                SerializationUtils.writeMap(writer, encoderContext, NodeMetadata.class, UUID::toString, this.registry, value.metadataByNode);
+            });
         }
 
         @Override

@@ -7,21 +7,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import club.mondaylunch.gatos.core.codec.ClassModelRegistry;
-import club.mondaylunch.gatos.core.Database;
 import club.mondaylunch.gatos.core.collection.BaseCollection;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.models.BaseModel;
 
 public class DataTypeCodecTest {
-
-    static {
-        ClassModelRegistry.register(
-            DataTypeContainer.class,
-            DataTypeContainerContainer.class
-        );
-        Database.refreshCodecRegistry();
-    }
 
     private static final BaseCollection<DataTypeContainer> CONTAINER_COLLECTION = new BaseCollection<>("dataTypeContainers", DataTypeContainer.class);
     private static final BaseCollection<DataTypeContainerContainer> CONTAINER_CONTAINER_COLLECTION = new BaseCollection<>("dataTypeContainerContainers", DataTypeContainerContainer.class);
@@ -45,13 +35,13 @@ public class DataTypeCodecTest {
 
     @Test
     public void canInsertDataTypeContainer() {
-        assertInsertDataTypeContainers(DataType.INTEGER);
+        assertInsertDataTypeContainers(DataType.NUMBER);
     }
 
     @Test
     public void canInsertMultipleDataTypeContainers() {
         assertInsertDataTypeContainers(
-            DataType.INTEGER,
+            DataType.NUMBER,
             DataType.BOOLEAN,
             DataType.STRING
         );
@@ -60,10 +50,10 @@ public class DataTypeCodecTest {
     @Test
     public void canInsertDataTypeContainersWithDuplicates() {
         assertInsertDataTypeContainers(
-            DataType.INTEGER,
+            DataType.NUMBER,
             DataType.BOOLEAN,
             DataType.STRING,
-            DataType.INTEGER,
+            DataType.NUMBER,
             DataType.BOOLEAN,
             DataType.STRING
         );
@@ -72,7 +62,7 @@ public class DataTypeCodecTest {
     @Test
     public void canInsertNestedContainer() {
         UUID id = UUID.randomUUID();
-        DataType<?> dataType = DataType.INTEGER;
+        DataType<?> dataType = DataType.NUMBER;
         DataTypeContainer container = new DataTypeContainer(UUID.randomUUID(), dataType);
         DataTypeContainerContainer containerContainer = new DataTypeContainerContainer(id, container);
         CONTAINER_CONTAINER_COLLECTION.insert(containerContainer);

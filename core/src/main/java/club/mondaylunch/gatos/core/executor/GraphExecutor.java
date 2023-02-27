@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.Unmodifiable;
 
+import club.mondaylunch.gatos.core.data.Conversions;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
@@ -80,7 +81,7 @@ public class GraphExecutor {
         for (var dep : this.nodeDependencies.get(node)) {
             var resForDep = allResults.get(dep);
             var depInputName = dep.to().name();
-            inputs.put(depInputName, resForDep.join());
+            inputs.put(depInputName, Conversions.convert(resForDep.join(), dep.to().type()));
         }
 
         return inputs;
@@ -98,7 +99,7 @@ public class GraphExecutor {
         Map<NodeConnection<?>, CompletableFuture<DataBox<?>>> resultsByConnection = new HashMap<>();
         Map<String, CompletableFuture<DataBox<?>>> resultsByConnectorName = node
                 .type() instanceof NodeType.WithOutputs outputs
-                        ? outputs.compute(inputs, node.settings())
+                        ? outputs.compute(inputs, node.settings(), node.inputTypes())
                         : Map.of();
         for (var entry : resultsByConnectorName.entrySet()) {
             for (var conn : this.getOutputConnectionsByName(node, entry.getKey())) {
@@ -118,7 +119,7 @@ public class GraphExecutor {
      */
     private Iterable<NodeConnection<?>> getOutputConnectionsByName(Node node, String name) {
         return node.getOutputWithName(name).stream()
-                .flatMap(c -> this.connections.stream().filter(a -> a.from().equals(c)))
+                .flatMap(c -> this.connections.stream().filter(a -> c.isCompatible(a.from())))
                 .toList();
     }
 }
