@@ -99,7 +99,7 @@ public class GraphExecutor {
         Map<NodeConnection<?>, CompletableFuture<DataBox<?>>> resultsByConnection = new HashMap<>();
         Map<String, CompletableFuture<DataBox<?>>> resultsByConnectorName = node
                 .type() instanceof NodeType.WithOutputs outputs
-                        ? outputs.compute(inputs, node.settings())
+                        ? outputs.compute(inputs, node.settings(), node.inputTypes())
                         : Map.of();
         for (var entry : resultsByConnectorName.entrySet()) {
             for (var conn : this.getOutputConnectionsByName(node, entry.getKey())) {

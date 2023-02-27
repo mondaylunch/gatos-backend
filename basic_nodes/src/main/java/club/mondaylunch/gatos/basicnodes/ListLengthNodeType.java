@@ -22,7 +22,7 @@ public class ListLengthNodeType extends NodeType.Process {
     }
 
     @Override
-    public Set<Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
+    public Set<Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         return Set.of(
             new NodeConnector.Input<>(nodeId, "input", ListDataType.GENERIC_LIST));
     }
@@ -34,7 +34,7 @@ public class ListLengthNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var inputList = DataBox.get(inputs, "input", ListDataType.GENERIC_LIST).orElse(new ArrayList<>());
         return Map.of("output", CompletableFuture.completedFuture(DataType.NUMBER.create((double) inputList.size())));
     }

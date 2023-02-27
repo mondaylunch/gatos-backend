@@ -9,22 +9,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import club.mondaylunch.gatos.core.Database;
-import club.mondaylunch.gatos.core.codec.ClassModelRegistry;
 import club.mondaylunch.gatos.core.collection.BaseCollection;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.models.BaseModel;
 
 public class DataBoxCodecTest {
-
-    static {
-        ClassModelRegistry.register(
-            DataBoxContainer.class,
-            DataBoxContainerContainer.class
-        );
-        Database.refreshCodecRegistry();
-    }
 
     private static final BaseCollection<DataBoxContainer> CONTAINER_COLLECTION = new BaseCollection<>("dataBoxContainers", DataBoxContainer.class);
     private static final BaseCollection<DataBoxContainerContainer> CONTAINER_CONTAINER_COLLECTION = new BaseCollection<>("dataBoxContainerContainers", DataBoxContainerContainer.class);

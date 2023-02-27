@@ -2,8 +2,11 @@ package club.mondaylunch.gatos.core.models;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonProperty;
+
+import club.mondaylunch.gatos.core.codec.SerializationUtils;
 
 /**
  * Class describing common properties for all database models.
@@ -12,6 +15,7 @@ public class BaseModel {
 
     @BsonId
     @BsonProperty("_id")
+    @JsonProperty("_id")
     private UUID id;
 
     public BaseModel(UUID id) {
@@ -37,6 +41,10 @@ public class BaseModel {
      */
     public void setId(UUID uuid) {
         this.id = uuid;
+    }
+
+    public String toJson() {
+        return SerializationUtils.toJson(this);
     }
 
     @Override

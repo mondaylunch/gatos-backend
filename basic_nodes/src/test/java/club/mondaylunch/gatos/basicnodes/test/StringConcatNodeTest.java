@@ -33,7 +33,7 @@ public class StringConcatNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.STRING.listOf().create(TEST_LIST)
         );
-        var output = BasicNodes.STRING_CONCAT.compute(input, Map.of());
+        var output = BasicNodes.STRING_CONCAT.compute(input, Map.of(), Map.of());
         Assertions.assertEquals(output.get("output").join().value(), String.join("", TEST_LIST));
     }
 
@@ -44,7 +44,7 @@ public class StringConcatNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.STRING.listOf().create(TEST_LIST)
         );
-        var output = BasicNodes.STRING_CONCAT.compute(input, node.settings());
+        var output = BasicNodes.STRING_CONCAT.compute(input, node.settings(), Map.of());
         Assertions.assertEquals(output.get("output").join().value(), String.join(" amongus ", TEST_LIST));
     }
 }
