@@ -40,8 +40,8 @@ public class OptionalOrElseNodeType extends NodeType.Process {
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         DataType<?> type = this.getTypeFromInputs(inputTypes);
         DataType<?> optionalDataType = type == DataType.ANY ? OptionalDataType.GENERIC_OPTIONAL : type.optionalOf();
-        Optional<?> optional = DataBox.get(inputs, "optional", optionalDataType);
-        Object fallback = DataBox.get(inputs, "fallback", type);
+        Optional<?> optional = (Optional<?>) DataBox.get(inputs, "optional", optionalDataType).orElseThrow();
+        Object fallback = DataBox.get(inputs, "fallback", type).orElseThrow();
         var result = this.getValue(optional, fallback, type);
         return Map.of(
             "output", CompletableFuture.completedFuture(result)
