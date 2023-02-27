@@ -7,8 +7,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import com.google.gson.JsonObject;
-
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.data.ListDataType;
@@ -25,7 +23,7 @@ public class ListHeadTailNodeType extends NodeType.Process {
     }
 
     @Override
-    public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
+    public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         return Set.of(
             new NodeConnector.Input<>(nodeId, "input", ListDataType.GENERIC_LIST)
         );
@@ -33,16 +31,16 @@ public class ListHeadTailNodeType extends NodeType.Process {
 
     @Override
     public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        var z = inputTypes;
+        var outType = inputTypes.isEmpty() ? DataType.ANY : inputTypes.get("input");
         return Set.of(
-            new NodeConnector.Output<>(nodeId, "first", DataType.ANY),
-            new NodeConnector.Output<>(nodeId, "rest", ListDataType.GENERIC_LIST)
+            new NodeConnector.Output<>(nodeId, "first", outType),
+            new NodeConnector.Output<>(nodeId, "rest", outType.listOf())
         );
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var inputList = DataBox.get(inputs, "input", ListDataType.GENERIC_LIST).orElse(List.of());
         if (inputList.isEmpty()) {
             return Map.of(
@@ -55,7 +53,7 @@ public class ListHeadTailNodeType extends NodeType.Process {
         var lastIndex = inputList.size() - 1;
         var extractionIndex = shouldExtractHead ? 0 : lastIndex;
         var subListOffset = shouldExtractHead ? 1 : 0;
-        var outputType = this.getTypeFromClass(inputList.get(0).getClass());
+        var outputType = this.findExactDatatype(inputTypes.get("input"));
         return Map.of(
             "first", CompletableFuture.completedFuture(outputType.create(
                 inputList.get(extractionIndex))),
@@ -64,16 +62,15 @@ public class ListHeadTailNodeType extends NodeType.Process {
         );
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> DataType<T> getTypeFromClass(Class<?> klass) {
-        DataType type;
-        if (klass == Double.class) {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private <T> DataType<T> findExactDatatype(DataType type) {
+        if (type.equals(DataType.NUMBER)) {
             type = DataType.NUMBER;
-        } else if (klass == String.class) {
+        } else if (type.equals(DataType.STRING)) {
             type = DataType.STRING;
-        } else if (klass == Boolean.class) {
+        } else if (type.equals(DataType.BOOLEAN)) {
             type = DataType.BOOLEAN;
-        } else if (klass == JsonObject.class) {
+        } else if (type.equals(DataType.JSON_OBJECT)) {
             type = DataType.JSON_OBJECT;
         } else {
             type = DataType.ANY;

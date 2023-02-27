@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import club.mondaylunch.gatos.core.data.DataType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +41,8 @@ public class ListHeadTailNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST)
         );
-        var output = BasicNodes.LIST_HEADTAIL.compute(input, node.settings());
+        var output = BasicNodes.LIST_HEADTAIL.compute(input, node.settings(),
+            Map.of("input", DataType.NUMBER));
         Assertions.assertEquals(TEST_NUM_LIST.get(0), output.get("first").join().value());
         Assertions.assertEquals(TEST_NUM_LIST.subList(1, TEST_NUM_LIST.size()), output.get("rest").join().value());
     }
@@ -52,7 +54,8 @@ public class ListHeadTailNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST)
         );
-        var output = BasicNodes.LIST_HEADTAIL.compute(input, node.settings());
+        var output = BasicNodes.LIST_HEADTAIL.compute(input, node.settings(),
+            Map.of("input", DataType.NUMBER));
         Assertions.assertEquals(TEST_NUM_LIST.get(TEST_NUM_LIST.size() - 1), output.get("first").join().value());
         Assertions.assertEquals(TEST_NUM_LIST.subList(0, TEST_NUM_LIST.size() - 1), output.get("rest").join().value());
     }
@@ -63,23 +66,26 @@ public class ListHeadTailNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_STR_LIST)
         );
-        var output = BasicNodes.LIST_HEADTAIL.compute(input, node.settings());
+        var output = BasicNodes.LIST_HEADTAIL.compute(input, node.settings(),
+            Map.of("input", DataType.STRING));
         Assertions.assertEquals(TEST_STR_LIST.get(0), output.get("first").join().value());
         Assertions.assertEquals(List.of(), output.get("rest").join().value());
 
         node.modifySetting("extraction_mode", ListHeadTailNodeType.getTailExtractionBox());
-        var output1 = BasicNodes.LIST_HEADTAIL.compute(input, node.settings());
+        var output1 = BasicNodes.LIST_HEADTAIL.compute(input, node.settings(),
+            Map.of("input", DataType.STRING));
         Assertions.assertEquals(TEST_STR_LIST.get(0), output1.get("first").join().value());
         Assertions.assertEquals(List.of(), output1.get("rest").join().value());
     }
 
     @Test
     public void correctlyReturnsNullForEmptyLists() {
-        var node = Node.create(BasicNodes.LIST_HEADTAIL);
+        var node = Node.create(BasicNodes.LIST_HEADTAIL)
+            .updateInputTypes(Map.of("input", DataType.ANY));
         Map<String, DataBox<?>> input = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_EMPTY_LIST)
         );
-        var output = BasicNodes.LIST_HEADTAIL.compute(input, node.settings());
+        var output = BasicNodes.LIST_HEADTAIL.compute(input, node.settings(), Map.of());
         Assertions.assertEquals(Optional.empty(), output.get("first").join().value());
         Assertions.assertEquals(List.of(), output.get("rest").join().value());
     }
