@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.data.ListDataType;
+import club.mondaylunch.gatos.core.data.OptionalDataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
@@ -31,21 +32,25 @@ public class ListHeadTailNodeType extends NodeType.Process {
 
     @Override
     public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        var outType = inputTypes.isEmpty() ? DataType.ANY : inputTypes.get("input");
+        var outputType = this.findExactDatatype(inputTypes.get("input"));
+        var optionalType = outputType == DataType.ANY ? OptionalDataType.GENERIC_OPTIONAL : outputType.optionalOf();
+        var listType = outputType == DataType.ANY ? ListDataType.GENERIC_LIST : outputType.listOf();
         return Set.of(
-            new NodeConnector.Output<>(nodeId, "first", outType),
-            new NodeConnector.Output<>(nodeId, "rest", outType.listOf())
+            new NodeConnector.Output<>(nodeId, "first", optionalType),
+            new NodeConnector.Output<>(nodeId, "rest", listType)
         );
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var inputList = DataBox.get(inputs, "input", ListDataType.GENERIC_LIST).orElse(List.of());
+        var outputType = this.findExactDatatype(inputTypes.get("input"));
+        var optionalType = outputType == DataType.ANY ? OptionalDataType.GENERIC_OPTIONAL : outputType.optionalOf();
+        var listType = outputType == DataType.ANY ? ListDataType.GENERIC_LIST : outputType.listOf();
         if (inputList.isEmpty()) {
             return Map.of(
-                "first", CompletableFuture.completedFuture(DataType.ANY.create(Optional.empty())),
-                "rest", CompletableFuture.completedFuture(ListDataType.GENERIC_LIST.create(List.of()))
+                "first", CompletableFuture.completedFuture(this.getGenericOptionalBox(Optional.empty(), optionalType)),
+                "rest", CompletableFuture.completedFuture(this.getGenericListBox(List.of(), listType))
             );
         }
         var shouldExtractHead = DataBox.get(settings, "extraction_mode",
@@ -53,29 +58,29 @@ public class ListHeadTailNodeType extends NodeType.Process {
         var lastIndex = inputList.size() - 1;
         var extractionIndex = shouldExtractHead ? 0 : lastIndex;
         var subListOffset = shouldExtractHead ? 1 : 0;
-        var outputType = this.findExactDatatype(inputTypes.get("input"));
+        var subList = inputList.subList(subListOffset, lastIndex + subListOffset);
         return Map.of(
-            "first", CompletableFuture.completedFuture(outputType.create(
-                inputList.get(extractionIndex))),
-            "rest", CompletableFuture.completedFuture(outputType.listOf().create(
-                (List<Object>) inputList.subList(subListOffset, lastIndex + subListOffset)))
+            "first", CompletableFuture.completedFuture(
+                this.getGenericOptionalBox(Optional.of(inputList.get(extractionIndex)), optionalType)
+            ), "rest", CompletableFuture.completedFuture(
+                this.getGenericListBox(subList, listType))
         );
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private <T> DataType<T> findExactDatatype(DataType type) {
-        if (type.equals(DataType.NUMBER)) {
-            type = DataType.NUMBER;
-        } else if (type.equals(DataType.STRING)) {
-            type = DataType.STRING;
-        } else if (type.equals(DataType.BOOLEAN)) {
-            type = DataType.BOOLEAN;
-        } else if (type.equals(DataType.JSON_OBJECT)) {
-            type = DataType.JSON_OBJECT;
-        } else {
-            type = DataType.ANY;
-        }
-        return type;
+    @SuppressWarnings({"unchecked", "OptionalUsedAsFieldOrParameterType"})
+    private <T> DataBox<T> getGenericOptionalBox(Optional<?> optional, DataType<?> type) {
+        return ((DataType<T>) type.optionalOf()).create(((Optional<T>) optional).orElse((T) Optional.empty()));
+    }
+
+    @SuppressWarnings({"unchecked", "ListUsedAsFieldOrParameterType"})
+    private <T> DataBox<T> getGenericListBox(List<?> list, DataType<?> type) {
+        return ((DataType<T>) type.listOf()).create((T) list);
+    }
+
+    private DataType<?> findExactDatatype(DataType<?> type) {
+        return type instanceof ListDataType<?> list
+            ? list.contains()
+            : DataType.ANY;
     }
 
     private enum ExtractionMode {
