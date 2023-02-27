@@ -93,7 +93,8 @@ public class FlowController {
         partial.setDescription(data.description);
         partial.setGraph(null);
 
-        var updated = Flow.objects.update(flow.getId(), partial);
+        Flow.objects.update(flow.getId(), partial);
+        var updated = Flow.objects.get(flow.getId());
         return new BasicFlowInfo(updated);
     }
 
