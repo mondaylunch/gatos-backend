@@ -4,8 +4,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
-import club.mondaylunch.gatos.api.exceptions.FlowNotFoundException;
-import club.mondaylunch.gatos.api.exceptions.NoPermissionException;
+import club.mondaylunch.gatos.api.exception.flow.FlowNotFoundException;
+import club.mondaylunch.gatos.api.exception.flow.NoPermissionException;
 import club.mondaylunch.gatos.core.models.Flow;
 import club.mondaylunch.gatos.core.models.User;
 

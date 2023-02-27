@@ -2,8 +2,8 @@ package club.mondaylunch.gatos.api.repository;
 
 import org.springframework.stereotype.Repository;
 
-import club.mondaylunch.gatos.api.exceptions.EmailAlreadyInUseException;
-import club.mondaylunch.gatos.api.exceptions.UsernameAlreadyInUseException;
+import club.mondaylunch.gatos.api.exception.signup.EmailAlreadyInUseException;
+import club.mondaylunch.gatos.api.exception.signup.UsernameAlreadyInUseException;
 import club.mondaylunch.gatos.core.models.User;
 
 @Repository
