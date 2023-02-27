@@ -33,8 +33,8 @@ public class EqualsNodeTest {
     public void areInputsCorrect() {
         var node = Node.create(BasicNodes.EQUALS);
         Assertions.assertEquals(2, node.inputs().size());
-        Assertions.assertTrue(node.inputs().containsKey("first_object"));
-        Assertions.assertTrue(node.inputs().containsKey("second_object"));
+        Assertions.assertTrue(node.inputs().containsKey("inputA"));
+        Assertions.assertTrue(node.inputs().containsKey("inputB"));
     }
 
     @Test
@@ -47,8 +47,8 @@ public class EqualsNodeTest {
     @Test
     public void identifiesEqualStrings() {
         Map<String, DataBox<?>> input = Map.of(
-            "first_object", DataType.ANY.create("test_string"),
-            "second_object", DataType.ANY.create("test_string")
+            "inputA", DataType.ANY.create("test_string"),
+            "inputB", DataType.ANY.create("test_string")
         );
 
         var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
@@ -58,8 +58,8 @@ public class EqualsNodeTest {
     @Test
     public void identifiesNotEqualStrings() {
         Map<String, DataBox<?>> input = Map.of(
-            "first_object", DataType.ANY.create("test_string"),
-            "second_object", DataType.ANY.create("this is not equal to the first string")
+            "inputA", DataType.ANY.create("test_string"),
+            "inputB", DataType.ANY.create("this is not equal to the first string")
         );
 
         var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
@@ -69,8 +69,8 @@ public class EqualsNodeTest {
     @Test
     public void identifiesEqualNumbers() {
         Map<String, DataBox<?>> input = Map.of(
-            "first_object", DataType.ANY.create(0.0),
-            "second_object", DataType.ANY.create(0.0)
+            "inputA", DataType.ANY.create(0.0),
+            "inputB", DataType.ANY.create(0.0)
         );
 
         var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
@@ -80,8 +80,8 @@ public class EqualsNodeTest {
     @Test
     public void identifiesNotEqualNumbers() {
         Map<String, DataBox<?>> input = Map.of(
-            "first_object", DataType.ANY.create(1.0),
-            "second_object", DataType.ANY.create(0.0)
+            "inputA", DataType.ANY.create(1.0),
+            "inputB", DataType.ANY.create(0.0)
         );
         
         var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
@@ -91,8 +91,8 @@ public class EqualsNodeTest {
     @Test
     public void identifiesEqualBooleans() {
         Map<String, DataBox<?>> input = Map.of(
-            "first_object", DataType.ANY.create(true),
-            "second_object", DataType.ANY.create(true)
+            "inputA", DataType.ANY.create(true),
+            "inputB", DataType.ANY.create(true)
         );
         
         var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
@@ -102,8 +102,8 @@ public class EqualsNodeTest {
     @Test
     public void identifiesNotEqualBooleans() {
         Map<String, DataBox<?>> input = Map.of(
-            "first_object", DataType.ANY.create(true),
-            "second_object", DataType.ANY.create(false)
+            "inputA", DataType.ANY.create(true),
+            "inputB", DataType.ANY.create(false)
         );
         
         var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
@@ -121,8 +121,8 @@ public class EqualsNodeTest {
         }
 
         Map<String, DataBox<?>> input = Map.of(
-            "first_object", DataType.ANY.create(firstObject),
-            "second_object", DataType.ANY.create(secondObject)
+            "inputA", DataType.ANY.create(firstObject),
+            "inputB", DataType.ANY.create(secondObject)
         );
         
         var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
@@ -140,8 +140,8 @@ public class EqualsNodeTest {
         }
 
         Map<String, DataBox<?>> input = Map.of(
-            "first_object", DataType.ANY.create(firstObject),
-            "second_object", DataType.ANY.create(secondObject)
+            "inputA", DataType.ANY.create(firstObject),
+            "inputB", DataType.ANY.create(secondObject)
         );
         var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
         Assertions.assertEquals(false, output.get("output").join().value());
@@ -156,8 +156,8 @@ public class EqualsNodeTest {
         }
 
         Map<String, DataBox<?>> input = Map.of(
-            "first_object", DataType.ANY.create(firstObject),
-            "second_object", DataType.ANY.create(true)
+            "inputA", DataType.ANY.create(firstObject),
+            "inputB", DataType.ANY.create(true)
         );
         var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
         Assertions.assertEquals(false, output.get("output").join().value());
@@ -169,13 +169,13 @@ public class EqualsNodeTest {
         JsonObject TEST_JSON_OBJECT_2 = GSON.fromJson(GSON.toJson(new TestEqualsNodeSecondJSON()), JsonObject.class);
 
         Map<String, DataBox<?>> input_1 = Map.of(
-            "first_object", DataType.ANY.create(TEST_JSON_OBJECT_1),
-            "second_object", DataType.ANY.create(TEST_JSON_OBJECT_1)
+            "inputA", DataType.ANY.create(TEST_JSON_OBJECT_1),
+            "inputB", DataType.ANY.create(TEST_JSON_OBJECT_1)
         );
         
         Map<String, DataBox<?>> input_2 = Map.of(
-            "first_object", DataType.ANY.create(TEST_JSON_OBJECT_2),
-            "second_object", DataType.ANY.create(TEST_JSON_OBJECT_2)
+            "inputA", DataType.ANY.create(TEST_JSON_OBJECT_2),
+            "inputB", DataType.ANY.create(TEST_JSON_OBJECT_2)
         );
 
         var output_1 = BasicNodes.EQUALS.compute(input_1, Map.of(), Map.of());
@@ -191,8 +191,8 @@ public class EqualsNodeTest {
         JsonObject TEST_JSON_OBJECT_2 = GSON.fromJson(GSON.toJson(new TestEqualsNodeSecondJSON()), JsonObject.class);
 
         Map<String, DataBox<?>> input = Map.of(
-            "first_object", DataType.ANY.create(TEST_JSON_OBJECT_1),
-            "second_object", DataType.ANY.create(TEST_JSON_OBJECT_2)
+            "inputA", DataType.ANY.create(TEST_JSON_OBJECT_1),
+            "inputB", DataType.ANY.create(TEST_JSON_OBJECT_2)
         );
 
         var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());

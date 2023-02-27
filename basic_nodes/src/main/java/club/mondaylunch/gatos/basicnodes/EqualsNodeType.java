@@ -22,8 +22,8 @@ public class EqualsNodeType extends NodeType.Process {
     @Override
     public Set<Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         return Set.of(
-            new NodeConnector.Input<>(nodeId, "first_object", DataType.ANY),
-            new NodeConnector.Input<>(nodeId, "second_object", DataType.ANY)
+            new NodeConnector.Input<>(nodeId, "inputA", DataType.ANY),
+            new NodeConnector.Input<>(nodeId, "inputB", DataType.ANY)
         );
     }
 
@@ -35,9 +35,9 @@ public class EqualsNodeType extends NodeType.Process {
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        var firstObject = DataBox.get(inputs, "first_object", DataType.ANY).orElse("");
-        var secondObject = DataBox.get(inputs, "second_object", DataType.ANY).orElse("");
-        return Map.of("output", CompletableFuture.completedFuture(DataType.BOOLEAN.create(firstObject.equals(secondObject))));
+        var inputA = DataBox.get(inputs, "inputA", DataType.ANY).orElse("");
+        var inputB = DataBox.get(inputs, "inputB", DataType.ANY).orElse("");
+        return Map.of("output", CompletableFuture.completedFuture(DataType.BOOLEAN.create(inputA.equals(inputB))));
     }
     
 }
