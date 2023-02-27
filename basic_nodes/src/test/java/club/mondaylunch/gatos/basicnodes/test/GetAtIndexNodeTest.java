@@ -92,7 +92,7 @@ public class GetAtIndexNodeTest {
         );
 
         Map<String, DataType<?>> inputTypes = Map.of(
-            "input_type", DataType.NUMBER
+            "input", DataType.NUMBER
         );
 
         var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), inputTypes);
@@ -108,7 +108,7 @@ public class GetAtIndexNodeTest {
         );
 
         Map<String, DataType<?>> inputTypes = Map.of(
-            "input_type", DataType.NUMBER
+            "input", DataType.NUMBER
         );
 
         var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), inputTypes);
@@ -130,12 +130,18 @@ public class GetAtIndexNodeTest {
         );
 
         Map<String, DataType<?>> inputTypes = Map.of(
-            "input_type", DataType.STRING
+            "input", DataType.STRING
         );
 
         var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), inputTypes);
         Assertions.assertEquals("i0", output.get("output").join().value());
         Assertions.assertEquals(output.get("output").join().type(), DataType.STRING);
+    }
+
+    @Test
+    public void correctlyEvaluatesLinkedNodesInGraph() {
+        var firstNode = Node.create(BasicNodes.GET_AT_INDEX);
+        var secondNode = Node.create(BasicNodes.GET_AT_INDEX);
     }
 
 }

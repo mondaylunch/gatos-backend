@@ -31,10 +31,10 @@ public class GetAtIndexNodeType extends NodeType.Process {
 
     @Override
     public Set<Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        var inputType = inputTypes.getOrDefault("input_type", OptionalDataType.GENERIC_OPTIONAL);
+        var inputType = inputTypes.getOrDefault("input", ListDataType.GENERIC_LIST);
         DataType<?> outType;
 
-        if (inputType != OptionalDataType.GENERIC_OPTIONAL) {
+        if (inputType != ListDataType.GENERIC_LIST) {
             outType = inputType;
         } else {
             outType = DataType.ANY;
@@ -48,7 +48,7 @@ public class GetAtIndexNodeType extends NodeType.Process {
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var inputList = DataBox.get(inputs, "input", ListDataType.GENERIC_LIST).orElse(new ArrayList<>());
         Double inputIndex = DataBox.get(inputs, "index", DataType.NUMBER).orElse(-1.0);
-        DataType outType = inputTypes.getOrDefault("input_type", DataType.ANY);
+        DataType outType = inputTypes.getOrDefault("input", DataType.ANY);
         int index = inputIndex.intValue();
         boolean ListOutOfBound = index == inputList.size()-1;
 
