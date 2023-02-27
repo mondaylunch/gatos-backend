@@ -30,11 +30,13 @@ public class ParseStringNodeType extends NodeType.Process {
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+        double output = 0;
+        try {
+            output = Double.parseDouble(String.join("", DataBox.get(inputs, "input", DataType.STRING).orElse("").split(",")));
+        } catch(NumberFormatException e) {
+            output = Double.NaN;
+        }
         return Map.of(
-            "output", CompletableFuture.completedFuture(DataType.NUMBER.create(
-                Double.parseDouble(
-                    String.join("", DataBox.get(inputs, "input", DataType.STRING).orElse("").split(",")))
-            ))
-        );
+            "output", CompletableFuture.completedFuture(DataType.NUMBER.create(output)));
     }
 }
