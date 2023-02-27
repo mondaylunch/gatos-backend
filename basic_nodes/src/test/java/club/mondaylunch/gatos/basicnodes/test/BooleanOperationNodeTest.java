@@ -16,10 +16,10 @@ import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.Node;
 
 public class BooleanOperationNodeTest {
-    private static final Node OR    = Node.create(BasicNodes.BOOL_OP).modifySetting("mode", BooleanOperationNodeType.BOOL_OPERATION_MODE.create(BooleanOperationNodeType.Mode.OR));
-    private static final Node AND   = Node.create(BasicNodes.BOOL_OP).modifySetting("mode", BooleanOperationNodeType.BOOL_OPERATION_MODE.create(BooleanOperationNodeType.Mode.AND));
-    private static final Node XOR   = Node.create(BasicNodes.BOOL_OP).modifySetting("mode", BooleanOperationNodeType.BOOL_OPERATION_MODE.create(BooleanOperationNodeType.Mode.XOR));
-    private static final Node NOT   = Node.create(BasicNodes.BOOL_OP).modifySetting("mode", BooleanOperationNodeType.BOOL_OPERATION_MODE.create(BooleanOperationNodeType.Mode.NOT));
+    private static final Node OR = Node.create(BasicNodes.BOOL_OP).modifySetting("mode", BooleanOperationNodeType.BOOL_OPERATION_MODE.create(BooleanOperationNodeType.Mode.OR));
+    private static final Node AND = Node.create(BasicNodes.BOOL_OP).modifySetting("mode", BooleanOperationNodeType.BOOL_OPERATION_MODE.create(BooleanOperationNodeType.Mode.AND));
+    private static final Node XOR = Node.create(BasicNodes.BOOL_OP).modifySetting("mode", BooleanOperationNodeType.BOOL_OPERATION_MODE.create(BooleanOperationNodeType.Mode.XOR));
+    private static final Node NOT = Node.create(BasicNodes.BOOL_OP).modifySetting("mode", BooleanOperationNodeType.BOOL_OPERATION_MODE.create(BooleanOperationNodeType.Mode.NOT));
 
     @Test
     public void canAddNodeToGraph() {

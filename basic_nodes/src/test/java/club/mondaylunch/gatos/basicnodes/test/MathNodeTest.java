@@ -1,10 +1,12 @@
 package club.mondaylunch.gatos.basicnodes.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
 import club.mondaylunch.gatos.basicnodes.MathNodeType;
 import club.mondaylunch.gatos.core.data.DataBox;
@@ -43,15 +45,15 @@ public class MathNodeTest {
     @Test
     public void integerAddition() {
         Map<String, DataBox<?>> inputs = Map.of(
-                "inputA", DataType.NUMBER.create( (double) 10),
-                "inputB", DataType.NUMBER.create( (double) 15)
+            "inputA", DataType.NUMBER.create( (double) 10),
+            "inputB", DataType.NUMBER.create( (double) 15)
         );
         double result = (double) BasicNodes.MATH.compute(inputs, ADD.settings(), Map.of()).get("output").join().value();
         assertEquals(25, result);
 
         inputs = Map.of(
-                "inputA", DataType.NUMBER.create( (double) 10),
-                "inputB", DataType.NUMBER.create( (double) -15)
+            "inputA", DataType.NUMBER.create( (double) 10),
+            "inputB", DataType.NUMBER.create( (double) -15)
         );
         result = (double) BasicNodes.MATH.compute(inputs, ADD.settings(), Map.of()).get("output").join().value();
         assertEquals(-5, result);
@@ -60,15 +62,15 @@ public class MathNodeTest {
     @Test
     public void integerSubtraction() {
         Map<String, DataBox<?>> inputs = Map.of(
-                "inputA", DataType.NUMBER.create( (double) 10),
-                "inputB", DataType.NUMBER.create( (double) 15)
+            "inputA", DataType.NUMBER.create( (double) 10),
+            "inputB", DataType.NUMBER.create( (double) 15)
         );
         double result = (double) BasicNodes.MATH.compute(inputs, SUB.settings(), Map.of()).get("output").join().value();
         assertEquals(-5, result);
 
         inputs = Map.of(
-                "inputA", DataType.NUMBER.create( (double) 10),
-                "inputB", DataType.NUMBER.create( (double) -15)
+            "inputA", DataType.NUMBER.create( (double) 10),
+            "inputB", DataType.NUMBER.create( (double) -15)
         );
         result = (double) BasicNodes.MATH.compute(inputs, SUB.settings(), Map.of()).get("output").join().value();
         assertEquals(25, result);
@@ -77,15 +79,15 @@ public class MathNodeTest {
     @Test
     public void integerMultiplication() {
         Map<String, DataBox<?>> inputs = Map.of(
-                "inputA", DataType.NUMBER.create( (double) 10),
-                "inputB", DataType.NUMBER.create( (double) 15)
+            "inputA", DataType.NUMBER.create( (double) 10),
+            "inputB", DataType.NUMBER.create( (double) 15)
         );
         double result = (double) BasicNodes.MATH.compute(inputs, MLT.settings(), Map.of()).get("output").join().value();
         assertEquals(150, result);
 
         inputs = Map.of(
-                "inputA", DataType.NUMBER.create( (double) 10),
-                "inputB", DataType.NUMBER.create( (double) -15)
+            "inputA", DataType.NUMBER.create( (double) 10),
+            "inputB", DataType.NUMBER.create( (double) -15)
         );
         result = (double) BasicNodes.MATH.compute(inputs, MLT.settings(), Map.of()).get("output").join().value();
         assertEquals(-150, result);
@@ -94,36 +96,36 @@ public class MathNodeTest {
     @Test
     public void integerDivision() {
         Map<String, DataBox<?>> inputs = Map.of(
-                "inputA", DataType.NUMBER.create( (double) 90),
-                "inputB", DataType.NUMBER.create( (double) 15)
+            "inputA", DataType.NUMBER.create( (double) 90),
+            "inputB", DataType.NUMBER.create( (double) 15)
         );
         double result = (double) BasicNodes.MATH.compute(inputs, DIV.settings(), Map.of()).get("output").join().value();
         assertEquals(6, result);
 
         inputs = Map.of(
-                "inputA", DataType.NUMBER.create( (double) -10),
-                "inputB", DataType.NUMBER.create( (double) 2)
+            "inputA", DataType.NUMBER.create( (double) -10),
+            "inputB", DataType.NUMBER.create( (double) 2)
         );
         result = (double) BasicNodes.MATH.compute(inputs, DIV.settings(), Map.of()).get("output").join().value();
         assertEquals(-5, result);
 
         inputs = Map.of(
-                "inputA", DataType.NUMBER.create( (double) 10),
-                "inputB", DataType.NUMBER.create( (double) 20)
+            "inputA", DataType.NUMBER.create( (double) 10),
+            "inputB", DataType.NUMBER.create( (double) 20)
         );
         result = (double) BasicNodes.MATH.compute(inputs, DIV.settings(), Map.of()).get("output").join().value();
         assertEquals(0.5, result);
 
         inputs = Map.of(
-                "inputA", DataType.NUMBER.create( (double) 10),
-                "inputB", DataType.NUMBER.create( (double) 15)
+            "inputA", DataType.NUMBER.create( (double) 10),
+            "inputB", DataType.NUMBER.create( (double) 15)
         );
         result = (double) BasicNodes.MATH.compute(inputs, DIV.settings(), Map.of()).get("output").join().value();
         assertEquals((double) 2 / 3, result);
 
         inputs = Map.of(
-                "inputA", DataType.NUMBER.create( (double) 15),
-                "inputB", DataType.NUMBER.create( (double) 10)
+            "inputA", DataType.NUMBER.create( (double) 15),
+            "inputB", DataType.NUMBER.create( (double) 10)
         );
         result = (double) BasicNodes.MATH.compute(inputs, DIV.settings(), Map.of()).get("output").join().value();
         assertEquals(1.5, result);
@@ -132,15 +134,15 @@ public class MathNodeTest {
     @Test
     public void doubleAddition() {
         Map<String, DataBox<?>> inputs = Map.of(
-                "inputA", DataType.NUMBER.create( 10.25),
-                "inputB", DataType.NUMBER.create( 9.75)
+            "inputA", DataType.NUMBER.create( 10.25),
+            "inputB", DataType.NUMBER.create( 9.75)
         );
         double result = (double) BasicNodes.MATH.compute(inputs, ADD.settings(), Map.of()).get("output").join().value();
         assertEquals(20, result);
 
         inputs = Map.of(
-                "inputA", DataType.NUMBER.create( 9.75),
-                "inputB", DataType.NUMBER.create( -8.25)
+            "inputA", DataType.NUMBER.create( 9.75),
+            "inputB", DataType.NUMBER.create( -8.25)
         );
         result = (double) BasicNodes.MATH.compute(inputs, ADD.settings(), Map.of()).get("output").join().value();
         assertEquals(1.5, result);
@@ -149,15 +151,15 @@ public class MathNodeTest {
     @Test
     public void doubleSubtraction() {
         Map<String, DataBox<?>> inputs = Map.of(
-                "inputA", DataType.NUMBER.create(11.45),
-                "inputB", DataType.NUMBER.create(0.25)
+            "inputA", DataType.NUMBER.create(11.45),
+            "inputB", DataType.NUMBER.create(0.25)
         );
         double result = (double) BasicNodes.MATH.compute(inputs, SUB.settings(), Map.of()).get("output").join().value();
         assertEquals(11.2, result);
 
         inputs = Map.of(
-                "inputA", DataType.NUMBER.create(100.001),
-                "inputB", DataType.NUMBER.create(-99.999)
+            "inputA", DataType.NUMBER.create(100.001),
+            "inputB", DataType.NUMBER.create(-99.999)
         );
         result = (double) BasicNodes.MATH.compute(inputs, SUB.settings(), Map.of()).get("output").join().value();
         assertEquals(200, result);
@@ -166,15 +168,15 @@ public class MathNodeTest {
     @Test
     public void doubleMultiplication() {
         Map<String, DataBox<?>> inputs = Map.of(
-                "inputA", DataType.NUMBER.create( 0.1),
-                "inputB", DataType.NUMBER.create( (double) 15)
+            "inputA", DataType.NUMBER.create( 0.1),
+            "inputB", DataType.NUMBER.create( (double) 15)
         );
         double result = (double) BasicNodes.MATH.compute(inputs, MLT.settings(), Map.of()).get("output").join().value();
         assertEquals(1.5, result);
 
         inputs = Map.of(
-                "inputA", DataType.NUMBER.create( 0.25),
-                "inputB", DataType.NUMBER.create( 3.1)
+            "inputA", DataType.NUMBER.create( 0.25),
+            "inputB", DataType.NUMBER.create( 3.1)
         );
         result = (double) BasicNodes.MATH.compute(inputs, MLT.settings(), Map.of()).get("output").join().value();
         assertEquals(0.775, result);
@@ -183,15 +185,15 @@ public class MathNodeTest {
     @Test
     public void doubleDivision() {
         Map<String, DataBox<?>> inputs = Map.of(
-                "inputA", DataType.NUMBER.create( 1.5),
-                "inputB", DataType.NUMBER.create( 0.75)
+            "inputA", DataType.NUMBER.create( 1.5),
+            "inputB", DataType.NUMBER.create( 0.75)
         );
         double result = (double) BasicNodes.MATH.compute(inputs, DIV.settings(), Map.of()).get("output").join().value();
         assertEquals(2, result);
 
         inputs = Map.of(
-                "inputA", DataType.NUMBER.create( 74.213),
-                "inputB", DataType.NUMBER.create( 2.4)
+            "inputA", DataType.NUMBER.create( 74.213),
+            "inputB", DataType.NUMBER.create( 2.4)
         );
         result = (double) BasicNodes.MATH.compute(inputs, DIV.settings(), Map.of()).get("output").join().value();
         assertEquals(30.9220833333333333, result);
