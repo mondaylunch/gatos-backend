@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -22,6 +21,7 @@ public class EqualsNodeTest {
         private final String secondKey = "Jeroen";
         private final String thirdKey = "Keppens";
     }
+
     private static final class TestEqualsNodeSecondJSON {
         private final String firstKey = "Doctor";
         private final String secondKey = "Keppens";
