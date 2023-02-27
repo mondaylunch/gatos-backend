@@ -97,15 +97,15 @@ public class NodeTest {
 
     private static final class TestNodeType extends NodeType.Process {
         @Override
-        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
+        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
                     new NodeConnector.Input<>(nodeId, "in", DataType.NUMBER));
         }
 
         @Override
-        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
+        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             var out = new NodeConnector.Output<>(nodeId, "out", DataType.NUMBER);
-            return (Boolean) state.get("setting_2").value()
+            return (Boolean) settings.get("setting_2").value()
                     ? Set.of(
                             out,
                             new NodeConnector.Output<>(nodeId, "out_2", DataType.NUMBER))
@@ -122,7 +122,7 @@ public class NodeTest {
 
         @Override
         public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
-                Map<String, DataBox<?>> settings) {
+                Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Map.of();
         }
     }
