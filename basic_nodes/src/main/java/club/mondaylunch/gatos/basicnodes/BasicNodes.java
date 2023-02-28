@@ -25,4 +25,6 @@ public final class BasicNodes {
         .register("list_length", new ListLengthNodeType());
     public static final EqualsNodeType EQUALS = NodeType.REGISTRY
         .register("equals", new EqualsNodeType());
+    public static final TruthinessNodeType TRUTHINESS = NodeType.REGISTRY
+        .register("truthiness", new TruthinessNodeType());
 }
