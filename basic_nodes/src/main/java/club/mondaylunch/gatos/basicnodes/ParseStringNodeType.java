@@ -8,6 +8,8 @@ import java.util.concurrent.CompletableFuture;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
+import club.mondaylunch.gatos.core.graph.connector.NodeConnector.Input;
+import club.mondaylunch.gatos.core.graph.connector.NodeConnector.Output;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 public class ParseStringNodeType extends NodeType.Process {
@@ -17,19 +19,19 @@ public class ParseStringNodeType extends NodeType.Process {
     }
 
     @Override
-    public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
+    public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         return Set.of(
             new NodeConnector.Input<>(nodeId, "input", DataType.STRING));
     }
 
     @Override
-    public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
+    public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         return Set.of(
             new NodeConnector.Output<>(nodeId, "output", DataType.NUMBER));
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         double output = 0;
         try {
             output = Double.parseDouble(String.join("", DataBox.get(inputs, "input", DataType.STRING).orElse("").split(",")));
@@ -38,5 +40,9 @@ public class ParseStringNodeType extends NodeType.Process {
         }
         return Map.of(
             "output", CompletableFuture.completedFuture(DataType.NUMBER.create(output)));
+    }
+
+    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs) {
+        return compute(inputs, Map.of(), Map.of());
     }
 }
