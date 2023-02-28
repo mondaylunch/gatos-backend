@@ -17,6 +17,10 @@ public final class BasicNodes {
         .register("string_concat", new StringConcatNodeType());
     public static final MathNodeType MATH = NodeType.REGISTRY
         .register("math", new MathNodeType());
+    public static final IsFiniteNodeType IS_FINITE = NodeType.REGISTRY
+        .register("is_finite", new IsFiniteNodeType());
+    public static final IsNanNodeType IS_NAN = NodeType.REGISTRY
+        .register("is_nan", new IsNanNodeType());
     public static final BooleanOperationNodeType BOOL_OP = NodeType.REGISTRY
         .register("boolean_operation", new BooleanOperationNodeType());
     public static final ListLengthNodeType LIST_LENGTH = NodeType.REGISTRY
