@@ -39,5 +39,4 @@ public class EqualsNodeType extends NodeType.Process {
         var inputB = DataBox.get(inputs, "inputB", DataType.ANY).orElse("");
         return Map.of("output", CompletableFuture.completedFuture(DataType.BOOLEAN.create(inputA.equals(inputB))));
     }
-    
 }
