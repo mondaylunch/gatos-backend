@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Unmodifiable;
 import club.mondaylunch.gatos.core.codec.SerializationUtils;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.data.Conversions;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
@@ -39,18 +40,21 @@ public final class Node {
     private final @Unmodifiable Map<String, DataBox<?>> settings;
     private final @Unmodifiable Map<String, NodeConnector.Input<?>> inputs;
     private final @Unmodifiable Map<String, NodeConnector.Output<?>> outputs;
+    private final @Unmodifiable Map<String, DataType<?>> inputTypes;
 
     private Node(
         UUID id,
         NodeType type,
         Map<String, DataBox<?>> settings,
         Set<NodeConnector.Input<?>> inputs,
-        Set<NodeConnector.Output<?>> outputs) {
+        Set<NodeConnector.Output<?>> outputs,
+        Map<String, DataType<?>> inputTypes) {
         this.id = id;
         this.type = type;
         this.settings = Map.copyOf(settings);
         this.inputs = Map.copyOf(inputs.stream().collect(Collectors.toMap(NodeConnector::name, Function.identity())));
         this.outputs = Map.copyOf(outputs.stream().collect(Collectors.toMap(NodeConnector::name, Function.identity())));
+        this.inputTypes = Map.copyOf(inputTypes);
     }
 
     /**
@@ -66,8 +70,9 @@ public final class Node {
             id,
             type,
             defaultSettings,
-            NodeType.inputsOrEmpty(type, id, defaultSettings),
-            NodeType.outputsOrEmpty(type, id, defaultSettings));
+            NodeType.inputsOrEmpty(type, id, defaultSettings, Map.of()),
+            NodeType.outputsOrEmpty(type, id, defaultSettings, Map.of()),
+            Map.of());
     }
 
     /**
@@ -89,15 +94,32 @@ public final class Node {
         }
 
         var newSettings = new HashMap<>(this.settings);
-
         newSettings.put(settingKey, value);
-
+        var newInputs = NodeType.inputsOrEmpty(this.type, this.id, newSettings, this.inputTypes);
+        var newInputTypes = filterValidInputTypes(this.inputTypes, newInputs.stream().collect(Collectors.toMap(NodeConnector::name, Function.identity())));
         return new Node(
             this.id,
             this.type,
             newSettings,
-            NodeType.inputsOrEmpty(this.type, this.id, newSettings),
-            NodeType.outputsOrEmpty(this.type, this.id, newSettings));
+            newInputs,
+            NodeType.outputsOrEmpty(this.type, this.id, newSettings, newInputTypes),
+            newInputTypes);
+    }
+
+    /**
+     * Create a new node, the same as this one, but with possibly-changed outputs due to different input types.
+     *
+     * @param newInputTypes the canonical types of each input connection
+     * @return the new node
+     */
+    public Node updateInputTypes(Map<String, DataType<?>> newInputTypes) {
+        return new Node(
+            this.id,
+            this.type,
+            this.settings,
+            Set.copyOf(this.inputs.values()),
+            NodeType.outputsOrEmpty(this.type, this.id, this.settings, newInputTypes),
+            newInputTypes);
     }
 
     /**
@@ -192,6 +214,14 @@ public final class Node {
         return Optional.ofNullable(this.outputs.get(name));
     }
 
+    /**
+     * Returns the types on the other end of the connections of each input connector.
+     * @return the input datatypes
+     */
+    public Map<String, DataType<?>> inputTypes() {
+        return this.inputTypes;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) {
@@ -217,12 +247,26 @@ public final class Node {
 
     @Override
     public String toString() {
-        return "Node[id=%s, type=%s, settings=%s, inputs=%s, outputs=%s]".formatted(
+        return "Node[id=%s, type=%s, settings=%s, inputs=%s, outputs=%s, inputTypes=%s]".formatted(
             this.id,
             this.type,
             this.settings,
             this.inputs,
-            this.outputs);
+            this.outputs,
+            this.inputTypes);
+    }
+
+    /**
+     * Filters out map entries where the datatype value is not convertable to the type of the input connector specified by the key.
+     * @param oldInputTypes the input types to filter
+     * @param newInputs     the inputs of the node
+     * @return              a filtered input type map
+     */
+    private static Map<String, DataType<?>> filterValidInputTypes(Map<String, DataType<?>> oldInputTypes, Map<String, NodeConnector.Input<?>> newInputs) {
+        return oldInputTypes.entrySet().stream()
+            .filter(kv -> newInputs.containsKey(kv.getKey()))
+            .filter(kv -> Conversions.canConvert(kv.getValue(), newInputs.get(kv.getKey()).type()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public static final class NodeCodec implements Codec<Node> {
@@ -234,33 +278,39 @@ public final class Node {
 
         @Override
         public Node decode(BsonReader reader, DecoderContext decoderContext) {
-            reader.readStartDocument();
-            reader.readName("id");
-            UUID id = decoderContext.decodeWithChildContext(this.registry.get(UUID.class), reader);
-            reader.readName("type");
-            NodeType type = decoderContext.decodeWithChildContext(this.registry.get(NodeType.class), reader);
-            reader.readName("settings");
-            Map<String, DataBox<?>> settings = SerializationUtils.readMap(reader, decoderContext, DataBox.class, Function.identity(), this.registry);
-            reader.readEndDocument();
-            return new Node(
-                id,
-                type,
-                settings,
-                NodeType.inputsOrEmpty(type, id, settings),
-                NodeType.outputsOrEmpty(type, id, settings)
-            );
+            return SerializationUtils.readDocument(reader, () -> {
+                reader.readName("id");
+                UUID id = decoderContext.decodeWithChildContext(this.registry.get(UUID.class), reader);
+                reader.readName("type");
+                NodeType type = decoderContext.decodeWithChildContext(this.registry.get(NodeType.class), reader);
+                reader.readName("settings");
+                Map<String, DataBox<?>> settings = SerializationUtils.readMap(reader, decoderContext, DataBox.class, Function.identity(), this.registry);
+                reader.readName("inputTypes");
+                Map<String, DataType<?>> inputTypes = SerializationUtils.readMap(reader, decoderContext, DataType.class, Function.identity(), this.registry);
+                var inputs = NodeType.inputsOrEmpty(type, id, settings, inputTypes);
+                return new Node(
+                    id,
+                    type,
+                    settings,
+                    inputs,
+                    NodeType.outputsOrEmpty(type, id, settings, Map.of()),
+                    filterValidInputTypes(inputTypes, inputs.stream().collect(Collectors.toMap(NodeConnector::name, Function.identity())))
+                );
+            });
         }
 
         @Override
         public void encode(BsonWriter writer, Node value, EncoderContext encoderContext) {
-            writer.writeStartDocument();
-            writer.writeName("id");
-            encoderContext.encodeWithChildContext(this.registry.get(UUID.class), writer, value.id);
-            writer.writeName("type");
-            encoderContext.encodeWithChildContext(this.registry.get(NodeType.class), writer, value.type);
-            writer.writeName("settings");
-            SerializationUtils.writeMap(writer, encoderContext, DataBox.class, Function.identity(), this.registry, value.settings);
-            writer.writeEndDocument();
+            SerializationUtils.writeDocument(writer, () -> {
+                writer.writeName("id");
+                encoderContext.encodeWithChildContext(this.registry.get(UUID.class), writer, value.id);
+                writer.writeName("type");
+                encoderContext.encodeWithChildContext(this.registry.get(NodeType.class), writer, value.type);
+                writer.writeName("settings");
+                SerializationUtils.writeMap(writer, encoderContext, DataBox.class, Function.identity(), this.registry, value.settings);
+                writer.writeName("inputTypes");
+                SerializationUtils.writeMap(writer, encoderContext, DataType.class, Function.identity(), this.registry, value.inputTypes);
+            });
         }
 
         @Override

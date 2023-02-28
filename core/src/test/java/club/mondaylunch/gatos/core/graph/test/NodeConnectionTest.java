@@ -69,13 +69,13 @@ public class NodeConnectionTest {
 
     private static final class TestNodeType extends NodeType.Process {
         @Override
-        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
+        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
                 new NodeConnector.Input<>(nodeId, "in", DataType.NUMBER));
         }
 
         @Override
-        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
+        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
                 new NodeConnector.Output<>(nodeId, "out", DataType.NUMBER),
                 new NodeConnector.Output<>(nodeId, "out_2", DataType.BOOLEAN)
@@ -89,20 +89,21 @@ public class NodeConnectionTest {
 
         @Override
         public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
-                                                                  Map<String, DataBox<?>> settings) {
+                                                                  Map<String, DataBox<?>> settings,
+                                                                  Map<String, DataType<?>> inputTypes) {
             return Map.of();
         }
     }
 
     private static final class TestNodeType2 extends NodeType.Process {
         @Override
-        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
+        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
                 new NodeConnector.Input<>(nodeId, "in", DataType.STRING));
         }
 
         @Override
-        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
+        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of();
         }
 
@@ -113,7 +114,8 @@ public class NodeConnectionTest {
 
         @Override
         public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
-                                                                  Map<String, DataBox<?>> settings) {
+                                                                  Map<String, DataBox<?>> settings,
+                                                                  Map<String, DataType<?>> inputTypes) {
             return Map.of();
         }
     }
