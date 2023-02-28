@@ -15,8 +15,6 @@ public final class BasicNodes {
         .register("string_contains", new StringContainsNodeType());
     public static final StringConcatNodeType STRING_CONCAT = NodeType.REGISTRY
         .register("string_concat", new StringConcatNodeType());
-    public static final ParseStringNodeType PARSE_STRING = NodeType.REGISTRY
-        .register("parse_string", new ParseStringNodeType());
     public static final MathNodeType MATH = NodeType.REGISTRY
         .register("math", new MathNodeType());
     public static final BooleanOperationNodeType BOOL_OP = NodeType.REGISTRY
@@ -25,4 +23,6 @@ public final class BasicNodes {
         .register("list_length", new ListLengthNodeType());
     public static final EqualsNodeType EQUALS = NodeType.REGISTRY
         .register("equals", new EqualsNodeType());
+    public static final ParseStringNodeType PARSE_STRING = NodeType.REGISTRY
+        .register("parse_string", new ParseStringNodeType());
 }
