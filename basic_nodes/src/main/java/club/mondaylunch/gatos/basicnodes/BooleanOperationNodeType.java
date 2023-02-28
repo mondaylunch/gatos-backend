@@ -11,8 +11,7 @@ import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 public class BooleanOperationNodeType extends NodeType.Process {
-
-    public static final DataType<Mode> BOOL_OPERATION_MODE = DataType.register("booloperationmode");
+    public static final DataType<Mode> BOOL_OPERATION_MODE = DataType.register("booloperationmode", Mode.class);
 
     @Override
     public Map<String, DataBox<?>> settings() {
@@ -22,10 +21,10 @@ public class BooleanOperationNodeType extends NodeType.Process {
     }
 
     @Override
-    public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
-        if(DataBox.get(settings, "mode", BOOL_OPERATION_MODE).orElseThrow().equals(Mode.NOT))
+    public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+        if (DataBox.get(settings, "mode", BOOL_OPERATION_MODE).orElseThrow().equals(Mode.NOT)) {
             return Set.of(new NodeConnector.Input<>(nodeId, "input", DataType.BOOLEAN));
-
+        }
         return Set.of(
                 new NodeConnector.Input<>(nodeId, "inputA", DataType.BOOLEAN),
                 new NodeConnector.Input<>(nodeId, "inputB", DataType.BOOLEAN)
@@ -33,18 +32,19 @@ public class BooleanOperationNodeType extends NodeType.Process {
     }
 
     @Override
-    public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings) {
+    public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         return Set.of(
                 new NodeConnector.Output<>(nodeId, "output", DataType.BOOLEAN));
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         Mode mode = DataBox.get(settings, "mode", BOOL_OPERATION_MODE).orElseThrow();
-        if(mode.equals(Mode.NOT))
+        if (mode.equals(Mode.NOT)) {
             return Map.of("output", CompletableFuture.completedFuture(DataType.BOOLEAN.create(
                 !DataBox.get(inputs, "input", DataType.BOOLEAN).orElseThrow()
             )));
+        }
 
         boolean a = DataBox.get(inputs, "inputA", DataType.BOOLEAN).orElseThrow();
         boolean b = DataBox.get(inputs, "inputB", DataType.BOOLEAN).orElseThrow();
@@ -56,17 +56,20 @@ public class BooleanOperationNodeType extends NodeType.Process {
 
     public enum Mode {
         OR("or") {
-            @Override public boolean apply(boolean a, boolean b) { return a | b; }
+            @Override public boolean apply(boolean a, boolean b) {
+                return a | b; }
         },
         AND("and") {
-            @Override public boolean apply(boolean a, boolean b) { return a & b; }
+            @Override public boolean apply(boolean a, boolean b) {
+                return a & b; }
         },
         XOR("xor") {
-            @Override public boolean apply(boolean a, boolean b) { return a ^ b; }
+            @Override public boolean apply(boolean a, boolean b) {
+                return a ^ b; }
         },
         NOT("not") {
-            public boolean apply(boolean a) { return apply(a, false); }
-            @Override public boolean apply(boolean a, boolean b) { return !a; }
+            @Override public boolean apply(boolean a, boolean b) {
+                return !a; }
         };
 
         private final String op;
