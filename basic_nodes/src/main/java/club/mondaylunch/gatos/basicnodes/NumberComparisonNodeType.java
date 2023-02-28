@@ -69,7 +69,7 @@ public class NumberComparisonNodeType extends NodeType.Process {
  
     /**
      * If no mode is given default to greaterthan
-     * @param inputs    a map of the two given doubles
+     * @param inputs    a map of the two given booleans
      * @return          a map of the computed result
      */
     public Map<String, CompletableFuture<DataBox<?>>> compute (Map<String, DataBox<?>> inputs) {
