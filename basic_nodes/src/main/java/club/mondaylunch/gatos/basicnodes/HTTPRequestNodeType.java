@@ -7,6 +7,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpRequest.Builder;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Map;
 import java.util.Set;
@@ -47,38 +48,52 @@ public class HTTPRequestNodeType extends NodeType.Process {
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var url = DataBox.get(settings, "url", DataType.STRING).orElse("");
-        // TODO: make the method impact the request
-        var method = DataBox.get(settings, "method", DataType.STRING).orElse("");
+        var method = DataBox.get(settings, "method", DataType.STRING).orElse("").toLowerCase();
         var body = DataBox.get(inputs, "body", DataType.STRING).orElse("");
         
-        try {
-            // creating the request
-            HttpRequest request = HttpRequest.newBuilder()
-            .uri(new URI(url))
-            .POST(BodyPublishers.ofString(body))
-            .build();
+        // not a valid request
+        boolean notValid = url.equals("") || method.equals("");
+        if (notValid) {
+            return this.handleInvalidReturns();
+        }
 
+        Builder builder = HttpRequest.newBuilder();
+        HttpRequest request;
+
+        double statusCode;
+        String responseBody;
+        
+        try {
+            // TODO: extend this with an enum
+            // creating the request
+            switch (method) {
+                case "get": request = builder.uri(new URI(url)).GET().build(); break;
+                case "post": request = builder.uri(new URI(url)).POST(BodyPublishers.ofString(body)).build(); break;
+                case "put": request = builder.uri(new URI(url)).PUT(BodyPublishers.ofString(body)).build(); break;
+                case "delete": request = builder.uri(new URI(url)).DELETE().build(); break;
+                default: return this.handleInvalidReturns();
+            }
+            
             // sending the request
             HttpClient httpClient = HttpClient.newHttpClient();
             HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
-
+            statusCode = response.statusCode();
+            responseBody = response.body();
         } catch (URISyntaxException | IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        boolean notValid = url.equals("") || method.equals("");
-        
-        if (notValid) {
-            return Map.of(
-                "StatusCode", CompletableFuture.completedFuture(DataType.NUMBER.create(404.0)),
-                "responseText", CompletableFuture.completedFuture(DataType.STRING.create("URL or method are incorrect"))
-            );
+            // if a problem happens just return nothing
+            return this.handleInvalidReturns();
         }
 
         return Map.of(
-            "StatusCode", CompletableFuture.completedFuture(DataType.NUMBER.create(200.0)),
-            "responseText", CompletableFuture.completedFuture(DataType.STRING.create("among"))
+            "StatusCode", CompletableFuture.completedFuture(DataType.NUMBER.create(statusCode)),
+            "responseText", CompletableFuture.completedFuture(DataType.STRING.create(responseBody))
         );
     }
-    
+
+    private Map<String, CompletableFuture<DataBox<?>>> handleInvalidReturns() {
+        return Map.of(
+            "StatusCode", CompletableFuture.completedFuture(DataType.NUMBER.create(404.0)),
+            "responseText", CompletableFuture.completedFuture(DataType.STRING.create("URL or method are incorrect"))
+        );
+    }
 }
