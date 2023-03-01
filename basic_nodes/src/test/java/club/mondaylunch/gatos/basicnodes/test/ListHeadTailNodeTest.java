@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.xml.crypto.Data;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -80,13 +82,29 @@ public class ListHeadTailNodeTest {
 
     @Test
     public void correctlyReturnsNullForEmptyLists() {
-        var node = Node.create(BasicNodes.LIST_HEADTAIL)
-            .updateInputTypes(Map.of("input", DataType.ANY));
+        var node = Node.create(BasicNodes.LIST_HEADTAIL);
         Map<String, DataBox<?>> input = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_EMPTY_LIST)
         );
         var output = BasicNodes.LIST_HEADTAIL.compute(input, node.settings(), Map.of());
         Assertions.assertEquals(Optional.empty(), output.get("first").join().value());
         Assertions.assertEquals(List.of(), output.get("rest").join().value());
+    }
+
+    @Test
+    public void correctlySpecialisesTypes() {
+        var node = Node.create(BasicNodes.LIST_HEADTAIL)
+            .updateInputTypes(Map.of("input", DataType.NUMBER.listOf()));
+        Assertions.assertEquals(DataType.NUMBER.optionalOf(), node.getOutputWithName("first").orElseThrow().type());
+        Assertions.assertEquals(DataType.NUMBER.listOf(), node.getOutputWithName("rest").orElseThrow().type());
+    }
+
+    @Test
+    public void outputsWithCorrectTypes() {
+        var node = Node.create(BasicNodes.LIST_HEADTAIL)
+            .updateInputTypes(Map.of("input", DataType.NUMBER.listOf()));
+        var res = BasicNodes.LIST_HEADTAIL.compute(Map.of("input", DataType.NUMBER.listOf().create(List.of(10., 5., 4.))), node.settings(), node.inputTypes());
+        Assertions.assertEquals(DataType.NUMBER.optionalOf(), res.get("first").join().type());
+        Assertions.assertEquals(DataType.NUMBER.listOf(), res.get("rest").join().type());
     }
 }
