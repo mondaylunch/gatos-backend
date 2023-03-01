@@ -69,12 +69,12 @@ public class ListHeadTailNodeType extends NodeType.Process {
 
     @SuppressWarnings({"unchecked", "OptionalUsedAsFieldOrParameterType"})
     private <T> DataBox<T> getGenericOptionalBox(Optional<?> optional, DataType<?> type) {
-        return ((DataType<T>) type.optionalOf()).create(((Optional<T>) optional).orElse((T) Optional.empty()));
+        return ((DataType<T>) type).create(((Optional<T>) optional).orElse((T) Optional.empty()));
     }
 
     @SuppressWarnings({"unchecked", "ListUsedAsFieldOrParameterType"})
     private <T> DataBox<T> getGenericListBox(List<?> list, DataType<?> type) {
-        return ((DataType<T>) type.listOf()).create((T) list);
+        return ((DataType<T>) type).create((T) list);
     }
 
     private DataType<?> findExactDatatype(DataType<?> type) {
