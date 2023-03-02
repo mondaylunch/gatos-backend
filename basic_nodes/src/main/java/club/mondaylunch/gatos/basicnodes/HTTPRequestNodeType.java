@@ -60,13 +60,7 @@ public class HTTPRequestNodeType extends NodeType.Process {
         HttpRequest request = this.createRequest(method, uri, body);
         HttpClient httpClient = HttpClient.newHttpClient();
 
-        CompletableFuture<HttpResponse<String>> future = httpClient.sendAsync(request, BodyHandlers.ofString()).handle((msg, ex) -> {
-            if (ex != null) {
-                return null;
-            }else {
-                return msg;
-            }
-        });
+        CompletableFuture<HttpResponse<String>> future = httpClient.sendAsync(request, BodyHandlers.ofString()).exceptionally(ex -> null);
         return Map.of(
             "StatusCode", future.thenApply(response -> response == null ? DataType.NUMBER.create(404.0) : DataType.NUMBER.create((double) response.statusCode())),
             "responseText", future.thenApply(response -> response == null ? DataType.STRING.create("URL or method are incorrect") : DataType.STRING.create(response.body()))
