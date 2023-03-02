@@ -9,6 +9,7 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpRequest.Builder;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -22,7 +23,6 @@ import club.mondaylunch.gatos.core.graph.connector.NodeConnector.Output;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 public class HTTPRequestNodeType extends NodeType.Process {
-
     @Override
     public Map<String, DataBox<?>> settings() {
         return Map.of(
@@ -48,40 +48,27 @@ public class HTTPRequestNodeType extends NodeType.Process {
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var url = DataBox.get(settings, "url", DataType.STRING).orElse("");
-        var method = DataBox.get(settings, "method", DataType.STRING).orElse("").toLowerCase();
+        var method = DataBox.get(settings, "method", DataType.STRING).orElse("").toUpperCase();
         var body = DataBox.get(inputs, "body", DataType.STRING).orElse("");
         
-        // not a valid request
-        boolean notValid = url.equals("") || method.equals("");
-        if (notValid) {
+        // get uri by checking url and method
+        URI uri = this.getURI(url, method);
+
+        if (uri == null) {
             return this.handleInvalidReturns();
         }
 
-        Builder builder = HttpRequest.newBuilder();
-        HttpRequest request;
-
+        // the url and method are valid so we create the request
+        HttpRequest request = this.createRequest(method, uri, body);
         double statusCode;
         String responseBody;
-        
-        System.out.println(url + " " + method + " " + body);
-        
+    
+        // send the request
         try {
-            // TODO: extend this with an enum
-            // creating the request
-            switch (method) {
-                case "get": request = builder.uri(new URI(url)).GET().build(); break;
-                case "post": request = builder.uri(new URI(url)).POST(BodyPublishers.ofString(body)).build(); break;
-                case "put": request = builder.uri(new URI(url)).PUT(BodyPublishers.ofString(body)).build(); break;
-                case "delete": request = builder.uri(new URI(url)).DELETE().build(); break;
-                default: return this.handleInvalidReturns();
-            }
-            
-            // sending the request
-            HttpClient httpClient = HttpClient.newHttpClient();
-            HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
+            HttpResponse<String> response = this.sendRequest(request);
             statusCode = response.statusCode();
             responseBody = response.body();
-        } catch (URISyntaxException | IOException | InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             // if a problem happens just return nothing
             return this.handleInvalidReturns();
         }
@@ -97,5 +84,62 @@ public class HTTPRequestNodeType extends NodeType.Process {
             "StatusCode", CompletableFuture.completedFuture(DataType.NUMBER.create(404.0)),
             "responseText", CompletableFuture.completedFuture(DataType.STRING.create("URL or method are incorrect"))
         );
+    }
+
+    private URI getURI(String url, String method) {
+        URI uri = null;
+        if (this.validateMethod(method)) {
+            try {
+                uri = new URI(url);
+            } catch (URISyntaxException e) {
+                uri = null;
+            }
+        }
+        return uri;
+    }
+
+    private boolean validateMethod(String method) {
+        return Methods.isMethod(method);
+    }
+
+    private HttpRequest createRequest(String method, URI uri, String body) {
+        // note: this method is called after validating the method parameter so the switch will execute
+        // no null will be returned 
+        Builder builder = HttpRequest.newBuilder();
+        HttpRequest request = null;
+        switch (method) {
+            case "GET": request = builder.uri(uri).GET().build(); break;
+            case "POST": request = builder.uri(uri).POST(BodyPublishers.ofString(body)).build(); break;
+            case "PUT": request = builder.uri(uri).PUT(BodyPublishers.ofString(body)).build(); break;
+            case "DELETE": request = builder.uri(uri).DELETE().build(); break;
+        }
+        return request;
+    }
+
+    private HttpResponse<String> sendRequest(HttpRequest request) throws IOException, InterruptedException {
+        HttpClient httpClient = HttpClient.newHttpClient();
+        HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
+        return response;
+    }
+
+    private enum Methods {
+        GET("GET"),
+        POST("POST"),
+        PUT("PUT"),
+        DELETE("DELETE");
+
+        private final String method;
+        Methods(String method) {
+            this.method = method;
+        }
+
+        @Override
+        public String toString() {
+            return this.method;
+        }
+
+        public static boolean isMethod(String method) {
+            return List.of(GET.toString(), POST.toString(), PUT.toString(), DELETE.toString()).contains(method);
+        }
     }
 }
