@@ -130,7 +130,7 @@ public class FlowController {
         var nodeType = NodeType.REGISTRY.get(body.nodeType)
             .orElseThrow(InvalidNodeTypeException::new);
         var node = graph.addNode(nodeType);
-        Flow.objects.update(flow.getId(), flow);
+        Flow.objects.updateGraph(flow);
         return SerializationUtils.toJson(node);
     }
 }

@@ -61,6 +61,8 @@ public class Graph {
      */
     private final Map<UUID, NodeMetadata> metadataByNode = new HashMap<>();
 
+    private final GraphObserver observer = new GraphObserver();
+
     public Graph() {}
 
     public Graph(Collection<Node> nodes, Map<UUID, NodeMetadata> metas, Collection<NodeConnection<?>> connections) {
@@ -70,6 +72,8 @@ public class Graph {
         }
         this.metadataByNode.putAll(metas);
         connections.forEach(this::addConnection);
+
+        this.observer.reset();
     }
 
     /**
@@ -81,6 +85,9 @@ public class Graph {
     public Node addNode(NodeType type) {
         var node = Node.create(type);
         this.nodes.put(node.id(), node);
+
+        this.observer.nodeAdded(node);
+
         return node;
     }
 
@@ -110,6 +117,9 @@ public class Graph {
         this.connections.removeAll(invalidConns);
         this.connectionsByNode.get(id).removeAll(invalidConns);
 
+        this.observer.nodeModified(result);
+        this.observer.connectionsRemoved(invalidConns);
+
         return result;
     }
 
@@ -119,14 +129,22 @@ public class Graph {
      * @param id the UUID of the node to remove
      */
     public void removeNode(UUID id) {
-        this.nodes.remove(id);
-        this.metadataByNode.remove(id);
+        @Nullable
+        var oldNode = this.nodes.remove(id);
+        var oldMetaData = this.metadataByNode.remove(id);
         @Nullable
         var conns = this.connectionsByNode.remove(id);
         if (conns == null) {
             return;
         }
         conns.forEach(this::removeConnection);
+
+        if (oldNode != null) {
+            this.observer.nodeRemoved(id);
+        }
+        if (oldMetaData != null) {
+            this.observer.metadataRemoved(id);
+        }
     }
 
     /**
@@ -188,6 +206,8 @@ public class Graph {
         this.modifyNode(nodeTo.id(), n -> n.updateInputTypes(destinationNodeConnections.stream()
                 .filter(c -> c.to().nodeId().equals(nodeTo.id()))
             .collect(Collectors.toMap(c -> c.to().name(), c -> this.getCanonicalConnector(c.from()).type()))));
+
+        this.observer.connectionAdded(connection);
     }
 
     /**
@@ -196,7 +216,7 @@ public class Graph {
      * @param connection the connection to remove
      */
     public void removeConnection(NodeConnection<?> connection) {
-        this.connections.remove(connection);
+        var removed = this.connections.remove(connection);
         this.getOrCreateConnectionsForNode(connection.from().nodeId()).remove(connection);
         var destinationNodeConnections = this.getOrCreateConnectionsForNode(connection.to().nodeId());
         destinationNodeConnections.remove(connection);
@@ -204,6 +224,10 @@ public class Graph {
             this.modifyNode(connection.to().nodeId(), n -> n.updateInputTypes(destinationNodeConnections.stream()
                     .filter(c -> c.to().nodeId().equals(connection.to().nodeId()))
                 .collect(Collectors.toMap(c -> c.to().name(), c -> this.getCanonicalConnector(c.from()).type()))));
+        }
+
+        if (removed) {
+            this.observer.connectionRemoved(connection);
         }
     }
 
@@ -274,12 +298,20 @@ public class Graph {
      * @throws NullPointerException if the unary operator returns null
      */
     public NodeMetadata modifyMetadata(UUID nodeId, UnaryOperator<NodeMetadata> func) {
+        var hadMetadata = this.metadataByNode.containsKey(nodeId);
         var result = func.apply(this.getOrCreateMetadataForNode(nodeId));
         if (result == null) {
             throw new NullPointerException("The modify function returned null.");
         }
 
         this.metadataByNode.put(nodeId, result);
+
+        if (hadMetadata) {
+            this.observer.metadataModified(nodeId, result);
+        } else {
+            this.observer.metadataAdded(nodeId, result);
+        }
+
         return result;
     }
 
@@ -390,6 +422,10 @@ public class Graph {
      */
     public int connectionCount() {
         return this.connections.size();
+    }
+
+    public GraphObserver observer() {
+        return this.observer;
     }
 
     @Override
