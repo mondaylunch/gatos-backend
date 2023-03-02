@@ -1,8 +1,8 @@
-name: Test
+name: Checkstyle
 on: [push, pull_request]
 
 jobs:
-    build:
+    checkstyle:
         runs-on: ubuntu-22.04
         steps:
             - uses: actions/checkout@v3
@@ -11,8 +11,5 @@ jobs:
                   distribution: "temurin"
                   java-version: 17
                   cache: "gradle"
-            - name: Run services in background
-              run: |
-                  docker-compose up -d
-            - name: Run tests
-              run: ./gradlew test --stacktrace --parallel
+            - name: Run checkstyle
+              run: ./gradlew build --stacktrace --parallel
