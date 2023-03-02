@@ -70,6 +70,22 @@ public class HTTPRequestNodeTest {
     }
 
     @Test
+    public void canHandlePOSTWithoutBody() {
+        var node = Node.create(BasicNodes.HTTP_REQUEST)
+        .modifySetting("url", DataType.STRING.create(URL))
+        .modifySetting("method", DataType.STRING.create("POST"));
+
+        Map<String, DataBox<?>> input = Map.of(
+            "body", DataType.STRING.create("")
+        );
+
+        var output = BasicNodes.HTTP_REQUEST.compute(input, node.settings(), Map.of());
+        Assertions.assertEquals(200.0, output.get("StatusCode").join().value());
+        Assertions.assertEquals("POST request", output.get("responseText").join().value());
+    }
+
+
+    @Test
     public void createPUTRequest() {
         var node = Node.create(BasicNodes.HTTP_REQUEST)
         .modifySetting("url", DataType.STRING.create(URL))
