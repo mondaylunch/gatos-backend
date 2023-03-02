@@ -63,6 +63,8 @@ public class HTTPRequestNodeType extends NodeType.Process {
         double statusCode;
         String responseBody;
         
+        System.out.println(url + " " + method + " " + body);
+        
         try {
             // TODO: extend this with an enum
             // creating the request

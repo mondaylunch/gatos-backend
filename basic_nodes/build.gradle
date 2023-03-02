@@ -9,6 +9,9 @@ dependencies {
     // Tests
     testImplementation(platform('org.junit:junit-bom:5.9.2'))
     testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    // HTTP mock server for testing the HTTP node request
+    implementation group: 'com.sun.net.httpserver', name: 'http', version: '20070405'
 }
 
 tasks.named('test') {
