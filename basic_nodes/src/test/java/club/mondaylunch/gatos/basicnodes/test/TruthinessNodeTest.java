@@ -20,7 +20,7 @@ public class TruthinessNodeTest {
         true, DataType.BOOLEAN,
         new JsonObject(), DataType.JSON_OBJECT,
         List.of(), DataType.NUMBER.listOf(),
-        Optional.of("live jeroen reaction"), DataType.STRING.optionalOf()
+        Optional.of("leonardo"), DataType.STRING.optionalOf()
     );
     private static final Map<Object, DataType<?>> FALSY_VALUES = Map.of(
         0.0, DataType.NUMBER,
