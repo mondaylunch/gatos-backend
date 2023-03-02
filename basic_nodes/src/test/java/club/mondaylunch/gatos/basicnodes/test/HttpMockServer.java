@@ -1,19 +1,18 @@
 package club.mondaylunch.gatos.basicnodes.test;
 
-import com.sun.net.httpserver.HttpServer;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.Scanner;
 
+import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 public class HttpMockServer {
 
-    public static void start() throws Exception{
+    public static void start() throws Exception {
         HttpServer httpServer = HttpServer.create(new InetSocketAddress(8000), 0);
         httpServer.createContext("/test", new HttpRequestHandler());
         httpServer.setExecutor(null);
@@ -47,6 +46,7 @@ public class HttpMockServer {
             }
 
             try (Scanner scanner = new Scanner(body).useDelimiter("\\A")) {
+
                 String requestBody = scanner.hasNext() ? scanner.next() : null;
 
                 if (requestBody != null) {
