@@ -1,6 +1,5 @@
 package club.mondaylunch.gatos.basicnodes;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -14,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
@@ -54,29 +52,24 @@ public class HTTPRequestNodeType extends NodeType.Process {
         
         // get uri by checking url and method
         URI uri = this.getURI(url, method);
-
         if (uri == null) {
             return this.handleInvalidReturns();
         }
 
-        // the url and method are valid so we create the request
+        // the url and method are valid so we create and send the request
         HttpRequest request = this.createRequest(method, uri, body);
-        double statusCode;
-        String responseBody;
-    
-        // send the request
-        try {
-            HttpResponse<String> response = this.sendRequest(request);
-            statusCode = response.statusCode();
-            responseBody = response.body();
-        } catch (IOException | InterruptedException | ExecutionException e) {
-            // if a problem happens just return nothing
-            return this.handleInvalidReturns();
-        }
+        HttpClient httpClient = HttpClient.newHttpClient();
 
+        CompletableFuture<HttpResponse<String>> future = httpClient.sendAsync(request, BodyHandlers.ofString()).handle((msg, ex) -> {
+            if (ex != null) {
+                return null;
+            }else {
+                return msg;
+            }
+        });
         return Map.of(
-            "StatusCode", CompletableFuture.completedFuture(DataType.NUMBER.create(statusCode)),
-            "responseText", CompletableFuture.completedFuture(DataType.STRING.create(responseBody))
+            "StatusCode", future.thenApply(response -> response == null ? DataType.NUMBER.create(404.0) : DataType.NUMBER.create((double) response.statusCode())),
+            "responseText", future.thenApply(response -> response == null ? DataType.STRING.create("URL or method are incorrect") : DataType.STRING.create(response.body()))
         );
     }
 
@@ -115,11 +108,6 @@ public class HTTPRequestNodeType extends NodeType.Process {
             case "DELETE": request = builder.uri(uri).DELETE().build(); break;
         }
         return request;
-    }
-
-    private HttpResponse<String> sendRequest(HttpRequest request) throws IOException, InterruptedException, ExecutionException {
-        HttpClient httpClient = HttpClient.newHttpClient();
-        return httpClient.sendAsync(request, BodyHandlers.ofString()).get();
     }
 
     private enum Methods {
