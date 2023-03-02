@@ -1,5 +1,6 @@
 package club.mondaylunch.gatos.core.codec;
 
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,8 +8,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.bson.BsonDocument;
-import org.bson.BsonDocumentWriter;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
 import org.bson.codecs.Codec;
@@ -19,6 +18,8 @@ import org.bson.codecs.MapCodecProvider;
 import org.bson.codecs.Parameterizable;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.json.JsonReader;
+import org.bson.json.JsonWriter;
 
 import club.mondaylunch.gatos.core.Database;
 
@@ -148,13 +149,21 @@ public final class SerializationUtils {
      * @return The JSON representation of the object
      */
     public static String toJson(Object object) {
-        BsonDocument document = new BsonDocument();
-        try (BsonDocumentWriter writer = new BsonDocumentWriter(document)) {
+        var stringWriter = new StringWriter();
+        try (var jsonWriter = new JsonWriter(stringWriter)) {
             @SuppressWarnings("unchecked")
-            Codec<Object> codec = (Codec<Object>) JSON_CODEC_REGISTRY.get(object.getClass());
-            EncoderContext context = EncoderContext.builder().build();
-            codec.encode(writer, object, context);
-            return document.toJson();
+            var codec = (Codec<Object>) JSON_CODEC_REGISTRY.get(object.getClass());
+            var context = EncoderContext.builder().build();
+            codec.encode(jsonWriter, object, context);
+            return stringWriter.toString();
+        }
+    }
+
+    public static <T> T fromJson(String json, Class<T> clazz) {
+        try (var reader = new JsonReader(json)) {
+            var codec = JSON_CODEC_REGISTRY.get(clazz);
+            var context = DecoderContext.builder().build();
+            return codec.decode(reader, context);
         }
     }
 
