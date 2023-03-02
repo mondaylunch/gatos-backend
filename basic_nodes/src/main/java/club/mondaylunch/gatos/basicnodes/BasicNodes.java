@@ -3,6 +3,13 @@ package club.mondaylunch.gatos.basicnodes;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 public final class BasicNodes {
+
+    /**
+     * Class load this class to register node types.
+     */
+    public static void init() {
+    }
+
     public static final StringInterpolationNodeType STRING_INTERPOLATION = NodeType.REGISTRY
         .register("string_interpolation", new StringInterpolationNodeType());
     public static final VariableExtractionNodeType VARIABLE_EXTRACTION = NodeType.REGISTRY
@@ -15,6 +22,8 @@ public final class BasicNodes {
         .register("string_contains", new StringContainsNodeType());
     public static final StringConcatNodeType STRING_CONCAT = NodeType.REGISTRY
         .register("string_concat", new StringConcatNodeType());
+    public static final NumberComparisonNodeType NUMBER_COMPARISON = NodeType.REGISTRY
+        .register("number_comparison", new NumberComparisonNodeType());
     public static final MathNodeType MATH = NodeType.REGISTRY
         .register("math", new MathNodeType());
     public static final BooleanOperationNodeType BOOL_OP = NodeType.REGISTRY
