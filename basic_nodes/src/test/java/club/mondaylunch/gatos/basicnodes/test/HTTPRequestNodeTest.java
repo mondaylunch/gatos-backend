@@ -51,7 +51,7 @@ public class HTTPRequestNodeTest {
 
         var output = BasicNodes.HTTP_REQUEST.compute(input, node.settings(), Map.of());
         Assertions.assertEquals(200.0, output.get("StatusCode").join().value());
-        Assertions.assertEquals("no query was sent :(", output.get("responseText").join().value());
+        Assertions.assertEquals("GET request", output.get("responseText").join().value());
     }
 
     @Test
@@ -66,6 +66,66 @@ public class HTTPRequestNodeTest {
 
         var output = BasicNodes.HTTP_REQUEST.compute(input, node.settings(), Map.of());
         Assertions.assertEquals(200.0, output.get("StatusCode").join().value());
-        Assertions.assertEquals("no query was sent :(", output.get("responseText").join().value());
+        Assertions.assertEquals("POST request request has a body: asdsdf", output.get("responseText").join().value());
+    }
+
+    @Test
+    public void createPUTRequest() {
+        var node = Node.create(BasicNodes.HTTP_REQUEST)
+        .modifySetting("url", DataType.STRING.create(URL))
+        .modifySetting("method", DataType.STRING.create("PUT"));
+
+        Map<String, DataBox<?>> input = Map.of(
+            "body", DataType.STRING.create("asdsdf")
+        );
+
+        var output = BasicNodes.HTTP_REQUEST.compute(input, node.settings(), Map.of());
+        Assertions.assertEquals(200.0, output.get("StatusCode").join().value());
+        Assertions.assertEquals("PUT request request has a body: asdsdf", output.get("responseText").join().value());
+    }
+
+    @Test
+    public void createDELETERequest() {
+        var node = Node.create(BasicNodes.HTTP_REQUEST)
+        .modifySetting("url", DataType.STRING.create(URL))
+        .modifySetting("method", DataType.STRING.create("DELETE"));
+
+        Map<String, DataBox<?>> input = Map.of(
+            "body", DataType.STRING.create("")
+        );
+
+        var output = BasicNodes.HTTP_REQUEST.compute(input, node.settings(), Map.of());
+        Assertions.assertEquals(200.0, output.get("StatusCode").join().value());
+        Assertions.assertEquals("DELETE request", output.get("responseText").join().value());
+    }
+
+    @Test
+    public void handleIncorrectAPIs() {
+        var node = Node.create(BasicNodes.HTTP_REQUEST)
+        .modifySetting("url", DataType.STRING.create("http://notlocalhost:8080/not_correct"))
+        .modifySetting("method", DataType.STRING.create("POST"));
+
+        Map<String, DataBox<?>> input = Map.of(
+            "body", DataType.STRING.create("")
+        );
+
+        var output = BasicNodes.HTTP_REQUEST.compute(input, node.settings(), Map.of());
+        Assertions.assertEquals(404.0, output.get("StatusCode").join().value());
+        Assertions.assertEquals("URL or method are incorrect", output.get("responseText").join().value());
+    }
+
+    @Test
+    public void handleIncorrectMethods() {
+        var node = Node.create(BasicNodes.HTTP_REQUEST)
+        .modifySetting("url", DataType.STRING.create(URL))
+        .modifySetting("method", DataType.STRING.create("NOTPOST"));
+
+        Map<String, DataBox<?>> input = Map.of(
+            "body", DataType.STRING.create("")
+        );
+
+        var output = BasicNodes.HTTP_REQUEST.compute(input, node.settings(), Map.of());
+        Assertions.assertEquals(404.0, output.get("StatusCode").join().value());
+        Assertions.assertEquals("URL or method are incorrect", output.get("responseText").join().value());
     }
 }

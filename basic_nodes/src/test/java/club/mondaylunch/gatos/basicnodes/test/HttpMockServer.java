@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.Scanner;
 
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -26,7 +27,9 @@ public class HttpMockServer {
         @Override
         public void handle(HttpExchange t) throws IOException {
             InputStream requestBody = t.getRequestBody();
-            String response = this.createResponse(requestBody);
+            String method = t.getRequestMethod();
+
+            String response = this.createResponse(requestBody, method);
             
             t.sendResponseHeaders(HTTP_OK_STATUS, response.getBytes().length);
             OutputStream os = t.getResponseBody();
@@ -34,15 +37,24 @@ public class HttpMockServer {
             os.close();
         }
     
-        private String createResponse(InputStream body) {
-            try (Scanner scanner = new Scanner(body).useDelimiter("\\A")) {
-                String requestBody = scanner.hasNext() ? scanner.next() : "";
+        private String createResponse(InputStream body, String method) {
+            String response = "";
 
-                if ( requestBody.equals("")) {
-                    return "there was a query sent: " + requestBody;
+            switch(method) {
+                case "GET": response += "GET request"; break;
+                case "POST": response += "POST request"; break;
+                case "PUT": response += "PUT request"; break;
+                case "DELETE": response += "DELETE request"; break;
+            }
+
+            try (Scanner scanner = new Scanner(body).useDelimiter("\\A")) {
+                String requestBody = scanner.hasNext() ? scanner.next() : null;
+
+                if (requestBody != null) {
+                    return response + " request has a body: " + requestBody;
                 }
             }
-            return "no query was sent :(";
+            return response;
         }
     }
 }
