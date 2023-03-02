@@ -19,8 +19,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import club.mondaylunch.gatos.api.exception.flow.InvalidNodeTypeException;
 import club.mondaylunch.gatos.api.repository.FlowRepository;
 import club.mondaylunch.gatos.api.repository.LoginRepository;
+import club.mondaylunch.gatos.core.codec.SerializationUtils;
+import club.mondaylunch.gatos.core.graph.type.NodeType;
 import club.mondaylunch.gatos.core.models.Flow;
 import club.mondaylunch.gatos.core.models.User;
 
@@ -83,8 +86,11 @@ public class FlowController {
     }
 
     @PatchMapping("{flowId}")
-    public BasicFlowInfo updateFlow(@RequestHeader("x-auth-token") String token, @PathVariable UUID flowId,
-                           @Valid @RequestBody BodyUpdateFlow data) {
+    public BasicFlowInfo updateFlow(
+        @RequestHeader("x-auth-token") String token,
+        @PathVariable UUID flowId,
+        @Valid @RequestBody BodyUpdateFlow data
+    ) {
         var user = this.userRepository.authenticateUser(token);
         var flow = this.flowRepository.getFlow(user, flowId);
 
@@ -102,7 +108,29 @@ public class FlowController {
     public void deleteFlow(@RequestHeader("x-auth-token") String token, @PathVariable UUID flowId) {
         var user = this.userRepository.authenticateUser(token);
         var flow = this.flowRepository.getFlow(user, flowId);
-
         Flow.objects.delete(flow.getId());
+    }
+
+    // Graph operations
+
+    private record BodyAddNode(
+        @JsonProperty("node_type") String nodeType
+    ) {
+    }
+
+    @PostMapping(value = "{flowId}/graph", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String addNode(
+        @RequestHeader("x-auth-token") String token,
+        @PathVariable UUID flowId,
+        @Valid @RequestBody BodyAddNode body
+    ) {
+        var user = this.userRepository.authenticateUser(token);
+        var flow = this.flowRepository.getFlow(user, flowId);
+        var graph = flow.getGraph();
+        var nodeType = NodeType.REGISTRY.get(body.nodeType)
+            .orElseThrow(InvalidNodeTypeException::new);
+        var node = graph.addNode(nodeType);
+        Flow.objects.update(flow.getId(), flow);
+        return SerializationUtils.toJson(node);
     }
 }

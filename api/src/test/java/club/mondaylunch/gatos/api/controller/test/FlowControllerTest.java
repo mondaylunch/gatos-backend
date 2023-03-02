@@ -7,10 +7,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.google.gson.JsonObject;
 import com.jayway.jsonpath.JsonPath;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -22,6 +24,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import club.mondaylunch.gatos.api.BaseMvcTest;
 import club.mondaylunch.gatos.api.helpers.UserCreationHelper;
+import club.mondaylunch.gatos.basicnodes.BasicNodes;
+import club.mondaylunch.gatos.core.codec.SerializationUtils;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.Node;
@@ -38,6 +42,11 @@ import club.mondaylunch.gatos.testshared.graph.type.test.TestNodeTypes;
 public class FlowControllerTest extends BaseMvcTest implements UserCreationHelper {
     private static final String ENDPOINT = "/api/v1/flows";
     private User user;
+
+    @BeforeAll
+    public static void init() {
+        BasicNodes.init();
+    }
 
     @BeforeEach
     void setUp() {
@@ -309,6 +318,32 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         Assertions.assertNotNull(Flow.objects.get(flow.getId()));
     }
 
+    @Test
+    public void canAddGraphNode() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        Assertions.assertEquals(0, graph.nodeCount());
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        var nodeType = "string_interpolation";
+        var nodeTypeJson = new JsonObject();
+        nodeTypeJson.addProperty("node_type", nodeType);
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT + "/" + flow.getId() + "/graph")
+                .header("x-auth-token", this.user.getAuthToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(nodeTypeJson.toString()))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var id = flow.getId();
+        var updatedFlow = Flow.objects.get(id);
+        var updatedGraph = updatedFlow.getGraph();
+        Assertions.assertEquals(1, updatedGraph.nodeCount());
+        var body = result.andReturn().getResponse().getContentAsString();
+        var actualNode = SerializationUtils.fromJson(body, Node.class);
+        var nodeId = actualNode.id();
+        var expectedNode = updatedGraph.getNode(nodeId).orElseThrow();
+        Assertions.assertEquals(expectedNode, actualNode);
+    }
+
     /// --- UTILITIES ---
 
     private void assertFlowCount(long count) {
@@ -404,6 +439,10 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
 
     private static void compareNode(Node node, int index, ResultActions result) {
         var prefix = OBJECT_EXPRESSION_PREFIX + "graph.nodes[" + index + "].";
+        compareNode(node, result, prefix);
+    }
+
+    private static void compareNode(Node node, ResultActions result, String prefix) {
         compareFields(prefix, result,
             Map.entry("id", node.id()),
             Map.entry("type", NodeType.REGISTRY.getName(node.type()).orElseThrow())
