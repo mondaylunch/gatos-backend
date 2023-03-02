@@ -1,5 +1,7 @@
 package club.mondaylunch.gatos.core.models;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
@@ -111,5 +113,27 @@ public class User extends BaseModel {
     public boolean validatePassword(String plaintextPassword) {
         Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
         return encoder.matches(plaintextPassword, this.getPassword());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), this.username, this.email, this.password, this.authToken);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        } else if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        } else if (!super.equals(obj)) {
+            return false;
+        } else {
+            var other = (User) obj;
+            return Objects.equals(this.username, other.username)
+                && Objects.equals(this.email, other.email)
+                && Objects.equals(this.password, other.password)
+                && Objects.equals(this.authToken, other.authToken);
+        }
     }
 }
