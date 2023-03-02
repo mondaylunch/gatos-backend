@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
@@ -68,7 +69,7 @@ public class HTTPRequestNodeType extends NodeType.Process {
             HttpResponse<String> response = this.sendRequest(request);
             statusCode = response.statusCode();
             responseBody = response.body();
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException | InterruptedException | ExecutionException e) {
             // if a problem happens just return nothing
             return this.handleInvalidReturns();
         }
@@ -116,10 +117,9 @@ public class HTTPRequestNodeType extends NodeType.Process {
         return request;
     }
 
-    private HttpResponse<String> sendRequest(HttpRequest request) throws IOException, InterruptedException {
+    private HttpResponse<String> sendRequest(HttpRequest request) throws IOException, InterruptedException, ExecutionException {
         HttpClient httpClient = HttpClient.newHttpClient();
-        HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
-        return response;
+        return httpClient.sendAsync(request, BodyHandlers.ofString()).get();
     }
 
     private enum Methods {
