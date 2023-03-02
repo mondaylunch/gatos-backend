@@ -2,7 +2,7 @@ name: Checkstyle
 on: [push, pull_request]
 
 jobs:
-    build:
+    checkstyle:
         runs-on: ubuntu-22.04
         steps:
             - uses: actions/checkout@v3
