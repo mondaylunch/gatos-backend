@@ -118,7 +118,9 @@ public class Graph {
         this.connectionsByNode.get(id).removeAll(invalidConns);
 
         this.observer.nodeModified(result);
-        this.observer.connectionsRemoved(invalidConns);
+        for (var invalidConn : invalidConns) {
+            this.observer.connectionRemoved(invalidConn);
+        }
 
         return result;
     }
@@ -135,10 +137,10 @@ public class Graph {
         var oldMetaData = this.metadataByNode.remove(id);
 
         if (oldNode != null) {
-            this.observer.nodeRemoved(id);
+            this.observer.nodeRemoved(oldNode);
         }
         if (oldMetaData != null) {
-            this.observer.metadataRemoved(id);
+            this.observer.metadataRemoved(id, oldMetaData);
         }
 
         @Nullable

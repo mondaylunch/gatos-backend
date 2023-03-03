@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -21,53 +22,102 @@ public class GraphObserver {
 
     private final Map<UUID, Node> addedNodes = new HashMap<>();
     private final Map<UUID, Node> modifiedNodes = new HashMap<>();
-    private final Set<UUID> removedNodesIds = new HashSet<>();
-    private final Set<NodeConnection<?>> addedConnections = new HashSet<>();
-    private final Set<NodeConnection<?>> removedConnections = new HashSet<>();
+    private final Map<UUID, Node> removedNodes = new HashMap<>();
+    private final Map<ConnectionId, NodeConnection<?>> addedConnections = new HashMap<>();
+    private final Map<ConnectionId, NodeConnection<?>> modifiedConnections = new HashMap<>();
+    private final Map<ConnectionId, NodeConnection<?>> removedConnections = new HashMap<>();
     private final Map<UUID, NodeMetadata> addedMetadata = new HashMap<>();
     private final Map<UUID, NodeMetadata> modifiedMetadata = new HashMap<>();
-    private final Set<UUID> removedMetadataIds = new HashSet<>();
+    private final Map<UUID, NodeMetadata> removedMetadata = new HashMap<>();
 
     public void nodeAdded(Node node) {
-        this.addedNodes.put(node.id(), node);
+        added(node.id(), node, this.addedNodes, this.modifiedNodes, this.removedNodes);
     }
 
     public void nodeModified(Node node) {
-        this.modifiedNodes.put(node.id(), node);
+        modified(node.id(), node, this.addedNodes, this.modifiedNodes, this.removedNodes);
     }
 
-    public void nodeRemoved(UUID nodeId) {
-        this.removedNodesIds.add(nodeId);
-        this.addedNodes.remove(nodeId);
-        this.modifiedNodes.remove(nodeId);
+    public void nodeRemoved(Node node) {
+        removed(node.id(), node, this.addedNodes, this.modifiedNodes, this.removedNodes);
     }
 
     public void connectionAdded(NodeConnection<?> connection) {
-        this.addedConnections.add(connection);
+        ConnectionId id = new ConnectionId(connection);
+        added(id, connection, this.addedConnections, this.modifiedConnections, this.removedConnections);
     }
 
     public void connectionRemoved(NodeConnection<?> connection) {
-        this.removedConnections.add(connection);
-        this.addedConnections.remove(connection);
-    }
-
-    public void connectionsRemoved(Collection<NodeConnection<?>> connections) {
-        this.removedConnections.addAll(connections);
-        this.addedConnections.removeAll(connections);
+        ConnectionId id = new ConnectionId(connection);
+        removed(id, connection, this.addedConnections, this.modifiedConnections, this.removedConnections);
     }
 
     public void metadataAdded(UUID nodeId, NodeMetadata metadata) {
-        this.addedMetadata.put(nodeId, metadata);
+        added(nodeId, metadata, this.addedMetadata, this.modifiedMetadata, this.removedMetadata);
     }
 
     public void metadataModified(UUID nodeId, NodeMetadata metadata) {
-        this.modifiedMetadata.put(nodeId, metadata);
+        modified(nodeId, metadata, this.addedMetadata, this.modifiedMetadata, this.removedMetadata);
     }
 
-    public void metadataRemoved(UUID nodeId) {
-        this.removedMetadataIds.add(nodeId);
-        this.addedMetadata.remove(nodeId);
-        this.modifiedMetadata.remove(nodeId);
+    public void metadataRemoved(UUID nodeId, NodeMetadata metadata) {
+        removed(nodeId, metadata, this.addedMetadata, this.modifiedMetadata, this.removedMetadata);
+    }
+
+    private static <K, V> void added(K key, V value, Map<K, V> added, Map<K, V> modified, Map<K, V> removed) {
+        if (modified.containsKey(key)) {
+            /*
+            If a value with a key was modified when
+            a value with the same key is added, set
+            the modified value to the added value.
+             */
+            modified.put(key, value);
+        } else if (removed.containsKey(key)) {
+            /*
+            If a value with a key was removed when a
+            value with the same key is added, it is
+            not removed anymore.
+             */
+            removed.remove(key);
+            if (!value.equals(removed.get(key))) {
+                /*
+                If the contents of the removed value
+                and the added value are not the same,
+                the value becomes a modified value.
+                 */
+                modified.put(key, value);
+            }
+        } else {
+            // Otherwise, the value is added.
+            added.put(key, value);
+        }
+    }
+
+    private static <K, V> void modified(K key, V value, Map<K, V> added, Map<K, V> modified, Map<K, V> removed) {
+        if (added.containsKey(key)) {
+            /*
+            If a value with a key was added when a
+            value with the same key is modified,
+            the added value is replaced with the
+            modified value.
+             */
+            added.put(key, value);
+        } else if (removed.containsKey(key)) {
+            /*
+            If a value that was removed cannot at
+            be modified.
+             */
+            throw new IllegalStateException("Cannot modify a " + value.getClass().getSimpleName() + " that has been removed");
+        } else {
+            // Otherwise, the value is modified.
+            modified.put(key, value);
+        }
+    }
+
+    private static <K, V> void removed(K key, V value, Map<K, V> added, Map<K, V> modified, Map<K, V> removed) {
+        removed.put(key, value);
+        added.remove(key);
+        modified.remove(key);
     }
 
     /**
@@ -79,10 +129,11 @@ public class GraphObserver {
      * @return The update, or empty if no changes have been made.
      */
     public Optional<Bson> createFlowUpdate() {
+        this.validate();
         List<Bson> updates = new ArrayList<>();
 
-        this.createRemoveNodeUpdate(updates);
         this.createAddNodeUpdate(updates);
+        this.createRemoveNodeUpdate(updates);
 
         if (updates.isEmpty()) {
             return Optional.empty();
@@ -91,9 +142,51 @@ public class GraphObserver {
         }
     }
 
+    private void validate() {
+        var nodeShared = sharedValues(
+            this.addedNodes.keySet(),
+            this.modifiedNodes.keySet(),
+            this.removedNodes.keySet()
+        );
+        if (nodeShared) {
+            throw new IllegalStateException("Node updates are in multiple states");
+        }
+        var connectionShared = sharedValues(
+            this.addedConnections.keySet(),
+            this.modifiedConnections.keySet(),
+            this.removedConnections.keySet()
+        );
+        if (connectionShared) {
+            throw new IllegalStateException("Connection updates are in multiple states");
+        }
+        var metadataShared = sharedValues(
+            this.addedMetadata.keySet(),
+            this.modifiedMetadata.keySet(),
+            this.removedMetadata.keySet()
+        );
+        if (metadataShared) {
+            throw new IllegalStateException("Metadata updates are in multiple states");
+        }
+    }
+
+    @SafeVarargs
+    private static <T> boolean sharedValues(Set<T> set1, Set<T> set2, Set<T>... sets) {
+        return !intersection(set1, set2, sets).isEmpty();
+    }
+
+    @SafeVarargs
+    private static <T> Set<T> intersection(Set<T> set1, Set<T> set2, Set<T>... sets) {
+        Set<T> result = new HashSet<>(set1);
+        result.retainAll(set2);
+        for (Set<T> set : sets) {
+            result.retainAll(set);
+        }
+        return result;
+    }
+
     private void createRemoveNodeUpdate(Collection<Bson> updates) {
-        if (!this.removedNodesIds.isEmpty()) {
-            var filter = Filters.in("id", this.removedNodesIds);
+        if (!this.removedNodes.isEmpty()) {
+            var filter = Filters.in("id", this.removedNodes.keySet());
             var removedNodes = Updates.pullByFilter(new BasicDBObject("graph.nodes", filter));
             updates.add(removedNodes);
         }
@@ -112,10 +205,66 @@ public class GraphObserver {
     public void reset() {
         this.addedNodes.clear();
         this.modifiedNodes.clear();
-        this.removedNodesIds.clear();
+        this.removedNodes.clear();
         this.addedConnections.clear();
         this.removedConnections.clear();
         this.addedMetadata.clear();
-        this.removedMetadataIds.clear();
+        this.removedMetadata.clear();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        } else if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        } else {
+            GraphObserver that = (GraphObserver) obj;
+            return Objects.equals(this.addedNodes, that.addedNodes)
+                && Objects.equals(this.modifiedNodes, that.modifiedNodes)
+                && Objects.equals(this.removedNodes, that.removedNodes)
+                && Objects.equals(this.addedConnections, that.addedConnections)
+                && Objects.equals(this.modifiedConnections, that.modifiedConnections)
+                && Objects.equals(this.removedConnections, that.removedConnections)
+                && Objects.equals(this.addedMetadata, that.addedMetadata)
+                && Objects.equals(this.modifiedMetadata, that.modifiedMetadata)
+                && Objects.equals(this.removedMetadata, that.removedMetadata);
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+            this.addedNodes,
+            this.modifiedNodes,
+            this.removedNodes,
+            this.addedConnections,
+            this.modifiedConnections,
+            this.removedConnections,
+            this.addedMetadata,
+            this.modifiedMetadata,
+            this.removedMetadata
+        );
+    }
+
+    @Override
+    public String toString() {
+        return "GraphObserver{"
+            + "addedNodes=" + this.addedNodes
+            + ", modifiedNodes=" + this.modifiedNodes
+            + ", removedNodes=" + this.removedNodes
+            + ", addedConnections=" + this.addedConnections
+            + ", modifiedConnections=" + this.modifiedConnections
+            + ", removedConnections=" + this.removedConnections
+            + ", addedMetadata=" + this.addedMetadata
+            + ", modifiedMetadata=" + this.modifiedMetadata
+            + ", removedMetadata=" + this.removedMetadata
+            + '}';
+    }
+
+    private record ConnectionId(UUID fromId, UUID toId) {
+        ConnectionId(NodeConnection<?> connection) {
+            this(connection.from().nodeId(), connection.to().nodeId());
+        }
     }
 }
