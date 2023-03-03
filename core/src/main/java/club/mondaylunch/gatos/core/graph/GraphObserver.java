@@ -7,16 +7,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import org.bson.conversions.Bson;
 
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
+import club.mondaylunch.gatos.core.models.Flow;
 
 public class GraphObserver {
 
@@ -124,21 +125,21 @@ public class GraphObserver {
      * Creates a Bson update for the graph
      * from the changes seen by this observer
      * since the last time {@link #reset()}
-     * was called.
+     * was called, and applies it to the collection.
      *
-     * @return The update, or empty if no changes have been made.
+     * @param flowId     The ID of the flow to update.
+     * @param collection The collection to update.
      */
-    public Optional<Bson> createFlowUpdate() {
+    public void updateFlow(UUID flowId, MongoCollection<Flow> collection) {
         this.validate();
         List<Bson> updates = new ArrayList<>();
 
         this.createAddNodeUpdate(updates);
         this.createRemoveNodeUpdate(updates);
 
-        if (updates.isEmpty()) {
-            return Optional.empty();
-        } else {
-            return Optional.of(Updates.combine(updates));
+        if (!updates.isEmpty()) {
+            var update = Updates.combine(updates);
+            collection.updateOne(Filters.eq(flowId), update);
         }
     }
 
@@ -206,9 +207,13 @@ public class GraphObserver {
         this.addedNodes.clear();
         this.modifiedNodes.clear();
         this.removedNodes.clear();
+
         this.addedConnections.clear();
+        this.modifiedConnections.clear();
         this.removedConnections.clear();
+
         this.addedMetadata.clear();
+        this.modifiedMetadata.clear();
         this.removedMetadata.clear();
     }
 

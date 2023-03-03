@@ -27,7 +27,6 @@ public class FlowCollection extends BaseCollection<Flow> {
     public void updateGraph(Flow flow) {
         flow.getGraph()
             .observer()
-            .createFlowUpdate()
-            .ifPresent(updates -> this.getCollection().updateOne(Filters.eq(flow.getId()), updates));
+            .updateFlow(flow.getId(), this.getCollection());
     }
 }
