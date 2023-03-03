@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import org.bson.conversions.Bson;
 
@@ -68,13 +70,19 @@ public class GraphObserver {
         this.modifiedMetadata.remove(nodeId);
     }
 
+    /**
+     * Creates a Bson update for the graph
+     * from the changes seen by this observer
+     * since the last time {@link #reset()}
+     * was called.
+     *
+     * @return The update, or empty if no changes have been made.
+     */
     public Optional<Bson> createFlowUpdate() {
         List<Bson> updates = new ArrayList<>();
 
-        if (!this.addedNodes.isEmpty()) {
-            var addedNodes = Updates.pushEach("graph.nodes", new ArrayList<>(this.addedNodes.values()));
-            updates.add(addedNodes);
-        }
+        this.createRemoveNodeUpdate(updates);
+        this.createAddNodeUpdate(updates);
 
         if (updates.isEmpty()) {
             return Optional.empty();
@@ -83,6 +91,24 @@ public class GraphObserver {
         }
     }
 
+    private void createRemoveNodeUpdate(Collection<Bson> updates) {
+        if (!this.removedNodesIds.isEmpty()) {
+            var filter = Filters.in("id", this.removedNodesIds);
+            var removedNodes = Updates.pullByFilter(new BasicDBObject("graph.nodes", filter));
+            updates.add(removedNodes);
+        }
+    }
+
+    private void createAddNodeUpdate(Collection<Bson> updates) {
+        if (!this.addedNodes.isEmpty()) {
+            var addedNodes = Updates.pushEach("graph.nodes", new ArrayList<>(this.addedNodes.values()));
+            updates.add(addedNodes);
+        }
+    }
+
+    /**
+     * Resets the observer, clearing all changes.
+     */
     public void reset() {
         this.addedNodes.clear();
         this.modifiedNodes.clear();

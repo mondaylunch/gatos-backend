@@ -344,6 +344,25 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         Assertions.assertEquals(expectedNode, actualNode);
     }
 
+    @Test
+    public void canDeleteGraphNode() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        var node = graph.addNode(TestNodeTypes.START);
+        Assertions.assertEquals(1, graph.nodeCount());
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        var flowId = flow.getId();
+        var nodeId = node.id();
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT + "/" + flow.getId() + "/graph/nodes/" + nodeId)
+                .header("x-auth-token", this.user.getAuthToken()))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var updatedFlow = Flow.objects.get(flowId);
+        var updatedGraph = updatedFlow.getGraph();
+        Assertions.assertEquals(0, updatedGraph.nodeCount());
+        Assertions.assertFalse(updatedGraph.containsNode(nodeId));
+    }
+
     /// --- UTILITIES ---
 
     private void assertFlowCount(long count) {

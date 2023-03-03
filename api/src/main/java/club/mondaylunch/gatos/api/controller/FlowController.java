@@ -133,4 +133,17 @@ public class FlowController {
         Flow.objects.updateGraph(flow);
         return SerializationUtils.toJson(node);
     }
+
+    @DeleteMapping("{flowId}/graph/nodes/{nodeId}")
+    public void deleteNode(
+        @RequestHeader("x-auth-token") String token,
+        @PathVariable UUID flowId,
+        @PathVariable UUID nodeId
+    ) {
+        var user = this.userRepository.authenticateUser(token);
+        var flow = this.flowRepository.getFlow(user, flowId);
+        var graph = flow.getGraph();
+        graph.removeNode(nodeId);
+        Flow.objects.updateGraph(flow);
+    }
 }
