@@ -30,8 +30,12 @@ public final class BasicNodes {
         .register("boolean_operation", new BooleanOperationNodeType());
     public static final ListLengthNodeType LIST_LENGTH = NodeType.REGISTRY
         .register("list_length", new ListLengthNodeType());
+    public static final ListHeadTailNodeType LIST_HEADTAIL = NodeType.REGISTRY
+        .register("list_headtail", new ListHeadTailNodeType());
     public static final EqualsNodeType EQUALS = NodeType.REGISTRY
         .register("equals", new EqualsNodeType());
     public static final TruthinessNodeType TRUTHINESS = NodeType.REGISTRY
         .register("truthiness", new TruthinessNodeType());
+    public static final HTTPRequestNodeType HTTP_REQUEST = NodeType.REGISTRY
+        .register("http_request", new HTTPRequestNodeType());
 }
