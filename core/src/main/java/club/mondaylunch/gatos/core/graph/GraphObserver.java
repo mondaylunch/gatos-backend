@@ -134,8 +134,9 @@ public class GraphObserver {
         this.validate();
         List<Bson> updates = new ArrayList<>();
 
-        this.createAddNodeUpdate(updates);
-        this.createRemoveNodeUpdate(updates);
+        this.updateAddNode(updates);
+        this.updateModifyNode(flowId, collection);
+        this.updateRemoveNode(updates);
 
         if (!updates.isEmpty()) {
             var update = Updates.combine(updates);
@@ -185,18 +186,26 @@ public class GraphObserver {
         return result;
     }
 
-    private void createRemoveNodeUpdate(Collection<Bson> updates) {
+    private void updateAddNode(Collection<Bson> updates) {
+        if (!this.addedNodes.isEmpty()) {
+            var addedNodes = Updates.pushEach("graph.nodes", new ArrayList<>(this.addedNodes.values()));
+            updates.add(addedNodes);
+        }
+    }
+
+    private void updateModifyNode(UUID flowId, MongoCollection<Flow> collection) {
+        for (var modified : this.modifiedNodes.values()) {
+            var filter = Filters.and(Filters.eq(flowId), Filters.eq("graph.nodes.id", modified.id()));
+            var update = Updates.set("graph.nodes.$", modified);
+            collection.updateOne(filter, update);
+        }
+    }
+
+    private void updateRemoveNode(Collection<Bson> updates) {
         if (!this.removedNodes.isEmpty()) {
             var filter = Filters.in("id", this.removedNodes.keySet());
             var removedNodes = Updates.pullByFilter(new BasicDBObject("graph.nodes", filter));
             updates.add(removedNodes);
-        }
-    }
-
-    private void createAddNodeUpdate(Collection<Bson> updates) {
-        if (!this.addedNodes.isEmpty()) {
-            var addedNodes = Updates.pushEach("graph.nodes", new ArrayList<>(this.addedNodes.values()));
-            updates.add(addedNodes);
         }
     }
 
