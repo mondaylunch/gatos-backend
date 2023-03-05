@@ -38,6 +38,8 @@ public final class BasicNodes {
         .register("list_headtail", new ListHeadTailNodeType());
     public static final EqualsNodeType EQUALS = NodeType.REGISTRY
         .register("equals", new EqualsNodeType());
+    public static final TruthinessNodeType TRUTHINESS = NodeType.REGISTRY
+        .register("truthiness", new TruthinessNodeType());
     public static final HTTPRequestNodeType HTTP_REQUEST = NodeType.REGISTRY
         .register("http_request", new HTTPRequestNodeType());
 }
