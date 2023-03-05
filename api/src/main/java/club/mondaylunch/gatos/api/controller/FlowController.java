@@ -6,6 +6,7 @@ import java.util.UUID;
 import javax.validation.Valid;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.JsonParser;
 import org.hibernate.validator.constraints.Length;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.MediaType;
@@ -19,10 +20,12 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import club.mondaylunch.gatos.api.exception.NotJsonObjectException;
 import club.mondaylunch.gatos.api.exception.flow.InvalidNodeTypeException;
 import club.mondaylunch.gatos.api.repository.FlowRepository;
 import club.mondaylunch.gatos.api.repository.LoginRepository;
 import club.mondaylunch.gatos.core.codec.SerializationUtils;
+import club.mondaylunch.gatos.core.data.DataBoxParser;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 import club.mondaylunch.gatos.core.models.Flow;
 import club.mondaylunch.gatos.core.models.User;
@@ -132,6 +135,29 @@ public class FlowController {
         var node = graph.addNode(nodeType);
         Flow.objects.updateGraph(flow);
         return SerializationUtils.toJson(node);
+    }
+
+    @PatchMapping("{flowId}/graph/nodes/{nodeId}")
+    public void modifyNodeSettings(
+        @RequestHeader("x-auth-token") String token,
+        @PathVariable UUID flowId,
+        @PathVariable UUID nodeId,
+        @RequestBody String body
+    ) {
+        var user = this.userRepository.authenticateUser(token);
+        var flow = this.flowRepository.getFlow(user, flowId);
+        var graph = flow.getGraph();
+        var json = JsonParser.parseString(body);
+        if (!json.isJsonObject()) {
+            throw new NotJsonObjectException();
+        }
+        json.getAsJsonObject()
+            .asMap()
+            .forEach((key, value) -> {
+                var dataBox = DataBoxParser.parse(value);
+                graph.modifyNode(nodeId, node -> node.modifySetting(key, dataBox));
+            });
+        Flow.objects.updateGraph(flow);
     }
 
     @DeleteMapping("{flowId}/graph/nodes/{nodeId}")

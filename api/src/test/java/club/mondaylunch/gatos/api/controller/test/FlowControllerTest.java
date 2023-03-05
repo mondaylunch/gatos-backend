@@ -345,6 +345,32 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
     }
 
     @Test
+    public void canModifyNodeSettings() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        var node = graph.addNode(TestNodeTypes.START);
+        Assertions.assertEquals(0, node.getSetting("setting", DataType.NUMBER).value());
+        Assertions.assertEquals(1, graph.nodeCount());
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        var flowId = flow.getId();
+        var nodeId = node.id();
+        var body = new JsonObject();
+        body.addProperty("setting", 1);
+        this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flow.getId() + "/graph/nodes/" + nodeId)
+                .header("x-auth-token", this.user.getAuthToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body.toString())
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var updatedFlow = Flow.objects.get(flowId);
+        var updatedGraph = updatedFlow.getGraph();
+        Assertions.assertEquals(1, updatedGraph.nodeCount());
+        var updatedNode = updatedGraph.getNode(nodeId).orElseThrow();
+        Assertions.assertEquals(1, updatedNode.getSetting("setting", DataType.NUMBER).value());
+    }
+
+    @Test
     public void canDeleteGraphNode() throws Exception {
         var flow = createFlow(this.user);
         var graph = flow.getGraph();
