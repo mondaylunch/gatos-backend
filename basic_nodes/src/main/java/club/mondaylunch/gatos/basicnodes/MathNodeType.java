@@ -72,4 +72,17 @@ public class MathNodeType extends NodeType.Process {
 
         public abstract double apply(double a, double b);
     }
+
+    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+        return this.compute(inputs, settings, Map.of()); 
+    }
+
+    /**
+     * if no mode is given default to addition.
+     * @param inputs    a map of the two inputted doubles
+     * @return          a map of the computed result
+     */
+    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs) {
+        return this.compute(inputs, this.settings(), Map.of()); 
+    }
 }

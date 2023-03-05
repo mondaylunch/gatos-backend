@@ -113,12 +113,14 @@ public final class Node {
      * @return the new node
      */
     public Node updateInputTypes(Map<String, DataType<?>> newInputTypes) {
+        var newInputs = NodeType.inputsOrEmpty(this.type, this.id, this.settings, newInputTypes);
+        var filteredInputTypes = filterValidInputTypes(newInputTypes, newInputs.stream().collect(Collectors.toMap(NodeConnector::name, Function.identity())));
         return new Node(
             this.id,
             this.type,
             this.settings,
-            Set.copyOf(this.inputs.values()),
-            NodeType.outputsOrEmpty(this.type, this.id, this.settings, newInputTypes),
+            newInputs,
+            NodeType.outputsOrEmpty(this.type, this.id, this.settings, filteredInputTypes),
             newInputTypes);
     }
 
