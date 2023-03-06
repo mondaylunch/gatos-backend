@@ -42,6 +42,8 @@ public final class BasicNodes {
         .register("equals", new EqualsNodeType());
     public static final TruthinessNodeType TRUTHINESS = NodeType.REGISTRY
         .register("truthiness", new TruthinessNodeType());
+    public static final NegationNodeType NEGATION = NodeType.REGISTRY
+        .register("negation", new NegationNodeType());
     public static final HTTPRequestNodeType HTTP_REQUEST = NodeType.REGISTRY
         .register("http_request", new HTTPRequestNodeType());
 }
