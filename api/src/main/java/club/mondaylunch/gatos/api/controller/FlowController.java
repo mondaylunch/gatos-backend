@@ -2,11 +2,11 @@ package club.mondaylunch.gatos.api.controller;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 
 import javax.validation.Valid;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.gson.JsonParser;
 import org.hibernate.validator.constraints.Length;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.MediaType;
@@ -20,12 +20,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import club.mondaylunch.gatos.api.exception.NotJsonObjectException;
 import club.mondaylunch.gatos.api.exception.flow.InvalidNodeTypeException;
 import club.mondaylunch.gatos.api.repository.FlowRepository;
 import club.mondaylunch.gatos.api.repository.LoginRepository;
 import club.mondaylunch.gatos.core.codec.SerializationUtils;
-import club.mondaylunch.gatos.core.data.DataBoxParser;
+import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 import club.mondaylunch.gatos.core.models.Flow;
 import club.mondaylunch.gatos.core.models.User;
@@ -147,16 +146,12 @@ public class FlowController {
         var user = this.userRepository.authenticateUser(token);
         var flow = this.flowRepository.getFlow(user, flowId);
         var graph = flow.getGraph();
-        var json = JsonParser.parseString(body);
-        if (!json.isJsonObject()) {
-            throw new NotJsonObjectException();
+        var newSettings = SerializationUtils.readMap(body, Function.identity(), DataBox.class);
+        for (var entry : newSettings.entrySet()) {
+            var key = entry.getKey();
+            DataBox<?> dataBox = entry.getValue();
+            graph.modifyNode(nodeId, node -> node.modifySetting(key, dataBox));
         }
-        json.getAsJsonObject()
-            .asMap()
-            .forEach((key, value) -> {
-                var dataBox = DataBoxParser.parse(value);
-                graph.modifyNode(nodeId, node -> node.modifySetting(key, dataBox));
-            });
         Flow.objects.updateGraph(flow);
     }
 

@@ -355,8 +355,12 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         this.assertFlowCount(1);
         var flowId = flow.getId();
         var nodeId = node.id();
+
+        var dataBox = new JsonObject();
+        dataBox.addProperty("type", "number");
+        dataBox.addProperty("value", 1);
         var body = new JsonObject();
-        body.addProperty("setting", 1);
+        body.add("setting", dataBox);
         this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flow.getId() + "/graph/nodes/" + nodeId)
                 .header("x-auth-token", this.user.getAuthToken())
                 .contentType(MediaType.APPLICATION_JSON)

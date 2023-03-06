@@ -123,6 +123,7 @@ public final class SerializationUtils {
      * @param reader    the BSON reader
      * @param function  the function to run
      */
+    @SuppressWarnings("unused")
     public static void readDocument(BsonReader reader, Runnable function) {
         reader.readStartDocument();
         function.run();
@@ -164,6 +165,13 @@ public final class SerializationUtils {
             var codec = JSON_CODEC_REGISTRY.get(clazz);
             var context = DecoderContext.builder().build();
             return codec.decode(reader, context);
+        }
+    }
+
+    public static <K, V> Map<K, V> readMap(String json, Function<String, K> stringToKey, Class<V> valueType) {
+        try (var jsonReader = new JsonReader(json)) {
+            var context = DecoderContext.builder().build();
+            return readMap(jsonReader, context, valueType, stringToKey, JSON_CODEC_REGISTRY);
         }
     }
 
