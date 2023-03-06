@@ -25,6 +25,7 @@ import club.mondaylunch.gatos.api.repository.FlowRepository;
 import club.mondaylunch.gatos.api.repository.LoginRepository;
 import club.mondaylunch.gatos.core.codec.SerializationUtils;
 import club.mondaylunch.gatos.core.data.DataBox;
+import club.mondaylunch.gatos.core.graph.NodeMetadata;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 import club.mondaylunch.gatos.core.models.Flow;
 import club.mondaylunch.gatos.core.models.User;
@@ -165,6 +166,20 @@ public class FlowController {
         var flow = this.flowRepository.getFlow(user, flowId);
         var graph = flow.getGraph();
         graph.removeNode(nodeId);
+        Flow.objects.updateGraph(flow);
+    }
+
+    @PatchMapping("{flowId}/graph/nodes/{nodeId}/metadata")
+    public void modifyNodeMetadata(
+        @RequestHeader("x-auth-token") String token,
+        @PathVariable UUID flowId,
+        @PathVariable UUID nodeId,
+        @RequestBody NodeMetadata metadata
+    ) {
+        var user = this.userRepository.authenticateUser(token);
+        var flow = this.flowRepository.getFlow(user, flowId);
+        var graph = flow.getGraph();
+        graph.setMetadata(nodeId, metadata);
         Flow.objects.updateGraph(flow);
     }
 }

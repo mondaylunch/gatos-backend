@@ -138,6 +138,10 @@ public class GraphObserver {
         this.updateModifyNode(flowId, collection);
         this.updateRemoveNode(updates);
 
+        this.updateAddMetadata(flowId, collection);
+        this.updateModifyMetadata(flowId, collection);
+        this.updateRemoveMetadata(flowId, collection);
+
         if (!updates.isEmpty()) {
             var update = Updates.combine(updates);
             collection.updateOne(Filters.eq(flowId), update);
@@ -206,6 +210,32 @@ public class GraphObserver {
             var filter = Filters.in("id", this.removedNodes.keySet());
             var removedNodes = Updates.pullByFilter(new BasicDBObject("graph.nodes", filter));
             updates.add(removedNodes);
+        }
+    }
+
+    private void updateAddMetadata(UUID flowId, MongoCollection<Flow> collection) {
+        for (var entry : this.addedMetadata.entrySet()) {
+            setMetadata(flowId, entry.getKey(), entry.getValue(), collection);
+        }
+    }
+
+    private void updateModifyMetadata(UUID flowId, MongoCollection<Flow> collection) {
+        for (var entry : this.modifiedMetadata.entrySet()) {
+            setMetadata(flowId, entry.getKey(), entry.getValue(), collection);
+        }
+    }
+
+    private static void setMetadata(UUID flowId, UUID nodeId, NodeMetadata metadata, MongoCollection<Flow> collection) {
+        var filter = Filters.eq(flowId);
+        var update = Updates.set("graph.metadata." + nodeId, metadata);
+        collection.updateOne(filter, update);
+    }
+
+    private void updateRemoveMetadata(UUID flowId, MongoCollection<Flow> collection) {
+        for (var nodeId : this.removedMetadata.keySet()) {
+            var filter = Filters.and(Filters.eq(flowId));
+            var update = Updates.unset("graph.metadata." + nodeId);
+            collection.updateOne(filter, update);
         }
     }
 

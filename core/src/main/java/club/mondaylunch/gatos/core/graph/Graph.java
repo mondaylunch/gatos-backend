@@ -63,7 +63,8 @@ public class Graph {
 
     private final GraphObserver observer = new GraphObserver();
 
-    public Graph() {}
+    public Graph() {
+    }
 
     public Graph(Collection<Node> nodes, Map<UUID, NodeMetadata> metas, Collection<NodeConnection<?>> connections) {
         this();
@@ -153,8 +154,9 @@ public class Graph {
 
     /**
      * Gets the node with a given UUID from the graph, if it exists.
-     * @param id    the UUID of the graph
-     * @return      the node with the UUID, or empty
+     *
+     * @param id the UUID of the graph
+     * @return the node with the UUID, or empty
      */
     public Optional<Node> getNode(UUID id) {
         return Optional.ofNullable(this.nodes.get(id));
@@ -208,7 +210,7 @@ public class Graph {
         var destinationNodeConnections = this.getOrCreateConnectionsForNode(nodeTo.id());
         destinationNodeConnections.add(connection);
         this.modifyNode(nodeTo.id(), n -> n.updateInputTypes(destinationNodeConnections.stream()
-                .filter(c -> c.to().nodeId().equals(nodeTo.id()))
+            .filter(c -> c.to().nodeId().equals(nodeTo.id()))
             .collect(Collectors.toMap(c -> c.to().name(), c -> this.getCanonicalConnector(c.from()).type()))));
 
         this.observer.connectionAdded(connection);
@@ -226,7 +228,7 @@ public class Graph {
         destinationNodeConnections.remove(connection);
         if (this.containsNode(connection.to().nodeId())) {
             this.modifyNode(connection.to().nodeId(), n -> n.updateInputTypes(destinationNodeConnections.stream()
-                    .filter(c -> c.to().nodeId().equals(connection.to().nodeId()))
+                .filter(c -> c.to().nodeId().equals(connection.to().nodeId()))
                 .collect(Collectors.toMap(c -> c.to().name(), c -> this.getCanonicalConnector(c.from()).type()))));
         }
 
@@ -274,8 +276,9 @@ public class Graph {
     /**
      * For an output connector which may have a modified type, gets the connector with the 'true' type.
      * If the connector does not exist, this method throws an exception.
-     * @param derivedConnector  the connector to find the canonical representation of
-     * @return  the canonical representation of the connector
+     *
+     * @param derivedConnector the connector to find the canonical representation of
+     * @return the canonical representation of the connector
      */
     private NodeConnector.Output<?> getCanonicalConnector(NodeConnector.Output<?> derivedConnector) {
         return this.nodes.get(derivedConnector.nodeId()).getOutputWithName(derivedConnector.name()).orElseThrow();
@@ -309,7 +312,6 @@ public class Graph {
         }
 
         this.metadataByNode.put(nodeId, result);
-
         if (hadMetadata) {
             this.observer.metadataModified(nodeId, result);
         } else {
@@ -317,6 +319,17 @@ public class Graph {
         }
 
         return result;
+    }
+
+    /**
+     * Sets the metadata for a node with a given UUID.
+     *
+     * @param nodeId   the UUID of the node to change
+     * @param metadata the new metadata
+     * @throws NullPointerException if the metadata is null
+     */
+    public void setMetadata(UUID nodeId, NodeMetadata metadata) {
+        this.modifyMetadata(nodeId, $ -> metadata);
     }
 
     /**

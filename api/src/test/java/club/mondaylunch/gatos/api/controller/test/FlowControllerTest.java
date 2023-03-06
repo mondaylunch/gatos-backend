@@ -384,13 +384,97 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         this.assertFlowCount(1);
         var flowId = flow.getId();
         var nodeId = node.id();
-        this.mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT + "/" + flow.getId() + "/graph/nodes/" + nodeId)
-                .header("x-auth-token", this.user.getAuthToken()))
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT + "/" + flowId + "/graph/nodes/" + nodeId)
+                .header("x-auth-token", this.user.getAuthToken())
+            )
             .andExpect(MockMvcResultMatchers.status().isOk());
         var updatedFlow = Flow.objects.get(flowId);
         var updatedGraph = updatedFlow.getGraph();
         Assertions.assertEquals(0, updatedGraph.nodeCount());
         Assertions.assertFalse(updatedGraph.containsNode(nodeId));
+    }
+
+    @Test
+    public void canModifyNodeMetadata() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        var node = graph.addNode(TestNodeTypes.START);
+        Assertions.assertEquals(1, graph.nodeCount());
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        var expectedMetadata = new NodeMetadata(0, 0);
+        var actualMetadata = graph.getOrCreateMetadataForNode(node.id());
+        Assertions.assertEquals(expectedMetadata, actualMetadata);
+        var flowId = flow.getId();
+        var nodeId = node.id();
+        var body = new JsonObject();
+        body.addProperty("xPos", 1);
+        body.addProperty("yPos", 1);
+        this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flowId + "/graph/nodes/" + nodeId + "/metadata")
+                .header("x-auth-token", this.user.getAuthToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body.toString())
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var updatedFlow = Flow.objects.get(flowId);
+        var updatedGraph = updatedFlow.getGraph();
+        expectedMetadata = new NodeMetadata(1, 1);
+        actualMetadata = updatedGraph.getOrCreateMetadataForNode(nodeId);
+        Assertions.assertEquals(expectedMetadata, actualMetadata);
+    }
+
+    @Test
+    public void canModifyExistingMetadata() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        var node = graph.addNode(TestNodeTypes.START);
+        var flowId = flow.getId();
+        var nodeId = node.id();
+        Assertions.assertEquals(1, graph.nodeCount());
+        var metadata = new NodeMetadata(1, 1);
+        graph.setMetadata(nodeId, metadata);
+        var actualMetadata = graph.getOrCreateMetadataForNode(node.id());
+        Assertions.assertEquals(metadata, actualMetadata);
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        var body = new JsonObject();
+        body.addProperty("xPos", 2);
+        body.addProperty("yPos", 2);
+        this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flowId + "/graph/nodes/" + nodeId + "/metadata")
+                .header("x-auth-token", this.user.getAuthToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body.toString())
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var updatedFlow = Flow.objects.get(flowId);
+        var updatedGraph = updatedFlow.getGraph();
+        var expectedMetadata = new NodeMetadata(2, 2);
+        actualMetadata = updatedGraph.getOrCreateMetadataForNode(nodeId);
+        Assertions.assertEquals(expectedMetadata, actualMetadata);
+    }
+
+    @Test
+    public void canDeleteNodeWithMetaData() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        var node = graph.addNode(TestNodeTypes.START);
+        var flowId = flow.getId();
+        var nodeId = node.id();
+        var updatedMetadata = new NodeMetadata(1, 1);
+        graph.setMetadata(nodeId, updatedMetadata);
+        Assertions.assertEquals(updatedMetadata, graph.getOrCreateMetadataForNode(nodeId));
+        Assertions.assertEquals(1, graph.nodeCount());
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT + "/" + flowId + "/graph/nodes/" + nodeId)
+                .header("x-auth-token", this.user.getAuthToken())
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var updatedFlow = Flow.objects.get(flowId);
+        var updatedGraph = updatedFlow.getGraph();
+        Assertions.assertEquals(0, updatedGraph.nodeCount());
+        Assertions.assertFalse(updatedGraph.containsNode(nodeId));
+        Assertions.assertEquals(new NodeMetadata(0, 0), updatedGraph.getOrCreateMetadataForNode(nodeId));
     }
 
     /// --- UTILITIES ---
