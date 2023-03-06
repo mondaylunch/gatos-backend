@@ -58,7 +58,7 @@ public class FlowController {
         }
     }
 
-    @GetMapping("list")
+    @GetMapping
     public List<BasicFlowInfo> getFlows(@RequestHeader("x-auth-token") String token) {
         var user = this.userRepository.authenticateUser(token);
         return Flow.objects.get("author_id", user.getId())

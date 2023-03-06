@@ -77,13 +77,13 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
 
     @Test
     public void cannotGetFlowsWithoutToken() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/list"))
+        this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT))
             .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @Test
     public void cannotGetFlowsWithInvalidToken() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/list")
+        this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT)
                 .header("x-auth-token", "invalid"))
             .andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
@@ -577,7 +577,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
     }
 
     private ResultActions getFlows(int expectedFlowCount) throws Exception {
-        return this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/list")
+        return this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT)
                 .header("x-auth-token", this.user.getAuthToken()))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.jsonPath("$",
