@@ -4,13 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-public class InvalidConnectionException extends RuntimeException {
+public class InvalidNodeSettingException extends RuntimeException {
 
-    public InvalidConnectionException() {
-        super("Invalid connection");
-    }
-
-    public InvalidConnectionException(String message) {
+    public InvalidNodeSettingException(String message) {
         super(message);
     }
 }

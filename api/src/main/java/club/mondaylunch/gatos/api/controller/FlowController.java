@@ -1,6 +1,7 @@
 package club.mondaylunch.gatos.api.controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -20,8 +21,10 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import club.mondaylunch.gatos.api.exception.InvalidBodyException;
 import club.mondaylunch.gatos.api.exception.flow.InvalidConnectionException;
 import club.mondaylunch.gatos.api.exception.flow.InvalidDataTypeException;
+import club.mondaylunch.gatos.api.exception.flow.InvalidNodeSettingException;
 import club.mondaylunch.gatos.api.exception.flow.InvalidNodeTypeException;
 import club.mondaylunch.gatos.api.exception.flow.NodeNotFoundException;
 import club.mondaylunch.gatos.api.repository.FlowRepository;
@@ -153,11 +156,27 @@ public class FlowController {
         var user = this.userRepository.authenticateUser(token);
         var flow = this.flowRepository.getFlow(user, flowId);
         var graph = flow.getGraph();
-        var newSettings = SerializationUtils.readMap(body, Function.identity(), DataBox.class);
+        if (!graph.containsNode(nodeId)) {
+            throw new NodeNotFoundException();
+        }
+        Map<String, DataBox<?>> newSettings;
+        try {
+            @SuppressWarnings("unchecked")
+            var type = (Class<DataBox<?>>) (Object) DataBox.class;
+            newSettings = SerializationUtils.readMap(body, Function.identity(), type);
+        } catch (Exception e) {
+            throw new InvalidBodyException();
+        }
         for (var entry : newSettings.entrySet()) {
             var key = entry.getKey();
-            DataBox<?> dataBox = entry.getValue();
-            graph.modifyNode(nodeId, node -> node.modifySetting(key, dataBox));
+            var dataBox = entry.getValue();
+            graph.modifyNode(nodeId, node -> {
+                try {
+                    return node.modifySetting(key, dataBox);
+                } catch (Exception e) {
+                    throw new InvalidNodeSettingException(e.getMessage());
+                }
+            });
         }
         Flow.objects.updateGraph(flow);
     }
@@ -194,7 +213,11 @@ public class FlowController {
         var flow = this.flowRepository.getFlow(user, flowId);
         var graph = flow.getGraph();
         var connection = createConnection(graph, body);
-        graph.addConnection(connection);
+        try {
+            graph.addConnection(connection);
+        } catch (Exception e) {
+            throw new InvalidConnectionException(e.getMessage());
+        }
         Flow.objects.updateGraph(flow);
     }
 
@@ -208,7 +231,11 @@ public class FlowController {
         var flow = this.flowRepository.getFlow(user, flowId);
         var graph = flow.getGraph();
         var connection = createConnection(graph, body);
-        graph.removeConnection(connection);
+        try {
+            graph.removeConnection(connection);
+        } catch (Exception e) {
+            throw new InvalidConnectionException(e.getMessage());
+        }
         Flow.objects.updateGraph(flow);
     }
 
