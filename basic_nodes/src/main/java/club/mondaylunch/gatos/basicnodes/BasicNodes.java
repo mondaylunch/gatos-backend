@@ -26,16 +26,24 @@ public final class BasicNodes {
         .register("number_comparison", new NumberComparisonNodeType());
     public static final MathNodeType MATH = NodeType.REGISTRY
         .register("math", new MathNodeType());
+    public static final IsFiniteNodeType IS_FINITE = NodeType.REGISTRY
+        .register("is_finite", new IsFiniteNodeType());
+    public static final IsNanNodeType IS_NAN = NodeType.REGISTRY
+        .register("is_nan", new IsNanNodeType());
     public static final BooleanOperationNodeType BOOL_OP = NodeType.REGISTRY
         .register("boolean_operation", new BooleanOperationNodeType());
     public static final ListLengthNodeType LIST_LENGTH = NodeType.REGISTRY
         .register("list_length", new ListLengthNodeType());
+    public static final OptionalOrElseNodeType OPTIONAL_OR_ELSE = NodeType.REGISTRY
+        .register("optional_or_else", new OptionalOrElseNodeType());
     public static final ListHeadTailNodeType LIST_HEADTAIL = NodeType.REGISTRY
         .register("list_headtail", new ListHeadTailNodeType());
     public static final EqualsNodeType EQUALS = NodeType.REGISTRY
         .register("equals", new EqualsNodeType());
     public static final ParseStringNodeType PARSE_STRING = NodeType.REGISTRY
         .register("parse_string", new ParseStringNodeType());
+    public static final TruthinessNodeType TRUTHINESS = NodeType.REGISTRY
+        .register("truthiness", new TruthinessNodeType());
     public static final HTTPRequestNodeType HTTP_REQUEST = NodeType.REGISTRY
         .register("http_request", new HTTPRequestNodeType());
 }
