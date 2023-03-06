@@ -13,9 +13,8 @@ import club.mondaylunch.gatos.core.data.OptionalDataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
-public class AbstractEvaluationNodeType extends NodeType.Process {
+public abstract class AbstractEvaluationNodeType extends NodeType.Process {
     protected boolean shouldNegateOutput;
-
     @Override
     public Map<String, DataBox<?>> settings() {
         return Map.of();

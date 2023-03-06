@@ -14,13 +14,11 @@ import club.mondaylunch.gatos.core.data.OptionalDataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
-public class ListHeadTailNodeType extends NodeType.Process {
-    private static final DataType<ExtractionMode> EXTRACTION_MODE_TYPE = DataType.register("extraction_mode_type", ExtractionMode.class);
+public abstract class AbstractListSeparationNodeType extends NodeType.Process {
+    protected boolean shouldExtractHeadElem;
     @Override
     public Map<String, DataBox<?>> settings() {
-        return Map.of(
-            "extraction_mode", getHeadExtractionBox()
-        );
+        return Map.of();
     }
 
     @Override
@@ -53,11 +51,9 @@ public class ListHeadTailNodeType extends NodeType.Process {
                 "rest", CompletableFuture.completedFuture(this.getGenericListBox(List.of(), listType))
             );
         }
-        var shouldExtractHead = DataBox.get(settings, "extraction_mode",
-            EXTRACTION_MODE_TYPE).orElse(ExtractionMode.EXTRACT_HEAD) == ExtractionMode.EXTRACT_HEAD;
         var lastIndex = inputList.size() - 1;
-        var extractionIndex = shouldExtractHead ? 0 : lastIndex;
-        var subListOffset = shouldExtractHead ? 1 : 0;
+        var extractionIndex = this.shouldExtractHeadElem ? 0 : lastIndex;
+        var subListOffset = this.shouldExtractHeadElem ? 1 : 0;
         var subList = inputList.subList(subListOffset, lastIndex + subListOffset);
         return Map.of(
             "first", CompletableFuture.completedFuture(
@@ -81,18 +77,5 @@ public class ListHeadTailNodeType extends NodeType.Process {
         return type instanceof ListDataType<?> list
             ? list.contains()
             : DataType.ANY;
-    }
-
-    private enum ExtractionMode {
-        EXTRACT_HEAD,
-        EXTRACT_TAIL
-    }
-
-    public static DataBox<ExtractionMode> getHeadExtractionBox() {
-        return EXTRACTION_MODE_TYPE.create(ExtractionMode.EXTRACT_HEAD);
-    }
-
-    public static DataBox<ExtractionMode> getTailExtractionBox() {
-        return EXTRACTION_MODE_TYPE.create(ExtractionMode.EXTRACT_TAIL);
     }
 }
