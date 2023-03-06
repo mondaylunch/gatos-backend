@@ -36,4 +36,6 @@ public final class BasicNodes {
         .register("equals", new EqualsNodeType());
     public static final HTTPRequestNodeType HTTP_REQUEST = NodeType.REGISTRY
         .register("http_request", new HTTPRequestNodeType());
+    public static final ToStringNodeType TO_STRING = NodeType.REGISTRY
+        .register("to_string", new ToStringNodeType());
 }
