@@ -138,8 +138,12 @@ public class GraphObserver {
         this.updateModifyNode(flowId, collection);
         this.updateRemoveNode(updates);
 
-        this.updateAddMetadata(flowId, collection);
-        this.updateModifyMetadata(flowId, collection);
+        this.updateAddConnection(updates);
+        this.updateModifyConnection(flowId, collection);
+        this.updateRemoveConnection(updates);
+
+        this.updateAddMetadata(updates);
+        this.updateModifyMetadata(updates);
         this.updateRemoveMetadata(flowId, collection);
 
         if (!updates.isEmpty()) {
@@ -213,22 +217,51 @@ public class GraphObserver {
         }
     }
 
-    private void updateAddMetadata(UUID flowId, MongoCollection<Flow> collection) {
+    private void updateAddConnection(Collection<Bson> updates) {
+        if (!this.addedConnections.isEmpty()) {
+            var addedNodes = Updates.pushEach("graph.connections", new ArrayList<>(this.addedConnections.values()));
+            updates.add(addedNodes);
+        }
+    }
+
+    private void updateModifyConnection(UUID flowId, MongoCollection<Flow> collection) {
+        for (var modified : this.modifiedConnections.values()) {
+            var filter = Filters.and(
+                Filters.eq(flowId),
+                Filters.eq("graph.connections.output.nodeId", modified.from().nodeId()),
+                Filters.eq("graph.connections.input.nodeId", modified.to().nodeId())
+            );
+            var update = Updates.set("graph.connections.$", modified);
+            collection.updateOne(filter, update);
+        }
+    }
+
+    private void updateRemoveConnection(Collection<Bson> updates) {
+        for (var removed : this.removedConnections.values()) {
+            var filter = Filters.and(
+                Filters.eq("output.nodeId", removed.from().nodeId()),
+                Filters.eq("input.nodeId", removed.to().nodeId())
+            );
+            var removedConnections = Updates.pullByFilter(new BasicDBObject("graph.connections", filter));
+            updates.add(removedConnections);
+        }
+    }
+
+    private void updateAddMetadata(Collection<Bson> updates) {
         for (var entry : this.addedMetadata.entrySet()) {
-            setMetadata(flowId, entry.getKey(), entry.getValue(), collection);
+            setMetadata(entry.getKey(), entry.getValue(), updates);
         }
     }
 
-    private void updateModifyMetadata(UUID flowId, MongoCollection<Flow> collection) {
+    private void updateModifyMetadata(Collection<Bson> updates) {
         for (var entry : this.modifiedMetadata.entrySet()) {
-            setMetadata(flowId, entry.getKey(), entry.getValue(), collection);
+            setMetadata(entry.getKey(), entry.getValue(), updates);
         }
     }
 
-    private static void setMetadata(UUID flowId, UUID nodeId, NodeMetadata metadata, MongoCollection<Flow> collection) {
-        var filter = Filters.eq(flowId);
+    private static void setMetadata(UUID nodeId, NodeMetadata metadata, Collection<Bson> updates) {
         var update = Updates.set("graph.metadata." + nodeId, metadata);
-        collection.updateOne(filter, update);
+        updates.add(update);
     }
 
     private void updateRemoveMetadata(UUID flowId, MongoCollection<Flow> collection) {

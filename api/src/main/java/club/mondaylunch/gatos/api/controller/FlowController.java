@@ -20,12 +20,18 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import club.mondaylunch.gatos.api.exception.flow.InvalidConnectionException;
+import club.mondaylunch.gatos.api.exception.flow.InvalidDataTypeException;
 import club.mondaylunch.gatos.api.exception.flow.InvalidNodeTypeException;
+import club.mondaylunch.gatos.api.exception.flow.NodeNotFoundException;
 import club.mondaylunch.gatos.api.repository.FlowRepository;
 import club.mondaylunch.gatos.api.repository.LoginRepository;
 import club.mondaylunch.gatos.core.codec.SerializationUtils;
 import club.mondaylunch.gatos.core.data.DataBox;
+import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.NodeMetadata;
+import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 import club.mondaylunch.gatos.core.models.Flow;
 import club.mondaylunch.gatos.core.models.User;
@@ -167,6 +173,59 @@ public class FlowController {
         var graph = flow.getGraph();
         graph.removeNode(nodeId);
         Flow.objects.updateGraph(flow);
+    }
+
+    private record BodyConnection(
+        @JsonProperty("from_node_id") UUID fromNodeId,
+        @JsonProperty("from_name") String fromName,
+        @JsonProperty("to_node_id") UUID toNodeId,
+        @JsonProperty("to_name") String toName,
+        @JsonProperty("type") String type
+    ) {
+    }
+
+    @PostMapping("{flowId}/graph/connections")
+    public void addConnection(
+        @RequestHeader("x-auth-token") String token,
+        @PathVariable UUID flowId,
+        @RequestBody BodyConnection body
+    ) {
+        var user = this.userRepository.authenticateUser(token);
+        var flow = this.flowRepository.getFlow(user, flowId);
+        var graph = flow.getGraph();
+        var connection = createConnection(graph, body);
+        graph.addConnection(connection);
+        Flow.objects.updateGraph(flow);
+    }
+
+    @DeleteMapping("{flowId}/graph/connections")
+    public void deleteConnection(
+        @RequestHeader("x-auth-token") String token,
+        @PathVariable UUID flowId,
+        @RequestBody BodyConnection body
+    ) {
+        var user = this.userRepository.authenticateUser(token);
+        var flow = this.flowRepository.getFlow(user, flowId);
+        var graph = flow.getGraph();
+        var connection = createConnection(graph, body);
+        graph.removeConnection(connection);
+        Flow.objects.updateGraph(flow);
+    }
+
+    private static NodeConnection<?> createConnection(Graph graph, BodyConnection body) {
+        var fromNode = graph.getNode(body.fromNodeId)
+            .orElseThrow(() -> new NodeNotFoundException(body.fromNodeId));
+        var toNode = graph.getNode(body.toNodeId)
+            .orElseThrow(() -> new NodeNotFoundException(body.toNodeId));
+        var type = DataType.REGISTRY.get(body.type)
+            .orElseThrow(InvalidDataTypeException::new);
+        return NodeConnection.createConnection(
+            fromNode,
+            body.fromName,
+            toNode,
+            body.toName,
+            type
+        ).orElseThrow(InvalidConnectionException::new);
     }
 
     @PatchMapping("{flowId}/graph/nodes/{nodeId}/metadata")

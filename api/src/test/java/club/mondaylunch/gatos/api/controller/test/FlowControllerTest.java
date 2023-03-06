@@ -355,7 +355,6 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         this.assertFlowCount(1);
         var flowId = flow.getId();
         var nodeId = node.id();
-
         var dataBox = new JsonObject();
         dataBox.addProperty("type", "number");
         dataBox.addProperty("value", 1);
@@ -392,6 +391,73 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         var updatedGraph = updatedFlow.getGraph();
         Assertions.assertEquals(0, updatedGraph.nodeCount());
         Assertions.assertFalse(updatedGraph.containsNode(nodeId));
+    }
+
+    @Test
+    public void canAddConnection() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        var start = graph.addNode(TestNodeTypes.START);
+        var end = graph.addNode(TestNodeTypes.END);
+        Assertions.assertEquals(2, graph.nodeCount());
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        var body = new JsonObject();
+        body.addProperty("from_node_id", start.id().toString());
+        body.addProperty("from_name", "start_output");
+        body.addProperty("to_node_id", end.id().toString());
+        body.addProperty("to_name", "end_input");
+        body.addProperty("type", "number");
+        this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT + "/" + flow.getId() + "/graph/connections")
+                .header("x-auth-token", this.user.getAuthToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body.toString()))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var id = flow.getId();
+        var updatedFlow = Flow.objects.get(id);
+        var updatedGraph = updatedFlow.getGraph();
+        Assertions.assertEquals(2, updatedGraph.nodeCount());
+        Assertions.assertEquals(1, updatedGraph.connectionCount());
+        var startConnections = updatedGraph.getConnectionsForNode(start.id());
+        var endConnections = updatedGraph.getConnectionsForNode(end.id());
+        Assertions.assertEquals(1, startConnections.size());
+        Assertions.assertEquals(startConnections, endConnections);
+        var expectedConnection = NodeConnection.createConnection(start, "start_output", end, "end_input", DataType.NUMBER).orElseThrow();
+        Assertions.assertEquals(expectedConnection, startConnections.iterator().next());
+    }
+
+    @Test
+    public void canRemoveConnection() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        var start = graph.addNode(TestNodeTypes.START);
+        var end = graph.addNode(TestNodeTypes.END);
+        Assertions.assertEquals(2, graph.nodeCount());
+        var connection = NodeConnection.createConnection(start, "start_output", end, "end_input", DataType.NUMBER).orElseThrow();
+        graph.addConnection(connection);
+        Assertions.assertEquals(1, graph.connectionCount());
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        var body = new JsonObject();
+        body.addProperty("from_node_id", start.id().toString());
+        body.addProperty("from_name", "start_output");
+        body.addProperty("to_node_id", end.id().toString());
+        body.addProperty("to_name", "end_input");
+        body.addProperty("type", "number");
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT + "/" + flow.getId() + "/graph/connections")
+                .header("x-auth-token", this.user.getAuthToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body.toString()))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var id = flow.getId();
+        var updatedFlow = Flow.objects.get(id);
+        var updatedGraph = updatedFlow.getGraph();
+        Assertions.assertEquals(2, updatedGraph.nodeCount());
+        Assertions.assertEquals(0, updatedGraph.connectionCount());
+        var startConnections = updatedGraph.getConnectionsForNode(start.id());
+        var endConnections = updatedGraph.getConnectionsForNode(end.id());
+        Assertions.assertEquals(0, startConnections.size());
+        Assertions.assertEquals(startConnections, endConnections);
     }
 
     @Test
