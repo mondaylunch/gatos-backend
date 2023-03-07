@@ -64,6 +64,12 @@ public class FlowController {
         }
     }
 
+    /**
+     * Get all flows of the user.
+     *
+     * @return A list of flows.
+     * Does not include information about the graph.
+     */
     @GetMapping
     public List<BasicFlowInfo> getFlows(@RequestHeader("x-auth-token") String token) {
         var user = this.userRepository.authenticateUser(token);
@@ -73,6 +79,11 @@ public class FlowController {
             .toList();
     }
 
+    /**
+     * Gets a specific flow.
+     *
+     * @return The flow.
+     */
     @GetMapping(value = "{flowId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getFlow(@PathVariable("flowId") UUID flowId, @RequestHeader("x-auth-token") String token) {
         User user = this.userRepository.authenticateUser(token);
@@ -83,6 +94,12 @@ public class FlowController {
         @NotNull @Length(min = 1, max = 32) String name, String description) {
     }
 
+    /**
+     * Creates a new flow.
+     *
+     * @return The created flow.
+     * Does not include information about the graph.
+     */
     @PostMapping
     public BasicFlowInfo addFlow(@RequestHeader("x-auth-token") String token, @Valid @RequestBody BodyAddFlow data) {
         var user = this.userRepository.authenticateUser(token);
@@ -100,6 +117,12 @@ public class FlowController {
         @NotNull @Length(min = 1, max = 32) String name, String description) {
     }
 
+    /**
+     * Updates a flow.
+     *
+     * @return The updated flow.
+     * Does not include information about the graph.
+     */
     @PatchMapping("{flowId}")
     public BasicFlowInfo updateFlow(
         @RequestHeader("x-auth-token") String token,
@@ -119,6 +142,9 @@ public class FlowController {
         return new BasicFlowInfo(updated);
     }
 
+    /**
+     * Deletes a flow.
+     */
     @DeleteMapping("{flowId}")
     public void deleteFlow(@RequestHeader("x-auth-token") String token, @PathVariable UUID flowId) {
         var user = this.userRepository.authenticateUser(token);
@@ -133,6 +159,11 @@ public class FlowController {
     ) {
     }
 
+    /**
+     * Adds a node to the flow graph.
+     *
+     * @return The added node.
+     */
     @PostMapping(value = "{flowId}/graph", produces = MediaType.APPLICATION_JSON_VALUE)
     public String addNode(
         @RequestHeader("x-auth-token") String token,
@@ -149,6 +180,11 @@ public class FlowController {
         return SerializationUtils.toJson(node);
     }
 
+    /**
+     * Modifies a node's settings.
+     *
+     * @return The node with the updated settings.
+     */
     @PatchMapping(value = "{flowId}/graph/nodes/{nodeId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String modifyNodeSettings(
         @RequestHeader("x-auth-token") String token,
@@ -186,6 +222,9 @@ public class FlowController {
         return SerializationUtils.toJson(node);
     }
 
+    /**
+     * Deletes a node from the flow graph.
+     */
     @DeleteMapping("{flowId}/graph/nodes/{nodeId}")
     public void deleteNode(
         @RequestHeader("x-auth-token") String token,
@@ -208,6 +247,11 @@ public class FlowController {
     ) {
     }
 
+    /**
+     * Adds a connection between two nodes.
+     *
+     * @return The added connection.
+     */
     @PostMapping(value = "{flowId}/graph/connections", produces = MediaType.APPLICATION_JSON_VALUE)
     public String addConnection(
         @RequestHeader("x-auth-token") String token,
@@ -227,6 +271,9 @@ public class FlowController {
         return SerializationUtils.toJson(connection);
     }
 
+    /**
+     * Deletes a connection between two nodes.
+     */
     @DeleteMapping("{flowId}/graph/connections")
     public void deleteConnection(
         @RequestHeader("x-auth-token") String token,
@@ -261,6 +308,11 @@ public class FlowController {
         ).orElseThrow(InvalidConnectionException::new);
     }
 
+    /**
+     * Modifies a node's metadata.
+     *
+     * @return The updated metadata.
+     */
     @PatchMapping(value = "{flowId}/graph/nodes/{nodeId}/metadata", produces = MediaType.APPLICATION_JSON_VALUE)
     public String modifyNodeMetadata(
         @RequestHeader("x-auth-token") String token,
