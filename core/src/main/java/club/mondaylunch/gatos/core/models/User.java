@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.jetbrains.annotations.Nullable;
 
 import club.mondaylunch.gatos.core.collection.UserCollection;
 
@@ -17,12 +18,24 @@ public class User extends BaseModel {
     @JsonProperty("email")
     private String email;
 
+    @BsonProperty("discord_id")
+    @JsonProperty("discord_id")
+    private @Nullable String discordId;
+
     public String getEmail() {
         return this.email;
     }
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public @Nullable String getDiscordId() {
+        return this.discordId;
+    }
+
+    public void setDiscordId(@Nullable String discordId) {
+        this.discordId = discordId;
     }
 
     @Override

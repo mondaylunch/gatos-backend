@@ -8,6 +8,9 @@ dependencies {
 	implementation project(":core")
     implementation project(":basic_nodes")
 
+    // gson
+    implementation 'com.google.code.gson:gson:2.10.1'
+
 	// validation
 	implementation 'javax.validation:validation-api:2.0.1.Final'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -31,7 +34,7 @@ dependencies {
 }
 
 processResources {
-    filesMatching('**/application.yml') {
+    filesMatching('**/*') {
         expand getSecrets()
     }
 }
