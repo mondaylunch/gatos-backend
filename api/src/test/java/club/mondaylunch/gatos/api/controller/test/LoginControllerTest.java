@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import club.mondaylunch.gatos.api.BaseMvcTest;
-import club.mondaylunch.gatos.api.exceptions.UserNotFoundException;
+import club.mondaylunch.gatos.api.exception.login.UserNotFoundException;
 import club.mondaylunch.gatos.api.helpers.UserCreationHelper;
 import club.mondaylunch.gatos.core.models.User;
 

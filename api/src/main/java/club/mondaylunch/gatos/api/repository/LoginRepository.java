@@ -2,8 +2,8 @@ package club.mondaylunch.gatos.api.repository;
 
 import org.springframework.stereotype.Repository;
 
-import club.mondaylunch.gatos.api.exceptions.InvalidTokenException;
-import club.mondaylunch.gatos.api.exceptions.UserNotFoundException;
+import club.mondaylunch.gatos.api.exception.login.InvalidTokenException;
+import club.mondaylunch.gatos.api.exception.login.UserNotFoundException;
 import club.mondaylunch.gatos.core.models.User;
 
 @Repository

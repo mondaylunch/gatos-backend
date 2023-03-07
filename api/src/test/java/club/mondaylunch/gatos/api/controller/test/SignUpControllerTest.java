@@ -18,8 +18,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import club.mondaylunch.gatos.api.BaseMvcTest;
-import club.mondaylunch.gatos.api.exceptions.EmailAlreadyInUseException;
-import club.mondaylunch.gatos.api.exceptions.UsernameAlreadyInUseException;
+import club.mondaylunch.gatos.api.exception.signup.EmailAlreadyInUseException;
+import club.mondaylunch.gatos.api.exception.signup.UsernameAlreadyInUseException;
 import club.mondaylunch.gatos.api.helpers.UserCreationHelper;
 import club.mondaylunch.gatos.core.models.User;
 
