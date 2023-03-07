@@ -205,8 +205,8 @@ public class FlowController {
     ) {
     }
 
-    @PostMapping("{flowId}/graph/connections")
-    public void addConnection(
+    @PostMapping(value = "{flowId}/graph/connections", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String addConnection(
         @RequestHeader("x-auth-token") String token,
         @PathVariable UUID flowId,
         @RequestBody BodyConnection body
@@ -221,6 +221,7 @@ public class FlowController {
             throw new InvalidConnectionException(e.getMessage());
         }
         Flow.objects.updateGraph(flow);
+        return SerializationUtils.toJson(connection);
     }
 
     @DeleteMapping("{flowId}/graph/connections")

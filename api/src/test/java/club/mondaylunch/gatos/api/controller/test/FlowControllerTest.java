@@ -411,7 +411,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         body.addProperty("to_node_id", end.id().toString());
         body.addProperty("to_name", "end_input");
         body.addProperty("type", "number");
-        this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT + "/" + flow.getId() + "/graph/connections")
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT + "/" + flow.getId() + "/graph/connections")
                 .header("x-auth-token", this.user.getAuthToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body.toString()))
@@ -427,6 +427,9 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         Assertions.assertEquals(startConnections, endConnections);
         var expectedConnection = NodeConnection.createConnection(start, "start_output", end, "end_input", DataType.NUMBER).orElseThrow();
         Assertions.assertEquals(expectedConnection, startConnections.iterator().next());
+        var responseBody = result.andReturn().getResponse().getContentAsString();
+        var responseConnection = SerializationUtils.fromJson(responseBody, NodeConnection.class);
+        Assertions.assertEquals(expectedConnection, responseConnection);
     }
 
     @Test
