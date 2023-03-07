@@ -7,6 +7,7 @@ import java.util.Random;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 
+import jakarta.validation.Valid;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import jakarta.validation.Valid;
 
 import club.mondaylunch.gatos.api.repository.LoginRepository;
 import club.mondaylunch.gatos.core.models.User;
