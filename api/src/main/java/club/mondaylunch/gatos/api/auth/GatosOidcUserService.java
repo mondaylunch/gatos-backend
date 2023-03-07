@@ -15,6 +15,6 @@ public class GatosOidcUserService implements OAuth2UserService<OidcUserRequest, 
     @Override
     public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
         OidcUser oidcUser = this.oidcUserService.loadUser(userRequest);
-        return new GatosOidcUser(oidcUser, User.objects.getOrCreateUserByAuthId(oidcUser.getClaimAsString("user_id")));
+        return new GatosOidcUser(oidcUser, User.objects.getOrCreateUserByEmail(oidcUser.getClaimAsString("email")));
     }
 }

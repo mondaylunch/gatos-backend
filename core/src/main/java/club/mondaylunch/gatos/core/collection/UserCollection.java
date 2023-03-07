@@ -28,29 +28,29 @@ public class UserCollection extends BaseCollection<User> {
     /**
      * Gets a document.
      *
-     * @param authId The Auth ID of the user.
+     * @param email The Auth ID of the user.
      * @return The POJO.
      */
-    public User getUserByAuthId(String authId) {
-        return this.getCollection().find(this.authIdFilter(authId)).first();
+    public User getUserByEmail(String email) {
+        return this.getCollection().find(this.emailFilter(email)).first();
     }
 
 
-    public User getOrCreateUserByAuthId(String authId) {
-        User user = this.getUserByUserId(authId);
+    public User getOrCreateUserByEmail(String email) {
+        User user = this.getUserByUserId(email);
         if (user == null) {
             user = new User();
-            user.setAuthId(authId);
-            this.getCollection().insertOne(user);
+            user.setEmail(email);
+            this.insert(user);
         }
         return user;
     }
 
     private Bson userIdFilter(String userId) {
-        return eq("user_id", userId);
+        return eq(userId);
     }
 
-    private Bson authIdFilter(String authId) {
-        return eq("auth_id", authId);
+    private Bson emailFilter(String email) {
+        return eq("email", email);
     }
 }

@@ -1,4 +1,4 @@
-package club.mondaylunch.gatos.api.controller;
+package club.mondaylunch.gatos.api.auth;
 
 import java.io.IOException;
 
