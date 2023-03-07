@@ -18,70 +18,39 @@ public class UserCollection extends BaseCollection<User> {
     /**
      * Gets a document.
      *
-     * @param username The username of the user.
+     * @param userId The ID of the user.
      * @return The POJO.
      */
-    public User getUser(String username) {
-        return getCollection().find(usernameFilter(username)).first();
+    public User getUserByUserId(String userId) {
+        return this.getCollection().find(this.userIdFilter(userId)).first();
     }
 
     /**
      * Gets a document.
      *
-     * @param email The email of the user.
+     * @param authId The Auth ID of the user.
      * @return The POJO.
      */
-    public User getUserByEmail(String email) {
-        return getCollection().find(emailFilter(email)).first();
+    public User getUserByAuthId(String authId) {
+        return this.getCollection().find(this.authIdFilter(authId)).first();
     }
 
-    /**
-     * Gets a document.
-     *
-     * @param authToken User's auth token.
-     * @return The POJO.
-     */
-    public User getUserByToken(String authToken) {
-        return getCollection().find(eq("auth_token", authToken)).first();
+
+    public User getOrCreateUserByAuthId(String authId) {
+        User user = this.getUserByUserId(authId);
+        if (user == null) {
+            user = new User();
+            user.setAuthId(authId);
+            this.getCollection().insertOne(user);
+        }
+        return user;
     }
 
-    /**
-     * checks if the username is already in use.
-     *
-     * @param username The potential username of the user.
-     * @return true if the username is already in use
-     */
-    public Boolean usernameAlreadyInUse(String username) {
-        return getCollection().find(usernameFilter(username)).first() != null;
+    private Bson userIdFilter(String userId) {
+        return eq("user_id", userId);
     }
 
-    /**
-     * checks if the email is already in use.
-     *
-     * @param email The potential email of the user.
-     * @return true if the email is already in use
-     */
-    public Boolean emailAlreadyInUse(String email) {
-        return getCollection().find(emailFilter(email)).first() != null;
-    }
-
-    /**
-     * Creates a username filter.
-     *
-     * @param String The username to filter by.
-     * @return The filter.
-     */
-    private static Bson usernameFilter(String username) {
-        return eq("username", username);
-    }
-
-    /**
-     * Creates an email filter.
-     *
-     * @param String The email to filter by.
-     * @return The filter.
-     */
-    private static Bson emailFilter(String email) {
-        return eq("email", email);
+    private Bson authIdFilter(String authId) {
+        return eq("auth_id", authId);
     }
 }

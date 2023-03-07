@@ -19,6 +19,7 @@ dependencies {
 	// web
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
     testImplementation project(":test_shared")
 
@@ -27,6 +28,18 @@ dependencies {
 
     // GSON
     testImplementation 'com.google.code.gson:gson:2.10.1'
+}
+
+processResources {
+    filesMatching('**/application.yml') {
+        expand getSecrets()
+    }
+}
+
+static def getSecrets() {
+    def secrets = new Properties()
+    secrets.load(new FileInputStream("secrets.properties"))
+    return secrets
 }
 
 tasks.named('test') {
