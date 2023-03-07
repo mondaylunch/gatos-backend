@@ -287,7 +287,7 @@ public final class Node {
                 NodeType type = decoderContext.decodeWithChildContext(this.registry.get(NodeType.class), reader);
                 reader.readName("settings");
                 Map<String, DataBox<?>> settings = SerializationUtils.readMap(reader, decoderContext, DataBox.class, Function.identity(), this.registry);
-                reader.readName("inputTypes");
+                reader.readName("input_types");
                 Map<String, DataType<?>> inputTypes = SerializationUtils.readMap(reader, decoderContext, DataType.class, Function.identity(), this.registry);
                 var inputs = NodeType.inputsOrEmpty(type, id, settings, inputTypes);
                 return new Node(
@@ -310,7 +310,7 @@ public final class Node {
                 encoderContext.encodeWithChildContext(this.registry.get(NodeType.class), writer, value.type);
                 writer.writeName("settings");
                 SerializationUtils.writeMap(writer, encoderContext, DataBox.class, Function.identity(), this.registry, value.settings);
-                writer.writeName("inputTypes");
+                writer.writeName("input_types");
                 SerializationUtils.writeMap(writer, encoderContext, DataType.class, Function.identity(), this.registry, value.inputTypes);
             });
         }

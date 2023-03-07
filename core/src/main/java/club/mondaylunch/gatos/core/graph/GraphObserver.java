@@ -228,8 +228,8 @@ public class GraphObserver {
         for (var modified : this.modifiedConnections.values()) {
             var filter = Filters.and(
                 Filters.eq(flowId),
-                Filters.eq("graph.connections.output.nodeId", modified.from().nodeId()),
-                Filters.eq("graph.connections.input.nodeId", modified.to().nodeId())
+                Filters.eq("graph.connections.output.node_id", modified.from().nodeId()),
+                Filters.eq("graph.connections.input.node_id", modified.to().nodeId())
             );
             var update = Updates.set("graph.connections.$", modified);
             collection.updateOne(filter, update);
@@ -239,8 +239,8 @@ public class GraphObserver {
     private void updateRemoveConnection(Collection<Bson> updates) {
         for (var removed : this.removedConnections.values()) {
             var filter = Filters.and(
-                Filters.eq("output.nodeId", removed.from().nodeId()),
-                Filters.eq("input.nodeId", removed.to().nodeId())
+                Filters.eq("output.node_id", removed.from().nodeId()),
+                Filters.eq("input.node_id", removed.to().nodeId())
             );
             var removedConnections = Updates.pullByFilter(new BasicDBObject("graph.connections", filter));
             updates.add(removedConnections);

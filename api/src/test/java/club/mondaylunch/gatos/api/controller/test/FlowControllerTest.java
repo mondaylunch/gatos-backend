@@ -481,8 +481,8 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         var flowId = flow.getId();
         var nodeId = node.id();
         var body = new JsonObject();
-        body.addProperty("xPos", 1);
-        body.addProperty("yPos", 1);
+        body.addProperty("x_pos", 1);
+        body.addProperty("y_pos", 1);
         var result = this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flowId + "/graph/nodes/" + nodeId + "/metadata")
                 .header("x-auth-token", this.user.getAuthToken())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -520,8 +520,8 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         Flow.objects.insert(flow);
         this.assertFlowCount(1);
         var body = new JsonObject();
-        body.addProperty("xPos", 2);
-        body.addProperty("yPos", 2);
+        body.addProperty("x_pos", 2);
+        body.addProperty("y_pos", 2);
         var result = this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flowId + "/graph/nodes/" + nodeId + "/metadata")
                 .header("x-auth-token", this.user.getAuthToken())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -723,7 +723,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
             throw new IllegalArgumentException("Unknown connector class " + connectorClass);
         }
         compareFields(expressionPrefix + type + '.', result,
-            Map.entry("nodeId", connector.nodeId()),
+            Map.entry("node_id", connector.nodeId()),
             Map.entry("name", connector.name()),
             Map.entry("type", connector.type().name())
         );
@@ -738,8 +738,8 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
 
     private static void compareMetadata(UUID nodeId, NodeMetadata metadata, String expressionPrefix, ResultActions result) {
         compareFields(expressionPrefix + nodeId + '.', result,
-            Map.entry("xPos", (double) metadata.xPos()),
-            Map.entry("yPos", (double) metadata.yPos())
+            Map.entry("x_pos", (double) metadata.xPos()),
+            Map.entry("y_pos", (double) metadata.yPos())
         );
     }
 
