@@ -155,7 +155,7 @@ public class FlowController {
     // Graph operations
 
     private record BodyAddNode(
-        @JsonProperty("node_type") String nodeType
+        @JsonProperty("type") String nodeType
     ) {
     }
 
@@ -164,7 +164,7 @@ public class FlowController {
      *
      * @return The added node.
      */
-    @PostMapping(value = "{flowId}/graph", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "{flowId}/graph/nodes", produces = MediaType.APPLICATION_JSON_VALUE)
     public String addNode(
         @RequestHeader("x-auth-token") String token,
         @PathVariable UUID flowId,

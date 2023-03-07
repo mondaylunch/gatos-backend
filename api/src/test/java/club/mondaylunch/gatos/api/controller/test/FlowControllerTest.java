@@ -328,8 +328,8 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         this.assertFlowCount(1);
         var nodeType = "string_interpolation";
         var nodeTypeJson = new JsonObject();
-        nodeTypeJson.addProperty("node_type", nodeType);
-        var result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT + "/" + flow.getId() + "/graph")
+        nodeTypeJson.addProperty("type", nodeType);
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT + "/" + flow.getId() + "/graph/nodes")
                 .header("x-auth-token", this.user.getAuthToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(nodeTypeJson.toString()))
