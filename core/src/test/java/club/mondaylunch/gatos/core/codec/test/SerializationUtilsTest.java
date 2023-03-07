@@ -32,7 +32,7 @@ public class SerializationUtilsTest {
         flow.setDescription("This is a test flow");
 
         UUID startId = UUID.fromString("9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd");
-        Node start = createNode(TestNodeTypes.START, startId);
+        Node start = createNode(TestNodeTypes.NO_INPUTS, startId);
 
         UUID processId = UUID.fromString("6f8de627-706d-4817-8921-73bff23006a8");
         Node process = createNode(TestNodeTypes.PROCESS, processId);

@@ -350,7 +350,7 @@ public class GraphExecutorTest {
         }
     }
 
-    private static final class InputNumNodeType extends NodeType.Start {
+    private static final class InputNumNodeType extends NodeType.Process {
         @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
@@ -369,6 +369,11 @@ public class GraphExecutorTest {
             return Map.of(
                     "out", CompletableFuture.completedFuture(
                             DataType.NUMBER.create(DataBox.get(settings, "value", DataType.NUMBER).orElseThrow())));
+        }
+
+        @Override
+        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+            return Set.of();
         }
     }
 

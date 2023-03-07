@@ -402,7 +402,7 @@ public class GraphTest {
         }
     }
 
-    private static final class TestInputNodeType extends NodeType.Start {
+    private static final class TestInputNodeType extends NodeType.Process {
         @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
@@ -418,6 +418,11 @@ public class GraphTest {
         public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
                 Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Map.of();
+        }
+
+        @Override
+        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+            return Set.of();
         }
     }
 
@@ -473,7 +478,7 @@ public class GraphTest {
         }
     }
 
-    private static final class TestStringOptStartDataType extends NodeType.Start {
+    private static final class TestStringOptStartDataType extends NodeType.Process {
         @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(new NodeConnector.Output<>(nodeId, "out", DataType.STRING.optionalOf()));
@@ -489,6 +494,11 @@ public class GraphTest {
                                                                   Map<String, DataBox<?>> settings,
                                                                   Map<String, DataType<?>> inputTypes) {
             return Map.of();
+        }
+
+        @Override
+        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+            return Set.of();
         }
     }
 }
