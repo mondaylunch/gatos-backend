@@ -48,4 +48,6 @@ public final class BasicNodes {
         .register("negation", new NegationNodeType());
     public static final HTTPRequestNodeType HTTP_REQUEST = NodeType.REGISTRY
         .register("http_request", new HTTPRequestNodeType());
+    public static final ToStringNodeType TO_STRING = NodeType.REGISTRY
+        .register("to_string", new ToStringNodeType());
 }
