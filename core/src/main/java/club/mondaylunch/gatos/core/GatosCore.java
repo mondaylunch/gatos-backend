@@ -1,9 +1,8 @@
 package club.mondaylunch.gatos.core;
 
-import club.mondaylunch.gatos.core.data.DataType;
-import club.mondaylunch.gatos.core.graph.type.NodeType;
-
 import java.util.ServiceLoader;
+
+import club.mondaylunch.gatos.core.data.DataType;
 
 /**
  * Gatos Core entrypoint.
