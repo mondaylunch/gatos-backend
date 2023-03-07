@@ -1,5 +1,6 @@
 package club.mondaylunch.gatos.api;
 
+import club.mondaylunch.gatos.core.GatosCore;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,7 +21,7 @@ public class ApiApplication {
     public static void main(String[] args) {
         Database.checkConnection();
         SpringApplication.run(ApiApplication.class, args);
-        BasicNodes.init();
+        GatosCore.init();
     }
 
     @Bean

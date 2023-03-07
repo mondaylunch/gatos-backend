@@ -26,7 +26,7 @@ public class NodeTypeControllerTest extends BaseMvcTest {
 
     @BeforeAll
     public static void init() {
-        BasicNodes.init();
+        new BasicNodes().init();
     }
 
     @Test
