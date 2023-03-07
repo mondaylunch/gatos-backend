@@ -8,8 +8,6 @@ import java.util.concurrent.CompletableFuture;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
-import club.mondaylunch.gatos.core.graph.connector.NodeConnector.Input;
-import club.mondaylunch.gatos.core.graph.connector.NodeConnector.Output;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 public class ParseNumberFromStringNodeType extends NodeType.Process {
