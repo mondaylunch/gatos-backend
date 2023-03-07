@@ -6,25 +6,22 @@
   "graph": {
     "nodes": [
       {
-        "id": "b15f484f-4345-4f30-9162-5210b4ff1433",
-        "type": "test_end",
+        "id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
+        "type": "test_start",
         "settings": {
           "setting": {
-            "type": "optional$number",
-            "value": {
-              "present": true,
-              "value": 1.5
-            }
+            "type": "number",
+            "value": 0.0
           }
         },
-        "inputs": {
-          "end_input": {
-            "node_id": "b15f484f-4345-4f30-9162-5210b4ff1433",
-            "name": "end_input",
+        "inputs": {},
+        "outputs": {
+          "start_output": {
+            "node_id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
+            "name": "start_output",
             "type": "number"
           }
-        },
-        "outputs": {}
+        }
       },
       {
         "id": "6f8de627-706d-4817-8921-73bff23006a8",
@@ -54,22 +51,25 @@
         }
       },
       {
-        "id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
-        "type": "test_start",
+        "id": "b15f484f-4345-4f30-9162-5210b4ff1433",
+        "type": "test_end",
         "settings": {
           "setting": {
-            "type": "number",
-            "value": 0.0
+            "type": "optional$number",
+            "value": {
+              "present": true,
+              "value": 1.5
+            }
           }
         },
-        "inputs": {},
-        "outputs": {
-          "start_output": {
-            "node_id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
-            "name": "start_output",
+        "inputs": {
+          "end_input": {
+            "node_id": "b15f484f-4345-4f30-9162-5210b4ff1433",
+            "name": "end_input",
             "type": "number"
           }
-        }
+        },
+        "outputs": {}
       }
     ],
     "connections": [
