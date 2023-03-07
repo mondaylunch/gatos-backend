@@ -8,7 +8,6 @@ import java.util.function.Function;
 import javax.validation.Valid;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.hibernate.validator.constraints.Length;
@@ -40,7 +39,6 @@ import club.mondaylunch.gatos.core.graph.NodeMetadata;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 import club.mondaylunch.gatos.core.models.Flow;
-import club.mondaylunch.gatos.core.models.User;
 
 @RestController
 @RequestMapping("api/v1/flows")
@@ -86,7 +84,7 @@ public class FlowController {
      */
     @GetMapping(value = "{flowId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getFlow(@PathVariable("flowId") UUID flowId, @RequestHeader("x-auth-token") String token) {
-        User user = this.userRepository.authenticateUser(token);
+        var user = this.userRepository.authenticateUser(token);
         return this.flowRepository.getFlow(user, flowId).toJson();
     }
 
@@ -104,7 +102,7 @@ public class FlowController {
     public BasicFlowInfo addFlow(@RequestHeader("x-auth-token") String token, @Valid @RequestBody BodyAddFlow data) {
         var user = this.userRepository.authenticateUser(token);
 
-        Flow flow = new Flow();
+        var flow = new Flow();
         flow.setName(data.name);
         flow.setAuthorId(user.getId());
         flow.setDescription(data.description);
@@ -132,7 +130,7 @@ public class FlowController {
         var user = this.userRepository.authenticateUser(token);
         var flow = this.flowRepository.getFlow(user, flowId);
 
-        Flow partial = new Flow();
+        var partial = new Flow();
         partial.setName(data.name);
         partial.setDescription(data.description);
         partial.setGraph(null);
@@ -325,9 +323,9 @@ public class FlowController {
         var graph = flow.getGraph();
         graph.setMetadata(nodeId, metadata);
         Flow.objects.updateGraph(flow);
-        String metadataJsonString = SerializationUtils.toJson(metadata);
-        JsonElement metadataJson = JsonParser.parseString(metadataJsonString);
-        JsonObject response = new JsonObject();
+        var metadataJsonString = SerializationUtils.toJson(metadata);
+        var metadataJson = JsonParser.parseString(metadataJsonString);
+        var response = new JsonObject();
         response.add(nodeId.toString(), metadataJson);
         return response.toString();
     }
