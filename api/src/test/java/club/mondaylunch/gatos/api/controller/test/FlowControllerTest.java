@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.jayway.jsonpath.JsonPath;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterAll;
@@ -482,7 +483,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         var body = new JsonObject();
         body.addProperty("xPos", 1);
         body.addProperty("yPos", 1);
-        this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flowId + "/graph/nodes/" + nodeId + "/metadata")
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flowId + "/graph/nodes/" + nodeId + "/metadata")
                 .header("x-auth-token", this.user.getAuthToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body.toString())
@@ -493,6 +494,15 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         expectedMetadata = new NodeMetadata(1, 1);
         actualMetadata = updatedGraph.getOrCreateMetadataForNode(nodeId);
         Assertions.assertEquals(expectedMetadata, actualMetadata);
+        var responseBody = result.andReturn().getResponse().getContentAsString();
+        var responseJson = JsonParser.parseString(responseBody).getAsJsonObject();
+        Assertions.assertEquals(1, responseJson.size());
+        var metadataEntry = responseJson.asMap().entrySet().iterator().next();
+        var metadataId = metadataEntry.getKey();
+        var metadataJson = metadataEntry.getValue();
+        var responseMetadata = SerializationUtils.fromJson(metadataJson.toString(), NodeMetadata.class);
+        Assertions.assertEquals(metadataId, nodeId.toString());
+        Assertions.assertEquals(expectedMetadata, responseMetadata);
     }
 
     @Test
@@ -512,7 +522,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         var body = new JsonObject();
         body.addProperty("xPos", 2);
         body.addProperty("yPos", 2);
-        this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flowId + "/graph/nodes/" + nodeId + "/metadata")
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flowId + "/graph/nodes/" + nodeId + "/metadata")
                 .header("x-auth-token", this.user.getAuthToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body.toString())
@@ -523,6 +533,15 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         var expectedMetadata = new NodeMetadata(2, 2);
         actualMetadata = updatedGraph.getOrCreateMetadataForNode(nodeId);
         Assertions.assertEquals(expectedMetadata, actualMetadata);
+        var responseBody = result.andReturn().getResponse().getContentAsString();
+        var responseJson = JsonParser.parseString(responseBody).getAsJsonObject();
+        Assertions.assertEquals(1, responseJson.size());
+        var metadataEntry = responseJson.asMap().entrySet().iterator().next();
+        var metadataId = metadataEntry.getKey();
+        var metadataJson = metadataEntry.getValue();
+        var responseMetadata = SerializationUtils.fromJson(metadataJson.toString(), NodeMetadata.class);
+        Assertions.assertEquals(metadataId, nodeId.toString());
+        Assertions.assertEquals(expectedMetadata, responseMetadata);
     }
 
     @Test

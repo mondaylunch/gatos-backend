@@ -8,6 +8,9 @@ import java.util.function.Function;
 import javax.validation.Valid;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.hibernate.validator.constraints.Length;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.MediaType;
@@ -258,8 +261,8 @@ public class FlowController {
         ).orElseThrow(InvalidConnectionException::new);
     }
 
-    @PatchMapping("{flowId}/graph/nodes/{nodeId}/metadata")
-    public void modifyNodeMetadata(
+    @PatchMapping(value = "{flowId}/graph/nodes/{nodeId}/metadata", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String modifyNodeMetadata(
         @RequestHeader("x-auth-token") String token,
         @PathVariable UUID flowId,
         @PathVariable UUID nodeId,
@@ -270,5 +273,10 @@ public class FlowController {
         var graph = flow.getGraph();
         graph.setMetadata(nodeId, metadata);
         Flow.objects.updateGraph(flow);
+        String metadataJsonString = SerializationUtils.toJson(metadata);
+        JsonElement metadataJson = JsonParser.parseString(metadataJsonString);
+        JsonObject response = new JsonObject();
+        response.add(nodeId.toString(), metadataJson);
+        return response.toString();
     }
 }
