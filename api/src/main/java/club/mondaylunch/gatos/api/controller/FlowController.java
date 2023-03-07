@@ -146,8 +146,8 @@ public class FlowController {
         return SerializationUtils.toJson(node);
     }
 
-    @PatchMapping("{flowId}/graph/nodes/{nodeId}")
-    public void modifyNodeSettings(
+    @PatchMapping(value = "{flowId}/graph/nodes/{nodeId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String modifyNodeSettings(
         @RequestHeader("x-auth-token") String token,
         @PathVariable UUID flowId,
         @PathVariable UUID nodeId,
@@ -179,6 +179,8 @@ public class FlowController {
             });
         }
         Flow.objects.updateGraph(flow);
+        var node = graph.getNode(nodeId).orElseThrow();
+        return SerializationUtils.toJson(node);
     }
 
     @DeleteMapping("{flowId}/graph/nodes/{nodeId}")

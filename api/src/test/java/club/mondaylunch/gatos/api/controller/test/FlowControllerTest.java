@@ -360,7 +360,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         dataBox.addProperty("value", 1);
         var body = new JsonObject();
         body.add("setting", dataBox);
-        this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flow.getId() + "/graph/nodes/" + nodeId)
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flow.getId() + "/graph/nodes/" + nodeId)
                 .header("x-auth-token", this.user.getAuthToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body.toString())
@@ -371,6 +371,9 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         Assertions.assertEquals(1, updatedGraph.nodeCount());
         var updatedNode = updatedGraph.getNode(nodeId).orElseThrow();
         Assertions.assertEquals(1, updatedNode.getSetting("setting", DataType.NUMBER).value());
+        var responseBody = result.andReturn().getResponse().getContentAsString();
+        var responseNode = SerializationUtils.fromJson(responseBody, Node.class);
+        Assertions.assertEquals(updatedNode, responseNode);
     }
 
     @Test
