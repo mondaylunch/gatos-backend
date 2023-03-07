@@ -34,8 +34,8 @@ public final class BasicNodes {
         .register("list_headtail", new ListHeadTailNodeType());
     public static final EqualsNodeType EQUALS = NodeType.REGISTRY
         .register("equals", new EqualsNodeType());
-    public static final ParseStringNodeType PARSE_STRING = NodeType.REGISTRY
-        .register("parse_string", new ParseStringNodeType());
+    public static final ParseNumberFromStringNodeType PARSE_STRING_FROM_NUMBER = NodeType.REGISTRY
+        .register("parse_string_from_number", new ParseNumberFromStringNodeType());
     public static final HTTPRequestNodeType HTTP_REQUEST = NodeType.REGISTRY
         .register("http_request", new HTTPRequestNodeType());
 }

@@ -12,7 +12,7 @@ import club.mondaylunch.gatos.core.graph.connector.NodeConnector.Input;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector.Output;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
-public class ParseStringNodeType extends NodeType.Process {
+public class ParseNumberFromStringNodeType extends NodeType.Process {
     @Override
     public Map<String, DataBox<?>> settings() {
         return Map.of();
