@@ -178,6 +178,7 @@ public final class SerializationUtils {
     private static CodecRegistry createRegistry() {
         return CodecRegistries.fromRegistries(
             CodecRegistries.fromCodecs(UuidStringCodec.INSTANCE),
+            CodecRegistries.fromProviders(NodeCodecProvider.FOR_API),
             Database.getCodecRegistry()
         );
     }
