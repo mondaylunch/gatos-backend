@@ -183,7 +183,7 @@ public class FlowController {
      *
      * @return The node with the updated settings.
      */
-    @PatchMapping(value = "{flowId}/graph/nodes/{nodeId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "{flowId}/graph/nodes/{nodeId}/settings", produces = MediaType.APPLICATION_JSON_VALUE)
     public String modifyNodeSettings(
         @RequestHeader("x-auth-token") String token,
         @PathVariable UUID flowId,
