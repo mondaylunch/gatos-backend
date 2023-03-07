@@ -16,6 +16,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -319,6 +321,25 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         Assertions.assertNotNull(Flow.objects.get(flow.getId()));
     }
 
+    // Graph operations
+
+    @Test
+    public void canGetGraphNode() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        var node = graph.addNode(TestNodeTypes.START);
+        Assertions.assertEquals(0, node.getSetting("setting", DataType.NUMBER).value());
+        Assertions.assertEquals(1, graph.nodeCount());
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/" + flow.getId() + "/graph/nodes/" + node.id())
+                .header("x-auth-token", this.user.getAuthToken()))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var responseBody = result.andReturn().getResponse().getContentAsString();
+        var responseNode = SerializationUtils.fromJson(responseBody, Node.class);
+        Assertions.assertEquals(node, responseNode);
+    }
+
     @Test
     public void canAddGraphNode() throws Exception {
         var flow = createFlow(this.user);
@@ -398,6 +419,34 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
     }
 
     @Test
+    public void canGetConnections() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        var start = graph.addNode(TestNodeTypes.START);
+        var end = graph.addNode(TestNodeTypes.END);
+        Assertions.assertEquals(2, graph.nodeCount());
+        var connection = NodeConnection.createConnection(start, "start_output", end, "end_input", DataType.NUMBER).orElseThrow();
+        graph.addConnection(connection);
+        Assertions.assertEquals(1, graph.connectionCount());
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        var startConnectionsResult = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/" + flow.getId() + "/graph/connections/" + start.id())
+                .header("x-auth-token", this.user.getAuthToken()))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var endConnectionsResult = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/" + flow.getId() + "/graph/connections/" + end.id())
+                .header("x-auth-token", this.user.getAuthToken()))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var startConnectionsBody = startConnectionsResult.andReturn().getResponse().getContentAsString();
+        var endConnectionsBody = endConnectionsResult.andReturn().getResponse().getContentAsString();
+        JSONAssert.assertEquals(startConnectionsBody, endConnectionsBody, JSONCompareMode.NON_EXTENSIBLE);
+        var connectionsJson = JsonParser.parseString(startConnectionsBody).getAsJsonArray();
+        Assertions.assertEquals(1, connectionsJson.size());
+        var connectionJson = connectionsJson.get(0);
+        var responseConnection = SerializationUtils.fromJson(connectionJson.toString(), NodeConnection.class);
+        Assertions.assertEquals(connection, responseConnection);
+    }
+
+    @Test
     public void canAddConnection() throws Exception {
         var flow = createFlow(this.user);
         var graph = flow.getGraph();
@@ -468,6 +517,28 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
     }
 
     @Test
+    public void canGetNodeMetadata() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        var node = graph.addNode(TestNodeTypes.START);
+        var flowId = flow.getId();
+        var nodeId = node.id();
+        Assertions.assertEquals(1, graph.nodeCount());
+        var metadata = new NodeMetadata(1, 1);
+        graph.setMetadata(nodeId, metadata);
+        var actualMetadata = graph.getOrCreateMetadataForNode(node.id());
+        Assertions.assertEquals(metadata, actualMetadata);
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/" + flowId + "/graph/nodes/" + nodeId + "/metadata")
+                .header("x-auth-token", this.user.getAuthToken()))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var responseBody = result.andReturn().getResponse().getContentAsString();
+        var responseMetadata = SerializationUtils.fromJson(responseBody, NodeMetadata.class);
+        Assertions.assertEquals(metadata, responseMetadata);
+    }
+
+    @Test
     public void canModifyNodeMetadata() throws Exception {
         var flow = createFlow(this.user);
         var graph = flow.getGraph();
@@ -495,13 +566,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         actualMetadata = updatedGraph.getOrCreateMetadataForNode(nodeId);
         Assertions.assertEquals(expectedMetadata, actualMetadata);
         var responseBody = result.andReturn().getResponse().getContentAsString();
-        var responseJson = JsonParser.parseString(responseBody).getAsJsonObject();
-        Assertions.assertEquals(1, responseJson.size());
-        var metadataEntry = responseJson.asMap().entrySet().iterator().next();
-        var metadataId = metadataEntry.getKey();
-        var metadataJson = metadataEntry.getValue();
-        var responseMetadata = SerializationUtils.fromJson(metadataJson.toString(), NodeMetadata.class);
-        Assertions.assertEquals(metadataId, nodeId.toString());
+        var responseMetadata = SerializationUtils.fromJson(responseBody, NodeMetadata.class);
         Assertions.assertEquals(expectedMetadata, responseMetadata);
     }
 
@@ -534,13 +599,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         actualMetadata = updatedGraph.getOrCreateMetadataForNode(nodeId);
         Assertions.assertEquals(expectedMetadata, actualMetadata);
         var responseBody = result.andReturn().getResponse().getContentAsString();
-        var responseJson = JsonParser.parseString(responseBody).getAsJsonObject();
-        Assertions.assertEquals(1, responseJson.size());
-        var metadataEntry = responseJson.asMap().entrySet().iterator().next();
-        var metadataId = metadataEntry.getKey();
-        var metadataJson = metadataEntry.getValue();
-        var responseMetadata = SerializationUtils.fromJson(metadataJson.toString(), NodeMetadata.class);
-        Assertions.assertEquals(metadataId, nodeId.toString());
+        var responseMetadata = SerializationUtils.fromJson(responseBody, NodeMetadata.class);
         Assertions.assertEquals(expectedMetadata, responseMetadata);
     }
 

@@ -8,7 +8,7 @@ import java.util.function.Function;
 import javax.validation.Valid;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import org.hibernate.validator.constraints.Length;
 import org.jetbrains.annotations.NotNull;
@@ -158,6 +158,25 @@ public class FlowController {
     }
 
     /**
+     * Gets a node from the flow graph.
+     *
+     * @return The node.
+     */
+    @GetMapping(value = "{flowId}/graph/nodes/{nodeId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getNode(
+        @RequestHeader("x-auth-token") String token,
+        @PathVariable UUID flowId,
+        @PathVariable UUID nodeId
+    ) {
+        var user = this.userRepository.authenticateUser(token);
+        var flow = this.flowRepository.getFlow(user, flowId);
+        var graph = flow.getGraph();
+        var node = graph.getNode(nodeId)
+            .orElseThrow(NodeNotFoundException::new);
+        return SerializationUtils.toJson(node);
+    }
+
+    /**
      * Adds a node to the flow graph.
      *
      * @return The added node.
@@ -246,6 +265,33 @@ public class FlowController {
     }
 
     /**
+     * Gets all connections for a node.
+     *
+     * @return The connections.
+     */
+    @GetMapping(value = "{flowId}/graph/connections/{nodeId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getConnections(
+        @RequestHeader("x-auth-token") String token,
+        @PathVariable UUID flowId,
+        @PathVariable UUID nodeId
+    ) {
+        var user = this.userRepository.authenticateUser(token);
+        var flow = this.flowRepository.getFlow(user, flowId);
+        var graph = flow.getGraph();
+        if (!graph.containsNode(nodeId)) {
+            throw new NodeNotFoundException();
+        }
+        var connectionsJson = new JsonArray();
+        var connections = graph.getConnectionsForNode(nodeId);
+        for (var connection : connections) {
+            var connectionJsonString = SerializationUtils.toJson(connection);
+            var connectionJson = JsonParser.parseString(connectionJsonString);
+            connectionsJson.add(connectionJson);
+        }
+        return connectionsJson.toString();
+    }
+
+    /**
      * Adds a connection between two nodes.
      *
      * @return The added connection.
@@ -307,6 +353,27 @@ public class FlowController {
     }
 
     /**
+     * Gets a node's metadata.
+     *
+     * @return The metadata.
+     */
+    @GetMapping(value = "{flowId}/graph/nodes/{nodeId}/metadata", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getMetadata(
+        @RequestHeader("x-auth-token") String token,
+        @PathVariable UUID flowId,
+        @PathVariable UUID nodeId
+    ) {
+        var user = this.userRepository.authenticateUser(token);
+        var flow = this.flowRepository.getFlow(user, flowId);
+        var graph = flow.getGraph();
+        if (!graph.containsNode(nodeId)) {
+            throw new NodeNotFoundException();
+        }
+        var metadata = graph.getOrCreateMetadataForNode(nodeId);
+        return SerializationUtils.toJson(metadata);
+    }
+
+    /**
      * Modifies a node's metadata.
      *
      * @return The updated metadata.
@@ -321,12 +388,11 @@ public class FlowController {
         var user = this.userRepository.authenticateUser(token);
         var flow = this.flowRepository.getFlow(user, flowId);
         var graph = flow.getGraph();
+        if (!graph.containsNode(nodeId)) {
+            throw new NodeNotFoundException();
+        }
         graph.setMetadata(nodeId, metadata);
         Flow.objects.updateGraph(flow);
-        var metadataJsonString = SerializationUtils.toJson(metadata);
-        var metadataJson = JsonParser.parseString(metadataJsonString);
-        var response = new JsonObject();
-        response.add(nodeId.toString(), metadataJson);
-        return response.toString();
+        return SerializationUtils.toJson(metadata);
     }
 }
