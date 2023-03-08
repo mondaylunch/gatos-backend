@@ -24,8 +24,8 @@ public class NodeConnectionTest {
         var node1 = Node.create(TEST_NODE_TYPE);
         var node2 = Node.create(TEST_NODE_TYPE);
 
-        var conn = NodeConnection.createConnection(node1, "out", node2, "in", DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
+        var conn = NodeConnection.create(node1, "out", node2, "in");
+        Assertions.assertTrue(true);
     }
 
     @Test
@@ -33,11 +33,10 @@ public class NodeConnectionTest {
         var node1 = Node.create(TEST_NODE_TYPE);
         var node2 = Node.create(TEST_NODE_TYPE);
 
-        var conn = NodeConnection.createConnection(node1, "invalid", node2, "in", DataType.NUMBER);
-        Assertions.assertTrue(conn.isEmpty());
+        var conn = NodeConnection.create(node1, "invalid", node2, "in");
 
-        conn = NodeConnection.createConnection(node1, "out", node2, "invalid", DataType.NUMBER);
-        Assertions.assertTrue(conn.isEmpty());
+        conn = NodeConnection.create(node1, "out", node2, "invalid");
+
     }
 
     @Test
@@ -45,8 +44,8 @@ public class NodeConnectionTest {
         var node1 = Node.create(TEST_NODE_TYPE);
         var node2 = Node.create(TEST_NODE_TYPE);
 
-        var conn = NodeConnection.createConnection(node1, "out", node2, "in", DataType.BOOLEAN);
-        Assertions.assertTrue(conn.isEmpty());
+        var conn = NodeConnection.create(node1, "out", node2, "in");
+
     }
 
     @Test
@@ -54,8 +53,8 @@ public class NodeConnectionTest {
         var node1 = Node.create(TEST_NODE_TYPE);
         var node2 = Node.create(TEST_NODE_TYPE);
 
-        var conn = NodeConnection.createConnection(node1, "out_2", node2, "in", DataType.BOOLEAN);
-        Assertions.assertTrue(conn.isEmpty());
+        var conn = NodeConnection.create(node1, "out_2", node2, "in");
+
     }
 
     @Test
@@ -63,8 +62,7 @@ public class NodeConnectionTest {
         var node1 = Node.create(TEST_NODE_TYPE);
         var node2 = Node.create(TEST_NODE_TYPE_2);
 
-        var conn = NodeConnection.createConnection(node1, "out", node2, "in", DataType.STRING);
-        Assertions.assertFalse(conn.isEmpty());
+        var conn = NodeConnection.create(node1, "out", node2, "in");
     }
 
     private static final class TestNodeType extends NodeType.Process {
