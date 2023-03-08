@@ -100,10 +100,10 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         var process = graph.addNode(TestNodeTypes.PROCESS);
         var end = graph.addNode(TestNodeTypes.END);
 
-        var startToProcess = NodeConnection.createConnection(start, "start_output", process, "process_input", DataType.NUMBER);
-        var processToEnd = NodeConnection.createConnection(process, "process_output", end, "end_input", DataType.NUMBER);
-        graph.addConnection(startToProcess.orElseThrow());
-        graph.addConnection(processToEnd.orElseThrow());
+        var startToProcess = NodeConnection.create(start, "start_output", process, "process_input");
+        var processToEnd = NodeConnection.create(process, "process_output", end, "end_input");
+        graph.addConnection(startToProcess);
+        graph.addConnection(processToEnd);
 
         graph.modifyMetadata(start.id(), nodeMetadata -> nodeMetadata.withX(1));
 
@@ -425,7 +425,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         var start = graph.addNode(TestNodeTypes.START);
         var end = graph.addNode(TestNodeTypes.END);
         Assertions.assertEquals(2, graph.nodeCount());
-        var connection = NodeConnection.createConnection(start, "start_output", end, "end_input", DataType.NUMBER).orElseThrow();
+        var connection = NodeConnection.create(start, "start_output", end, "end_input");
         graph.addConnection(connection);
         Assertions.assertEquals(1, graph.connectionCount());
         Flow.objects.insert(flow);
@@ -474,7 +474,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         var endConnections = updatedGraph.getConnectionsForNode(end.id());
         Assertions.assertEquals(1, startConnections.size());
         Assertions.assertEquals(startConnections, endConnections);
-        var expectedConnection = NodeConnection.createConnection(start, "start_output", end, "end_input", DataType.NUMBER).orElseThrow();
+        var expectedConnection = NodeConnection.create(start, "start_output", end, "end_input");
         Assertions.assertEquals(expectedConnection, startConnections.iterator().next());
         var responseBody = result.andReturn().getResponse().getContentAsString();
         var responseConnection = SerializationUtils.fromJson(responseBody, NodeConnection.class);
@@ -488,7 +488,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         var start = graph.addNode(TestNodeTypes.START);
         var end = graph.addNode(TestNodeTypes.END);
         Assertions.assertEquals(2, graph.nodeCount());
-        var connection = NodeConnection.createConnection(start, "start_output", end, "end_input", DataType.NUMBER).orElseThrow();
+        var connection = NodeConnection.create(start, "start_output", end, "end_input");
         graph.addConnection(connection);
         Assertions.assertEquals(1, graph.connectionCount());
         Flow.objects.insert(flow);

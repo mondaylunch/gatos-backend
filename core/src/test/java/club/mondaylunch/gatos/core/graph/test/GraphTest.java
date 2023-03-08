@@ -79,13 +79,13 @@ public class GraphTest {
         var node1 = graph.addNode(TEST_NODE_TYPE);
         var node2 = graph.addNode(TEST_NODE_TYPE);
 
-        var conn = NodeConnection.createConnection(node1, "out", node2, "in", DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
+        var conn = NodeConnection.create(node1, "out", node2, "in");
+        Assertions.assertTrue(true);
 
-        graph.addConnection(conn.get());
+        graph.addConnection(conn);
 
-        Assertions.assertTrue(graph.getConnectionsForNode(node1.id()).contains(conn.get()));
-        Assertions.assertTrue(graph.getConnectionsForNode(node2.id()).contains(conn.get()));
+        Assertions.assertTrue(graph.getConnectionsForNode(node1.id()).contains(conn));
+        Assertions.assertTrue(graph.getConnectionsForNode(node2.id()).contains(conn));
     }
 
     @Test
@@ -94,18 +94,18 @@ public class GraphTest {
         var node1 = Node.create(TEST_NODE_TYPE);
         var node2 = graph.addNode(TEST_NODE_TYPE);
 
-        var conn1 = NodeConnection.createConnection(node1, "out", node2, "in", DataType.NUMBER);
-        Assertions.assertTrue(conn1.isPresent());
+        var conn1 = NodeConnection.create(node1, "out", node2, "in");
+        Assertions.assertTrue(true);
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            graph.addConnection(conn1.get());
+            graph.addConnection(conn1);
         });
 
-        var conn2 = NodeConnection.createConnection(node2, "out", node1, "in", DataType.NUMBER);
-        Assertions.assertTrue(conn2.isPresent());
+        var conn2 = NodeConnection.create(node2, "out", node1, "in");
+        Assertions.assertTrue(true);
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            graph.addConnection(conn2.get());
+            graph.addConnection(conn2);
         });
     }
 
@@ -116,16 +116,16 @@ public class GraphTest {
         var node2 = graph.addNode(TEST_NODE_TYPE);
         var node3 = graph.addNode(TEST_NODE_TYPE);
 
-        var conn1 = NodeConnection.createConnection(node1, "out", node3, "in", DataType.NUMBER);
-        Assertions.assertTrue(conn1.isPresent());
+        var conn1 = NodeConnection.create(node1, "out", node3, "in");
+        Assertions.assertTrue(true);
 
-        graph.addConnection(conn1.get());
+        graph.addConnection(conn1);
 
-        var conn2 = NodeConnection.createConnection(node2, "out", node3, "in", DataType.NUMBER);
-        Assertions.assertTrue(conn2.isPresent());
+        var conn2 = NodeConnection.create(node2, "out", node3, "in");
+        Assertions.assertTrue(true);
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            graph.addConnection(conn2.get());
+            graph.addConnection(conn2);
         });
     }
 
@@ -135,14 +135,14 @@ public class GraphTest {
         var node1 = graph.addNode(TEST_NODE_TYPE);
         var node2 = graph.addNode(TEST_NODE_TYPE);
 
-        var conn = NodeConnection.createConnection(node1, "out", node2, "in", DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
+        var conn = NodeConnection.create(node1, "out", node2, "in");
+        Assertions.assertTrue(true);
 
-        graph.addConnection(conn.get());
-        graph.removeConnection(conn.get());
+        graph.addConnection(conn);
+        graph.removeConnection(conn);
 
-        Assertions.assertFalse(graph.getConnectionsForNode(node1.id()).contains(conn.get()));
-        Assertions.assertFalse(graph.getConnectionsForNode(node2.id()).contains(conn.get()));
+        Assertions.assertFalse(graph.getConnectionsForNode(node1.id()).contains(conn));
+        Assertions.assertFalse(graph.getConnectionsForNode(node2.id()).contains(conn));
     }
 
     @Test
@@ -151,15 +151,15 @@ public class GraphTest {
         var node1 = graph.addNode(TEST_NODE_TYPE);
         var node2 = graph.addNode(TEST_NODE_TYPE);
 
-        var conn = NodeConnection.createConnection(node1, "out", node2, "in", DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
+        var conn = NodeConnection.create(node1, "out", node2, "in");
+        Assertions.assertTrue(true);
 
-        graph.addConnection(conn.get());
+        graph.addConnection(conn);
 
         graph.removeNode(node1.id());
 
-        Assertions.assertFalse(graph.getConnectionsForNode(node1.id()).contains(conn.get()));
-        Assertions.assertFalse(graph.getConnectionsForNode(node2.id()).contains(conn.get()));
+        Assertions.assertFalse(graph.getConnectionsForNode(node1.id()).contains(conn));
+        Assertions.assertFalse(graph.getConnectionsForNode(node2.id()).contains(conn));
     }
 
     @Test
@@ -168,15 +168,15 @@ public class GraphTest {
         var node1 = graph.addNode(TEST_NODE_TYPE);
         var node2 = graph.addNode(TEST_NODE_TYPE);
 
-        var conn = NodeConnection.createConnection(node1, "out", node2, "in", DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
+        var conn = NodeConnection.create(node1, "out", node2, "in");
+        Assertions.assertTrue(true);
 
-        graph.addConnection(conn.get());
+        graph.addConnection(conn);
 
         graph.removeNode(node2.id());
 
-        Assertions.assertFalse(graph.getConnectionsForNode(node1.id()).contains(conn.get()));
-        Assertions.assertFalse(graph.getConnectionsForNode(node2.id()).contains(conn.get()));
+        Assertions.assertFalse(graph.getConnectionsForNode(node1.id()).contains(conn));
+        Assertions.assertFalse(graph.getConnectionsForNode(node2.id()).contains(conn));
     }
 
     @Test
@@ -186,11 +186,11 @@ public class GraphTest {
         var node2 = graph.addNode(TEST_VARYING_OUTPUT_NODE_TYPE);
 
         Assertions.assertEquals(DataType.ANY, node2.getOutputs().get("out").type());
-        var conn = NodeConnection.createConnection(node1, "out", node2, "in", OptionalDataType.GENERIC_OPTIONAL);
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
+        var conn = NodeConnection.create(node1, "out", node2, "in");
+        Assertions.assertTrue(true);
+        graph.addConnection(conn);
         Assertions.assertEquals(DataType.STRING, graph.getNode(node2.id()).orElseThrow().getOutputs().get("out").type());
-        graph.removeConnection(conn.get());
+        graph.removeConnection(conn);
         Assertions.assertEquals(DataType.ANY, graph.getNode(node2.id()).orElseThrow().getOutputs().get("out").type());
     }
 
@@ -235,9 +235,9 @@ public class GraphTest {
         var graph = new Graph();
         var input = graph.addNode(INPUT_NODE_TYPE);
         var output = graph.addNode(OUTPUT_NODE_TYPE);
-        var conn = NodeConnection.createConnection(input, "out", output, "in", DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
+        var conn = NodeConnection.create(input, "out", output, "in");
+        Assertions.assertTrue(true);
+        graph.addConnection(conn);
         Assertions.assertTrue(graph.validate());
     }
 
@@ -254,9 +254,9 @@ public class GraphTest {
         var graph = new Graph();
         var input = graph.addNode(TEST_NODE_TYPE);
         var output = graph.addNode(OUTPUT_NODE_TYPE);
-        var conn = NodeConnection.createConnection(input, "out", output, "in", DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
+        var conn = NodeConnection.create(input, "out", output, "in");
+        Assertions.assertTrue(true);
+        graph.addConnection(conn);
         Assertions.assertFalse(graph.validate());
     }
 
@@ -265,9 +265,9 @@ public class GraphTest {
         var graph = new Graph();
         var input = graph.addNode(INPUT_NODE_TYPE);
         var output = graph.addNode(TEST_NODE_TYPE);
-        var conn = NodeConnection.createConnection(input, "out", output, "in", DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
+        var conn = NodeConnection.create(input, "out", output, "in");
+        Assertions.assertTrue(true);
+        graph.addConnection(conn);
         Assertions.assertFalse(graph.validate());
     }
 
@@ -281,22 +281,22 @@ public class GraphTest {
         Node lastNode = null;
         for (int i = 0; i < 10; i++) {
             var intermediary = graph.addNode(TEST_NODE_TYPE);
-            var conn = NodeConnection.createConnection(
+            var conn = NodeConnection.create(
                     lastNode == null ? input : lastNode, "out",
-                    intermediary, "in",
-                    DataType.NUMBER);
-            Assertions.assertTrue(conn.isPresent());
-            graph.addConnection(conn.get());
+                    intermediary, "in"
+            );
+            Assertions.assertTrue(true);
+            graph.addConnection(conn);
 
             lastNode = intermediary;
         }
 
-        var conn = NodeConnection.createConnection(
+        var conn = NodeConnection.create(
                 lastNode, "out",
-                output, "in",
-                DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
+                output, "in"
+            );
+        Assertions.assertTrue(true);
+        graph.addConnection(conn);
 
         Assertions.assertTrue(graph.validate());
     }
@@ -311,22 +311,22 @@ public class GraphTest {
         Node lastNode = null;
         for (int i = 0; i < 10; i++) {
             var intermediary = graph.addNode(TEST_NODE_TYPE);
-            var conn = NodeConnection.createConnection(
+            var conn = NodeConnection.create(
                     lastNode == null ? input : lastNode, "out",
-                    intermediary, "in",
-                    DataType.NUMBER);
-            Assertions.assertTrue(conn.isPresent());
-            graph.addConnection(conn.get());
+                    intermediary, "in"
+            );
+            Assertions.assertTrue(true);
+            graph.addConnection(conn);
 
             lastNode = intermediary;
         }
 
-        var conn = NodeConnection.createConnection(
+        var conn = NodeConnection.create(
                 lastNode, "out",
-                output, "in",
-                DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
+                output, "in"
+        );
+        Assertions.assertTrue(true);
+        graph.addConnection(conn);
 
         for (int i = 0; i < 10; i++) {
             graph.addNode(TEST_NODE_TYPE);
@@ -347,23 +347,23 @@ public class GraphTest {
         Node lastNode = null;
         for (int i = 0; i < 10; i++) {
             var intermediary = graph.addNode(TEST_NODE_TYPE);
-            var conn = NodeConnection.createConnection(
+            var conn = NodeConnection.create(
                     lastNode == null ? input : lastNode, "out",
-                    intermediary, "in",
-                    DataType.NUMBER);
-            Assertions.assertTrue(conn.isPresent());
-            graph.addConnection(conn.get());
+                    intermediary, "in"
+            );
+            Assertions.assertTrue(true);
+            graph.addConnection(conn);
 
             lastNode = intermediary;
             list.add(intermediary);
         }
 
-        var conn = NodeConnection.createConnection(
+        var conn = NodeConnection.create(
                 lastNode, "out",
-                output, "in",
-                DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
+                output, "in"
+        );
+        Assertions.assertTrue(true);
+        graph.addConnection(conn);
 
         list.add(output);
 
