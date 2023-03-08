@@ -112,7 +112,8 @@ public class FlowCollectionTest {
         Flow flowUpdate = new Flow();
         String newName = "New Name";
         flowUpdate.setName(newName);
-        Flow updated = Flow.objects.update(flow.getId(), flowUpdate);
+        Flow.objects.update(flow.getId(), flowUpdate);
+        Flow updated = Flow.objects.get(flow.getId());
         Assertions.assertEquals(newName, updated.getName());
     }
 
@@ -123,7 +124,8 @@ public class FlowCollectionTest {
         Flow flowUpdate = new Flow();
         UUID newAuthorId = UUID.randomUUID();
         flowUpdate.setAuthorId(newAuthorId);
-        Flow updated = Flow.objects.update(flow.getId(), flowUpdate);
+        Flow.objects.update(flow.getId(), flowUpdate);
+        Flow updated = Flow.objects.get(flow.getId());
         Assertions.assertEquals(newAuthorId, updated.getAuthorId());
     }
 
@@ -132,7 +134,10 @@ public class FlowCollectionTest {
         Flow flowUpdate = new Flow();
         String newName = "New Name";
         flowUpdate.setName(newName);
-        Assertions.assertNull(Flow.objects.update(UUID.randomUUID(), flowUpdate));
+        UUID id = UUID.randomUUID();
+        Flow.objects.update(id, flowUpdate);
+        Flow updated = Flow.objects.get(id);
+        Assertions.assertNull(updated);
     }
 
     @Test

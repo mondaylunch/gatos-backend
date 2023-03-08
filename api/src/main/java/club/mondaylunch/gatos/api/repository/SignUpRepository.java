@@ -2,8 +2,8 @@ package club.mondaylunch.gatos.api.repository;
 
 import org.springframework.stereotype.Repository;
 
-import club.mondaylunch.gatos.api.exceptions.EmailAlreadyInUseException;
-import club.mondaylunch.gatos.api.exceptions.UsernameAlreadyInUseException;
+import club.mondaylunch.gatos.api.exception.signup.EmailAlreadyInUseException;
+import club.mondaylunch.gatos.api.exception.signup.UsernameAlreadyInUseException;
 import club.mondaylunch.gatos.core.models.User;
 
 @Repository
@@ -15,11 +15,11 @@ public class SignUpRepository {
      * @param email             user's email
      * @param username          user's username
      * @param plaintextPassword given password
-     * @throws UsernameAlreadyInUseException
-     * @throws EmailAlreadyInUseException
+     * @throws UsernameAlreadyInUseException if the username is already in use
+     * @throws EmailAlreadyInUseException    if the email is already in use
      */
     public User addUser(String email, String username, String plaintextPassword)
-            throws UsernameAlreadyInUseException, EmailAlreadyInUseException {
+        throws UsernameAlreadyInUseException, EmailAlreadyInUseException {
         // Validate username and email are available
         if (this.usernameAlreadyInUse(username)) {
             throw new UsernameAlreadyInUseException();
@@ -40,7 +40,7 @@ public class SignUpRepository {
     /**
      * Check if the username is already in use.
      *
-     * @param String username
+     * @param username the username to check
      * @return true if the username is already in use
      */
     public Boolean usernameAlreadyInUse(String username) {
@@ -50,7 +50,7 @@ public class SignUpRepository {
     /**
      * Checks if the email is already in use.
      *
-     * @param String email
+     * @param email the email to check
      * @return true if the email is already in use
      */
     public Boolean emailAlreadyInUse(String email) {

@@ -36,10 +36,16 @@ public final class BasicNodes {
         .register("list_length", new ListLengthNodeType());
     public static final OptionalOrElseNodeType OPTIONAL_OR_ELSE = NodeType.REGISTRY
         .register("optional_or_else", new OptionalOrElseNodeType());
-    public static final ListHeadTailNodeType LIST_HEADTAIL = NodeType.REGISTRY
-        .register("list_headtail", new ListHeadTailNodeType());
+    public static final ListHeadSeparationNodeType LIST_HEAD_SEPARATION = NodeType.REGISTRY
+        .register("list_head_separation", new ListHeadSeparationNodeType());
+    public static final ListTailSeparationNodeType LIST_TAIL_SEPARATION = NodeType.REGISTRY
+        .register("list_tail_separation", new ListTailSeparationNodeType());
     public static final EqualsNodeType EQUALS = NodeType.REGISTRY
         .register("equals", new EqualsNodeType());
+    public static final TruthinessNodeType TRUTHINESS = NodeType.REGISTRY
+        .register("truthiness", new TruthinessNodeType());
+    public static final NegationNodeType NEGATION = NodeType.REGISTRY
+        .register("negation", new NegationNodeType());
     public static final ParseNumberFromStringNodeType PARSE_STRING_FROM_NUMBER = NodeType.REGISTRY
         .register("parse_string_from_number", new ParseNumberFromStringNodeType());
     public static final HTTPRequestNodeType HTTP_REQUEST = NodeType.REGISTRY

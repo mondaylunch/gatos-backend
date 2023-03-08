@@ -7,12 +7,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.jayway.jsonpath.JsonPath;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -22,6 +27,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import club.mondaylunch.gatos.api.BaseMvcTest;
 import club.mondaylunch.gatos.api.helpers.UserCreationHelper;
+import club.mondaylunch.gatos.basicnodes.BasicNodes;
+import club.mondaylunch.gatos.core.codec.SerializationUtils;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.Node;
@@ -38,6 +45,11 @@ import club.mondaylunch.gatos.testshared.graph.type.test.TestNodeTypes;
 public class FlowControllerTest extends BaseMvcTest implements UserCreationHelper {
     private static final String ENDPOINT = "/api/v1/flows";
     private User user;
+
+    @BeforeAll
+    public static void init() {
+        BasicNodes.init();
+    }
 
     @BeforeEach
     void setUp() {
@@ -68,13 +80,13 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
 
     @Test
     public void cannotGetFlowsWithoutToken() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/list"))
+        this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT))
             .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @Test
     public void cannotGetFlowsWithInvalidToken() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/list")
+        this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT)
                 .header("x-auth-token", "invalid"))
             .andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
@@ -309,6 +321,310 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         Assertions.assertNotNull(Flow.objects.get(flow.getId()));
     }
 
+    // Graph operations
+
+    @Test
+    public void canGetGraphNode() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        var node = graph.addNode(TestNodeTypes.START);
+        Assertions.assertEquals(0, node.getSetting("setting", DataType.NUMBER).value());
+        Assertions.assertEquals(1, graph.nodeCount());
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/" + flow.getId() + "/graph/nodes/" + node.id())
+                .header("x-auth-token", this.user.getAuthToken()))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var responseBody = result.andReturn().getResponse().getContentAsString();
+        var responseNode = SerializationUtils.fromJson(responseBody, Node.class);
+        Assertions.assertEquals(node, responseNode);
+    }
+
+    @Test
+    public void canAddGraphNode() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        Assertions.assertEquals(0, graph.nodeCount());
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        var nodeType = "string_interpolation";
+        var nodeTypeJson = new JsonObject();
+        nodeTypeJson.addProperty("type", nodeType);
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT + "/" + flow.getId() + "/graph/nodes")
+                .header("x-auth-token", this.user.getAuthToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(nodeTypeJson.toString()))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var id = flow.getId();
+        var updatedFlow = Flow.objects.get(id);
+        var updatedGraph = updatedFlow.getGraph();
+        Assertions.assertEquals(1, updatedGraph.nodeCount());
+        var body = result.andReturn().getResponse().getContentAsString();
+        var actualNode = SerializationUtils.fromJson(body, Node.class);
+        var nodeId = actualNode.id();
+        var expectedNode = updatedGraph.getNode(nodeId).orElseThrow();
+        Assertions.assertEquals(expectedNode, actualNode);
+    }
+
+    @Test
+    public void canModifyNodeSettings() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        var node = graph.addNode(TestNodeTypes.START);
+        Assertions.assertEquals(0, node.getSetting("setting", DataType.NUMBER).value());
+        Assertions.assertEquals(1, graph.nodeCount());
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        var flowId = flow.getId();
+        var nodeId = node.id();
+        var dataBox = new JsonObject();
+        dataBox.addProperty("type", "number");
+        dataBox.addProperty("value", 1);
+        var body = new JsonObject();
+        body.add("setting", dataBox);
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flow.getId() + "/graph/nodes/" + nodeId + "/settings")
+                .header("x-auth-token", this.user.getAuthToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body.toString())
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var updatedFlow = Flow.objects.get(flowId);
+        var updatedGraph = updatedFlow.getGraph();
+        Assertions.assertEquals(1, updatedGraph.nodeCount());
+        var updatedNode = updatedGraph.getNode(nodeId).orElseThrow();
+        Assertions.assertEquals(1, updatedNode.getSetting("setting", DataType.NUMBER).value());
+        var responseBody = result.andReturn().getResponse().getContentAsString();
+        var responseNode = SerializationUtils.fromJson(responseBody, Node.class);
+        Assertions.assertEquals(updatedNode, responseNode);
+    }
+
+    @Test
+    public void canDeleteGraphNode() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        var node = graph.addNode(TestNodeTypes.START);
+        Assertions.assertEquals(1, graph.nodeCount());
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        var flowId = flow.getId();
+        var nodeId = node.id();
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT + "/" + flowId + "/graph/nodes/" + nodeId)
+                .header("x-auth-token", this.user.getAuthToken())
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var updatedFlow = Flow.objects.get(flowId);
+        var updatedGraph = updatedFlow.getGraph();
+        Assertions.assertEquals(0, updatedGraph.nodeCount());
+        Assertions.assertFalse(updatedGraph.containsNode(nodeId));
+    }
+
+    @Test
+    public void canGetConnections() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        var start = graph.addNode(TestNodeTypes.START);
+        var end = graph.addNode(TestNodeTypes.END);
+        Assertions.assertEquals(2, graph.nodeCount());
+        var connection = NodeConnection.createConnection(start, "start_output", end, "end_input", DataType.NUMBER).orElseThrow();
+        graph.addConnection(connection);
+        Assertions.assertEquals(1, graph.connectionCount());
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        var startConnectionsResult = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/" + flow.getId() + "/graph/connections/" + start.id())
+                .header("x-auth-token", this.user.getAuthToken()))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var endConnectionsResult = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/" + flow.getId() + "/graph/connections/" + end.id())
+                .header("x-auth-token", this.user.getAuthToken()))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var startConnectionsBody = startConnectionsResult.andReturn().getResponse().getContentAsString();
+        var endConnectionsBody = endConnectionsResult.andReturn().getResponse().getContentAsString();
+        JSONAssert.assertEquals(startConnectionsBody, endConnectionsBody, JSONCompareMode.NON_EXTENSIBLE);
+        var connectionsJson = JsonParser.parseString(startConnectionsBody).getAsJsonArray();
+        Assertions.assertEquals(1, connectionsJson.size());
+        var connectionJson = connectionsJson.get(0);
+        var responseConnection = SerializationUtils.fromJson(connectionJson.toString(), NodeConnection.class);
+        Assertions.assertEquals(connection, responseConnection);
+    }
+
+    @Test
+    public void canAddConnection() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        var start = graph.addNode(TestNodeTypes.START);
+        var end = graph.addNode(TestNodeTypes.END);
+        Assertions.assertEquals(2, graph.nodeCount());
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        var body = new JsonObject();
+        body.addProperty("from_node_id", start.id().toString());
+        body.addProperty("from_name", "start_output");
+        body.addProperty("to_node_id", end.id().toString());
+        body.addProperty("to_name", "end_input");
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT + "/" + flow.getId() + "/graph/connections")
+                .header("x-auth-token", this.user.getAuthToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body.toString()))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var id = flow.getId();
+        var updatedFlow = Flow.objects.get(id);
+        var updatedGraph = updatedFlow.getGraph();
+        Assertions.assertEquals(2, updatedGraph.nodeCount());
+        Assertions.assertEquals(1, updatedGraph.connectionCount());
+        var startConnections = updatedGraph.getConnectionsForNode(start.id());
+        var endConnections = updatedGraph.getConnectionsForNode(end.id());
+        Assertions.assertEquals(1, startConnections.size());
+        Assertions.assertEquals(startConnections, endConnections);
+        var expectedConnection = NodeConnection.createConnection(start, "start_output", end, "end_input", DataType.NUMBER).orElseThrow();
+        Assertions.assertEquals(expectedConnection, startConnections.iterator().next());
+        var responseBody = result.andReturn().getResponse().getContentAsString();
+        var responseConnection = SerializationUtils.fromJson(responseBody, NodeConnection.class);
+        Assertions.assertEquals(expectedConnection, responseConnection);
+    }
+
+    @Test
+    public void canRemoveConnection() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        var start = graph.addNode(TestNodeTypes.START);
+        var end = graph.addNode(TestNodeTypes.END);
+        Assertions.assertEquals(2, graph.nodeCount());
+        var connection = NodeConnection.createConnection(start, "start_output", end, "end_input", DataType.NUMBER).orElseThrow();
+        graph.addConnection(connection);
+        Assertions.assertEquals(1, graph.connectionCount());
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        var body = new JsonObject();
+        body.addProperty("from_node_id", start.id().toString());
+        body.addProperty("from_name", "start_output");
+        body.addProperty("to_node_id", end.id().toString());
+        body.addProperty("to_name", "end_input");
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT + "/" + flow.getId() + "/graph/connections")
+                .header("x-auth-token", this.user.getAuthToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body.toString()))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var id = flow.getId();
+        var updatedFlow = Flow.objects.get(id);
+        var updatedGraph = updatedFlow.getGraph();
+        Assertions.assertEquals(2, updatedGraph.nodeCount());
+        Assertions.assertEquals(0, updatedGraph.connectionCount());
+        var startConnections = updatedGraph.getConnectionsForNode(start.id());
+        var endConnections = updatedGraph.getConnectionsForNode(end.id());
+        Assertions.assertEquals(0, startConnections.size());
+        Assertions.assertEquals(startConnections, endConnections);
+    }
+
+    @Test
+    public void canGetNodeMetadata() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        var node = graph.addNode(TestNodeTypes.START);
+        var flowId = flow.getId();
+        var nodeId = node.id();
+        Assertions.assertEquals(1, graph.nodeCount());
+        var metadata = new NodeMetadata(1, 1);
+        graph.setMetadata(nodeId, metadata);
+        var actualMetadata = graph.getOrCreateMetadataForNode(node.id());
+        Assertions.assertEquals(metadata, actualMetadata);
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/" + flowId + "/graph/nodes/" + nodeId + "/metadata")
+                .header("x-auth-token", this.user.getAuthToken()))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var responseBody = result.andReturn().getResponse().getContentAsString();
+        var responseMetadata = SerializationUtils.fromJson(responseBody, NodeMetadata.class);
+        Assertions.assertEquals(metadata, responseMetadata);
+    }
+
+    @Test
+    public void canModifyNodeMetadata() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        var node = graph.addNode(TestNodeTypes.START);
+        Assertions.assertEquals(1, graph.nodeCount());
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        var expectedMetadata = new NodeMetadata(0, 0);
+        var actualMetadata = graph.getOrCreateMetadataForNode(node.id());
+        Assertions.assertEquals(expectedMetadata, actualMetadata);
+        var flowId = flow.getId();
+        var nodeId = node.id();
+        var body = new JsonObject();
+        body.addProperty("x_pos", 1);
+        body.addProperty("y_pos", 1);
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flowId + "/graph/nodes/" + nodeId + "/metadata")
+                .header("x-auth-token", this.user.getAuthToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body.toString())
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var updatedFlow = Flow.objects.get(flowId);
+        var updatedGraph = updatedFlow.getGraph();
+        expectedMetadata = new NodeMetadata(1, 1);
+        actualMetadata = updatedGraph.getOrCreateMetadataForNode(nodeId);
+        Assertions.assertEquals(expectedMetadata, actualMetadata);
+        var responseBody = result.andReturn().getResponse().getContentAsString();
+        var responseMetadata = SerializationUtils.fromJson(responseBody, NodeMetadata.class);
+        Assertions.assertEquals(expectedMetadata, responseMetadata);
+    }
+
+    @Test
+    public void canModifyExistingMetadata() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        var node = graph.addNode(TestNodeTypes.START);
+        var flowId = flow.getId();
+        var nodeId = node.id();
+        Assertions.assertEquals(1, graph.nodeCount());
+        var metadata = new NodeMetadata(1, 1);
+        graph.setMetadata(nodeId, metadata);
+        var actualMetadata = graph.getOrCreateMetadataForNode(node.id());
+        Assertions.assertEquals(metadata, actualMetadata);
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        var body = new JsonObject();
+        body.addProperty("x_pos", 2);
+        body.addProperty("y_pos", 2);
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flowId + "/graph/nodes/" + nodeId + "/metadata")
+                .header("x-auth-token", this.user.getAuthToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body.toString())
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var updatedFlow = Flow.objects.get(flowId);
+        var updatedGraph = updatedFlow.getGraph();
+        var expectedMetadata = new NodeMetadata(2, 2);
+        actualMetadata = updatedGraph.getOrCreateMetadataForNode(nodeId);
+        Assertions.assertEquals(expectedMetadata, actualMetadata);
+        var responseBody = result.andReturn().getResponse().getContentAsString();
+        var responseMetadata = SerializationUtils.fromJson(responseBody, NodeMetadata.class);
+        Assertions.assertEquals(expectedMetadata, responseMetadata);
+    }
+
+    @Test
+    public void canDeleteNodeWithMetaData() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        var node = graph.addNode(TestNodeTypes.START);
+        var flowId = flow.getId();
+        var nodeId = node.id();
+        var updatedMetadata = new NodeMetadata(1, 1);
+        graph.setMetadata(nodeId, updatedMetadata);
+        Assertions.assertEquals(updatedMetadata, graph.getOrCreateMetadataForNode(nodeId));
+        Assertions.assertEquals(1, graph.nodeCount());
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT + "/" + flowId + "/graph/nodes/" + nodeId)
+                .header("x-auth-token", this.user.getAuthToken())
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var updatedFlow = Flow.objects.get(flowId);
+        var updatedGraph = updatedFlow.getGraph();
+        Assertions.assertEquals(0, updatedGraph.nodeCount());
+        Assertions.assertFalse(updatedGraph.containsNode(nodeId));
+        Assertions.assertEquals(new NodeMetadata(0, 0), updatedGraph.getOrCreateMetadataForNode(nodeId));
+    }
+
     /// --- UTILITIES ---
 
     private void assertFlowCount(long count) {
@@ -343,7 +659,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
     }
 
     private ResultActions getFlows(int expectedFlowCount) throws Exception {
-        return this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/list")
+        return this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT)
                 .header("x-auth-token", this.user.getAuthToken()))
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andExpect(MockMvcResultMatchers.jsonPath("$",
@@ -404,6 +720,10 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
 
     private static void compareNode(Node node, int index, ResultActions result) {
         var prefix = OBJECT_EXPRESSION_PREFIX + "graph.nodes[" + index + "].";
+        compareNode(node, result, prefix);
+    }
+
+    private static void compareNode(Node node, ResultActions result, String prefix) {
         compareFields(prefix, result,
             Map.entry("id", node.id()),
             Map.entry("type", NodeType.REGISTRY.getName(node.type()).orElseThrow())
@@ -460,7 +780,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
             throw new IllegalArgumentException("Unknown connector class " + connectorClass);
         }
         compareFields(expressionPrefix + type + '.', result,
-            Map.entry("nodeId", connector.nodeId()),
+            Map.entry("node_id", connector.nodeId()),
             Map.entry("name", connector.name()),
             Map.entry("type", connector.type().name())
         );
@@ -475,8 +795,8 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
 
     private static void compareMetadata(UUID nodeId, NodeMetadata metadata, String expressionPrefix, ResultActions result) {
         compareFields(expressionPrefix + nodeId + '.', result,
-            Map.entry("xPos", (double) metadata.xPos()),
-            Map.entry("yPos", (double) metadata.yPos())
+            Map.entry("x_pos", (double) metadata.xPos()),
+            Map.entry("y_pos", (double) metadata.yPos())
         );
     }
 

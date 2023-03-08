@@ -42,7 +42,7 @@ public class HTTPRequestNodeTest {
     @Test
     public void createGETRequest() {
         var node = Node.create(BasicNodes.HTTP_REQUEST)
-        .modifySetting("url", DataType.STRING.create(URL))
+            .modifySetting("url", DataType.STRING.create(URL))
             .modifySetting("method", DataType.STRING.create("GET"));
 
         Map<String, DataBox<?>> input = Map.of(
@@ -57,7 +57,7 @@ public class HTTPRequestNodeTest {
     @Test
     public void createPOSTRequest() {
         var node = Node.create(BasicNodes.HTTP_REQUEST)
-        .modifySetting("url", DataType.STRING.create(URL))
+            .modifySetting("url", DataType.STRING.create(URL))
             .modifySetting("method", DataType.STRING.create("POST"));
 
         Map<String, DataBox<?>> input = Map.of(
@@ -72,7 +72,7 @@ public class HTTPRequestNodeTest {
     @Test
     public void canHandlePOSTWithoutBody() {
         var node = Node.create(BasicNodes.HTTP_REQUEST)
-        .modifySetting("url", DataType.STRING.create(URL))
+            .modifySetting("url", DataType.STRING.create(URL))
             .modifySetting("method", DataType.STRING.create("POST"));
 
         Map<String, DataBox<?>> input = Map.of(
@@ -87,7 +87,7 @@ public class HTTPRequestNodeTest {
     @Test
     public void createPUTRequest() {
         var node = Node.create(BasicNodes.HTTP_REQUEST)
-        .modifySetting("url", DataType.STRING.create(URL))
+            .modifySetting("url", DataType.STRING.create(URL))
             .modifySetting("method", DataType.STRING.create("PUT"));
 
         Map<String, DataBox<?>> input = Map.of(
@@ -102,7 +102,7 @@ public class HTTPRequestNodeTest {
     @Test
     public void createDELETERequest() {
         var node = Node.create(BasicNodes.HTTP_REQUEST)
-        .modifySetting("url", DataType.STRING.create(URL))
+            .modifySetting("url", DataType.STRING.create(URL))
             .modifySetting("method", DataType.STRING.create("DELETE"));
 
         Map<String, DataBox<?>> input = Map.of(
@@ -117,7 +117,7 @@ public class HTTPRequestNodeTest {
     @Test
     public void handleIncorrectAPIs() {
         var node = Node.create(BasicNodes.HTTP_REQUEST)
-        .modifySetting("url", DataType.STRING.create("http://notlocalhost:8080/not_correct"))
+            .modifySetting("url", DataType.STRING.create("http://notlocalhost:8080/not_correct"))
             .modifySetting("method", DataType.STRING.create("POST"));
 
         Map<String, DataBox<?>> input = Map.of(
@@ -132,7 +132,7 @@ public class HTTPRequestNodeTest {
     @Test
     public void handleIncorrectMethods() {
         var node = Node.create(BasicNodes.HTTP_REQUEST)
-        .modifySetting("url", DataType.STRING.create(URL))
+            .modifySetting("url", DataType.STRING.create(URL))
             .modifySetting("method", DataType.STRING.create("NOTPOST"));
 
         Map<String, DataBox<?>> input = Map.of(

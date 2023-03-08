@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -32,7 +31,7 @@ public class NodeTypeControllerTest extends BaseMvcTest {
 
     @Test
     public void canGetNodeTypes() throws Exception {
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT))
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT))
             .andExpect(MockMvcResultMatchers.status().isOk());
         var body = result.andReturn().getResponse().getContentAsString();
         var gson = new Gson();

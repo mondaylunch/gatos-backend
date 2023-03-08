@@ -1,5 +1,6 @@
 package club.mondaylunch.gatos.core.models;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -54,12 +55,13 @@ public class BaseModel {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) {
+        if (this == obj) {
             return true;
-        } else if (obj instanceof BaseModel other) {
-            return this.id.equals(other.id);
-        } else {
+        } else if (obj == null || getClass() != obj.getClass()) {
             return false;
+        } else {
+            var other = (BaseModel) obj;
+            return Objects.equals(this.id, other.id);
         }
     }
 }
