@@ -36,4 +36,22 @@ public record NodeConnection<T>(
         var conn = new NodeConnection<T>(from.withType(type), (NodeConnector.Input<T>) to);
         return Optional.of(conn);
     }
+
+    public static NodeConnection<?> create(Node fromNode, String fromName, Node toNode, String toName) {
+        var from = fromNode.getOutputWithName(fromName)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid node output: " + fromName));
+        var to = toNode.getInputWithName(toName)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid node input: " + toNode));
+
+        if (!Conversions.canConvert(from.type(), to.type())) {
+            throw new IllegalArgumentException("Cannot convert type " + from.type() + " to type " + to.type());
+        }
+
+        @SuppressWarnings("unchecked")
+        var connection = new NodeConnection<>(
+            (NodeConnector.Output<Object>) from.withType(to.type()),
+            (NodeConnector.Input<Object>) to
+        );
+        return connection;
+    }
 }
