@@ -6,11 +6,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(code = HttpStatus.BAD_REQUEST)
 public class InvalidConnectionException extends RuntimeException {
 
-    public InvalidConnectionException() {
-        super("Invalid connection");
-    }
-
     public InvalidConnectionException(String message) {
         super(message);
+    }
+
+    public InvalidConnectionException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
