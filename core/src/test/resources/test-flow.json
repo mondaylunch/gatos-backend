@@ -7,7 +7,7 @@
     "nodes": [
       {
         "id": "9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd",
-        "type": "test_start",
+        "type": "test_no_inputs",
         "settings": {
           "setting": {
             "type": "number",

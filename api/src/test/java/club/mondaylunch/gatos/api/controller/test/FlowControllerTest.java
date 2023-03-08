@@ -327,7 +327,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
     public void canGetGraphNode() throws Exception {
         var flow = createFlow(this.user);
         var graph = flow.getGraph();
-        var node = graph.addNode(TestNodeTypes.START);
+        var node = graph.addNode(TestNodeTypes.NO_INPUTS);
         Assertions.assertEquals(0, node.getSetting("setting", DataType.NUMBER).value());
         Assertions.assertEquals(1, graph.nodeCount());
         Flow.objects.insert(flow);
@@ -370,7 +370,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
     public void canModifyNodeSettings() throws Exception {
         var flow = createFlow(this.user);
         var graph = flow.getGraph();
-        var node = graph.addNode(TestNodeTypes.START);
+        var node = graph.addNode(TestNodeTypes.NO_INPUTS);
         Assertions.assertEquals(0, node.getSetting("setting", DataType.NUMBER).value());
         Assertions.assertEquals(1, graph.nodeCount());
         Flow.objects.insert(flow);
@@ -402,7 +402,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
     public void canDeleteGraphNode() throws Exception {
         var flow = createFlow(this.user);
         var graph = flow.getGraph();
-        var node = graph.addNode(TestNodeTypes.START);
+        var node = graph.addNode(TestNodeTypes.NO_INPUTS);
         Assertions.assertEquals(1, graph.nodeCount());
         Flow.objects.insert(flow);
         this.assertFlowCount(1);
@@ -422,7 +422,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
     public void canGetConnections() throws Exception {
         var flow = createFlow(this.user);
         var graph = flow.getGraph();
-        var start = graph.addNode(TestNodeTypes.START);
+        var start = graph.addNode(TestNodeTypes.NO_INPUTS);
         var end = graph.addNode(TestNodeTypes.END);
         Assertions.assertEquals(2, graph.nodeCount());
         var connection = NodeConnection.createConnection(start, "start_output", end, "end_input", DataType.NUMBER).orElseThrow();
@@ -450,7 +450,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
     public void canAddConnection() throws Exception {
         var flow = createFlow(this.user);
         var graph = flow.getGraph();
-        var start = graph.addNode(TestNodeTypes.START);
+        var start = graph.addNode(TestNodeTypes.NO_INPUTS);
         var end = graph.addNode(TestNodeTypes.END);
         Assertions.assertEquals(2, graph.nodeCount());
         Flow.objects.insert(flow);
@@ -486,7 +486,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
     public void canRemoveConnection() throws Exception {
         var flow = createFlow(this.user);
         var graph = flow.getGraph();
-        var start = graph.addNode(TestNodeTypes.START);
+        var start = graph.addNode(TestNodeTypes.NO_INPUTS);
         var end = graph.addNode(TestNodeTypes.END);
         Assertions.assertEquals(2, graph.nodeCount());
         var connection = NodeConnection.createConnection(start, "start_output", end, "end_input", DataType.NUMBER).orElseThrow();
@@ -520,7 +520,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
     public void canGetNodeMetadata() throws Exception {
         var flow = createFlow(this.user);
         var graph = flow.getGraph();
-        var node = graph.addNode(TestNodeTypes.START);
+        var node = graph.addNode(TestNodeTypes.NO_INPUTS);
         var flowId = flow.getId();
         var nodeId = node.id();
         Assertions.assertEquals(1, graph.nodeCount());
@@ -542,7 +542,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
     public void canModifyNodeMetadata() throws Exception {
         var flow = createFlow(this.user);
         var graph = flow.getGraph();
-        var node = graph.addNode(TestNodeTypes.START);
+        var node = graph.addNode(TestNodeTypes.NO_INPUTS);
         Assertions.assertEquals(1, graph.nodeCount());
         Flow.objects.insert(flow);
         this.assertFlowCount(1);
@@ -574,7 +574,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
     public void canModifyExistingMetadata() throws Exception {
         var flow = createFlow(this.user);
         var graph = flow.getGraph();
-        var node = graph.addNode(TestNodeTypes.START);
+        var node = graph.addNode(TestNodeTypes.NO_INPUTS);
         var flowId = flow.getId();
         var nodeId = node.id();
         Assertions.assertEquals(1, graph.nodeCount());
@@ -607,7 +607,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
     public void canDeleteNodeWithMetaData() throws Exception {
         var flow = createFlow(this.user);
         var graph = flow.getGraph();
-        var node = graph.addNode(TestNodeTypes.START);
+        var node = graph.addNode(TestNodeTypes.NO_INPUTS);
         var flowId = flow.getId();
         var nodeId = node.id();
         var updatedMetadata = new NodeMetadata(1, 1);
