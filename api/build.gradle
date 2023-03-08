@@ -20,13 +20,13 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
+    // GSON
+    implementation 'com.google.code.gson:gson:2.10.1'
+
     testImplementation project(":test_shared")
 
 	// spring testing
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-    // GSON
-    testImplementation 'com.google.code.gson:gson:2.10.1'
 }
 
 tasks.named('test') {

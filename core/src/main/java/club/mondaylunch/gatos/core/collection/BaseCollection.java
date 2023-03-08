@@ -90,14 +90,12 @@ public class BaseCollection<T extends BaseModel> {
      *
      * @param id  The ID of the document to update.
      * @param obj The POJO to update with.
-     * @return The updated POJO.
      */
-    public T update(UUID id, T obj) {
+    public void update(UUID id, T obj) {
         List<Bson> updates = getNonNullUpdates(obj);
         if (!updates.isEmpty()) {
             this.getCollection().updateOne(Filters.eq(id), Updates.combine(updates));
         }
-        return this.get(id);
     }
 
     /**
