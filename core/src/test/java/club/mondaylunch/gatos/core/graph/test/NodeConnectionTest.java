@@ -33,9 +33,8 @@ public class NodeConnectionTest {
         var node1 = Node.create(TEST_NODE_TYPE);
         var node2 = Node.create(TEST_NODE_TYPE);
 
-        var conn = NodeConnection.create(node1, "invalid", node2, "in");
-
-        conn = NodeConnection.create(node1, "out", node2, "invalid");
+        Assertions.assertThrows(Throwable.class, () -> NodeConnection.create(node1, "invalid", node2, "in"));
+        Assertions.assertThrows(Throwable.class, () -> NodeConnection.create(node1, "out", node2, "invalid"));
 
     }
 
@@ -45,7 +44,7 @@ public class NodeConnectionTest {
         var node2 = Node.create(TEST_NODE_TYPE);
 
         var conn = NodeConnection.create(node1, "out", node2, "in");
-
+        Assertions.assertNotNull(conn);
     }
 
     @Test
@@ -53,8 +52,7 @@ public class NodeConnectionTest {
         var node1 = Node.create(TEST_NODE_TYPE);
         var node2 = Node.create(TEST_NODE_TYPE);
 
-        var conn = NodeConnection.create(node1, "out_2", node2, "in");
-
+        Assertions.assertThrows(Throwable.class, () -> NodeConnection.create(node1, "out_2", node2, "in"));
     }
 
     @Test
@@ -63,6 +61,7 @@ public class NodeConnectionTest {
         var node2 = Node.create(TEST_NODE_TYPE_2);
 
         var conn = NodeConnection.create(node1, "out", node2, "in");
+        Assertions.assertNotNull(conn);
     }
 
     private static final class TestNodeType extends NodeType.Process {
