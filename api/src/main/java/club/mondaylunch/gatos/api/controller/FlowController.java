@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import club.mondaylunch.gatos.api.exception.InvalidBodyException;
 import club.mondaylunch.gatos.api.exception.flow.InvalidConnectionException;
-import club.mondaylunch.gatos.api.exception.flow.InvalidDataTypeException;
 import club.mondaylunch.gatos.api.exception.flow.InvalidNodeSettingException;
 import club.mondaylunch.gatos.api.exception.flow.InvalidNodeTypeException;
 import club.mondaylunch.gatos.api.exception.flow.NodeNotFoundException;
@@ -33,7 +32,6 @@ import club.mondaylunch.gatos.api.repository.FlowRepository;
 import club.mondaylunch.gatos.api.repository.LoginRepository;
 import club.mondaylunch.gatos.core.codec.SerializationUtils;
 import club.mondaylunch.gatos.core.data.DataBox;
-import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.NodeMetadata;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
@@ -255,15 +253,6 @@ public class FlowController {
         Flow.objects.updateGraph(flow);
     }
 
-    private record BodyConnection(
-        @JsonProperty("from_node_id") UUID fromNodeId,
-        @JsonProperty("from_name") String fromName,
-        @JsonProperty("to_node_id") UUID toNodeId,
-        @JsonProperty("to_name") String toName,
-        @JsonProperty("type") String type
-    ) {
-    }
-
     /**
      * Gets all connections for a node.
      *
@@ -289,6 +278,14 @@ public class FlowController {
             connectionsJson.add(connectionJson);
         }
         return connectionsJson.toString();
+    }
+
+    private record BodyConnection(
+        @JsonProperty("from_node_id") UUID fromNodeId,
+        @JsonProperty("from_name") String fromName,
+        @JsonProperty("to_node_id") UUID toNodeId,
+        @JsonProperty("to_name") String toName
+    ) {
     }
 
     /**
@@ -341,15 +338,16 @@ public class FlowController {
             .orElseThrow(() -> new NodeNotFoundException(body.fromNodeId));
         var toNode = graph.getNode(body.toNodeId)
             .orElseThrow(() -> new NodeNotFoundException(body.toNodeId));
-        var type = DataType.REGISTRY.get(body.type)
-            .orElseThrow(InvalidDataTypeException::new);
-        return NodeConnection.createConnection(
-            fromNode,
-            body.fromName,
-            toNode,
-            body.toName,
-            type
-        ).orElseThrow(InvalidConnectionException::new);
+        try {
+            return NodeConnection.create(
+                fromNode,
+                body.fromName,
+                toNode,
+                body.toName
+            );
+        } catch (Exception e) {
+            throw new InvalidConnectionException(e.getMessage(), e);
+        }
     }
 
     /**
