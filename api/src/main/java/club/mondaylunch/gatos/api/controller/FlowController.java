@@ -14,6 +14,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.hibernate.validator.constraints.Length;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -419,6 +420,7 @@ public class FlowController {
         }
         var executor = new GraphExecutor(graph);
         var executeFunction = executor.execute(startNodeId);
+        @Nullable
         JsonObject inputJson = null;
         if (input != null) {
             var inputJsonElement = JsonParser.parseString(input);
