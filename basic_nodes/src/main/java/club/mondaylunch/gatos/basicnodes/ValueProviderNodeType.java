@@ -19,11 +19,6 @@ public class ValueProviderNodeType<T> extends NodeType.Process {
         this.defaultValue = box.value();
     }
 
-    public ValueProviderNodeType(DataType<T> type, T defaultValue) {
-        this.type = type;
-        this.defaultValue = defaultValue;
-    }
-
     @Override
     public Map<String, DataBox<?>> settings() {
         return Map.of(
