@@ -8,19 +8,17 @@ logging:
     org.springframework.web: ERROR
     com.auth0.example: TRACE
 
+auth0:
+  audience: https://gatos-backend.mondaylunch.club
+  management:
+    token_request_url: https://mondaylunchdev.eu.auth0.com/oauth/token
+    client_id: ${AUTH0_CLIENT_ID}
+    client_secret: ${AUTH0_CLIENT_SECRET}
+    audience: https://mondaylunchdev.eu.auth0.com/api/v2/
+
 spring:
   security:
     oauth2:
-      client:
-        registration:
-          auth0:
-            client-id: ${AUTH0_CLIENT_ID}
-            client-secret: ${AUTH0_CLIENT_SECRET}
-            scope:
-              - openid
-              - profile
-              - email
-        provider:
-          auth0:
-            # trailing slash is important!
-            issuer-uri: https://mondaylunchdev.eu.auth0.com/
+      resourceserver:
+        jwt:
+          issuer-uri: https://mondaylunchdev.eu.auth0.com/

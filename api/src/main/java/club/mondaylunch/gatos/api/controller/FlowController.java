@@ -8,28 +8,33 @@ import javax.validation.Valid;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.Length;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import club.mondaylunch.gatos.api.auth.GatosOidcUser;
 import club.mondaylunch.gatos.api.repository.FlowRepository;
+import club.mondaylunch.gatos.api.repository.UserRepository;
 import club.mondaylunch.gatos.core.models.Flow;
+import club.mondaylunch.gatos.core.models.User;
 
 @RestController
 @RequestMapping("api/v1/flows")
 public class FlowController {
     private final FlowRepository flowRepository;
+    private final UserRepository userRepository;
 
-    public FlowController(FlowRepository flowRepository) {
+    @Autowired
+    public FlowController(FlowRepository flowRepository, UserRepository userRepository) {
         this.flowRepository = flowRepository;
+        this.userRepository = userRepository;
     }
 
     private record BasicFlowInfo(
@@ -44,16 +49,18 @@ public class FlowController {
     }
 
     @GetMapping("list")
-    public List<BasicFlowInfo> getFlows(@AuthenticationPrincipal GatosOidcUser principal) {
-        return Flow.objects.get("author_id", principal.getUser().getId())
+    public List<BasicFlowInfo> getFlows(@RequestHeader(name = "x-user-email") String userEmail) {
+        User user = this.userRepository.getOrCreateUser(userEmail);
+        return Flow.objects.get("author_id", user.getId())
             .stream()
             .map(BasicFlowInfo::new)
             .toList();
     }
 
     @GetMapping(value = "{flowId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getFlow(@PathVariable("flowId") UUID flowId, @AuthenticationPrincipal GatosOidcUser principal) {
-        return this.flowRepository.getFlow(principal.getUser(), flowId).toJson();
+    public String getFlow(@RequestHeader(name = "x-user-email") String userEmail, @PathVariable("flowId") UUID flowId) {
+        User user = this.userRepository.getOrCreateUser(userEmail);
+        return this.flowRepository.getFlow(user, flowId).toJson();
     }
 
     private record BodyAddFlow(
@@ -61,10 +68,11 @@ public class FlowController {
     }
 
     @PostMapping
-    public BasicFlowInfo addFlow(@AuthenticationPrincipal GatosOidcUser principal, @Valid @RequestBody BodyAddFlow data) {
+    public BasicFlowInfo addFlow(@RequestHeader(name = "x-user-email") String userEmail, @Valid @RequestBody BodyAddFlow data) {
+        User user = this.userRepository.getOrCreateUser(userEmail);
         Flow flow = new Flow();
         flow.setName(data.name);
-        flow.setAuthorId(principal.getUser().getId());
+        flow.setAuthorId(user.getId());
         flow.setDescription(data.description);
 
         Flow.objects.insert(flow);
@@ -76,9 +84,10 @@ public class FlowController {
     }
 
     @PatchMapping("{flowId}")
-    public BasicFlowInfo updateFlow(@AuthenticationPrincipal GatosOidcUser principal, @PathVariable UUID flowId,
-                           @Valid @RequestBody BodyUpdateFlow data) {
-        var flow = this.flowRepository.getFlow(principal.getUser(), flowId);
+    public BasicFlowInfo updateFlow(@RequestHeader(name = "x-user-email") String userEmail, @PathVariable UUID flowId,
+                                    @Valid @RequestBody BodyUpdateFlow data) {
+        User user = this.userRepository.getOrCreateUser(userEmail);
+        var flow = this.flowRepository.getFlow(user, flowId);
 
         Flow partial = new Flow();
         partial.setName(data.name);
@@ -90,8 +99,9 @@ public class FlowController {
     }
 
     @DeleteMapping("{flowId}")
-    public void deleteFlow(@AuthenticationPrincipal GatosOidcUser principal, @PathVariable UUID flowId) {
-        var flow = this.flowRepository.getFlow(principal.getUser(), flowId);
+    public void deleteFlow(@RequestHeader(name = "x-user-email") String userEmail, @PathVariable UUID flowId) {
+        User user = this.userRepository.getOrCreateUser(userEmail);
+        var flow = this.flowRepository.getFlow(user, flowId);
 
         Flow.objects.delete(flow.getId());
     }
