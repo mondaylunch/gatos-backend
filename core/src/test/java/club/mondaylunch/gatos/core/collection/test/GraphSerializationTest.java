@@ -76,10 +76,10 @@ public class GraphSerializationTest {
         Node node1 = graph.addNode(TestNodeTypes.START);
         Node node2 = graph.addNode(TestNodeTypes.PROCESS);
         Node node3 = graph.addNode(TestNodeTypes.END);
-        var connection1 = NodeConnection.createConnection(node1, "start_output", node2, "process_input", DataType.NUMBER);
-        var connection2 = NodeConnection.createConnection(node2, "process_output", node3, "end_input", DataType.NUMBER);
-        graph.addConnection(connection1.orElseThrow());
-        graph.addConnection(connection2.orElseThrow());
+        var connection1 = NodeConnection.create(node1, "start_output", node2, "process_input");
+        var connection2 = NodeConnection.create(node2, "process_output", node3, "end_input");
+        graph.addConnection(connection1);
+        graph.addConnection(connection2);
         Flow.objects.insert(flow);
         assertFlowCount(1);
         Flow retrievedFlow = Flow.objects.get(id);

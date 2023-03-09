@@ -24,13 +24,13 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 
+    // GSON
+    implementation 'com.google.code.gson:gson:2.10.1'
+
     testImplementation project(":test_shared")
 
 	// spring testing
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-    // GSON
-    testImplementation 'com.google.code.gson:gson:2.10.1'
 }
 
 processResources {

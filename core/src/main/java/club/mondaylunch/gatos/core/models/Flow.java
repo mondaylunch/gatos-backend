@@ -1,5 +1,6 @@
 package club.mondaylunch.gatos.core.models;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -113,5 +114,27 @@ public class Flow extends BaseModel {
      */
     public void setGraph(Graph graph) {
         this.graph = graph;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), this.name, this.description, this.authorId, this.graph);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        } else if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        } else if (!super.equals(obj)) {
+            return false;
+        } else {
+            var other = (Flow) obj;
+            return Objects.equals(this.name, other.name)
+                && Objects.equals(this.description, other.description)
+                && Objects.equals(this.authorId, other.authorId)
+                && Objects.equals(this.graph, other.graph);
+        }
     }
 }

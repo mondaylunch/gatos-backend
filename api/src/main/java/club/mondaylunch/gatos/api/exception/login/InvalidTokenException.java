@@ -1,4 +1,4 @@
-package club.mondaylunch.gatos.api.exceptions;
+package club.mondaylunch.gatos.api.exception.login;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

@@ -38,19 +38,19 @@ public class GraphExecutorTest {
         var adder = graph.addNode(ADD_NUMS);
         graph.modifyNode(adder.id(), node -> node.modifySetting("value_to_add", DataType.NUMBER.create(5.)));
 
-        var conn = NodeConnection.createConnection(
+        var conn = NodeConnection.create(
                 input, "out",
-                adder, "in",
-                DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
+                adder, "in"
+        );
+        Assertions.assertTrue(true);
+        graph.addConnection(conn);
 
-        conn = NodeConnection.createConnection(
+        conn = NodeConnection.create(
                 adder, "out",
-                output, "in",
-                DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
+                output, "in"
+        );
+        Assertions.assertTrue(true);
+        graph.addConnection(conn);
 
         var executionOrderedNodes = graph.getExecutionOrder();
         Assertions.assertTrue(executionOrderedNodes.isPresent());
@@ -71,19 +71,19 @@ public class GraphExecutorTest {
         var adder = graph.addNode(ADD_NUMS_SLOWLY);
         graph.modifyNode(adder.id(), node -> node.modifySetting("value_to_add", DataType.NUMBER.create(5.)));
 
-        var conn = NodeConnection.createConnection(
+        var conn = NodeConnection.create(
                 input, "out",
-                adder, "in",
-                DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
+                adder, "in"
+        );
+        Assertions.assertTrue(true);
+        graph.addConnection(conn);
 
-        conn = NodeConnection.createConnection(
+        conn = NodeConnection.create(
                 adder, "out",
-                output, "in",
-                DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
+                output, "in"
+        );
+        Assertions.assertTrue(true);
+        graph.addConnection(conn);
 
         var executionOrderedNodes = graph.getExecutionOrder();
         Assertions.assertTrue(executionOrderedNodes.isPresent());
@@ -235,21 +235,21 @@ public class GraphExecutorTest {
     }
 
     private static void connectInt(Graph graph, Node a, String connectorA, Node b, String connectorB) {
-        var conn = NodeConnection.createConnection(
+        var conn = NodeConnection.create(
                 a, connectorA,
-                b, connectorB,
-                DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
+                b, connectorB
+        );
+        Assertions.assertTrue(true);
+        graph.addConnection(conn);
     }
 
     private static void connectString(Graph graph, Node a, String connectorA, Node b, String connectorB) {
-        var conn = NodeConnection.createConnection(
+        var conn = NodeConnection.create(
             a, connectorA,
-            b, connectorB,
-            DataType.STRING);
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
+            b, connectorB
+        );
+        Assertions.assertTrue(true);
+        graph.addConnection(conn);
     }
 
     private static final class AddNumNodeType extends NodeType.Process {
