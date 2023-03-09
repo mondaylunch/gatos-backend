@@ -27,7 +27,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import club.mondaylunch.gatos.api.BaseMvcTest;
 import club.mondaylunch.gatos.api.helpers.UserCreationHelper;
-import club.mondaylunch.gatos.basicnodes.BasicNodes;
+import club.mondaylunch.gatos.core.GatosCore;
 import club.mondaylunch.gatos.core.codec.SerializationUtils;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Graph;
@@ -48,7 +48,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
 
     @BeforeAll
     public static void init() {
-        BasicNodes.init();
+        GatosCore.init();
     }
 
     @BeforeEach

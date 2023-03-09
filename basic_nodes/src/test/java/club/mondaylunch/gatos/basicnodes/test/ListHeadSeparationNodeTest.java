@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
-import club.mondaylunch.gatos.basicnodes.ListHeadTailNodeType;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.data.ListDataType;

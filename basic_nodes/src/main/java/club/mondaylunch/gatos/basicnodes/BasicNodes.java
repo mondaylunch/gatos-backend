@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.VisibleForTesting;
 
+import club.mondaylunch.gatos.core.GatosPlugin;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
