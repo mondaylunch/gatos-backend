@@ -35,7 +35,6 @@ import club.mondaylunch.gatos.api.repository.FlowRepository;
 import club.mondaylunch.gatos.api.repository.LoginRepository;
 import club.mondaylunch.gatos.core.codec.SerializationUtils;
 import club.mondaylunch.gatos.core.data.DataBox;
-import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.executor.GraphExecutor;
 import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.NodeMetadata;
@@ -400,6 +399,11 @@ public class FlowController {
         return SerializationUtils.toJson(metadata);
     }
 
+    /**
+     * Executes a flow.
+     *
+     * @return The flow output.
+     */
     @PostMapping(value = "{flowId}/run/{startNodeId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String executeFlow(
         @RequestHeader("x-auth-token") String token,
@@ -435,8 +439,9 @@ public class FlowController {
         executeFunction.accept(webhookStartInput);
         var output = outputReference.get();
         if (output == null) {
-            output = DataType.ANY.create(null);
+            return "";
+        } else {
+            return SerializationUtils.toJson(output);
         }
-        return SerializationUtils.toJson(output);
     }
 }
