@@ -287,7 +287,7 @@ public class GraphObserver {
 
     private void updateRemoveMetadata(UUID flowId, MongoCollection<Flow> collection) {
         for (var nodeId : this.removedMetadata.keySet()) {
-            var filter = Filters.and(Filters.eq(flowId));
+            var filter = Filters.eq(flowId);
             var update = Updates.unset("graph.metadata." + nodeId);
             collection.updateOne(filter, update);
         }
