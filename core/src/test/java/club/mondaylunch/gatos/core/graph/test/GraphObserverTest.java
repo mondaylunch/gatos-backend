@@ -478,39 +478,39 @@ public class GraphObserverTest {
     }
 
     private Map<UUID, Node> addedNodes() {
-        return getFieldValue("addedNodes");
+        return this.getFieldValue("addedNodes");
     }
 
     private Map<UUID, Node> modifiedNodes() {
-        return getFieldValue("modifiedNodes");
+        return this.getFieldValue("modifiedNodes");
     }
 
     private Map<UUID, Node> removedNodes() {
-        return getFieldValue("removedNodes");
+        return this.getFieldValue("removedNodes");
     }
 
     private Map<Object, NodeConnection<?>> addedConnections() {
-        return getFieldValue("addedConnections");
+        return this.getFieldValue("addedConnections");
     }
 
     private Map<Object, NodeConnection<?>> modifiedConnections() {
-        return getFieldValue("modifiedConnections");
+        return this.getFieldValue("modifiedConnections");
     }
 
     private Map<Object, NodeConnection<?>> removedConnections() {
-        return getFieldValue("removedConnections");
+        return this.getFieldValue("removedConnections");
     }
 
     private Map<UUID, NodeMetadata> addedMetadata() {
-        return getFieldValue("addedMetadata");
+        return this.getFieldValue("addedMetadata");
     }
 
     private Map<UUID, NodeMetadata> modifiedMetadata() {
-        return getFieldValue("modifiedMetadata");
+        return this.getFieldValue("modifiedMetadata");
     }
 
     private Map<UUID, NodeMetadata> removedMetadata() {
-        return getFieldValue("removedMetadata");
+        return this.getFieldValue("removedMetadata");
     }
 
     private void validate() {
