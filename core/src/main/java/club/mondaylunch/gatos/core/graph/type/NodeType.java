@@ -6,15 +6,15 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-import club.mondaylunch.gatos.core.graph.Node;
-import club.mondaylunch.gatos.core.models.Flow;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import club.mondaylunch.gatos.core.Registry;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
-import org.jetbrains.annotations.Nullable;
+import club.mondaylunch.gatos.core.models.Flow;
 
 /**
  * A type of node that may go on a graph.

@@ -631,10 +631,10 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         var graph = flow.getGraph();
         Assertions.assertEquals(0, graph.nodeCount());
         Flow.objects.insert(flow);
-        var start = addNode(flow.getId(), "webhook_start");
-        var end = addNode(flow.getId(), "webhook_end");
-        addConnection(flow.getId(), start.id(), "requestBody", end.id(), "graphOutput");
-        addConnection(flow.getId(), start.id(), "endOutputReference", end.id(), "outputReference");
+        var start = this.addNode(flow.getId(), "webhook_start");
+        var end = this.addNode(flow.getId(), "webhook_end");
+        this.addConnection(flow.getId(), start.id(), "requestBody", end.id(), "graphOutput");
+        this.addConnection(flow.getId(), start.id(), "endOutputReference", end.id(), "outputReference");
         var inputBody = new JsonObject();
         inputBody.addProperty("input", "value");
         var inputBodyString = inputBody.toString();
