@@ -256,13 +256,17 @@ public class GraphObserver {
     }
 
     private void updateRemoveConnection(Collection<Bson> updates) {
-        for (var removed : this.removedConnections.values()) {
-            var filter = Filters.and(
+        var filters = this.removedConnections.values()
+            .stream()
+            .map(removed -> Filters.and(
                 Filters.eq("output.node_id", removed.from().nodeId()),
                 Filters.eq("output.name", removed.from().name()),
                 Filters.eq("input.node_id", removed.to().nodeId()),
                 Filters.eq("input.name", removed.to().name())
-            );
+            ))
+            .toList();
+        if (!filters.isEmpty()) {
+            var filter = Filters.or(filters);
             var removedConnections = Updates.pullByFilter(new BasicDBObject("graph.connections", filter));
             updates.add(removedConnections);
         }
