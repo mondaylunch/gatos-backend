@@ -423,9 +423,9 @@ public class FlowController {
         if (input != null) {
             var inputJsonElement = JsonParser.parseString(input);
             if (inputJsonElement.isJsonObject()) {
-                throw new InvalidBodyException("Body must be a JSON object");
-            } else {
                 inputJson = inputJsonElement.getAsJsonObject();
+            } else {
+                throw new InvalidBodyException("Body must be a JSON object");
             }
         }
         var outputReference = new AtomicReference<DataBox<?>>();
