@@ -116,9 +116,26 @@ public class GraphObserver {
     }
 
     private static <K, V> void removed(K key, V value, Map<K, V> added, Map<K, V> modified, Map<K, V> removed) {
-        removed.put(key, value);
-        added.remove(key);
-        modified.remove(key);
+        if (added.containsKey(key)) {
+            /*
+            If a value with a key was added when a
+            value with the same key is removed, it
+            is not added anymore.
+             */
+            added.remove(key);
+        } else if (modified.containsKey(key)) {
+            /*
+            If a value with a key was modified when
+            a value with the same key is removed, it
+            is not modified anymore, and the value
+            is removed.
+             */
+            modified.remove(key);
+            removed.put(key, value);
+        } else {
+            // Otherwise, the value is removed.
+            removed.put(key, value);
+        }
     }
 
     /**
