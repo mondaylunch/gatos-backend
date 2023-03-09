@@ -405,7 +405,7 @@ public class FlowController {
         @RequestHeader("x-auth-token") String token,
         @PathVariable UUID flowId,
         @PathVariable UUID startNodeId,
-        @RequestBody(required = false) String input
+        @RequestBody(required = false) @Nullable String input
     ) {
         var user = this.userRepository.authenticateUser(token);
         var flow = this.flowRepository.getFlow(user, flowId);
