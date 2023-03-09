@@ -332,7 +332,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         Assertions.assertEquals(1, graph.nodeCount());
         Flow.objects.insert(flow);
         this.assertFlowCount(1);
-        var result = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/" + flow.getId() + "/graph/nodes/" + node.id())
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/" + flow.getId() + "/nodes/" + node.id())
                 .header("x-auth-token", this.user.getAuthToken()))
             .andExpect(MockMvcResultMatchers.status().isOk());
         var responseBody = result.andReturn().getResponse().getContentAsString();
@@ -350,7 +350,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         var nodeType = "string_interpolation";
         var nodeTypeJson = new JsonObject();
         nodeTypeJson.addProperty("type", nodeType);
-        var result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT + "/" + flow.getId() + "/graph/nodes")
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT + "/" + flow.getId() + "/nodes")
                 .header("x-auth-token", this.user.getAuthToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(nodeTypeJson.toString()))
@@ -382,7 +382,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         dataBox.addProperty("value", 1);
         var body = new JsonObject();
         body.add("setting", dataBox);
-        var result = this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flow.getId() + "/graph/nodes/" + nodeId + "/settings")
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flow.getId() + "/nodes/" + nodeId + "/settings")
                 .header("x-auth-token", this.user.getAuthToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body.toString())
@@ -408,7 +408,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         this.assertFlowCount(1);
         var flowId = flow.getId();
         var nodeId = node.id();
-        this.mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT + "/" + flowId + "/graph/nodes/" + nodeId)
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT + "/" + flowId + "/nodes/" + nodeId)
                 .header("x-auth-token", this.user.getAuthToken())
             )
             .andExpect(MockMvcResultMatchers.status().isOk());
@@ -430,10 +430,10 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         Assertions.assertEquals(1, graph.connectionCount());
         Flow.objects.insert(flow);
         this.assertFlowCount(1);
-        var startConnectionsResult = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/" + flow.getId() + "/graph/connections/" + start.id())
+        var startConnectionsResult = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/" + flow.getId() + "/connections/" + start.id())
                 .header("x-auth-token", this.user.getAuthToken()))
             .andExpect(MockMvcResultMatchers.status().isOk());
-        var endConnectionsResult = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/" + flow.getId() + "/graph/connections/" + end.id())
+        var endConnectionsResult = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/" + flow.getId() + "/connections/" + end.id())
                 .header("x-auth-token", this.user.getAuthToken()))
             .andExpect(MockMvcResultMatchers.status().isOk());
         var startConnectionsBody = startConnectionsResult.andReturn().getResponse().getContentAsString();
@@ -460,7 +460,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         body.addProperty("from_name", "start_output");
         body.addProperty("to_node_id", end.id().toString());
         body.addProperty("to_name", "end_input");
-        var result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT + "/" + flow.getId() + "/graph/connections")
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT + "/" + flow.getId() + "/connections")
                 .header("x-auth-token", this.user.getAuthToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body.toString()))
@@ -498,7 +498,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         body.addProperty("from_name", "start_output");
         body.addProperty("to_node_id", end.id().toString());
         body.addProperty("to_name", "end_input");
-        this.mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT + "/" + flow.getId() + "/graph/connections")
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT + "/" + flow.getId() + "/connections")
                 .header("x-auth-token", this.user.getAuthToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body.toString()))
@@ -528,7 +528,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         Assertions.assertEquals(metadata, actualMetadata);
         Flow.objects.insert(flow);
         this.assertFlowCount(1);
-        var result = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/" + flowId + "/graph/nodes/" + nodeId + "/metadata")
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/" + flowId + "/nodes/" + nodeId + "/metadata")
                 .header("x-auth-token", this.user.getAuthToken()))
             .andExpect(MockMvcResultMatchers.status().isOk());
         var responseBody = result.andReturn().getResponse().getContentAsString();
@@ -552,7 +552,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         var body = new JsonObject();
         body.addProperty("x_pos", 1);
         body.addProperty("y_pos", 1);
-        var result = this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flowId + "/graph/nodes/" + nodeId + "/metadata")
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flowId + "/nodes/" + nodeId + "/metadata")
                 .header("x-auth-token", this.user.getAuthToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body.toString())
@@ -585,7 +585,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         var body = new JsonObject();
         body.addProperty("x_pos", 2);
         body.addProperty("y_pos", 2);
-        var result = this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flowId + "/graph/nodes/" + nodeId + "/metadata")
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.patch(ENDPOINT + "/" + flowId + "/nodes/" + nodeId + "/metadata")
                 .header("x-auth-token", this.user.getAuthToken())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body.toString())
@@ -614,7 +614,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         Assertions.assertEquals(1, graph.nodeCount());
         Flow.objects.insert(flow);
         this.assertFlowCount(1);
-        this.mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT + "/" + flowId + "/graph/nodes/" + nodeId)
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT + "/" + flowId + "/nodes/" + nodeId)
                 .header("x-auth-token", this.user.getAuthToken())
             )
             .andExpect(MockMvcResultMatchers.status().isOk());
@@ -653,7 +653,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         requestBody.addProperty("type", nodeType);
         var nodeCountBefore = getNodeCount(flowId);
         try {
-            var result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT + "/" + flowId + "/graph/nodes")
+            var result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT + "/" + flowId + "/nodes")
                     .header("x-auth-token", this.user.getAuthToken())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestBody.toString())
@@ -678,7 +678,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         requestBody.addProperty("to_name", toName);
         var connectionCountBefore = getConnectionCount(flowId);
         try {
-            var result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT + "/" + flowId + "/graph/connections")
+            var result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT + "/" + flowId + "/connections")
                     .header("x-auth-token", this.user.getAuthToken())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestBody.toString())
