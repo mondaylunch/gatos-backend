@@ -51,26 +51,4 @@ public class User extends BaseModel {
     public int hashCode() {
         return Objects.hash(super.hashCode(), this.getEmail(), this.getId());
     }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), this.username, this.email, this.password, this.authToken);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        } else if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        } else if (!super.equals(obj)) {
-            return false;
-        } else {
-            var other = (User) obj;
-            return Objects.equals(this.username, other.username)
-                && Objects.equals(this.email, other.email)
-                && Objects.equals(this.password, other.password)
-                && Objects.equals(this.authToken, other.authToken);
-        }
-    }
 }
