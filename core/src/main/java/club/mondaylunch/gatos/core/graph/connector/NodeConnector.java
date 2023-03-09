@@ -66,6 +66,15 @@ public abstract sealed class NodeConnector<T> {
         return Objects.hash(this.nodeId, this.name, this.dataType);
     }
 
+    @Override
+    public String toString() {
+        return "NodeConnector{"
+            + "nodeId=" + this.nodeId
+            + ", name='" + this.name
+            + ", dataType=" + this.dataType
+            + '}';
+    }
+
     /**
      * An input connector on a node.
      * @param <T> the type of data this node takes in
