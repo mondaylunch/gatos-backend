@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import club.mondaylunch.gatos.core.data.Conversions;
 import club.mondaylunch.gatos.core.data.DataBox;
+import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.type.NodeCategory;
@@ -43,6 +44,16 @@ public class GraphExecutor {
         this.nonEndNodes = nodes.stream().filter(n -> n.type() instanceof NodeType.WithOutputs).toList();
         this.endNodes = nodes.stream().filter(n -> n.type().category() == NodeCategory.END).toList();
         this.startNodes = nodes.stream().filter(n -> n.type().category() == NodeCategory.START).toList();
+    }
+
+    /**
+     * Creates a new {@code GraphExecutor}.
+     *
+     * @param graph The graph to execute.
+     * @throws IllegalArgumentException If the graph is {@link Graph#validate() invalid}.
+     */
+    public GraphExecutor(Graph graph) {
+        this(graph.getExecutionOrder().orElseThrow(IllegalArgumentException::new), graph.getConnections());
     }
 
     /**
