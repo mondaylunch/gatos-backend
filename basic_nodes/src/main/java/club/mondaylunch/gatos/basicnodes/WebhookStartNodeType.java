@@ -2,11 +2,13 @@ package club.mondaylunch.gatos.basicnodes;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
+import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Nullable;
 
 import club.mondaylunch.gatos.core.data.DataBox;
@@ -40,14 +42,10 @@ public class WebhookStartNodeType extends NodeType.Start<WebhookStartNodeInput> 
     public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable WebhookStartNodeInput input, Map<String, DataBox<?>> settings) {
         Objects.requireNonNull(input);
         return Map.of(
-            "requestBody", CompletableFuture.completedFuture(new DataBox<>(
-                input.requestBody(),
-                DataType.JSON_OBJECT
-            )),
-            "endOutput", CompletableFuture.completedFuture(new DataBox<>(
-                input.endOutput(),
-                DataType.REFERENCE
-            ))
+            "requestBody", CompletableFuture.completedFuture(DataType.JSON_OBJECT.create(
+                Optional.ofNullable(input.requestBody()).orElse(new JsonObject()))),
+            "endOutputReference", CompletableFuture.completedFuture(DataType.REFERENCE.create(
+                input.endOutput()))
         );
     }
 }
