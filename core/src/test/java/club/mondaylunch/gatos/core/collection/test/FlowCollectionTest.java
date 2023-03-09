@@ -2,11 +2,11 @@ package club.mondaylunch.gatos.core.collection.test;
 
 import java.util.UUID;
 
+import com.mongodb.MongoWriteException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import com.mongodb.MongoWriteException;
 
 import club.mondaylunch.gatos.core.models.Flow;
 
