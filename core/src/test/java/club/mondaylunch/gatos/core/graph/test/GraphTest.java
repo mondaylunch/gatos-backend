@@ -367,12 +367,10 @@ public class GraphTest {
         var graph = new Graph();
         var input = graph.addNode(START_TWO_OUTPUTS_NODE_TYPE);
         var output = graph.addNode(END_TWO_INPUTS_NODE_TYPE);
-        var conn = NodeConnection.createConnection(input, "out1", output, "in1", DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
-        conn = NodeConnection.createConnection(input, "out2", output, "in2", DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
+        var conn = NodeConnection.create(input, "out1", output, "in1");
+        graph.addConnection(conn);
+        conn = NodeConnection.create(input, "out2", output, "in2");
+        graph.addConnection(conn);
         Assertions.assertTrue(graph.validate());
     }
 
