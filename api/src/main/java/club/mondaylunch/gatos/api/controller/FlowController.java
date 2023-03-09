@@ -428,7 +428,7 @@ public class FlowController {
                 inputJson = inputJsonElement.getAsJsonObject();
             }
         }
-        AtomicReference<DataBox<?>> outputReference = new AtomicReference<>();
+        var outputReference = new AtomicReference<DataBox<?>>();
         var webhookStartInput = new WebhookStartNodeInput(inputJson, outputReference);
         executeFunction.accept(webhookStartInput);
         var output = outputReference.get();
