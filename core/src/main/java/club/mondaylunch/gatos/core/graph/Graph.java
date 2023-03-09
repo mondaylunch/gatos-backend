@@ -354,6 +354,12 @@ public class Graph {
     public Optional<List<Node>> getExecutionOrder() {
         Set<UUID> relevantNodes = new HashSet<>(this.nodes.keySet());
         relevantNodes.removeIf(n -> this.getConnectionsForNode(n).isEmpty());
+        Set<NodeConnection<?>> deduplicatedConnections = new HashSet<>();
+        for (var conn : this.connections) {
+            if (deduplicatedConnections.stream().noneMatch(conn2 -> conn2.to().nodeId().equals(conn.to().nodeId()) && conn2.from().nodeId().equals(conn.from().nodeId()))) {
+                deduplicatedConnections.add(conn);
+            }
+        }
 
         boolean hasSeenInput = false;
         boolean hasSeenOutput = false;
@@ -362,7 +368,7 @@ public class Graph {
 
         Deque<UUID> nodesWithoutIncoming = new ArrayDeque<>();
         for (var uuid : relevantNodes) {
-            if (this.getConnectionsForNode(uuid).stream().noneMatch(c -> c.to().nodeId() == uuid)) {
+            if (this.getConnectionsForNode(uuid).stream().noneMatch(c -> c.to().nodeId().equals(uuid))) {
                 nodesWithoutIncoming.add(uuid);
             }
         }
@@ -383,7 +389,10 @@ public class Graph {
             }
 
             for (NodeConnection<?> conn : this.getConnectionsForNode(nodeId)) {
-                if (!visitedConnections.contains(conn) && conn.from().nodeId().equals(nodeId)) {
+                if (!visitedConnections.contains(conn)
+                    && deduplicatedConnections.contains(conn)
+                    && conn.from().nodeId().equals(nodeId)
+                ) {
                     visitedConnections.add(conn);
                     UUID to = conn.to().nodeId();
                     if (this.getConnectionsForNode(to).stream()
@@ -394,7 +403,7 @@ public class Graph {
             }
         }
 
-        if (!hasSeenInput || !hasSeenOutput || !visitedConnections.containsAll(this.connections)) {
+        if (!hasSeenInput || !hasSeenOutput || !visitedConnections.containsAll(deduplicatedConnections)) {
             return Optional.empty();
         }
 
