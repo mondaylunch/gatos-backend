@@ -165,7 +165,7 @@ public class FlowController {
      *
      * @return The node.
      */
-    @GetMapping(value = "{flowId}/graph/nodes/{nodeId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "{flowId}/nodes/{nodeId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getNode(
         @RequestHeader("x-auth-token") String token,
         @PathVariable UUID flowId,
@@ -184,7 +184,7 @@ public class FlowController {
      *
      * @return The added node.
      */
-    @PostMapping(value = "{flowId}/graph/nodes", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "{flowId}/nodes", produces = MediaType.APPLICATION_JSON_VALUE)
     public String addNode(
         @RequestHeader("x-auth-token") String token,
         @PathVariable UUID flowId,
@@ -205,7 +205,7 @@ public class FlowController {
      *
      * @return The node with the updated settings.
      */
-    @PatchMapping(value = "{flowId}/graph/nodes/{nodeId}/settings", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "{flowId}/nodes/{nodeId}/settings", produces = MediaType.APPLICATION_JSON_VALUE)
     public String modifyNodeSettings(
         @RequestHeader("x-auth-token") String token,
         @PathVariable UUID flowId,
@@ -245,7 +245,7 @@ public class FlowController {
     /**
      * Deletes a node from the flow graph.
      */
-    @DeleteMapping("{flowId}/graph/nodes/{nodeId}")
+    @DeleteMapping("{flowId}/nodes/{nodeId}")
     public void deleteNode(
         @RequestHeader("x-auth-token") String token,
         @PathVariable UUID flowId,
@@ -263,7 +263,7 @@ public class FlowController {
      *
      * @return The connections.
      */
-    @GetMapping(value = "{flowId}/graph/connections/{nodeId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "{flowId}/connections/{nodeId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getConnections(
         @RequestHeader("x-auth-token") String token,
         @PathVariable UUID flowId,
@@ -298,7 +298,7 @@ public class FlowController {
      *
      * @return The added connection.
      */
-    @PostMapping(value = "{flowId}/graph/connections", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "{flowId}/connections", produces = MediaType.APPLICATION_JSON_VALUE)
     public String addConnection(
         @RequestHeader("x-auth-token") String token,
         @PathVariable UUID flowId,
@@ -320,7 +320,7 @@ public class FlowController {
     /**
      * Deletes a connection between two nodes.
      */
-    @DeleteMapping("{flowId}/graph/connections")
+    @DeleteMapping("{flowId}/connections")
     public void deleteConnection(
         @RequestHeader("x-auth-token") String token,
         @PathVariable UUID flowId,
@@ -360,7 +360,7 @@ public class FlowController {
      *
      * @return The metadata.
      */
-    @GetMapping(value = "{flowId}/graph/nodes/{nodeId}/metadata", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "{flowId}/nodes/{nodeId}/metadata", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getMetadata(
         @RequestHeader("x-auth-token") String token,
         @PathVariable UUID flowId,
@@ -381,7 +381,7 @@ public class FlowController {
      *
      * @return The updated metadata.
      */
-    @PatchMapping(value = "{flowId}/graph/nodes/{nodeId}/metadata", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "{flowId}/nodes/{nodeId}/metadata", produces = MediaType.APPLICATION_JSON_VALUE)
     public String modifyNodeMetadata(
         @RequestHeader("x-auth-token") String token,
         @PathVariable UUID flowId,
@@ -440,7 +440,7 @@ public class FlowController {
         executeFunction.accept(webhookStartInput);
         var output = outputReference.get();
         if (output == null) {
-            return "";
+            return new JsonObject().toString();
         } else {
             return SerializationUtils.toJson(output);
         }
