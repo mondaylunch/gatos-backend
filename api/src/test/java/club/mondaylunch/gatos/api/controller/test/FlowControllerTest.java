@@ -625,6 +625,86 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         Assertions.assertEquals(new NodeMetadata(0, 0), updatedGraph.getOrCreateMetadataForNode(nodeId));
     }
 
+    @Test
+    public void canExecuteFlow() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        Assertions.assertEquals(0, graph.nodeCount());
+        Flow.objects.insert(flow);
+        var start = addNode(flow.getId(), "webhook_start");
+        var end = addNode(flow.getId(), "webhook_end");
+        addConnection(flow.getId(), start.id(), "requestBody", end.id(), "graphOutput");
+        addConnection(flow.getId(), start.id(), "endOutputReference", end.id(), "outputReference");
+        var inputBody = new JsonObject();
+        inputBody.addProperty("input", "value");
+        var inputBodyString = inputBody.toString();
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT + "/" + flow.getId() + "/run/" + start.id())
+                .header("x-auth-token", this.user.getAuthToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(inputBodyString)
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var responseBody = result.andReturn().getResponse().getContentAsString();
+        JSONAssert.assertEquals(inputBodyString, responseBody, JSONCompareMode.NON_EXTENSIBLE);
+    }
+
+    private Node addNode(UUID flowId, String nodeType) {
+        var requestBody = new JsonObject();
+        requestBody.addProperty("type", nodeType);
+        var nodeCountBefore = getNodeCount(flowId);
+        try {
+            var result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT + "/" + flowId + "/graph/nodes")
+                    .header("x-auth-token", this.user.getAuthToken())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody.toString())
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk());
+            Assertions.assertEquals(nodeCountBefore + 1, getNodeCount(flowId));
+            var responseBody = result.andReturn().getResponse().getContentAsString();
+            var responseNode = SerializationUtils.fromJson(responseBody, Node.class);
+            Assertions.assertEquals(NodeType.REGISTRY.get(nodeType).orElseThrow(), responseNode.type());
+            return responseNode;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @SuppressWarnings("UnusedReturnValue")
+    private NodeConnection<?> addConnection(UUID flowId, UUID fromNodeId, String fromName, UUID toNodeId, String toName) {
+        var requestBody = new JsonObject();
+        requestBody.addProperty("from_node_id", fromNodeId.toString());
+        requestBody.addProperty("from_name", fromName);
+        requestBody.addProperty("to_node_id", toNodeId.toString());
+        requestBody.addProperty("to_name", toName);
+        var connectionCountBefore = getConnectionCount(flowId);
+        try {
+            var result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT + "/" + flowId + "/graph/connections")
+                    .header("x-auth-token", this.user.getAuthToken())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody.toString())
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk());
+            Assertions.assertEquals(connectionCountBefore + 1, getConnectionCount(flowId));
+            var responseBody = result.andReturn().getResponse().getContentAsString();
+            NodeConnection<?> responseConnection = SerializationUtils.fromJson(responseBody, NodeConnection.class);
+            Assertions.assertEquals(fromNodeId, responseConnection.from().nodeId());
+            Assertions.assertEquals(fromName, responseConnection.from().name());
+            Assertions.assertEquals(toNodeId, responseConnection.to().nodeId());
+            Assertions.assertEquals(toName, responseConnection.to().name());
+            return responseConnection;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static int getNodeCount(UUID flowId) {
+        return Flow.objects.get(flowId).getGraph().nodeCount();
+    }
+
+    private static int getConnectionCount(UUID flowId) {
+        return Flow.objects.get(flowId).getGraph().connectionCount();
+    }
+
     /// --- UTILITIES ---
 
     private void assertFlowCount(long count) {
