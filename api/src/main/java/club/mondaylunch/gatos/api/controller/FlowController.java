@@ -430,13 +430,13 @@ public class FlowController {
                 throw new InvalidBodyException("Body must be a JSON object");
             }
         }
-        var outputReference = new AtomicReference<DataBox<?>>();
+        AtomicReference<?> outputReference = new AtomicReference<>();
         var webhookStartInput = new WebhookStartNodeInput(inputJson, outputReference);
         executeFunction.accept(webhookStartInput);
         var output = outputReference.get();
         if (output == null) {
             output = DataType.ANY.create(null);
         }
-        return SerializationUtils.toJson(output.value());
+        return SerializationUtils.toJson(output);
     }
 }

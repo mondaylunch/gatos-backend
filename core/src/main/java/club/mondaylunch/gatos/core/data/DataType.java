@@ -20,7 +20,7 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
     public static final DataType<String> STRING = register("string", String.class);
     public static final DataType<JsonObject> JSON_OBJECT = register("json_object", JsonObject.class);
     public static final DataType<DataType<?>> DATA_TYPE = register("data_type", DataType.class);
-    public static final DataType<AtomicReference<DataBox<?>>> REFERENCE = register("reference", AtomicReference.class);
+    public static final DataType<AtomicReference<?>> REFERENCE = register("reference", AtomicReference.class);
     static {
         Conversions.register(NUMBER, STRING, Object::toString);
         Conversions.register(BOOLEAN, STRING, Object::toString);

@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
@@ -28,9 +29,14 @@ public class WebhookEndNodeType extends NodeType.End {
 
     @Override
     public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
-        var graphOutput = inputs.get("graphOutput");
+        var graphOutput = DataBox.get(
+            inputs,
+            "graphOutput",
+            DataType.ANY
+        ).orElseThrow();
         Objects.requireNonNull(graphOutput);
-        var outputReference = DataBox.get(
+        @SuppressWarnings("unchecked")
+        var outputReference = (AtomicReference<Object>) DataBox.get(
             inputs,
             "outputReference",
             DataType.REFERENCE
