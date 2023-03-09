@@ -10,7 +10,7 @@ import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
-public class ValueProviderNodeType<T> extends NodeType.Start {
+public class ValueProviderNodeType<T> extends NodeType.Process {
     private final DataType<T> type;
     private final T defaultValue;
 
@@ -29,6 +29,11 @@ public class ValueProviderNodeType<T> extends NodeType.Start {
         return Map.of(
             "value", this.type.create(this.defaultValue)
         );
+    }
+
+    @Override
+    public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+        return Set.of();
     }
 
     @Override
