@@ -246,7 +246,7 @@ public class GraphObserver {
             var filter = Filters.and(
                 Filters.eq(flowId),
                 Filters.eq("graph.connections.output.node_id", modified.from().nodeId()),
-                Filters.eq("graph.connections.output.name", modified.to().name()),
+                Filters.eq("graph.connections.output.name", modified.from().name()),
                 Filters.eq("graph.connections.input.node_id", modified.to().nodeId()),
                 Filters.eq("graph.connections.input.name", modified.to().name())
             );
