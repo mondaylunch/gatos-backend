@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;

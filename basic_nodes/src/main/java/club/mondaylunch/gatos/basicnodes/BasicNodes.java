@@ -1,5 +1,13 @@
 package club.mondaylunch.gatos.basicnodes;
 
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.jetbrains.annotations.VisibleForTesting;
+
+import club.mondaylunch.gatos.core.data.DataBox;
+import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 public final class BasicNodes {
@@ -52,4 +60,23 @@ public final class BasicNodes {
         .register("webhook_start", new WebhookStartNodeType());
     public static final WebhookEndNodeType WEBHOOK_END = NodeType.REGISTRY
         .register("webhook_end", new WebhookEndNodeType());
+
+    @VisibleForTesting
+    public static final Set<DataBox<?>> VALUE_PROVIDER_TYPES_WITH_DEFAULTS = Set.of(
+        DataType.STRING.create(""),
+        DataType.NUMBER.create(0.0),
+        DataType.BOOLEAN.create(false)
+    );
+
+    public static final Map<DataType<?>, ValueProviderNodeType<?>> VALUE_PROVIDERS = VALUE_PROVIDER_TYPES_WITH_DEFAULTS.stream()
+        .collect(Collectors.toMap(
+            DataBox::type,
+            box -> NodeType.REGISTRY.register("value_provider_"+DataType.REGISTRY.getName(box.type()), new ValueProviderNodeType<>(box))
+        ));
+
+    public static final Map<DataType<?>, ValueReplacerNodeType<?>> VALUE_REPLACERS = VALUE_PROVIDER_TYPES_WITH_DEFAULTS.stream()
+        .collect(Collectors.toMap(
+            DataBox::type,
+            box -> NodeType.REGISTRY.register("value_replacer_"+DataType.REGISTRY.getName(box.type()), new ValueReplacerNodeType<>(box))
+        ));
 }
