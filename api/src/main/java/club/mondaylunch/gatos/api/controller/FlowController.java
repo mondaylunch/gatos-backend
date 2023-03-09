@@ -424,9 +424,10 @@ public class FlowController {
         }
         var executor = new GraphExecutor(graph);
         var executeFunction = executor.execute(startNodeId);
-        @Nullable
-        JsonObject inputJson = null;
-        if (input != null) {
+        JsonObject inputJson;
+        if (input == null) {
+            inputJson = new JsonObject();
+        } else {
             var inputJsonElement = JsonParser.parseString(input);
             if (inputJsonElement.isJsonObject()) {
                 inputJson = inputJsonElement.getAsJsonObject();
