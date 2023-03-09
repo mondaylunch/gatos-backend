@@ -246,7 +246,9 @@ public class GraphObserver {
             var filter = Filters.and(
                 Filters.eq(flowId),
                 Filters.eq("graph.connections.output.node_id", modified.from().nodeId()),
-                Filters.eq("graph.connections.input.node_id", modified.to().nodeId())
+                Filters.eq("graph.connections.output.name", modified.to().name()),
+                Filters.eq("graph.connections.input.node_id", modified.to().nodeId()),
+                Filters.eq("graph.connections.input.name", modified.to().name())
             );
             var update = Updates.set("graph.connections.$", modified);
             collection.updateOne(filter, update);
@@ -257,7 +259,9 @@ public class GraphObserver {
         for (var removed : this.removedConnections.values()) {
             var filter = Filters.and(
                 Filters.eq("output.node_id", removed.from().nodeId()),
-                Filters.eq("input.node_id", removed.to().nodeId())
+                Filters.eq("output.name", removed.from().name()),
+                Filters.eq("input.node_id", removed.to().nodeId()),
+                Filters.eq("input.name", removed.to().name())
             );
             var removedConnections = Updates.pullByFilter(new BasicDBObject("graph.connections", filter));
             updates.add(removedConnections);
@@ -356,9 +360,9 @@ public class GraphObserver {
             + '}';
     }
 
-    private record ConnectionId(UUID fromId, UUID toId) {
+    private record ConnectionId(UUID fromId, String fromName, UUID toId, String toName) {
         ConnectionId(NodeConnection<?> connection) {
-            this(connection.from().nodeId(), connection.to().nodeId());
+            this(connection.from().nodeId(), connection.from().name(), connection.to().nodeId(), connection.to().name());
         }
     }
 }
