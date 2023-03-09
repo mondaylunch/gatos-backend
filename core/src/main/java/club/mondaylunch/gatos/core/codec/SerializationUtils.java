@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
 import org.bson.codecs.Codec;
@@ -150,6 +152,10 @@ public final class SerializationUtils {
      * @return The JSON representation of the object
      */
     public static String toJson(Object object) {
+        if (object instanceof JsonElement je) {
+            return new Gson().toJson(je);
+        }
+
         var stringWriter = new StringWriter();
         try (var jsonWriter = new JsonWriter(stringWriter)) {
             @SuppressWarnings("unchecked")

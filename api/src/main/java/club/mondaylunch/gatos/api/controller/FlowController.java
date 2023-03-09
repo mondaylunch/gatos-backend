@@ -437,6 +437,6 @@ public class FlowController {
         if (output == null) {
             output = DataType.ANY.create(null);
         }
-        return SerializationUtils.toJson(output);
+        return SerializationUtils.toJson(output.value());
     }
 }
