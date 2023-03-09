@@ -52,7 +52,7 @@ public class GraphSerializationTest {
         Flow flow = createFlow();
         UUID id = flow.getId();
         Graph graph = flow.getGraph();
-        Node node1 = graph.addNode(TestNodeTypes.START);
+        Node node1 = graph.addNode(TestNodeTypes.NO_INPUTS);
         Node node2 = graph.addNode(TestNodeTypes.PROCESS);
         Node node3 = graph.addNode(TestNodeTypes.END);
         Flow.objects.insert(flow);
@@ -73,7 +73,7 @@ public class GraphSerializationTest {
         Flow flow = createFlow();
         UUID id = flow.getId();
         Graph graph = flow.getGraph();
-        Node node1 = graph.addNode(TestNodeTypes.START);
+        Node node1 = graph.addNode(TestNodeTypes.NO_INPUTS);
         Node node2 = graph.addNode(TestNodeTypes.PROCESS);
         Node node3 = graph.addNode(TestNodeTypes.END);
         var connection1 = NodeConnection.create(node1, "start_output", node2, "process_input");
@@ -98,7 +98,7 @@ public class GraphSerializationTest {
         Flow flow = createFlow();
         UUID id = flow.getId();
         Graph graph = flow.getGraph();
-        Node node1 = graph.addNode(TestNodeTypes.START);
+        Node node1 = graph.addNode(TestNodeTypes.NO_INPUTS);
         Node node2 = graph.addNode(TestNodeTypes.PROCESS);
         Node node3 = graph.addNode(TestNodeTypes.END);
         NodeMetadata metadata = graph.modifyMetadata(node1.id(), nodeMetadata -> nodeMetadata.withX(1));

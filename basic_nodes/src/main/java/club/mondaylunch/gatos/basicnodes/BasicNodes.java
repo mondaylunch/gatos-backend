@@ -48,4 +48,8 @@ public final class BasicNodes {
         .register("negation", new NegationNodeType());
     public static final HTTPRequestNodeType HTTP_REQUEST = NodeType.REGISTRY
         .register("http_request", new HTTPRequestNodeType());
+    public static final WebhookStartNodeType WEBHOOK_START = NodeType.REGISTRY
+        .register("webhook_start", new WebhookStartNodeType());
+    public static final WebhookEndNodeType WEBHOOK_END = NodeType.REGISTRY
+        .register("webhook_end", new WebhookEndNodeType());
 }

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
@@ -20,13 +21,16 @@ import club.mondaylunch.gatos.core.graph.NodeMetadata;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
+import club.mondaylunch.gatos.core.models.Flow;
 
 public class GraphTest {
     private static final NodeType TEST_NODE_TYPE = new TestNodeType();
-    private static final NodeType INPUT_NODE_TYPE = new TestInputNodeType();
-    private static final NodeType OUTPUT_NODE_TYPE = new TestOutputNodeType();
+    private static final NodeType START_NODE_TYPE = new TestStartNodeType();
+    private static final NodeType END_NODE_TYPE = new TestEndNodeType();
     private static final NodeType TEST_VARYING_OUTPUT_NODE_TYPE = new TestVaryingOutputNodeType();
-    private static final NodeType TEST_STRING_OPT_START_NODE_TYPE = new TestStringOptStartDataType();
+    private static final NodeType TEST_STRING_OPT_START_NODE_TYPE = new TestStringOptStartNodeType();
+    private static final NodeType START_TWO_OUTPUTS_NODE_TYPE = new TestStartTwoOutputsNodeType();
+    private static final NodeType END_TWO_INPUTS_NODE_TYPE = new TestEndTwoInputsNodeType();
 
     @Test
     public void canAddNodeToGraph() {
@@ -58,7 +62,7 @@ public class GraphTest {
     @Test
     public void modifyingNonexistentNodeThrows() {
         var graph = new Graph();
-        var node = graph.addNode(TEST_NODE_TYPE);
+        graph.addNode(TEST_NODE_TYPE);
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             graph.modifyNode(UUID.randomUUID(), n -> n.modifySetting("setting_1", DataType.NUMBER.create(100.)));
         });
@@ -80,7 +84,6 @@ public class GraphTest {
         var node2 = graph.addNode(TEST_NODE_TYPE);
 
         var conn = NodeConnection.create(node1, "out", node2, "in");
-        Assertions.assertTrue(true);
 
         graph.addConnection(conn);
 
@@ -95,14 +98,12 @@ public class GraphTest {
         var node2 = graph.addNode(TEST_NODE_TYPE);
 
         var conn1 = NodeConnection.create(node1, "out", node2, "in");
-        Assertions.assertTrue(true);
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             graph.addConnection(conn1);
         });
 
         var conn2 = NodeConnection.create(node2, "out", node1, "in");
-        Assertions.assertTrue(true);
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             graph.addConnection(conn2);
@@ -117,12 +118,10 @@ public class GraphTest {
         var node3 = graph.addNode(TEST_NODE_TYPE);
 
         var conn1 = NodeConnection.create(node1, "out", node3, "in");
-        Assertions.assertTrue(true);
 
         graph.addConnection(conn1);
 
         var conn2 = NodeConnection.create(node2, "out", node3, "in");
-        Assertions.assertTrue(true);
 
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             graph.addConnection(conn2);
@@ -136,7 +135,6 @@ public class GraphTest {
         var node2 = graph.addNode(TEST_NODE_TYPE);
 
         var conn = NodeConnection.create(node1, "out", node2, "in");
-        Assertions.assertTrue(true);
 
         graph.addConnection(conn);
         graph.removeConnection(conn);
@@ -152,7 +150,6 @@ public class GraphTest {
         var node2 = graph.addNode(TEST_NODE_TYPE);
 
         var conn = NodeConnection.create(node1, "out", node2, "in");
-        Assertions.assertTrue(true);
 
         graph.addConnection(conn);
 
@@ -169,7 +166,6 @@ public class GraphTest {
         var node2 = graph.addNode(TEST_NODE_TYPE);
 
         var conn = NodeConnection.create(node1, "out", node2, "in");
-        Assertions.assertTrue(true);
 
         graph.addConnection(conn);
 
@@ -187,7 +183,6 @@ public class GraphTest {
 
         Assertions.assertEquals(DataType.ANY, node2.getOutputs().get("out").type());
         var conn = NodeConnection.create(node1, "out", node2, "in");
-        Assertions.assertTrue(true);
         graph.addConnection(conn);
         Assertions.assertEquals(DataType.STRING, graph.getNode(node2.id()).orElseThrow().getOutputs().get("out").type());
         graph.removeConnection(conn);
@@ -233,10 +228,9 @@ public class GraphTest {
     @Test
     public void graphWithPathIsValid() {
         var graph = new Graph();
-        var input = graph.addNode(INPUT_NODE_TYPE);
-        var output = graph.addNode(OUTPUT_NODE_TYPE);
+        var input = graph.addNode(START_NODE_TYPE);
+        var output = graph.addNode(END_NODE_TYPE);
         var conn = NodeConnection.create(input, "out", output, "in");
-        Assertions.assertTrue(true);
         graph.addConnection(conn);
         Assertions.assertTrue(graph.validate());
     }
@@ -244,8 +238,8 @@ public class GraphTest {
     @Test
     public void graphWithoutPathIsNotValid() {
         var graph = new Graph();
-        var input = graph.addNode(INPUT_NODE_TYPE);
-        var output = graph.addNode(OUTPUT_NODE_TYPE);
+        graph.addNode(START_NODE_TYPE);
+        graph.addNode(END_NODE_TYPE);
         Assertions.assertFalse(graph.validate());
     }
 
@@ -253,9 +247,8 @@ public class GraphTest {
     public void graphWithoutInputIsNotValid() {
         var graph = new Graph();
         var input = graph.addNode(TEST_NODE_TYPE);
-        var output = graph.addNode(OUTPUT_NODE_TYPE);
+        var output = graph.addNode(END_NODE_TYPE);
         var conn = NodeConnection.create(input, "out", output, "in");
-        Assertions.assertTrue(true);
         graph.addConnection(conn);
         Assertions.assertFalse(graph.validate());
     }
@@ -263,10 +256,9 @@ public class GraphTest {
     @Test
     public void graphWithoutOutputIsNotValid() {
         var graph = new Graph();
-        var input = graph.addNode(INPUT_NODE_TYPE);
+        var input = graph.addNode(START_NODE_TYPE);
         var output = graph.addNode(TEST_NODE_TYPE);
         var conn = NodeConnection.create(input, "out", output, "in");
-        Assertions.assertTrue(true);
         graph.addConnection(conn);
         Assertions.assertFalse(graph.validate());
     }
@@ -274,8 +266,8 @@ public class GraphTest {
     @Test
     public void graphWithLongerPathIsValid() {
         var graph = new Graph();
-        var input = graph.addNode(INPUT_NODE_TYPE);
-        var output = graph.addNode(OUTPUT_NODE_TYPE);
+        var input = graph.addNode(START_NODE_TYPE);
+        var output = graph.addNode(END_NODE_TYPE);
 
         @Nullable
         Node lastNode = null;
@@ -285,7 +277,6 @@ public class GraphTest {
                     lastNode == null ? input : lastNode, "out",
                     intermediary, "in"
             );
-            Assertions.assertTrue(true);
             graph.addConnection(conn);
 
             lastNode = intermediary;
@@ -295,7 +286,6 @@ public class GraphTest {
                 lastNode, "out",
                 output, "in"
             );
-        Assertions.assertTrue(true);
         graph.addConnection(conn);
 
         Assertions.assertTrue(graph.validate());
@@ -304,8 +294,8 @@ public class GraphTest {
     @Test
     public void graphWithLongerPathAndExtraNodesIsValid() {
         var graph = new Graph();
-        var input = graph.addNode(INPUT_NODE_TYPE);
-        var output = graph.addNode(OUTPUT_NODE_TYPE);
+        var input = graph.addNode(START_NODE_TYPE);
+        var output = graph.addNode(END_NODE_TYPE);
 
         @Nullable
         Node lastNode = null;
@@ -315,7 +305,6 @@ public class GraphTest {
                     lastNode == null ? input : lastNode, "out",
                     intermediary, "in"
             );
-            Assertions.assertTrue(true);
             graph.addConnection(conn);
 
             lastNode = intermediary;
@@ -325,7 +314,6 @@ public class GraphTest {
                 lastNode, "out",
                 output, "in"
         );
-        Assertions.assertTrue(true);
         graph.addConnection(conn);
 
         for (int i = 0; i < 10; i++) {
@@ -338,8 +326,8 @@ public class GraphTest {
     @Test
     public void graphHasCorrectPath() {
         var graph = new Graph();
-        var input = graph.addNode(INPUT_NODE_TYPE);
-        var output = graph.addNode(OUTPUT_NODE_TYPE);
+        var input = graph.addNode(START_NODE_TYPE);
+        var output = graph.addNode(END_NODE_TYPE);
         List<Node> list = new ArrayList<>();
         list.add(input);
 
@@ -351,7 +339,6 @@ public class GraphTest {
                     lastNode == null ? input : lastNode, "out",
                     intermediary, "in"
             );
-            Assertions.assertTrue(true);
             graph.addConnection(conn);
 
             lastNode = intermediary;
@@ -362,7 +349,6 @@ public class GraphTest {
                 lastNode, "out",
                 output, "in"
         );
-        Assertions.assertTrue(true);
         graph.addConnection(conn);
 
         list.add(output);
@@ -374,6 +360,18 @@ public class GraphTest {
         var sorted = graph.getExecutionOrder();
         Assertions.assertTrue(sorted.isPresent());
         Assertions.assertEquals(list, sorted.get());
+    }
+
+    @Test
+    public void graphWithMultiplePathsBetweenSameNodesIsValid() {
+        var graph = new Graph();
+        var input = graph.addNode(START_TWO_OUTPUTS_NODE_TYPE);
+        var output = graph.addNode(END_TWO_INPUTS_NODE_TYPE);
+        var conn = NodeConnection.create(input, "out1", output, "in1");
+        graph.addConnection(conn);
+        conn = NodeConnection.create(input, "out2", output, "in2");
+        graph.addConnection(conn);
+        Assertions.assertTrue(graph.validate());
     }
 
     private static final class TestNodeType extends NodeType.Process {
@@ -402,7 +400,7 @@ public class GraphTest {
         }
     }
 
-    private static final class TestInputNodeType extends NodeType.Start {
+    private static final class TestStartNodeType extends NodeType.Start<Object> {
         @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
@@ -415,13 +413,17 @@ public class GraphTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
-                Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+        public void setupFlow(Flow flow, Consumer<@Nullable Object> function, Node node) {
+
+        }
+
+        @Override
+        public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable Object o, Map<String, DataBox<?>> settings) {
             return Map.of();
         }
     }
 
-    private static final class TestOutputNodeType extends NodeType.End {
+    private static final class TestEndNodeType extends NodeType.End {
         @Override
         public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
@@ -473,7 +475,7 @@ public class GraphTest {
         }
     }
 
-    private static final class TestStringOptStartDataType extends NodeType.Start {
+    private static final class TestStringOptStartNodeType extends NodeType.Start<Object> {
         @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(new NodeConnector.Output<>(nodeId, "out", DataType.STRING.optionalOf()));
@@ -485,10 +487,57 @@ public class GraphTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
-                                                                  Map<String, DataBox<?>> settings,
-                                                                  Map<String, DataType<?>> inputTypes) {
+        public void setupFlow(Flow flow, Consumer<@Nullable Object> function, Node node) {
+        }
+
+        @Override
+        public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable Object o, Map<String, DataBox<?>> settings) {
             return Map.of();
+        }
+    }
+
+    private static final class TestStartTwoOutputsNodeType extends NodeType.Start<Object> {
+        @Override
+        public Map<String, DataBox<?>> settings() {
+            return Map.of();
+        }
+
+        @Override
+        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+            return Set.of(
+                    new NodeConnector.Output<>(nodeId, "out1", DataType.NUMBER),
+                    new NodeConnector.Output<>(nodeId, "out2", DataType.NUMBER)
+            );
+        }
+
+        @Override
+        public void setupFlow(Flow flow, Consumer<@Nullable Object> function, Node node) {
+        }
+
+        @Override
+        public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable Object o, Map<String, DataBox<?>> settings) {
+            return Map.of();
+        }
+    }
+
+    private static final class TestEndTwoInputsNodeType extends NodeType.End {
+        @Override
+        public Map<String, DataBox<?>> settings() {
+            return Map.of();
+        }
+
+        @Override
+        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+            return Set.of(
+                    new NodeConnector.Input<>(nodeId, "in1", DataType.NUMBER),
+                    new NodeConnector.Input<>(nodeId, "in2", DataType.NUMBER)
+            );
+        }
+
+        @Override
+        public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+            return CompletableFuture.runAsync(() -> {
+            });
         }
     }
 }

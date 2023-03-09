@@ -14,11 +14,11 @@ import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 public class TestNodeTypes {
 
-    public static final NodeType.Start START = NodeType.REGISTRY.register("test_start", new TestStartNodeType());
+    public static final NodeType.Process NO_INPUTS = NodeType.REGISTRY.register("test_no_inputs", new TestNoInputNodeType());
     public static final NodeType.Process PROCESS = NodeType.REGISTRY.register("test_process", new TestProcessNodeType());
     public static final NodeType.End END = NodeType.REGISTRY.register("test_end", new TestEndNodeType());
 
-    private static class TestStartNodeType extends NodeType.Start {
+    private static class TestNoInputNodeType extends NodeType.Process {
 
         @Override
         public Map<String, DataBox<?>> settings() {
@@ -35,6 +35,11 @@ public class TestNodeTypes {
         @Override
         public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Map.of();
+        }
+
+        @Override
+        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+            return Set.of();
         }
     }
 

@@ -79,8 +79,8 @@ public class GraphObserver {
             value with the same key is added, it is
             not removed anymore.
              */
-            removed.remove(key);
-            if (!value.equals(removed.get(key))) {
+            var removedValue = removed.remove(key);
+            if (!value.equals(removedValue)) {
                 /*
                 If the contents of the removed value
                 and the added value are not the same,
