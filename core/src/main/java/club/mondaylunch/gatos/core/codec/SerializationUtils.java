@@ -152,8 +152,8 @@ public final class SerializationUtils {
      * @return The JSON representation of the object
      */
     public static String toJson(Object object) {
-        if (object instanceof JsonElement je) {
-            return new Gson().toJson(je);
+        if (object instanceof JsonElement) {
+            return object.toString();
         }
 
         var stringWriter = new StringWriter();
