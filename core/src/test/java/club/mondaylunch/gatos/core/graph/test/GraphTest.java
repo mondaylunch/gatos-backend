@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
@@ -20,6 +21,7 @@ import club.mondaylunch.gatos.core.graph.NodeMetadata;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
+import club.mondaylunch.gatos.core.models.Flow;
 
 public class GraphTest {
     private static final NodeType TEST_NODE_TYPE = new TestNodeType();
@@ -402,7 +404,7 @@ public class GraphTest {
         }
     }
 
-    private static final class TestInputNodeType extends NodeType.Process {
+    private static final class TestInputNodeType extends NodeType.Start<Object> {
         @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
@@ -415,14 +417,13 @@ public class GraphTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
-                Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-            return Map.of();
+        public void setupFlow(Flow flow, Consumer<@Nullable Object> function, Node node) {
+
         }
 
         @Override
-        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-            return Set.of();
+        public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable Object o, Map<String, DataBox<?>> settings) {
+            return Map.of();
         }
     }
 
@@ -478,7 +479,7 @@ public class GraphTest {
         }
     }
 
-    private static final class TestStringOptStartDataType extends NodeType.Process {
+    private static final class TestStringOptStartDataType extends NodeType.Start<Object> {
         @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(new NodeConnector.Output<>(nodeId, "out", DataType.STRING.optionalOf()));
@@ -490,15 +491,12 @@ public class GraphTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
-                                                                  Map<String, DataBox<?>> settings,
-                                                                  Map<String, DataType<?>> inputTypes) {
-            return Map.of();
+        public void setupFlow(Flow flow, Consumer<@Nullable Object> function, Node node) {
         }
 
         @Override
-        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-            return Set.of();
+        public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable Object o, Map<String, DataBox<?>> settings) {
+            return Map.of();
         }
     }
 }
