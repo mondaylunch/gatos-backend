@@ -396,6 +396,7 @@ public class Graph {
                     visitedConnections.add(conn);
                     UUID to = conn.to().nodeId();
                     if (this.getConnectionsForNode(to).stream()
+                        .filter(deduplicatedConnections::contains)
                         .noneMatch(c -> !visitedConnections.contains(c) && c.to().nodeId() == to)) {
                         nodesWithoutIncoming.add(to);
                     }
