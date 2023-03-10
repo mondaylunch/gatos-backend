@@ -156,6 +156,21 @@ public class FlowCollectionTest {
         this.assertFlowCountChange(0);
     }
 
+    @Test
+    public void containsFlow() {
+        var flow = createFlow();
+        Flow.objects.insert(flow);
+        this.assertFlowCountChange(1);
+        var flowId = flow.getId();
+        Assertions.assertTrue(Flow.objects.contains(flowId));
+    }
+
+    @Test
+    public void doesNotContainFlow() {
+        var flowId = UUID.randomUUID();
+        Assertions.assertFalse(Flow.objects.contains(flowId));
+    }
+
     private void assertFlowCountChange(long change) {
         Assertions.assertEquals(this.initialFlowCount + change, getFlowCount());
     }
