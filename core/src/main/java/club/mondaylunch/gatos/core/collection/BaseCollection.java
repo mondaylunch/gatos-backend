@@ -108,6 +108,16 @@ public class BaseCollection<T extends BaseModel> {
     }
 
     /**
+     * Checks if a document with the given ID exists.
+     *
+     * @param id The ID of the document.
+     * @return {@code true} if the document exists, {@code false} otherwise.
+     */
+    public boolean contains(UUID id) {
+        return this.getCollection().countDocuments(Filters.eq(id)) > 0;
+    }
+
+    /**
      * Deletes all documents.
      */
     public void clear() {
