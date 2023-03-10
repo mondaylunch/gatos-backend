@@ -114,7 +114,9 @@ public class BaseCollection<T extends BaseModel> {
      * @return {@code true} if the document exists, {@code false} otherwise.
      */
     public boolean contains(UUID id) {
-        return this.getCollection().countDocuments(Filters.eq(id)) > 0;
+        try (var iterator = this.getCollection().find(Filters.eq(id)).limit(1).iterator()) {
+            return iterator.hasNext();
+        }
     }
 
     /**
