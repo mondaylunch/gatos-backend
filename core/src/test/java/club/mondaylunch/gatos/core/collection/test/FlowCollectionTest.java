@@ -160,7 +160,7 @@ public class FlowCollectionTest {
     public void containsFlow() {
         var flow = createFlow();
         Flow.objects.insert(flow);
-        assertFlowCountChange(1);
+        this.assertFlowCountChange(1);
         var flowId = flow.getId();
         Assertions.assertTrue(Flow.objects.contains(flowId));
     }
