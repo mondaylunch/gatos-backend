@@ -29,14 +29,15 @@ public class WebhookStartNodeTest {
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.WEBHOOK_START);
-        Assertions.assertEquals(2, node.getOutputs().size());
         var outputs = node.getOutputs();
+        Assertions.assertEquals(2, outputs.size());
+        var nodeId = node.id();
         var requestBody = outputs.get("requestBody");
-        Assertions.assertEquals(node.id(), requestBody.nodeId());
+        Assertions.assertEquals(nodeId, requestBody.nodeId());
         Assertions.assertEquals("requestBody", requestBody.name());
         Assertions.assertEquals(DataType.JSON_OBJECT, requestBody.type());
         var endOutputReference = outputs.get("endOutputReference");
-        Assertions.assertEquals(node.id(), endOutputReference.nodeId());
+        Assertions.assertEquals(nodeId, endOutputReference.nodeId());
         Assertions.assertEquals("endOutputReference", endOutputReference.name());
         Assertions.assertEquals(DataType.REFERENCE, endOutputReference.type());
     }
