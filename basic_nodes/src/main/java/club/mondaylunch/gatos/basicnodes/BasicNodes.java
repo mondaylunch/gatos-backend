@@ -46,8 +46,8 @@ public final class BasicNodes {
         .register("truthiness", new TruthinessNodeType());
     public static final NegationNodeType NEGATION = NodeType.REGISTRY
         .register("negation", new NegationNodeType());
-    public static final ParseNumberFromStringNodeType PARSE_STRING_FROM_NUMBER = NodeType.REGISTRY
-        .register("parse_string_from_number", new ParseNumberFromStringNodeType());
+    public static final ParseNumberFromStringNodeType PARSE_NUMBER_FROM_STRING = NodeType.REGISTRY
+        .register("parse_number_from_string", new ParseNumberFromStringNodeType());
     public static final HTTPRequestNodeType HTTP_REQUEST = NodeType.REGISTRY
         .register("http_request", new HTTPRequestNodeType());
 }

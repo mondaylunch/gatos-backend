@@ -16,20 +16,20 @@ public class ParseStringNodeTest {
     @Test
     public void canAddNodeToGraph() {
         var graph = new Graph();
-        var node = graph.addNode(BasicNodes.PARSE_STRING_FROM_NUMBER);
+        var node = graph.addNode(BasicNodes.PARSE_NUMBER_FROM_STRING);
         Assertions.assertTrue(graph.containsNode(node));
     }
 
     @Test
     public void areInputsCorrect() {
-        var node = Node.create(BasicNodes.PARSE_STRING_FROM_NUMBER);
+        var node = Node.create(BasicNodes.PARSE_NUMBER_FROM_STRING);
         Assertions.assertEquals(node.inputs().size(), 1);
         Assertions.assertTrue(node.inputs().containsKey("input"));
     }
 
     @Test
     public void areOutputsCorrect() {
-        var node = Node.create(BasicNodes.PARSE_STRING_FROM_NUMBER);
+        var node = Node.create(BasicNodes.PARSE_NUMBER_FROM_STRING);
         Assertions.assertEquals(node.getOutputs().size(), 1);
         Assertions.assertTrue(node.getOutputs().containsKey("output"));
     }
@@ -39,13 +39,13 @@ public class ParseStringNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.STRING.create("1")
         );
-        double output = (double) BasicNodes.PARSE_STRING_FROM_NUMBER.compute(input).get("output").join().value();
+        double output = (double) BasicNodes.PARSE_NUMBER_FROM_STRING.compute(input).get("output").join().value();
         Assertions.assertEquals(1, output);
         
         input = Map.of(
             "input", DataType.STRING.create("11")
         );
-        output = (double) BasicNodes.PARSE_STRING_FROM_NUMBER.compute(input).get("output").join().value();
+        output = (double) BasicNodes.PARSE_NUMBER_FROM_STRING.compute(input).get("output").join().value();
         Assertions.assertEquals(11, output);
     }
 
@@ -54,7 +54,7 @@ public class ParseStringNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.STRING.create("11,111")
         );
-        double output = (double) BasicNodes.PARSE_STRING_FROM_NUMBER.compute(input).get("output").join().value();
+        double output = (double) BasicNodes.PARSE_NUMBER_FROM_STRING.compute(input).get("output").join().value();
         Assertions.assertEquals(11111, output);
     }
 
@@ -63,7 +63,7 @@ public class ParseStringNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.STRING.create("11.11")
         );
-        double output = (double) BasicNodes.PARSE_STRING_FROM_NUMBER.compute(input).get("output").join().value();
+        double output = (double) BasicNodes.PARSE_NUMBER_FROM_STRING.compute(input).get("output").join().value();
         Assertions.assertEquals(11.11, output);
     }
 
@@ -72,13 +72,13 @@ public class ParseStringNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.STRING.create("11,111.11")
         );
-        double output = (double) BasicNodes.PARSE_STRING_FROM_NUMBER.compute(input).get("output").join().value();
+        double output = (double) BasicNodes.PARSE_NUMBER_FROM_STRING.compute(input).get("output").join().value();
         Assertions.assertEquals(11111.11, output);
 
         input = Map.of(
             "input", DataType.STRING.create("11,111,111.11")
         );
-        output = (double) BasicNodes.PARSE_STRING_FROM_NUMBER.compute(input).get("output").join().value();
+        output = (double) BasicNodes.PARSE_NUMBER_FROM_STRING.compute(input).get("output").join().value();
         Assertions.assertEquals(11111111.11, output);
     }
 
@@ -86,13 +86,13 @@ public class ParseStringNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.STRING.create("11.11.11")
         );
-        double output = (double) BasicNodes.PARSE_STRING_FROM_NUMBER.compute(input).get("output").join().value();
+        double output = (double) BasicNodes.PARSE_NUMBER_FROM_STRING.compute(input).get("output").join().value();
         Assertions.assertEquals(Double.NaN, output);
         
         input = Map.of(
             "input", DataType.STRING.create("hello I am an integer")    // the jester doth lie most fiendishly
         );
-        output = (double) BasicNodes.PARSE_STRING_FROM_NUMBER.compute(input).get("output").join().value();
+        output = (double) BasicNodes.PARSE_NUMBER_FROM_STRING.compute(input).get("output").join().value();
         Assertions.assertEquals(Double.NaN, output);
     }
 }
