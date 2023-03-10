@@ -19,6 +19,12 @@ import org.bson.conversions.Bson;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.models.Flow;
 
+/**
+ * Tracks changes to a {@link Graph} so that when
+ * it is updated in the database, only the parts
+ * that changed are written to the database,
+ * instead of the entire graph being overwritten.
+ */
 public class GraphObserver {
 
     private final Map<UUID, Node> addedNodes = new HashMap<>();
@@ -65,6 +71,18 @@ public class GraphObserver {
         removed(nodeId, metadata, this.addedMetadata, this.modifiedMetadata, this.removedMetadata);
     }
 
+    /**
+     * Records changes for when a graph component
+     * is added.
+     *
+     * @param key      The key of the component.
+     * @param value    The component.
+     * @param added    The currently added components.
+     * @param modified The currently modified components.
+     * @param removed  The currently removed components.
+     * @param <K>      The type of the key.
+     * @param <V>      The type of the component.
+     */
     private static <K, V> void added(K key, V value, Map<K, V> added, Map<K, V> modified, Map<K, V> removed) {
         if (modified.containsKey(key)) {
             /*
@@ -94,6 +112,18 @@ public class GraphObserver {
         }
     }
 
+    /**
+     * Records changes for when a graph component
+     * is modified.
+     *
+     * @param key      The key of the component.
+     * @param value    The component.
+     * @param added    The currently added components.
+     * @param modified The currently modified components.
+     * @param removed  The currently removed components.
+     * @param <K>      The type of the key.
+     * @param <V>      The type of the component.
+     */
     private static <K, V> void modified(K key, V value, Map<K, V> added, Map<K, V> modified, Map<K, V> removed) {
         if (added.containsKey(key)) {
             /*
@@ -115,6 +145,18 @@ public class GraphObserver {
         }
     }
 
+    /**
+     * Records changes for when a graph component
+     * is removed.
+     *
+     * @param key      The key of the component.
+     * @param value    The component.
+     * @param added    The currently added components.
+     * @param modified The currently modified components.
+     * @param removed  The currently removed components.
+     * @param <K>      The type of the key.
+     * @param <V>      The type of the component.
+     */
     private static <K, V> void removed(K key, V value, Map<K, V> added, Map<K, V> modified, Map<K, V> removed) {
         if (added.containsKey(key)) {
             /*
@@ -139,10 +181,11 @@ public class GraphObserver {
     }
 
     /**
-     * Creates a Bson update for the graph
+     * Creates {@link Bson} updates for the graph
      * from the changes seen by this observer
-     * since the last time {@link #reset()}
-     * was called, and applies it to the collection.
+     * since the last time the observer was
+     * {@link #reset() reset}, and applies it to
+     * the collection.
      *
      * @param flowId     The ID of the flow to update.
      * @param collection The collection to update.
@@ -169,6 +212,11 @@ public class GraphObserver {
         }
     }
 
+    /**
+     * Checks that this observer is in a valid
+     * state before updating the flow in the
+     * database.
+     */
     private void validate() {
         var nodeShared = sharedValues(
             this.addedNodes.keySet(),
@@ -196,11 +244,31 @@ public class GraphObserver {
         }
     }
 
+    /**
+     * Checks if any of the given sets
+     * share any values.
+     *
+     * @param set1 The first set.
+     * @param set2 The second set.
+     * @param sets The remaining sets.
+     * @param <T>  The type of the set values.
+     * @return {@code true} if any of the sets
+     * share any values, {@code false} otherwise.
+     */
     @SafeVarargs
     private static <T> boolean sharedValues(Set<T> set1, Set<T> set2, Set<T>... sets) {
         return !intersection(set1, set2, sets).isEmpty();
     }
 
+    /**
+     * Returns the intersection of the given sets.
+     *
+     * @param set1 The first set.
+     * @param set2 The second set.
+     * @param sets The remaining sets.
+     * @param <T>  The type of the set values.
+     * @return The intersection of the given sets.
+     */
     @SafeVarargs
     private static <T> Set<T> intersection(Set<T> set1, Set<T> set2, Set<T>... sets) {
         Set<T> result = new HashSet<>(set1);
@@ -210,6 +278,8 @@ public class GraphObserver {
         }
         return result;
     }
+
+    // Database updates
 
     private void updateAddNode(Collection<Bson> updates) {
         if (!this.addedNodes.isEmpty()) {
