@@ -14,6 +14,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.CountOptions;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import org.bson.codecs.pojo.annotations.BsonProperty;
@@ -114,9 +115,7 @@ public class BaseCollection<T extends BaseModel> {
      * @return {@code true} if the document exists, {@code false} otherwise.
      */
     public boolean contains(UUID id) {
-        try (var iterator = this.getCollection().find(Filters.eq(id)).limit(1).iterator()) {
-            return iterator.hasNext();
-        }
+        return this.getCollection().countDocuments(Filters.eq(id), new CountOptions().limit(1)) > 0;
     }
 
     /**
