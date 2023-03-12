@@ -7,6 +7,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
@@ -40,9 +43,14 @@ public class SendDiscordMessageNode extends NodeType.End {
         String guildId = DataBox.get(settings, "guild_id", DiscordDataTypes.GUILD_ID).orElseThrow();
         String channelId = DataBox.get(settings, "channel_id", DiscordDataTypes.CHANNEL_ID).orElseThrow();
         String message = DataBox.get(inputs, "message", DataType.STRING).orElseThrow();
-        return this.jda.get().getGuildById(guildId)
-            .getTextChannelById(channelId)
-            .sendMessage(message)
-            .submit().thenAccept($ -> {});
+        Guild guild = this.jda.get().getGuildById(guildId);
+        if (guild == null) {
+            throw new IllegalStateException("Guild not found: " + guildId);
+        }
+        TextChannel channel = guild.getTextChannelById(channelId);
+        if (channel == null) {
+            throw new IllegalStateException("Channel not found: " + channelId);
+        }
+        return channel.sendMessage(MessageCreateData.fromContent(message)).submit().thenAccept($ -> {});
     }
 }
