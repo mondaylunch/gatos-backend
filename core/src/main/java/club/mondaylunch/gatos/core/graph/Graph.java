@@ -499,6 +499,9 @@ public class Graph {
                 Set<NodeConnection<?>> connections = SerializationUtils.readSet(reader, decoderContext, NodeConnection.class, this.registry);
                 reader.readName("metadata");
                 Map<UUID, NodeMetadata> metadata = SerializationUtils.readMap(reader, decoderContext, NodeMetadata.class, UUID::fromString, this.registry);
+                // adding connections to nonexistent nodes makes the graph sad
+                var nodeIds = nodes.stream().map(Node::id).collect(Collectors.toSet());
+                connections.removeIf(c -> !nodeIds.contains(c.from().nodeId()) || !nodeIds.contains(c.to().nodeId()));
                 return new Graph(nodes, metadata, connections);
             });
         }
