@@ -26,7 +26,6 @@ public class BaseMvcTest {
     @Autowired
     protected MockMvc mockMvc;
 
-
     @SafeVarargs
     protected static ResultActions compareFields(String objectExpression, ResultActions result,
             Map.Entry<String, Object> field, Map.Entry<String, Object>... fields) {

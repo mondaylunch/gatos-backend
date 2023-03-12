@@ -36,7 +36,6 @@ public class UserCollection extends BaseCollection<User> {
         return this.getCollection().find(this.emailFilter(email)).first();
     }
 
-
     public User getOrCreateUserByEmail(String email) {
         User user = this.getUserByEmail(email);
         if (user == null) {
