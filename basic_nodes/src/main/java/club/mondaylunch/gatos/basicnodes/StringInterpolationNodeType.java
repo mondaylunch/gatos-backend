@@ -41,7 +41,7 @@ public class StringInterpolationNodeType extends NodeType.Process {
     @Override
     public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         return Set.of(
-                new NodeConnector.Output<>(nodeId, "result", DataType.STRING));
+                new NodeConnector.Output<>(nodeId, "output", DataType.STRING));
     }
 
     @Override
@@ -50,14 +50,14 @@ public class StringInterpolationNodeType extends NodeType.Process {
         String template = DataBox.get(settings, "template", DataType.STRING).orElse("");
         var matcher = PLACEHOLDER_PATTERN.matcher(template);
         AtomicInteger i = new AtomicInteger(0);
-        String result = matcher.replaceAll(match -> {
+        String output = matcher.replaceAll(match -> {
             i.getAndIncrement();
             return Matcher.quoteReplacement(
                     DataBox.get(inputs, getNameForPlaceholder($ -> i.get(), match), DataType.STRING)
                             .orElse(""));
         });
         return Map.of(
-                "result", CompletableFuture.completedFuture(DataType.STRING.create(result)));
+                "output", CompletableFuture.completedFuture(DataType.STRING.create(output)));
     }
 
     private static String getNameForPlaceholder(ToIntFunction<MatchResult> placeholderIndexer,
