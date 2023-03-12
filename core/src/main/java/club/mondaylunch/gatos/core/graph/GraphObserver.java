@@ -13,12 +13,20 @@ import java.util.UUID;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.UpdateOneModel;
 import com.mongodb.client.model.Updates;
+import com.mongodb.client.model.WriteModel;
 import org.bson.conversions.Bson;
 
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.models.Flow;
 
+/**
+ * Tracks changes to a {@link Graph} so that when
+ * it is updated in the database, only the parts
+ * that changed are written to the database,
+ * instead of the entire graph being overwritten.
+ */
 public class GraphObserver {
 
     private final Map<UUID, Node> addedNodes = new HashMap<>();
@@ -65,6 +73,18 @@ public class GraphObserver {
         removed(nodeId, metadata, this.addedMetadata, this.modifiedMetadata, this.removedMetadata);
     }
 
+    /**
+     * Records changes for when a graph component
+     * is added.
+     *
+     * @param key      The key of the component.
+     * @param value    The component.
+     * @param added    The currently added components.
+     * @param modified The currently modified components.
+     * @param removed  The currently removed components.
+     * @param <K>      The type of the key.
+     * @param <V>      The type of the component.
+     */
     private static <K, V> void added(K key, V value, Map<K, V> added, Map<K, V> modified, Map<K, V> removed) {
         if (modified.containsKey(key)) {
             /*
@@ -94,6 +114,18 @@ public class GraphObserver {
         }
     }
 
+    /**
+     * Records changes for when a graph component
+     * is modified.
+     *
+     * @param key      The key of the component.
+     * @param value    The component.
+     * @param added    The currently added components.
+     * @param modified The currently modified components.
+     * @param removed  The currently removed components.
+     * @param <K>      The type of the key.
+     * @param <V>      The type of the component.
+     */
     private static <K, V> void modified(K key, V value, Map<K, V> added, Map<K, V> modified, Map<K, V> removed) {
         if (added.containsKey(key)) {
             /*
@@ -115,43 +147,83 @@ public class GraphObserver {
         }
     }
 
+    /**
+     * Records changes for when a graph component
+     * is removed.
+     *
+     * @param key      The key of the component.
+     * @param value    The component.
+     * @param added    The currently added components.
+     * @param modified The currently modified components.
+     * @param removed  The currently removed components.
+     * @param <K>      The type of the key.
+     * @param <V>      The type of the component.
+     */
     private static <K, V> void removed(K key, V value, Map<K, V> added, Map<K, V> modified, Map<K, V> removed) {
-        removed.put(key, value);
-        added.remove(key);
-        modified.remove(key);
+        if (added.containsKey(key)) {
+            /*
+            If a value with a key was added when a
+            value with the same key is removed, it
+            is not added anymore.
+             */
+            added.remove(key);
+        } else if (modified.containsKey(key)) {
+            /*
+            If a value with a key was modified when
+            a value with the same key is removed, it
+            is not modified anymore, and the value
+            is removed.
+             */
+            modified.remove(key);
+            removed.put(key, value);
+        } else {
+            // Otherwise, the value is removed.
+            removed.put(key, value);
+        }
     }
 
     /**
-     * Creates a Bson update for the graph
+     * Creates {@link Bson} updates for the graph
      * from the changes seen by this observer
-     * since the last time {@link #reset()}
-     * was called, and applies it to the collection.
+     * since the last time the observer was
+     * {@link #reset() reset}, and applies it to
+     * the collection.
      *
      * @param flowId     The ID of the flow to update.
      * @param collection The collection to update.
      */
     public void updateFlow(UUID flowId, MongoCollection<Flow> collection) {
         this.validate();
-        List<Bson> updates = new ArrayList<>();
+        List<Bson> bsonUpdates = new ArrayList<>();
+        List<WriteModel<Flow>> writeModelUpdates = new ArrayList<>();
+        var flowIdFilter = Filters.eq(flowId);
 
-        this.updateAddNode(updates);
-        this.updateModifyNode(flowId, collection);
-        this.updateRemoveNode(updates);
+        this.updateAddNode(bsonUpdates);
+        this.updateModifyNode(flowIdFilter, writeModelUpdates);
+        this.updateRemoveNode(bsonUpdates);
 
-        this.updateAddConnection(updates);
-        this.updateModifyConnection(flowId, collection);
-        this.updateRemoveConnection(updates);
+        this.updateAddConnection(bsonUpdates);
+        this.updateModifyConnection(flowIdFilter, writeModelUpdates);
+        this.updateRemoveConnection(bsonUpdates);
 
-        this.updateAddMetadata(updates);
-        this.updateModifyMetadata(updates);
-        this.updateRemoveMetadata(flowId, collection);
+        this.updateAddMetadata(bsonUpdates);
+        this.updateModifyMetadata(bsonUpdates);
+        this.updateRemoveMetadata(bsonUpdates);
 
-        if (!updates.isEmpty()) {
-            var update = Updates.combine(updates);
-            collection.updateOne(Filters.eq(flowId), update);
+        if (!bsonUpdates.isEmpty()) {
+            var update = Updates.combine(bsonUpdates);
+            writeModelUpdates.add(new UpdateOneModel<>(flowIdFilter, update));
+        }
+        if (!writeModelUpdates.isEmpty()) {
+            collection.bulkWrite(writeModelUpdates);
         }
     }
 
+    /**
+     * Checks that this observer is in a valid
+     * state before updating the flow in the
+     * database.
+     */
     private void validate() {
         var nodeShared = sharedValues(
             this.addedNodes.keySet(),
@@ -179,11 +251,31 @@ public class GraphObserver {
         }
     }
 
+    /**
+     * Checks if any of the given sets
+     * share any values.
+     *
+     * @param set1 The first set.
+     * @param set2 The second set.
+     * @param sets The remaining sets.
+     * @param <T>  The type of the set values.
+     * @return {@code true} if any of the sets
+     * share any values, {@code false} otherwise.
+     */
     @SafeVarargs
     private static <T> boolean sharedValues(Set<T> set1, Set<T> set2, Set<T>... sets) {
         return !intersection(set1, set2, sets).isEmpty();
     }
 
+    /**
+     * Returns the intersection of the given sets.
+     *
+     * @param set1 The first set.
+     * @param set2 The second set.
+     * @param sets The remaining sets.
+     * @param <T>  The type of the set values.
+     * @return The intersection of the given sets.
+     */
     @SafeVarargs
     private static <T> Set<T> intersection(Set<T> set1, Set<T> set2, Set<T>... sets) {
         Set<T> result = new HashSet<>(set1);
@@ -194,6 +286,8 @@ public class GraphObserver {
         return result;
     }
 
+    // Database updates
+
     private void updateAddNode(Collection<Bson> updates) {
         if (!this.addedNodes.isEmpty()) {
             var addedNodes = Updates.pushEach("graph.nodes", new ArrayList<>(this.addedNodes.values()));
@@ -201,11 +295,11 @@ public class GraphObserver {
         }
     }
 
-    private void updateModifyNode(UUID flowId, MongoCollection<Flow> collection) {
+    private void updateModifyNode(Bson flowIdFilter, Collection<WriteModel<Flow>> updates) {
         for (var modified : this.modifiedNodes.values()) {
-            var filter = Filters.and(Filters.eq(flowId), Filters.eq("graph.nodes.id", modified.id()));
+            var filter = Filters.and(flowIdFilter, Filters.eq("graph.nodes.id", modified.id()));
             var update = Updates.set("graph.nodes.$", modified);
-            collection.updateOne(filter, update);
+            updates.add(new UpdateOneModel<>(filter, update));
         }
     }
 
@@ -224,24 +318,32 @@ public class GraphObserver {
         }
     }
 
-    private void updateModifyConnection(UUID flowId, MongoCollection<Flow> collection) {
+    private void updateModifyConnection(Bson flowIdFilter, Collection<WriteModel<Flow>> updates) {
         for (var modified : this.modifiedConnections.values()) {
             var filter = Filters.and(
-                Filters.eq(flowId),
+                flowIdFilter,
                 Filters.eq("graph.connections.output.node_id", modified.from().nodeId()),
-                Filters.eq("graph.connections.input.node_id", modified.to().nodeId())
+                Filters.eq("graph.connections.output.name", modified.from().name()),
+                Filters.eq("graph.connections.input.node_id", modified.to().nodeId()),
+                Filters.eq("graph.connections.input.name", modified.to().name())
             );
             var update = Updates.set("graph.connections.$", modified);
-            collection.updateOne(filter, update);
+            updates.add(new UpdateOneModel<>(filter, update));
         }
     }
 
     private void updateRemoveConnection(Collection<Bson> updates) {
-        for (var removed : this.removedConnections.values()) {
-            var filter = Filters.and(
+        var filters = this.removedConnections.values()
+            .stream()
+            .map(removed -> Filters.and(
                 Filters.eq("output.node_id", removed.from().nodeId()),
-                Filters.eq("input.node_id", removed.to().nodeId())
-            );
+                Filters.eq("output.name", removed.from().name()),
+                Filters.eq("input.node_id", removed.to().nodeId()),
+                Filters.eq("input.name", removed.to().name())
+            ))
+            .toList();
+        if (!filters.isEmpty()) {
+            var filter = Filters.or(filters);
             var removedConnections = Updates.pullByFilter(new BasicDBObject("graph.connections", filter));
             updates.add(removedConnections);
         }
@@ -264,11 +366,10 @@ public class GraphObserver {
         updates.add(update);
     }
 
-    private void updateRemoveMetadata(UUID flowId, MongoCollection<Flow> collection) {
+    private void updateRemoveMetadata(List<Bson> updates) {
         for (var nodeId : this.removedMetadata.keySet()) {
-            var filter = Filters.and(Filters.eq(flowId));
             var update = Updates.unset("graph.metadata." + nodeId);
-            collection.updateOne(filter, update);
+            updates.add(update);
         }
     }
 
@@ -339,9 +440,9 @@ public class GraphObserver {
             + '}';
     }
 
-    private record ConnectionId(UUID fromId, UUID toId) {
+    private record ConnectionId(UUID fromId, String fromName, UUID toId, String toName) {
         ConnectionId(NodeConnection<?> connection) {
-            this(connection.from().nodeId(), connection.to().nodeId());
+            this(connection.from().nodeId(), connection.from().name(), connection.to().nodeId(), connection.to().name());
         }
     }
 }

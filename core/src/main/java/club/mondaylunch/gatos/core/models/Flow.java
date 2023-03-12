@@ -137,4 +137,14 @@ public class Flow extends BaseModel {
                 && Objects.equals(this.graph, other.graph);
         }
     }
+
+    @Override
+    public String toString() {
+        return "Flow{"
+            + "name='" + this.name
+            + ", description='" + this.description
+            + ", authorId=" + this.authorId
+            + ", graph=" + this.graph
+            + '}';
+    }
 }
