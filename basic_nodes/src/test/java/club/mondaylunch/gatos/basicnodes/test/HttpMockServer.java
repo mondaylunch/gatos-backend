@@ -39,10 +39,10 @@ public class HttpMockServer {
             String response = "";
 
             switch (method) {
-                case "GET": response += "GET request"; break;
-                case "POST": response += "POST request"; break;
-                case "PUT": response += "PUT request"; break;
-                case "DELETE": response += "DELETE request"; break;
+                case "GET" -> response += "GET request";
+                case "POST" -> response += "POST request";
+                case "PUT" -> response += "PUT request";
+                case "DELETE" -> response += "DELETE request";
             }
 
             try (Scanner scanner = new Scanner(body).useDelimiter("\\A")) {

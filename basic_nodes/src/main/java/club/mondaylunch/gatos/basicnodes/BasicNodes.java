@@ -6,16 +6,14 @@ import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.VisibleForTesting;
 
+import club.mondaylunch.gatos.core.GatosPlugin;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
-public final class BasicNodes {
-
-    /**
-     * Class load this class to register node types.
-     */
-    public static void init() {
+public final class BasicNodes implements GatosPlugin {
+    @Override
+    public void init() {
     }
 
     public static final StringInterpolationNodeType STRING_INTERPOLATION = NodeType.REGISTRY
