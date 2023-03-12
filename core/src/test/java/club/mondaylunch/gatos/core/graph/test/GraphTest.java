@@ -430,6 +430,20 @@ public class GraphTest {
     }
 
     @Test
+    public void graphWithTwoIntoOneIsValid() {
+        var graph = new Graph();
+        var input1 = graph.addNode(START_NODE_TYPE);
+        var input2 = graph.addNode(START_NODE_TYPE);
+        var output = graph.addNode(END_TWO_INPUTS_NODE_TYPE);
+        var conn = NodeConnection.create(input1, "out", output, "in1");
+        graph.addConnection(conn);
+        conn = NodeConnection.create(input2, "out", output, "in2");
+        graph.addConnection(conn);
+        Assertions.assertTrue(graph.validate().isEmpty());
+    }
+
+    private static final class TestNodeType extends NodeType.Process {
+    @Test
     public void graphWithNodeSpecificErrorIsInvalid() {
         var graph = new Graph();
         var input = graph.addNode(START_NODE_TYPE);
