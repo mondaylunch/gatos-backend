@@ -663,7 +663,8 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         inputBody.addProperty("input", "value");
         var inputBodyString = inputBody.toString();
         var result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT + "/" + flow.getId() + "/run/" + start.id())
-                .header("x-auth-token", this.user.getAuthToken())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + TestSecurity.FAKE_TOKEN)
+                .header("x-user-email", this.user.getEmail())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(inputBodyString)
             )
@@ -678,7 +679,8 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         var nodeCountBefore = getNodeCount(flowId);
         try {
             var result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT + "/" + flowId + "/nodes")
-                    .header("x-auth-token", this.user.getAuthToken())
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + TestSecurity.FAKE_TOKEN)
+                    .header("x-user-email", this.user.getEmail())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestBody.toString())
                 )
@@ -703,7 +705,8 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         var connectionCountBefore = getConnectionCount(flowId);
         try {
             var result = this.mockMvc.perform(MockMvcRequestBuilders.post(ENDPOINT + "/" + flowId + "/connections")
-                    .header("x-auth-token", this.user.getAuthToken())
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + TestSecurity.FAKE_TOKEN)
+                    .header("x-user-email", this.user.getEmail())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestBody.toString())
                 )
