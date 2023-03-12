@@ -13,7 +13,7 @@ import club.mondaylunch.gatos.core.Registry;
  * A type of value which can be stored in a {@link DataBox}.
  */
 public sealed class DataType<T> permits ListDataType, OptionalDataType {
-    public static final Registry<DataType<?>> REGISTRY = Registry.create("data_type", DataType.class);
+    public static final DataTypeRegistry REGISTRY = Registry.REGISTRIES.register("data_type", new DataTypeRegistry());
     public static final DataType<Object> ANY = register("any", Object.class);
     public static final DataType<Double> NUMBER = register("number", Double.class);
     public static final DataType<Boolean> BOOLEAN = register("boolean", Boolean.class);
@@ -78,7 +78,7 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
     @SuppressWarnings("unchecked")
     public DataType<List<T>> listOf() {
         String listName = ListDataType.makeName(this);
-        Optional<DataType<?>> listType = REGISTRY.get(listName);
+        Optional<DataType<?>> listType = REGISTRY.getWithoutGenerating(listName);
         if (listType.isPresent()) {
             return (DataType<List<T>>) listType.get();
         } else {
@@ -95,7 +95,7 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
     @SuppressWarnings("unchecked")
     public DataType<Optional<T>> optionalOf() {
         String optionalName = OptionalDataType.makeName(this);
-        Optional<DataType<?>> optionalType = REGISTRY.get(optionalName);
+        Optional<DataType<?>> optionalType = REGISTRY.getWithoutGenerating(optionalName);
         if (optionalType.isPresent()) {
             return (DataType<Optional<T>>) optionalType.get();
         } else {

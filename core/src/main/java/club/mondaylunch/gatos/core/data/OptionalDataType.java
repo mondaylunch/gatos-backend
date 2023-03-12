@@ -3,6 +3,7 @@ package club.mondaylunch.gatos.core.data;
 import java.util.Optional;
 
 public final class OptionalDataType<T> extends DataType<Optional<T>> {
+    public static final String PREFIX = "optional$";
     public static final DataType<Optional<?>> GENERIC_OPTIONAL = DataType.register("optional", Optional.class);
     private final DataType<T> contains;
 
@@ -21,7 +22,7 @@ public final class OptionalDataType<T> extends DataType<Optional<T>> {
      * @return      the name of an optional type for the type
      */
     public static String makeName(DataType<?> type) {
-        return "optional$"+type.name();
+        return PREFIX+type.name();
     }
 
     /**
