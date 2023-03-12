@@ -25,4 +25,38 @@ public class DataTypeTest {
         Assertions.assertEquals(type, ((OptionalDataType<Double>) optionalOf).contains());
         Assertions.assertEquals(optionalOf, type.optionalOf());
     }
+
+    @Test
+    public void optionalsAreGeneratedFromRegistryGets() {
+        class Foo {
+        }
+
+        var type = DataType.register("optional_generation_foo", Foo.class);
+        var optionalType = DataType.REGISTRY.get(OptionalDataType.makeName(type));
+        Assertions.assertTrue(optionalType.isPresent());
+        Assertions.assertEquals(type.optionalOf(), optionalType.get());
+    }
+
+    @Test
+    public void listsAreGeneratedFromRegistryGets() {
+        class Foo {
+        }
+
+        var type = DataType.register("list_generation_foo", Foo.class);
+        var listType = DataType.REGISTRY.get(ListDataType.makeName(type));
+        Assertions.assertTrue(listType.isPresent());
+        Assertions.assertEquals(type.listOf(), listType.get());
+    }
+
+    @Test
+    public void derivedTypesAreNotGeneratedFromSpecialRegistryGet() {
+        class Foo {
+        }
+
+        var type = DataType.register("no_generation_foo", Foo.class);
+        var listType = DataType.REGISTRY.getWithoutGenerating(ListDataType.makeName(type));
+        var optionalType = DataType.REGISTRY.getWithoutGenerating(OptionalDataType.makeName(type));
+        Assertions.assertFalse(listType.isPresent());
+        Assertions.assertFalse(optionalType.isPresent());
+    }
 }
