@@ -133,6 +133,13 @@ public class Graph {
      */
     public void removeNode(UUID id) {
         @Nullable
+        var conns = this.connectionsByNode.remove(id);
+        if (conns == null) {
+            return;
+        }
+        conns.forEach(this::removeConnection);
+
+        @Nullable
         var oldNode = this.nodes.remove(id);
         @Nullable
         var oldMetaData = this.metadataByNode.remove(id);
@@ -143,13 +150,6 @@ public class Graph {
         if (oldMetaData != null) {
             this.observer.metadataRemoved(id, oldMetaData);
         }
-
-        @Nullable
-        var conns = this.connectionsByNode.remove(id);
-        if (conns == null) {
-            return;
-        }
-        conns.forEach(this::removeConnection);
     }
 
     /**
