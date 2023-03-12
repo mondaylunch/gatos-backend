@@ -295,7 +295,7 @@ public class GraphObserver {
         }
     }
 
-    private void updateModifyNode(Bson flowIdFilter, List<WriteModel<Flow>> updates) {
+    private void updateModifyNode(Bson flowIdFilter, Collection<WriteModel<Flow>> updates) {
         for (var modified : this.modifiedNodes.values()) {
             var filter = Filters.and(flowIdFilter, Filters.eq("graph.nodes.id", modified.id()));
             var update = Updates.set("graph.nodes.$", modified);
@@ -318,7 +318,7 @@ public class GraphObserver {
         }
     }
 
-    private void updateModifyConnection(Bson flowIdFilter, List<WriteModel<Flow>> updates) {
+    private void updateModifyConnection(Bson flowIdFilter, Collection<WriteModel<Flow>> updates) {
         for (var modified : this.modifiedConnections.values()) {
             var filter = Filters.and(
                 flowIdFilter,
