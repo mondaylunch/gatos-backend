@@ -49,6 +49,7 @@ public class Graph {
      * The nodes of this graph.
      */
     private final Map<UUID, Node> nodes = new HashMap<>();
+
     /**
      * The edges of this graph.
      */
@@ -57,7 +58,6 @@ public class Graph {
      * The edges of this graph, easily retrievable by their associated nodes' UUIDs.
      */
     private final Map<UUID, Set<NodeConnection<?>>> connectionsByNode = new HashMap<>();
-
     /**
      * The metadata of each node in the graph.
      */
@@ -77,6 +77,14 @@ public class Graph {
         connections.forEach(this::addConnection);
 
         this.observer.reset();
+    }
+
+    /**
+     * Returns an immutable set of all nodes in the graph.
+     * @return the graph's nodes
+     */
+    public Set<Node> nodes() {
+        return Set.copyOf(this.nodes.values());
     }
 
     /**

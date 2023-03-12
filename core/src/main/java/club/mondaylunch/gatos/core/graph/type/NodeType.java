@@ -133,6 +133,13 @@ public interface NodeType {
         public abstract void setupFlow(Flow flow, Consumer<@Nullable StartInput> function, Node node);
 
         /**
+         * Perform whatever teardown is needed to make this flow no longer trigger from this node.
+         * @param flow the flow this node is a part of
+         * @param node the node (pre-whatever modification made it invalid)
+         */
+        public abstract void teardownFlow(Flow flow, Node node);
+
+        /**
          * (Asynchronously) compute the outputs of this node in a map of output
          * connector name to value.
          * @param startInput whatever input this start node has. This can be null, if this node is not the one triggering the flow!
