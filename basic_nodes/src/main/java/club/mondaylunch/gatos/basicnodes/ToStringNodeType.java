@@ -1,6 +1,8 @@
 package club.mondaylunch.gatos.basicnodes;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -39,34 +41,20 @@ public class ToStringNodeType extends NodeType.Process {
         return Map.of("output", CompletableFuture.completedFuture(DataType.STRING.create(result)));
     }
 
-    /*
-    * the main string we can get would be of this form
-    * DataBox[value=[1, 2], type=DataType[name=list]]
-    * or 
-    * DataBox[value=Optional[d], type=DataType[name=any]]
-    * so if we start from index 14 all the way to the first occurence of ] this will result in the string 
-    * of a list but not of an optional so more work needs to be done in that case.  
-    */
     private String castToString(Object input) {
-        String temp = input.toString(); // this will result in one of the strings above
-        temp = temp.substring(14, temp.length());
-        if (temp.startsWith("Optional")) {
-            // check for empty situation
-            if (temp.startsWith("Optional.empty")) {
-                return "";
-            }
-            // then get the first occurence of both [ and ] respectively
-            int openBracket = temp.indexOf("[");
-            int closeBracket = temp.indexOf("]");
-            temp = temp.substring(openBracket+1, closeBracket);
-        } else {
-            int firstOccurence = temp.indexOf("]");
-            temp = temp.substring(0, firstOccurence+1);
-        }
-        return temp;
+        return input instanceof Optional ?
+            this.castOptional((Optional<?>) input) : this.castList((List<?>) input);
+    }
+
+    private String castOptional(Optional<?> op) {
+        return op.isEmpty() ? "" : op.get().toString();
+    }
+
+    private String castList(List<?> l) {
+        return l.toString();
     }
 
     private boolean canNotAutoCast(Object input) {
-        return input instanceof DataBox;
+        return input instanceof Optional || input instanceof List;
     }
 }

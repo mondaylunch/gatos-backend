@@ -63,7 +63,7 @@ public class ToStringNodeTest {
     @Test
     public void convertOptionalsCorrectly() {
         Map<String, DataBox<?>> input = Map.of(
-            "data", DataType.ANY.create(DataType.ANY.create(Optional.of("d")))
+            "data", DataType.ANY.create(Optional.of("d"))
         );
 
         var output = BasicNodes.TO_STRING.compute(input, Map.of(), Map.of());
@@ -73,7 +73,7 @@ public class ToStringNodeTest {
     @Test
     public void convertEmptyOptionalsCorrectly() {
         Map<String, DataBox<?>> input = Map.of(
-            "data", DataType.ANY.create(DataType.ANY.create(Optional.empty()))
+            "data", DataType.ANY.create(Optional.empty())
         );
 
         var output = BasicNodes.TO_STRING.compute(input, Map.of(), Map.of());
@@ -84,7 +84,7 @@ public class ToStringNodeTest {
     public void convertListsCorrectly() {
         List<Integer> testList = new ArrayList<>(List.of(1, 2));
         Map<String, DataBox<?>> input = Map.of(
-            "data", DataType.ANY.create(ListDataType.GENERIC_LIST.create(testList))
+            "data", DataType.ANY.create(testList)
         );
 
         var output = BasicNodes.TO_STRING.compute(input, Map.of(), Map.of());
@@ -95,7 +95,7 @@ public class ToStringNodeTest {
     public void convertEmptyListsCorrectly() {
         List<Integer> testList = new ArrayList<>();
         Map<String, DataBox<?>> input = Map.of(
-            "data", DataType.ANY.create(ListDataType.GENERIC_LIST.create(testList))
+            "data", DataType.ANY.create(testList)
         );
 
         var output = BasicNodes.TO_STRING.compute(input, Map.of(), Map.of());
