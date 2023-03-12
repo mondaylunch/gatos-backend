@@ -24,7 +24,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 
     // basic ndoes in tests
-    testImplementation project(":basic_nodes")
+    implementation project(":basic_nodes")
 
     // GSON
     implementation 'com.google.code.gson:gson:2.10.1'
