@@ -374,7 +374,9 @@ public class Graph {
         while (!nodesWithoutIncoming.isEmpty()) {
             UUID nodeId = nodesWithoutIncoming.pop();
             var node = this.nodes.get(nodeId);
-            res.add(node);
+            if (!res.contains(node)) {
+                res.add(node);
+            }
 
             if (!hasSeenInput && node.type().category() == NodeCategory.START) {
                 hasSeenInput = true;
@@ -391,7 +393,8 @@ public class Graph {
                 ) {
                     visitedConnections.add(conn);
                     UUID to = conn.to().nodeId();
-                    if (this.getConnectionsForNode(to).stream()
+                    if (!res.contains(this.getNode(to).orElseThrow())
+                        && this.getConnectionsForNode(to).stream()
                         .filter(deduplicatedConnections::contains)
                         .noneMatch(c -> !visitedConnections.contains(c) && c.to().nodeId() == to)) {
                         nodesWithoutIncoming.add(to);
