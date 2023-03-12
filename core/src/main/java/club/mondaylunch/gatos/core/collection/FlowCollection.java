@@ -25,6 +25,9 @@ public class FlowCollection extends BaseCollection<Flow> {
     }
 
     public void updateGraph(Flow flow) {
+        if (!this.contains(flow.getId())) {
+            throw new IllegalArgumentException("Flow with ID " + flow.getId() + " does not exist");
+        }
         flow.getGraph()
             .observer()
             .updateFlow(flow.getId(), this.getCollection());

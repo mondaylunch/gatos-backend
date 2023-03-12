@@ -4,9 +4,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpRequest.Builder;
+import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.List;
 import java.util.Map;
@@ -94,14 +94,13 @@ public class HTTPRequestNodeType extends NodeType.Process {
         // note: this method is called after validating the method parameter so the switch will execute
         // no null will be returned 
         Builder builder = HttpRequest.newBuilder();
-        HttpRequest request = null;
-        switch (method) {
-            case "GET": request = builder.uri(uri).GET().build(); break;
-            case "POST": request = builder.uri(uri).POST(BodyPublishers.ofString(body)).build(); break;
-            case "PUT": request = builder.uri(uri).PUT(BodyPublishers.ofString(body)).build(); break;
-            case "DELETE": request = builder.uri(uri).DELETE().build(); break;
-        }
-        return request;
+        return switch (method) {
+            case "GET" -> builder.uri(uri).GET().build();
+            case "POST" -> builder.uri(uri).POST(BodyPublishers.ofString(body)).build();
+            case "PUT" -> builder.uri(uri).PUT(BodyPublishers.ofString(body)).build();
+            case "DELETE" -> builder.uri(uri).DELETE().build();
+            default -> null;
+        };
     }
 
     private enum Methods {

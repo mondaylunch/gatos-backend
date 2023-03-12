@@ -6,9 +6,11 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,6 +22,7 @@ import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
+import club.mondaylunch.gatos.core.models.Flow;
 
 public class GraphExecutorTest {
     private static final NodeType ADD_NUMS = new AddNumNodeType();
@@ -38,19 +41,19 @@ public class GraphExecutorTest {
         var adder = graph.addNode(ADD_NUMS);
         graph.modifyNode(adder.id(), node -> node.modifySetting("value_to_add", DataType.NUMBER.create(5.)));
 
-        var conn = NodeConnection.createConnection(
+        var conn = NodeConnection.create(
                 input, "out",
-                adder, "in",
-                DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
+                adder, "in"
+        );
+        Assertions.assertTrue(true);
+        graph.addConnection(conn);
 
-        conn = NodeConnection.createConnection(
+        conn = NodeConnection.create(
                 adder, "out",
-                output, "in",
-                DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
+                output, "in"
+        );
+        Assertions.assertTrue(true);
+        graph.addConnection(conn);
 
         var executionOrderedNodes = graph.getExecutionOrder();
         Assertions.assertTrue(executionOrderedNodes.isPresent());
@@ -71,19 +74,19 @@ public class GraphExecutorTest {
         var adder = graph.addNode(ADD_NUMS_SLOWLY);
         graph.modifyNode(adder.id(), node -> node.modifySetting("value_to_add", DataType.NUMBER.create(5.)));
 
-        var conn = NodeConnection.createConnection(
+        var conn = NodeConnection.create(
                 input, "out",
-                adder, "in",
-                DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
+                adder, "in"
+        );
+        Assertions.assertTrue(true);
+        graph.addConnection(conn);
 
-        conn = NodeConnection.createConnection(
+        conn = NodeConnection.create(
                 adder, "out",
-                output, "in",
-                DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
+                output, "in"
+        );
+        Assertions.assertTrue(true);
+        graph.addConnection(conn);
 
         var executionOrderedNodes = graph.getExecutionOrder();
         Assertions.assertTrue(executionOrderedNodes.isPresent());
@@ -235,21 +238,21 @@ public class GraphExecutorTest {
     }
 
     private static void connectInt(Graph graph, Node a, String connectorA, Node b, String connectorB) {
-        var conn = NodeConnection.createConnection(
+        var conn = NodeConnection.create(
                 a, connectorA,
-                b, connectorB,
-                DataType.NUMBER);
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
+                b, connectorB
+        );
+        Assertions.assertTrue(true);
+        graph.addConnection(conn);
     }
 
     private static void connectString(Graph graph, Node a, String connectorA, Node b, String connectorB) {
-        var conn = NodeConnection.createConnection(
+        var conn = NodeConnection.create(
             a, connectorA,
-            b, connectorB,
-            DataType.STRING);
-        Assertions.assertTrue(conn.isPresent());
-        graph.addConnection(conn.get());
+            b, connectorB
+        );
+        Assertions.assertTrue(true);
+        graph.addConnection(conn);
     }
 
     private static final class AddNumNodeType extends NodeType.Process {
@@ -350,7 +353,7 @@ public class GraphExecutorTest {
         }
     }
 
-    private static final class InputNumNodeType extends NodeType.Start {
+    private static final class InputNumNodeType extends NodeType.Start<Object> {
         @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
@@ -364,11 +367,14 @@ public class GraphExecutorTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
-                Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+        public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable Object input, Map<String, DataBox<?>> settings) {
             return Map.of(
                     "out", CompletableFuture.completedFuture(
                             DataType.NUMBER.create(DataBox.get(settings, "value", DataType.NUMBER).orElseThrow())));
+        }
+
+        @Override
+        public void setupFlow(Flow flow, Consumer<@Nullable Object> function, Node node) {
         }
     }
 

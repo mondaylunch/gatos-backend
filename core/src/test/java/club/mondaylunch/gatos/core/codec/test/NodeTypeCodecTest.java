@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 
 import club.mondaylunch.gatos.core.collection.BaseCollection;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
-import club.mondaylunch.gatos.testshared.graph.type.test.TestNodeTypes;
 import club.mondaylunch.gatos.core.models.BaseModel;
+import club.mondaylunch.gatos.testshared.graph.type.test.TestNodeTypes;
 
 public class NodeTypeCodecTest {
 
@@ -36,13 +36,13 @@ public class NodeTypeCodecTest {
 
     @Test
     public void canInsertNodeTypeContainer() {
-        assertInsertNodeTypeContainers(TestNodeTypes.START);
+        assertInsertNodeTypeContainers(TestNodeTypes.NO_INPUTS);
     }
 
     @Test
     public void canInsertMultipleNodeTypeContainers() {
         assertInsertNodeTypeContainers(
-            TestNodeTypes.START,
+            TestNodeTypes.NO_INPUTS,
             TestNodeTypes.PROCESS,
             TestNodeTypes.END
         );
@@ -51,10 +51,10 @@ public class NodeTypeCodecTest {
     @Test
     public void canInsertNodeTypeContainersWithDuplicates() {
         assertInsertNodeTypeContainers(
-            TestNodeTypes.START,
+            TestNodeTypes.NO_INPUTS,
             TestNodeTypes.PROCESS,
             TestNodeTypes.END,
-            TestNodeTypes.START,
+            TestNodeTypes.NO_INPUTS,
             TestNodeTypes.PROCESS,
             TestNodeTypes.END
         );
@@ -63,7 +63,7 @@ public class NodeTypeCodecTest {
     @Test
     public void canInsertNestedContainer() {
         UUID id = UUID.randomUUID();
-        NodeType nodeType = TestNodeTypes.START;
+        NodeType nodeType = TestNodeTypes.NO_INPUTS;
         NodeTypeContainer container = new NodeTypeContainer();
         container.nodeType = nodeType;
         NodeTypeContainerContainer containerContainer = new NodeTypeContainerContainer(id, container);

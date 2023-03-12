@@ -2,6 +2,7 @@ package club.mondaylunch.gatos.core.collection;
 
 import static com.mongodb.client.model.Filters.eq;
 
+import com.google.gson.JsonObject;
 import org.bson.conversions.Bson;
 
 import club.mondaylunch.gatos.core.models.User;
@@ -18,70 +19,59 @@ public class UserCollection extends BaseCollection<User> {
     /**
      * Gets a document.
      *
-     * @param username The username of the user.
+     * @param userId The ID of the user.
      * @return The POJO.
      */
-    public User getUser(String username) {
-        return getCollection().find(usernameFilter(username)).first();
+    public User getUserByUserId(String userId) {
+        return this.getCollection().find(this.userIdFilter(userId)).first();
     }
 
     /**
      * Gets a document.
      *
-     * @param email The email of the user.
+     * @param email The Auth ID of the user.
      * @return The POJO.
      */
     public User getUserByEmail(String email) {
-        return getCollection().find(emailFilter(email)).first();
+        return this.getCollection().find(this.emailFilter(email)).first();
     }
 
-    /**
-     * Gets a document.
-     *
-     * @param authToken User's auth token.
-     * @return The POJO.
-     */
-    public User getUserByToken(String authToken) {
-        return getCollection().find(eq("auth_token", authToken)).first();
+    public User getOrCreateUserByEmail(String email) {
+        User user = this.getUserByEmail(email);
+        if (user == null) {
+            user = new User();
+            user.setEmail(email);
+            this.insert(user);
+        }
+        return user;
     }
 
-    /**
-     * checks if the username is already in use.
-     *
-     * @param username The potential username of the user.
-     * @return true if the username is already in use
-     */
-    public Boolean usernameAlreadyInUse(String username) {
-        return getCollection().find(usernameFilter(username)).first() != null;
+    private void updateUserWithProfileData(User user, JsonObject userProfile) {
+        if (userProfile.has("identities")) {
+            var identities = userProfile.getAsJsonArray("identities");
+            for (var identity : identities) {
+                var identityObject = identity.getAsJsonObject();
+                if (identityObject.has("connection")
+                    && identityObject.get("connection").getAsString().equals("discord")) {
+                    String unsplitDiscordId = identityObject.get("user_id").getAsString();
+                    String discordId = unsplitDiscordId.split("\\|")[1];
+                    user.setDiscordId(discordId);
+                }
+            }
+        }
+        this.update(user.getId(), user);
     }
 
-    /**
-     * checks if the email is already in use.
-     *
-     * @param email The potential email of the user.
-     * @return true if the email is already in use
-     */
-    public Boolean emailAlreadyInUse(String email) {
-        return getCollection().find(emailFilter(email)).first() != null;
+    public User updateDetailsForUser(User user, JsonObject userProfile) {
+        this.updateUserWithProfileData(user, userProfile);
+        return user;
     }
 
-    /**
-     * Creates a username filter.
-     *
-     * @param String The username to filter by.
-     * @return The filter.
-     */
-    private static Bson usernameFilter(String username) {
-        return eq("username", username);
+    private Bson userIdFilter(String userId) {
+        return eq(userId);
     }
 
-    /**
-     * Creates an email filter.
-     *
-     * @param String The email to filter by.
-     * @return The filter.
-     */
-    private static Bson emailFilter(String email) {
+    private Bson emailFilter(String email) {
         return eq("email", email);
     }
 }

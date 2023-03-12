@@ -16,7 +16,6 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 import club.mondaylunch.gatos.core.codec.SerializationUtils;
-import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
@@ -49,7 +48,7 @@ public class SerializationUtilsTest {
         flow.setDescription("This is a test flow");
 
         UUID startId = UUID.fromString("9f60cd6b-b4c2-43a1-83b7-711aa90ce8fd");
-        Node start = createNode(TestNodeTypes.START, startId);
+        Node start = createNode(TestNodeTypes.NO_INPUTS, startId);
 
         UUID processId = UUID.fromString("6f8de627-706d-4817-8921-73bff23006a8");
         Node process = createNode(TestNodeTypes.PROCESS, processId);
@@ -60,10 +59,10 @@ public class SerializationUtilsTest {
         Graph graph = new Graph(List.of(start, process, end), Map.of(), List.of());
         flow.setGraph(graph);
 
-        var startToProcess = NodeConnection.createConnection(start, "start_output", process, "process_input", DataType.NUMBER);
-        var processToEnd = NodeConnection.createConnection(process, "process_output", end, "end_input", DataType.NUMBER);
-        graph.addConnection(startToProcess.orElseThrow());
-        graph.addConnection(processToEnd.orElseThrow());
+        var startToProcess = NodeConnection.create(start, "start_output", process, "process_input");
+        var processToEnd = NodeConnection.create(process, "process_output", end, "end_input");
+        graph.addConnection(startToProcess);
+        graph.addConnection(processToEnd);
 
         graph.modifyMetadata(start.id(), nodeMetadata -> nodeMetadata.withX(1));
 

@@ -6,9 +6,9 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.Scanner;
 
-import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
 
 public class HttpMockServer {
 
@@ -39,10 +39,10 @@ public class HttpMockServer {
             String response = "";
 
             switch (method) {
-                case "GET": response += "GET request"; break;
-                case "POST": response += "POST request"; break;
-                case "PUT": response += "PUT request"; break;
-                case "DELETE": response += "DELETE request"; break;
+                case "GET" -> response += "GET request";
+                case "POST" -> response += "POST request";
+                case "PUT" -> response += "PUT request";
+                case "DELETE" -> response += "DELETE request";
             }
 
             try (Scanner scanner = new Scanner(body).useDelimiter("\\A")) {

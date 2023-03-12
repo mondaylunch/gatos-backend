@@ -4,13 +4,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import club.mondaylunch.gatos.core.Registry;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
+import club.mondaylunch.gatos.core.models.Flow;
 
 /**
  * A type of node that may go on a graph.
@@ -96,10 +100,32 @@ public interface NodeType {
     /**
      * A node type of the {@link NodeCategory#START start} category.
      */
-    abstract class Start implements NodeType, WithOutputs {
+    abstract class Start<StartInput> implements NodeType, WithOutputs {
         @Override
         public final NodeCategory category() {
             return NodeCategory.START;
+        }
+
+        /**
+         * Perform whatever setup is needed to get the flow this node is in to trigger.
+         * @param flow  the flow this node is a part of
+         * @param function the function to call to start the flow from this node
+         * @param node  the node
+         */
+        public abstract void setupFlow(Flow flow, Consumer<@Nullable StartInput> function, Node node);
+
+        /**
+         * (Asynchronously) compute the outputs of this node in a map of output
+         * connector name to value.
+         * @param startInput whatever input this start node has. This can be null, if this node is not the one triggering the flow!
+         * @param settings a map of node settings
+         * @return a CompletableFuture of each output in a map by name
+         */
+        public abstract Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable StartInput startInput, Map<String, DataBox<?>> settings);
+
+        @Override
+        public final Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+            return this.compute(null, settings);
         }
     }
 

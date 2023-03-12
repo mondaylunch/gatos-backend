@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import club.mondaylunch.gatos.basicnodes.BasicNodes;
 import club.mondaylunch.gatos.core.Database;
+import club.mondaylunch.gatos.core.GatosCore;
 
 @SpringBootApplication
 @RestController
@@ -20,7 +20,7 @@ public class ApiApplication {
     public static void main(String[] args) {
         Database.checkConnection();
         SpringApplication.run(ApiApplication.class, args);
-        BasicNodes.init();
+        GatosCore.init();
     }
 
     @Bean
