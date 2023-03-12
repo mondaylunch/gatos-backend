@@ -69,7 +69,7 @@ public class BaseCollection<T extends BaseModel> {
      * @return The POJO.
      */
     public T get(UUID id) {
-        return this.getCollection().find(Filters.eq(id)).first();
+        return this.getCollection().find(Filters.eq(id)).limit(1).first();
     }
 
     /**
