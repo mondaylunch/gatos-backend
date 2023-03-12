@@ -8,6 +8,8 @@ import java.util.function.Function;
 
 import javax.validation.Valid;
 
+import club.mondaylunch.gatos.core.models.BasicFlowInfo;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -55,17 +57,6 @@ public class FlowController {
     public FlowController(FlowRepository flowRepository, UserRepository userRepository) {
         this.flowRepository = flowRepository;
         this.userRepository = userRepository;
-    }
-
-    private record BasicFlowInfo(
-        @JsonProperty("_id") UUID id,
-        String name,
-        String description,
-        @JsonProperty("author_id") UUID authorId
-    ) {
-        BasicFlowInfo(Flow flow) {
-            this(flow.getId(), flow.getName(), flow.getDescription(), flow.getAuthorId());
-        }
     }
 
     /**
