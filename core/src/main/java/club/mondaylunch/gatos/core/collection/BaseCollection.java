@@ -1,7 +1,5 @@
 package club.mondaylunch.gatos.core.collection;
 
-import static com.mongodb.client.model.Filters.eq;
-
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -81,7 +79,7 @@ public class BaseCollection<T extends BaseModel> {
      */
     public List<T> get(String field, Object value) {
         return this.getCollection()
-            .find(eq(field, value))
+            .find(Filters.eq(field, value))
             .into(new ArrayList<>());
     }
 
