@@ -535,6 +535,45 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
     }
 
     @Test
+    public void canRemoveNodeWithConnections() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        var node1 = graph.addNode(TestNodeTypes.MULTIPLE_CONNECTIONS);
+        var node2 = graph.addNode(TestNodeTypes.MULTIPLE_CONNECTIONS);
+        var node3 = graph.addNode(TestNodeTypes.MULTIPLE_CONNECTIONS);
+        var node4 = graph.addNode(TestNodeTypes.MULTIPLE_CONNECTIONS);
+        Assertions.assertEquals(4, graph.nodeCount());
+        var connection1 = NodeConnection.create(node1, "output_1", node2, "input_1");
+        var connection2 = NodeConnection.create(node1, "output_2", node2, "input_2");
+        var connection3 = NodeConnection.create(node1, "output_3", node3, "input_1");
+        var connection4 = NodeConnection.create(node3, "output_1", node4, "input_1");
+        var connection5 = NodeConnection.create(node3, "output_2", node4, "input_2");
+        var connection6 = NodeConnection.create(node3, "output_3", node4, "input_3");
+        graph.addConnection(connection1);
+        graph.addConnection(connection2);
+        graph.addConnection(connection3);
+        graph.addConnection(connection4);
+        graph.addConnection(connection5);
+        graph.addConnection(connection6);
+        Assertions.assertEquals(6, graph.connectionCount());
+        Flow.objects.insert(flow);
+        this.assertFlowCount(1);
+        var id = flow.getId();
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(ENDPOINT + "/" + id + "/nodes/" + node3.id())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + TestSecurity.FAKE_TOKEN)
+                .header("x-user-email", this.user.getEmail())
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var updatedFlow = Flow.objects.get(id);
+        var updatedGraph = updatedFlow.getGraph();
+        Assertions.assertEquals(3, updatedGraph.nodeCount());
+        Assertions.assertEquals(2, updatedGraph.connectionCount());
+        var connections = updatedGraph.getConnections();
+        Assertions.assertTrue(connections.contains(connection1));
+        Assertions.assertTrue(connections.contains(connection2));
+    }
+
+    @Test
     public void canGetNodeMetadata() throws Exception {
         var flow = createFlow(this.user);
         var graph = flow.getGraph();
