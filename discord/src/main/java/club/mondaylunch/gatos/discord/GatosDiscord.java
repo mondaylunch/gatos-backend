@@ -36,6 +36,7 @@ public class GatosDiscord implements GatosPlugin {
             throw new RuntimeException("Failed to set up JDA", e);
         }
 
+        DiscordDataTypes.init();
         NodeType.REGISTRY.register("discord.send_message", new SendDiscordMessageNode(() -> this.jda));
     }
 
