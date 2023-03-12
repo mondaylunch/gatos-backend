@@ -3,15 +3,18 @@ package club.mondaylunch.gatos.api.controller;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import javax.validation.Valid;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.hibernate.validator.constraints.Length;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,8 +36,10 @@ import club.mondaylunch.gatos.api.repository.FlowRepository;
 import club.mondaylunch.gatos.api.repository.UserRepository;
 import club.mondaylunch.gatos.core.codec.SerializationUtils;
 import club.mondaylunch.gatos.core.data.DataBox;
+import club.mondaylunch.gatos.core.executor.GraphExecutor;
 import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.NodeMetadata;
+import club.mondaylunch.gatos.core.graph.WebhookStartNodeInput;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 import club.mondaylunch.gatos.core.models.Flow;
@@ -160,7 +165,7 @@ public class FlowController {
      *
      * @return The node.
      */
-    @GetMapping(value = "{flowId}/graph/nodes/{nodeId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "{flowId}/nodes/{nodeId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getNode(
         @RequestHeader("x-user-email") String userEmail,
         @PathVariable UUID flowId,
@@ -179,7 +184,7 @@ public class FlowController {
      *
      * @return The added node.
      */
-    @PostMapping(value = "{flowId}/graph/nodes", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "{flowId}/nodes", produces = MediaType.APPLICATION_JSON_VALUE)
     public String addNode(
         @RequestHeader("x-user-email") String userEmail,
         @PathVariable UUID flowId,
@@ -200,7 +205,7 @@ public class FlowController {
      *
      * @return The node with the updated settings.
      */
-    @PatchMapping(value = "{flowId}/graph/nodes/{nodeId}/settings", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "{flowId}/nodes/{nodeId}/settings", produces = MediaType.APPLICATION_JSON_VALUE)
     public String modifyNodeSettings(
         @RequestHeader("x-user-email") String userEmail,
         @PathVariable UUID flowId,
@@ -240,7 +245,7 @@ public class FlowController {
     /**
      * Deletes a node from the flow graph.
      */
-    @DeleteMapping("{flowId}/graph/nodes/{nodeId}")
+    @DeleteMapping("{flowId}/nodes/{nodeId}")
     public void deleteNode(
         @RequestHeader("x-user-email") String userEmail,
         @PathVariable UUID flowId,
@@ -258,7 +263,7 @@ public class FlowController {
      *
      * @return The connections.
      */
-    @GetMapping(value = "{flowId}/graph/connections/{nodeId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "{flowId}/connections/{nodeId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getConnections(
         @RequestHeader("x-user-email") String userEmail,
         @PathVariable UUID flowId,
@@ -293,7 +298,7 @@ public class FlowController {
      *
      * @return The added connection.
      */
-    @PostMapping(value = "{flowId}/graph/connections", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "{flowId}/connections", produces = MediaType.APPLICATION_JSON_VALUE)
     public String addConnection(
         @RequestHeader("x-user-email") String userEmail,
         @PathVariable UUID flowId,
@@ -315,7 +320,7 @@ public class FlowController {
     /**
      * Deletes a connection between two nodes.
      */
-    @DeleteMapping("{flowId}/graph/connections")
+    @DeleteMapping("{flowId}/connections")
     public void deleteConnection(
         @RequestHeader("x-user-email") String userEmail,
         @PathVariable UUID flowId,
@@ -355,7 +360,7 @@ public class FlowController {
      *
      * @return The metadata.
      */
-    @GetMapping(value = "{flowId}/graph/nodes/{nodeId}/metadata", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "{flowId}/nodes/{nodeId}/metadata", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getMetadata(
         @RequestHeader("x-user-email") String userEmail,
         @PathVariable UUID flowId,
@@ -376,7 +381,7 @@ public class FlowController {
      *
      * @return The updated metadata.
      */
-    @PatchMapping(value = "{flowId}/graph/nodes/{nodeId}/metadata", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "{flowId}/nodes/{nodeId}/metadata", produces = MediaType.APPLICATION_JSON_VALUE)
     public String modifyNodeMetadata(
         @RequestHeader("x-user-email") String userEmail,
         @PathVariable UUID flowId,
@@ -392,5 +397,52 @@ public class FlowController {
         graph.setMetadata(nodeId, metadata);
         Flow.objects.updateGraph(flow);
         return SerializationUtils.toJson(metadata);
+    }
+
+    /**
+     * Executes a flow.
+     *
+     * @return The flow output.
+     */
+    @PostMapping(value = "{flowId}/run/{startNodeId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String executeFlow(
+        @RequestHeader("x-auth-token") String token,
+        @PathVariable UUID flowId,
+        @PathVariable UUID startNodeId,
+        @RequestBody(required = false) @Nullable String input
+    ) {
+        var user = this.userRepository.authenticateUser(token);
+        var flow = this.flowRepository.getFlow(user, flowId);
+        var graph = flow.getGraph();
+        var startNode = graph.getNode(startNodeId)
+            .orElseThrow(() -> new NodeNotFoundException(startNodeId));
+        boolean isWebhookStart = NodeType.REGISTRY.get("webhook_start")
+            .map(nodeType -> startNode.type().equals(nodeType))
+            .orElse(false);
+        if (!isWebhookStart) {
+            throw new InvalidNodeTypeException("Node with ID " + startNodeId + " is not a webhook start node.");
+        }
+        var executor = new GraphExecutor(graph);
+        var executeFunction = executor.execute(startNodeId);
+        JsonObject inputJson;
+        if (input == null) {
+            inputJson = new JsonObject();
+        } else {
+            var inputJsonElement = JsonParser.parseString(input);
+            if (inputJsonElement.isJsonObject()) {
+                inputJson = inputJsonElement.getAsJsonObject();
+            } else {
+                throw new InvalidBodyException("Body must be a JSON object");
+            }
+        }
+        AtomicReference<?> outputReference = new AtomicReference<>();
+        var webhookStartInput = new WebhookStartNodeInput(inputJson, outputReference);
+        executeFunction.accept(webhookStartInput);
+        var output = outputReference.get();
+        if (output == null) {
+            return new JsonObject().toString();
+        } else {
+            return SerializationUtils.toJson(output);
+        }
     }
 }

@@ -2,11 +2,11 @@ package club.mondaylunch.gatos.core.collection.test;
 
 import java.util.UUID;
 
+import com.mongodb.MongoWriteException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import com.mongodb.MongoWriteException;
 
 import club.mondaylunch.gatos.core.models.Flow;
 
@@ -154,6 +154,21 @@ public class FlowCollectionTest {
     public void canDeleteNonExistentFlow() {
         Flow.objects.delete(UUID.randomUUID());
         this.assertFlowCountChange(0);
+    }
+
+    @Test
+    public void containsFlow() {
+        var flow = createFlow();
+        Flow.objects.insert(flow);
+        this.assertFlowCountChange(1);
+        var flowId = flow.getId();
+        Assertions.assertTrue(Flow.objects.contains(flowId));
+    }
+
+    @Test
+    public void doesNotContainFlow() {
+        var flowId = UUID.randomUUID();
+        Assertions.assertFalse(Flow.objects.contains(flowId));
     }
 
     private void assertFlowCountChange(long change) {
