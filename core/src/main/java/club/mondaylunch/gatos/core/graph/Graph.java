@@ -499,7 +499,21 @@ public class Graph {
                 Set<NodeConnection<?>> connections = SerializationUtils.readSet(reader, decoderContext, NodeConnection.class, this.registry);
                 reader.readName("metadata");
                 Map<UUID, NodeMetadata> metadata = SerializationUtils.readMap(reader, decoderContext, NodeMetadata.class, UUID::fromString, this.registry);
-                return new Graph(nodes, metadata, connections);
+
+                // adding connections in certain ways makes the graph sad, lets filter out connections that would do that
+                var nodeIds = nodes.stream().map(Node::id).collect(Collectors.toSet());
+                // list for faster iteration b/c we're gonna be doing a lot of streams
+                List<NodeConnection<?>> filteredConnections = new ArrayList<>();
+                for (var conn : connections) {
+                    if (nodeIds.contains(conn.from().nodeId())
+                        && nodeIds.contains(conn.to().nodeId())
+                        && filteredConnections.stream().noneMatch(c -> c.to().equals(conn.to()))
+                    ) {
+                        filteredConnections.add(conn);
+                    }
+                }
+
+                return new Graph(nodes, metadata, filteredConnections);
             });
         }
 
