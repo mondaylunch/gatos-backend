@@ -13,7 +13,9 @@ import java.util.UUID;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.UpdateOneModel;
 import com.mongodb.client.model.Updates;
+import com.mongodb.client.model.WriteModel;
 import org.bson.conversions.Bson;
 
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
@@ -192,23 +194,28 @@ public class GraphObserver {
      */
     public void updateFlow(UUID flowId, MongoCollection<Flow> collection) {
         this.validate();
-        List<Bson> updates = new ArrayList<>();
+        List<Bson> bsonUpdates = new ArrayList<>();
+        List<WriteModel<Flow>> writeModelUpdates = new ArrayList<>();
+        var flowIdFilter = Filters.eq(flowId);
 
-        this.updateAddNode(updates);
-        this.updateModifyNode(flowId, collection);
-        this.updateRemoveNode(updates);
+        this.updateAddNode(bsonUpdates);
+        this.updateModifyNode(flowIdFilter, writeModelUpdates);
+        this.updateRemoveNode(bsonUpdates);
 
-        this.updateAddConnection(updates);
-        this.updateModifyConnection(flowId, collection);
-        this.updateRemoveConnection(updates);
+        this.updateAddConnection(bsonUpdates);
+        this.updateModifyConnection(flowIdFilter, writeModelUpdates);
+        this.updateRemoveConnection(bsonUpdates);
 
-        this.updateAddMetadata(updates);
-        this.updateModifyMetadata(updates);
-        this.updateRemoveMetadata(flowId, collection);
+        this.updateAddMetadata(bsonUpdates);
+        this.updateModifyMetadata(bsonUpdates);
+        this.updateRemoveMetadata(bsonUpdates);
 
-        if (!updates.isEmpty()) {
-            var update = Updates.combine(updates);
-            collection.updateOne(Filters.eq(flowId), update);
+        if (!bsonUpdates.isEmpty()) {
+            var update = Updates.combine(bsonUpdates);
+            writeModelUpdates.add(new UpdateOneModel<>(flowIdFilter, update));
+        }
+        if (!writeModelUpdates.isEmpty()) {
+            collection.bulkWrite(writeModelUpdates);
         }
     }
 
@@ -288,11 +295,11 @@ public class GraphObserver {
         }
     }
 
-    private void updateModifyNode(UUID flowId, MongoCollection<Flow> collection) {
+    private void updateModifyNode(Bson flowIdFilter, List<WriteModel<Flow>> updates) {
         for (var modified : this.modifiedNodes.values()) {
-            var filter = Filters.and(Filters.eq(flowId), Filters.eq("graph.nodes.id", modified.id()));
+            var filter = Filters.and(flowIdFilter, Filters.eq("graph.nodes.id", modified.id()));
             var update = Updates.set("graph.nodes.$", modified);
-            collection.updateOne(filter, update);
+            updates.add(new UpdateOneModel<>(filter, update));
         }
     }
 
@@ -311,17 +318,17 @@ public class GraphObserver {
         }
     }
 
-    private void updateModifyConnection(UUID flowId, MongoCollection<Flow> collection) {
+    private void updateModifyConnection(Bson flowIdFilter, List<WriteModel<Flow>> updates) {
         for (var modified : this.modifiedConnections.values()) {
             var filter = Filters.and(
-                Filters.eq(flowId),
+                flowIdFilter,
                 Filters.eq("graph.connections.output.node_id", modified.from().nodeId()),
                 Filters.eq("graph.connections.output.name", modified.from().name()),
                 Filters.eq("graph.connections.input.node_id", modified.to().nodeId()),
                 Filters.eq("graph.connections.input.name", modified.to().name())
             );
             var update = Updates.set("graph.connections.$", modified);
-            collection.updateOne(filter, update);
+            updates.add(new UpdateOneModel<>(filter, update));
         }
     }
 
@@ -359,11 +366,10 @@ public class GraphObserver {
         updates.add(update);
     }
 
-    private void updateRemoveMetadata(UUID flowId, MongoCollection<Flow> collection) {
+    private void updateRemoveMetadata(List<Bson> updates) {
         for (var nodeId : this.removedMetadata.keySet()) {
-            var filter = Filters.eq(flowId);
             var update = Updates.unset("graph.metadata." + nodeId);
-            collection.updateOne(filter, update);
+            updates.add(update);
         }
     }
 
