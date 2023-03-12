@@ -16,6 +16,7 @@ public class TestNodeTypes {
 
     public static final NodeType.Process NO_INPUTS = NodeType.REGISTRY.register("test_no_inputs", new TestNoInputNodeType());
     public static final NodeType.Process PROCESS = NodeType.REGISTRY.register("test_process", new TestProcessNodeType());
+    public static final NodeType.Process MULTIPLE_CONNECTIONS = NodeType.REGISTRY.register("test_multiple_connections", new TestMultipleConnections());
     public static final NodeType.End END = NodeType.REGISTRY.register("test_end", new TestEndNodeType());
 
     private static class TestNoInputNodeType extends NodeType.Process {
@@ -60,6 +61,37 @@ public class TestNodeTypes {
         @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(new NodeConnector.Output<>(nodeId, "process_output", DataType.NUMBER));
+        }
+
+        @Override
+        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+            return Map.of();
+        }
+    }
+
+    private static class TestMultipleConnections extends NodeType.Process {
+
+        @Override
+        public Map<String, DataBox<?>> settings() {
+            return Map.of();
+        }
+
+        @Override
+        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+            return Set.of(
+                new NodeConnector.Input<>(nodeId, "input_1", DataType.NUMBER),
+                new NodeConnector.Input<>(nodeId, "input_2", DataType.NUMBER),
+                new NodeConnector.Input<>(nodeId, "input_3", DataType.NUMBER)
+            );
+        }
+
+        @Override
+        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+            return Set.of(
+                new NodeConnector.Output<>(nodeId, "output_1", DataType.NUMBER),
+                new NodeConnector.Output<>(nodeId, "output_2", DataType.NUMBER),
+                new NodeConnector.Output<>(nodeId, "output_3", DataType.NUMBER)
+            );
         }
 
         @Override
