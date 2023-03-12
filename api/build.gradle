@@ -35,18 +35,6 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-processResources {
-    filesMatching('**/*') {
-        expand getSecrets()
-    }
-}
-
-static def getSecrets() {
-    def secrets = new Properties()
-    secrets.load(new FileInputStream("secrets.properties"))
-    return secrets
-}
-
 tasks.named('test') {
 	useJUnitPlatform()
 }
