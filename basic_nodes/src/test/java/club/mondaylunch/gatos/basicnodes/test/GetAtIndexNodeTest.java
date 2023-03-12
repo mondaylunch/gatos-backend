@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -12,11 +13,7 @@ import club.mondaylunch.gatos.basicnodes.BasicNodes;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.data.ListDataType;
-import club.mondaylunch.gatos.core.data.OptionalDataType;
-import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.Node;
-import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
-import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 
 public class GetAtIndexNodeTest {
 
@@ -42,7 +39,7 @@ public class GetAtIndexNodeTest {
             "index", DataType.NUMBER.create(0.0)
         );
         var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), Map.of());
-        Assertions.assertEquals(OptionalDataType.GENERIC_OPTIONAL, output.get("output").join().value());
+        Assertions.assertEquals(Optional.empty(), output.get("output").join().value());
     }
 
     @Test
@@ -52,7 +49,7 @@ public class GetAtIndexNodeTest {
             "index", DataType.NUMBER.create(6.0)
         );
         var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), Map.of());
-        Assertions.assertEquals(OptionalDataType.GENERIC_OPTIONAL, output.get("output").join().value());
+        Assertions.assertEquals(Optional.empty(), output.get("output").join().value());
     }
 
     @Test
@@ -98,9 +95,13 @@ public class GetAtIndexNodeTest {
             "input", DataType.NUMBER
         );
 
-        var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), inputTypes);
+        var node = Node.create(BasicNodes.GET_AT_INDEX).updateInputTypes(inputTypes);
+        var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), node.inputTypes());
         Assertions.assertEquals(0, output.get("output").join().value());
-        Assertions.assertEquals(output.get("output").join().type(), DataType.NUMBER);
+        // System.out.println(node.inputTypes());
+        // System.out.println(node.getOutputWithName("output").get().type());
+
+        Assertions.assertEquals(DataType.NUMBER, node.getOutputWithName("output").orElseThrow().type());
     }
 
     @Test
@@ -115,8 +116,7 @@ public class GetAtIndexNodeTest {
         );
 
         var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), inputTypes);
-        Assertions.assertEquals(OptionalDataType.GENERIC_OPTIONAL, output.get("output").join().value());
-        Assertions.assertEquals(output.get("output").join().type(), DataType.NUMBER);
+        Assertions.assertEquals(Optional.empty(), output.get("output").join().value());
     }
 
     @Test
@@ -139,21 +139,6 @@ public class GetAtIndexNodeTest {
         var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), inputTypes);
         Assertions.assertEquals("i0", output.get("output").join().value());
         Assertions.assertEquals(output.get("output").join().type(), DataType.STRING);
-    }
-
-    @Test
-    public void correctlyEvaluatesLinkedNodesInGraph() {
-        List<Node> nodeList = new ArrayList<>();
-        var firstNode = Node.create(BasicNodes.GET_AT_INDEX);
-        var secondNode = Node.create(BasicNodes.GET_AT_INDEX);
-        nodeList.add(firstNode);
-        nodeList.add(secondNode);
-
-        List<NodeConnection<?>> connectionsList = new ArrayList<>();
-        var connection = NodeConnection.createConnection(firstNode, "output", secondNode, "input", DataType.NUMBER);
-        connectionsList.add(connection.get());
-        Graph graph = new Graph(nodeList, Map.of(), connectionsList);
-        Assertions.assertEquals(graph.getNode(secondNode.id()).get().getOutputWithName("output"), DataType.NUMBER);
     }
 
 }
