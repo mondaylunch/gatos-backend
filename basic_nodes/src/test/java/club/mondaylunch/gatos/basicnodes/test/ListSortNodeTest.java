@@ -24,6 +24,7 @@ public class ListSortNodeTest {
         private final double sampleInt = 23;
         private final boolean sampleBoolean = true;
     }
+
     private static final Gson GSON = new Gson();
     private static final List<JsonObject> TEST_JSN_LIST = Arrays.asList(new JsonObject(), GSON.fromJson(GSON.toJson(new TestJSONObjectClass()), JsonObject.class));
 
