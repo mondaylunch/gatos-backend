@@ -57,6 +57,9 @@ public class MathNodeType extends NodeType.Process {
         },
         DIVISION("/") { @Override public double apply(double a, double b) {
                 return a / b; }
+        },
+        EXPONENT("^") { @Override public double apply(double a, double b) {
+                return Math.pow(a, b); }
         };
 
         private final String op;
@@ -79,7 +82,7 @@ public class MathNodeType extends NodeType.Process {
 
     /**
      * if no mode is given default to addition.
-     * @param inputs    a map of the two inputted doubles
+     * @param inputs    a map of the two inputted double operands
      * @return          a map of the computed result
      */
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs) {
