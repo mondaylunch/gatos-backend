@@ -372,6 +372,19 @@ public class FlowController {
         return SerializationUtils.toJson(metadata);
     }
 
+    //TODO: test for this
+    @GetMapping(value = "{flowId}/validate", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String validateFlow(
+        @RequestHeader("x-user-email") String userEmail,
+        @PathVariable UUID flowId
+    ) {
+        User user = this.userRepository.getOrCreateUser(userEmail);
+        var flow = this.flowRepository.getFlow(user, flowId);
+        var graph = flow.getGraph();
+        var errors = graph.validate();
+        return SerializationUtils.toJson(errors);
+    }
+
     /**
      * Modifies a node's metadata.
      *
