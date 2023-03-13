@@ -82,7 +82,8 @@ public class ParseStringToNumberNodeTest {
         Assertions.assertEquals(11111111.11, output);
     }
 
-    @Test void correctlyNaNsInvalid() {
+    @Test
+    void correctlyNaNsInvalid() {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.STRING.create("11.11.11")
         );
