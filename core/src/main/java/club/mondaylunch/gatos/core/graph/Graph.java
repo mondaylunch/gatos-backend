@@ -546,7 +546,7 @@ public class Graph {
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
-        } else if (obj == null || getClass() != obj.getClass()) {
+        } else if (obj == null || this.getClass() != obj.getClass()) {
             return false;
         } else {
             Graph graph = (Graph) obj;
