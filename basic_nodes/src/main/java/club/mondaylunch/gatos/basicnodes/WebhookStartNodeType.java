@@ -37,6 +37,11 @@ public class WebhookStartNodeType extends NodeType.Start<WebhookStartNodeInput> 
     }
 
     @Override
+    public void teardownFlow(Flow flow, Node node) {
+
+    }
+
+    @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable WebhookStartNodeInput input, Map<String, DataBox<?>> settings) {
         Objects.requireNonNull(input);
         return Map.of(
