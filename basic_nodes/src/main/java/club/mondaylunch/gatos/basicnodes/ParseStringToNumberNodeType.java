@@ -10,7 +10,7 @@ import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
-public class ParseNumberFromStringNodeType extends NodeType.Process {
+public class ParseStringToNumberNodeType extends NodeType.Process {
     @Override
     public Map<String, DataBox<?>> settings() {
         return Map.of();

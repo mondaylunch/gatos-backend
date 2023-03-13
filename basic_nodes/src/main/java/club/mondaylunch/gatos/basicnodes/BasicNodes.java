@@ -52,8 +52,8 @@ public final class BasicNodes implements GatosPlugin {
         .register("truthiness", new TruthinessNodeType());
     public static final NegationNodeType NEGATION = NodeType.REGISTRY
         .register("negation", new NegationNodeType());
-    public static final ParseNumberFromStringNodeType PARSE_NUMBER_FROM_STRING = NodeType.REGISTRY
-        .register("parse_number_from_string", new ParseNumberFromStringNodeType());
+    public static final ParseStringToNumberNodeType PARSE_STRING_TO_NUMBER = NodeType.REGISTRY
+        .register("parse_string_to_number", new ParseStringToNumberNodeType());
     public static final HTTPRequestNodeType HTTP_REQUEST = NodeType.REGISTRY
         .register("http_request", new HTTPRequestNodeType());
     public static final WebhookStartNodeType WEBHOOK_START = NodeType.REGISTRY
