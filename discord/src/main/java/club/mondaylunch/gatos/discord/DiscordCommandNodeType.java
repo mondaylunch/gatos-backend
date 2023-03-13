@@ -36,7 +36,8 @@ public class DiscordCommandNodeType extends NodeType.Start<SlashCommandInteracti
     public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         return Set.of(
             new NodeConnector.Output<>(nodeId, "user", DiscordDataTypes.USER_ID),
-            new NodeConnector.Output<>(nodeId, "channel", DiscordDataTypes.CHANNEL_ID)
+            new NodeConnector.Output<>(nodeId, "channel", DiscordDataTypes.CHANNEL_ID),
+            new NodeConnector.Output<>(nodeId, "command_event", DiscordDataTypes.SLASH_COMMAND_EVENT)
         );
     }
 
@@ -49,9 +50,6 @@ public class DiscordCommandNodeType extends NodeType.Start<SlashCommandInteracti
             throw new IllegalStateException("Guild not found: " + guildId);
         }
         this.gatosDiscord.createSlashCommandListener(node.id(), commandName, guild, s -> {
-            if (s != null) {
-                s.reply("...").setEphemeral(true).queue();
-            }
             function.accept(s);
         });
     }
@@ -71,7 +69,8 @@ public class DiscordCommandNodeType extends NodeType.Start<SlashCommandInteracti
         }
         return Map.of(
             "user", CompletableFuture.completedFuture(DiscordDataTypes.USER_ID.create(event.getUser().getId())),
-            "channel", CompletableFuture.completedFuture(DiscordDataTypes.CHANNEL_ID.create(event.getChannel().getId()))
+            "channel", CompletableFuture.completedFuture(DiscordDataTypes.CHANNEL_ID.create(event.getChannel().getId())),
+            "command_event", CompletableFuture.completedFuture(DiscordDataTypes.SLASH_COMMAND_EVENT.create(event))
         );
     }
 }
