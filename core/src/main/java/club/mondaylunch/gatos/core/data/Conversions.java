@@ -1,6 +1,7 @@
 package club.mondaylunch.gatos.core.data;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -60,9 +61,17 @@ public final class Conversions {
         return typeB.create(result);
     }
 
+    /**
+     * Get a list of all registered conversions.
+     * @return a list of all registered conversions
+     */
+    public static List<ConversionPair> getAllConversions() {
+        return List.copyOf(MAP.keySet());
+    }
+
     private Conversions() {}
 
-    private record ConversionPair(DataType<?> a, DataType<?> b) {
+    public record ConversionPair(DataType<?> a, DataType<?> b) {
     }
 
     /**
