@@ -23,8 +23,8 @@ public class StringLengthNodeTest {
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.STRING_LENGTH);
-        Assertions.assertEquals(1, node.outputs().size());
-        Assertions.assertTrue(node.outputs().containsKey("output"));
+        Assertions.assertEquals(1, node.getOutputs().size());
+        Assertions.assertTrue(node.getOutputs().containsKey("output"));
     }
 
     @Test
@@ -32,14 +32,14 @@ public class StringLengthNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.STRING.create(TEST_STR)
         );
-        var output = BasicNodes.STRING_LENGTH.compute(input, Map.of());
-        Assertions.assertEquals(output.get("output").join().value(), 44);
+        var output = BasicNodes.STRING_LENGTH.compute(input, Map.of(), Map.of());
+        Assertions.assertEquals(44.0, output.get("output").join().value());
     }
 
     @Test
     public void correctlyBehavesForIncorrectInputs() {
         Map<String, DataBox<?>> input0 = Map.of();
-        var output0 = BasicNodes.STRING_LENGTH.compute(input0, Map.of());
-        Assertions.assertEquals(output0.get("output").join().value(), 0);
+        var output0 = BasicNodes.STRING_LENGTH.compute(input0, Map.of(), Map.of());
+        Assertions.assertEquals(0.0, output0.get("output").join().value());
     }
 }

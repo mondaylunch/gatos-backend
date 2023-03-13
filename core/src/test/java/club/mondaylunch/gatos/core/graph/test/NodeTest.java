@@ -32,7 +32,7 @@ public class NodeTest {
     @Test
     public void canGetOutputs() {
         var node = Node.create(TEST_NODE_TYPE);
-        Assertions.assertTrue(node.outputs().containsKey("out"));
+        Assertions.assertTrue(node.getOutputs().containsKey("out"));
     }
 
     @Test
@@ -44,14 +44,14 @@ public class NodeTest {
     @Test
     public void canGetSettingByName() {
         var node = Node.create(TEST_NODE_TYPE);
-        Assertions.assertEquals(0, node.getSetting("setting_1", DataType.INTEGER).value());
+        Assertions.assertEquals(0, node.getSetting("setting_1", DataType.NUMBER).value());
     }
 
     @Test
     public void gettingWrongSettingThrows() {
         var node = Node.create(TEST_NODE_TYPE);
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            node.getSetting("setting_3", DataType.INTEGER);
+            node.getSetting("setting_3", DataType.NUMBER);
         });
     }
 
@@ -59,23 +59,23 @@ public class NodeTest {
     public void gettingWrongTypeSettingThrows() {
         var node = Node.create(TEST_NODE_TYPE);
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            node.getSetting("setting_2", DataType.INTEGER);
+            node.getSetting("setting_2", DataType.NUMBER);
         });
     }
 
     @Test
     public void canMakeNewNodeWithChangedSettings() {
         var node = Node.create(TEST_NODE_TYPE);
-        var newNode = node.modifySetting("setting_1", DataType.INTEGER.create(100));
+        var newNode = node.modifySetting("setting_1", DataType.NUMBER.create(100.));
         Assertions.assertEquals(node.id(), newNode.id());
-        Assertions.assertEquals(100, newNode.getSetting("setting_1", DataType.INTEGER).value());
+        Assertions.assertEquals(100, newNode.getSetting("setting_1", DataType.NUMBER).value());
     }
 
     @Test
     public void changingNonexistentSettingThrows() {
         var node = Node.create(TEST_NODE_TYPE);
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            node.modifySetting("setting_3", DataType.INTEGER.create(100));
+            node.modifySetting("setting_3", DataType.NUMBER.create(100.));
         });
     }
 
@@ -83,7 +83,7 @@ public class NodeTest {
     public void changingWrongTypeSettingThrows() {
         var node = Node.create(TEST_NODE_TYPE);
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            node.modifySetting("setting_2", DataType.INTEGER.create(100));
+            node.modifySetting("setting_2", DataType.NUMBER.create(100.));
         });
     }
 
@@ -97,18 +97,18 @@ public class NodeTest {
 
     private static final class TestNodeType extends NodeType.Process {
         @Override
-        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state) {
+        public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
-                    new NodeConnector.Input<>(nodeId, "in", DataType.INTEGER));
+                    new NodeConnector.Input<>(nodeId, "in", DataType.NUMBER));
         }
 
         @Override
-        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state) {
-            var out = new NodeConnector.Output<>(nodeId, "out", DataType.INTEGER);
-            return (Boolean) state.get("setting_2").value()
+        public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+            var out = new NodeConnector.Output<>(nodeId, "out", DataType.NUMBER);
+            return (Boolean) settings.get("setting_2").value()
                     ? Set.of(
                             out,
-                            new NodeConnector.Output<>(nodeId, "out_2", DataType.INTEGER))
+                            new NodeConnector.Output<>(nodeId, "out_2", DataType.NUMBER))
                     : Set.of(
                             out);
         }
@@ -116,13 +116,13 @@ public class NodeTest {
         @Override
         public Map<String, DataBox<?>> settings() {
             return Map.of(
-                    "setting_1", DataType.INTEGER.create(0),
+                    "setting_1", DataType.NUMBER.create(0.),
                     "setting_2", DataType.BOOLEAN.create(false));
         }
 
         @Override
         public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
-                Map<String, DataBox<?>> settings) {
+                Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Map.of();
         }
     }

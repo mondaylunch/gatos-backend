@@ -3,6 +3,7 @@ package club.mondaylunch.gatos.core.graph.connector;
 import java.util.Objects;
 import java.util.UUID;
 
+import club.mondaylunch.gatos.core.data.Conversions;
 import club.mondaylunch.gatos.core.data.DataType;
 
 /**
@@ -65,6 +66,15 @@ public abstract sealed class NodeConnector<T> {
         return Objects.hash(this.nodeId, this.name, this.dataType);
     }
 
+    @Override
+    public String toString() {
+        return "NodeConnector{"
+            + "nodeId=" + this.nodeId
+            + ", name='" + this.name
+            + ", dataType=" + this.dataType
+            + '}';
+    }
+
     /**
      * An input connector on a node.
      * @param <T> the type of data this node takes in
@@ -82,6 +92,28 @@ public abstract sealed class NodeConnector<T> {
     public static final class Output<T> extends NodeConnector<T> {
         public Output(UUID nodeId, String name, DataType<T> dataType) {
             super(nodeId, name, dataType);
+        }
+
+        /**
+         * Returns a new object which refers to the same connector conceptually, but with a different datatype.
+         * @param type  the new datatype
+         * @param <B>   the new type
+         * @return      a new output connector with the type
+         */
+        public <B> Output<B> withType(DataType<B> type) {
+            return new Output<>(this.nodeId(), this.name(), type);
+        }
+
+        /**
+         * Returns whether the other connector has the same node ID and name, and that this connector's datatype can be
+         * converted to the other connector's.
+         * @param other the other connector
+         * @return      whether the connectors are compatible
+         */
+        public boolean isCompatible(Output<?> other) {
+            return this.nodeId().equals(other.nodeId())
+                && this.name().equals(other.name())
+                && Conversions.canConvert(this.type(), other.type());
         }
     }
 }

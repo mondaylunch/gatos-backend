@@ -4,11 +4,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
+import club.mondaylunch.gatos.core.Registry;
 import club.mondaylunch.gatos.core.data.DataBox;
+import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
+import club.mondaylunch.gatos.core.models.Flow;
 
 /**
  * A type of node that may go on a graph.
@@ -34,6 +40,11 @@ import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 @ApiStatus.NonExtendable
 public interface NodeType {
     /**
+     * The Node Type registry.
+     */
+    Registry<NodeType> REGISTRY = Registry.create("node_type", NodeType.class);
+
+    /**
      * Returns the category this node type belongs to.
      * @return the category this node type belongs to
      */
@@ -51,12 +62,13 @@ public interface NodeType {
     @ApiStatus.NonExtendable
     interface WithInputs {
         /**
-         * The input connectors of a node with a given UUID & settings state.
+         * The input connectors of a node with a given UUID, settings, & current input connections (if any).
          * @param nodeId the node UUID
-         * @param state  the node settings
+         * @param settings  the node settings
+         * @param inputTypes what type of output connector the input connectors to this node are connected to, if any
          * @return the input connectors of the node
          */
-        Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> state);
+        Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes);
     }
 
     /**
@@ -65,31 +77,55 @@ public interface NodeType {
     @ApiStatus.NonExtendable
     interface WithOutputs {
         /**
-         * The output connectors of a node with a given UUID & settings state.
+         * The output connectors of a node with a given UUID, settings, & input connections.
          * @param nodeId the node UUID
-         * @param state  the node settings
+         * @param settings  the node settings
+         * @param inputTypes what type of output connector the input connectors to this node are connected to, if any
          * @return the output connectors of the node
          */
-        Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> state);
+        Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes);
 
         /**
          * (Asynchronously) compute the outputs of this node in a map of output
          * connector name to value.
          * @param inputs   a map of input connector name to value
          * @param settings a map of node settings
+         * @param inputTypes what type of output connector the input connectors to this node are connected to, if any
          * @return a CompletableFuture of each output in a map by name
          */
         Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
-                Map<String, DataBox<?>> settings);
+                Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes);
     }
 
     /**
      * A node type of the {@link NodeCategory#START start} category.
      */
-    abstract class Start implements NodeType, WithOutputs {
+    abstract class Start<StartInput> implements NodeType, WithOutputs {
         @Override
         public final NodeCategory category() {
             return NodeCategory.START;
+        }
+
+        /**
+         * Perform whatever setup is needed to get the flow this node is in to trigger.
+         * @param flow  the flow this node is a part of
+         * @param function the function to call to start the flow from this node
+         * @param node  the node
+         */
+        public abstract void setupFlow(Flow flow, Consumer<@Nullable StartInput> function, Node node);
+
+        /**
+         * (Asynchronously) compute the outputs of this node in a map of output
+         * connector name to value.
+         * @param startInput whatever input this start node has. This can be null, if this node is not the one triggering the flow!
+         * @param settings a map of node settings
+         * @return a CompletableFuture of each output in a map by name
+         */
+        public abstract Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable StartInput startInput, Map<String, DataBox<?>> settings);
+
+        @Override
+        public final Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+            return this.compute(null, settings);
         }
     }
 
@@ -127,11 +163,11 @@ public interface NodeType {
      * inputs.
      * @param type  the node type
      * @param id    the UUID of the node these inputs are for
-     * @param state the settings state of the node these inputs are for
+     * @param settings the settings of the node these inputs are for
      * @return the inputs, or empty
      */
-    static Set<NodeConnector.Input<?>> inputsOrEmpty(NodeType type, UUID id, Map<String, DataBox<?>> state) {
-        return type instanceof WithInputs inputType ? inputType.inputs(id, state) : Set.of();
+    static Set<NodeConnector.Input<?>> inputsOrEmpty(NodeType type, UUID id, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+        return type instanceof WithInputs inputType ? inputType.inputs(id, settings, inputTypes) : Set.of();
     }
 
     /**
@@ -139,10 +175,11 @@ public interface NodeType {
      * outputs.
      * @param type  the node type
      * @param id    the UUID of the node these outputs are for
-     * @param state the settings state of the node these outputs are for
+     * @param settings the settings of the node these outputs are for
+     * @param inputTypes what type of output connector the input connectors to the node are connected to, if any
      * @return the outputs, or empty
      */
-    static Set<NodeConnector.Output<?>> outputsOrEmpty(NodeType type, UUID id, Map<String, DataBox<?>> state) {
-        return type instanceof WithOutputs outputType ? outputType.outputs(id, state) : Set.of();
+    static Set<NodeConnector.Output<?>> outputsOrEmpty(NodeType type, UUID id, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+        return type instanceof WithOutputs outputType ? outputType.outputs(id, settings, inputTypes) : Set.of();
     }
 }

@@ -1,8 +1,6 @@
 package club.mondaylunch.gatos.core.graph.connector;
 
-import java.util.Optional;
-
-import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.data.Conversions;
 import club.mondaylunch.gatos.core.graph.Node;
 
 /**
@@ -15,24 +13,21 @@ import club.mondaylunch.gatos.core.graph.Node;
 public record NodeConnection<T>(
         NodeConnector.Output<T> from,
         NodeConnector.Input<T> to) {
+    public static NodeConnection<?> create(Node fromNode, String fromName, Node toNode, String toName) {
+        var from = fromNode.getOutputWithName(fromName)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid node output: " + fromName));
+        var to = toNode.getInputWithName(toName)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid node input: " + toNode));
 
-    public static <T> Optional<NodeConnection<T>> createConnection(Node fromNode, String fromName, Node toNode,
-            String toName, DataType<T> type) {
-        var fromOpt = fromNode.getOutputWithName(fromName);
-        var toOpt = toNode.getInputWithName(toName);
-        if (fromOpt.isEmpty() || toOpt.isEmpty()) {
-            return Optional.empty();
+        if (!Conversions.canConvert(from.type(), to.type())) {
+            throw new IllegalArgumentException("Cannot convert type " + from.type() + " to type " + to.type());
         }
 
-        var from = fromOpt.get();
-        var to = toOpt.get();
-        if (!from.type().equals(to.type()) || !from.type().equals(type)) {
-            return Optional.empty();
-        }
-
-        // We know this cast succeeds because of the check above
-        // noinspection unchecked
-        var conn = new NodeConnection<T>((NodeConnector.Output<T>) from, (NodeConnector.Input<T>) to);
-        return Optional.of(conn);
+        @SuppressWarnings("unchecked")
+        var connection = new NodeConnection<>(
+            (NodeConnector.Output<Object>) from.withType(to.type()),
+            (NodeConnector.Input<Object>) to
+        );
+        return connection;
     }
 }
