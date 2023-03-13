@@ -232,7 +232,7 @@ public class GraphTest {
         var output = graph.addNode(END_NODE_TYPE);
         var conn = NodeConnection.create(input, "out", output, "in");
         graph.addConnection(conn);
-        Assertions.assertTrue(graph.validate());
+        Assertions.assertTrue(graph.validate().isEmpty());
     }
 
     @Test
@@ -240,7 +240,7 @@ public class GraphTest {
         var graph = new Graph();
         graph.addNode(START_NODE_TYPE);
         graph.addNode(END_NODE_TYPE);
-        Assertions.assertFalse(graph.validate());
+        Assertions.assertFalse(graph.validate().isEmpty());
     }
 
     @Test
@@ -250,7 +250,7 @@ public class GraphTest {
         var output = graph.addNode(END_NODE_TYPE);
         var conn = NodeConnection.create(input, "out", output, "in");
         graph.addConnection(conn);
-        Assertions.assertFalse(graph.validate());
+        Assertions.assertFalse(graph.validate().isEmpty());
     }
 
     @Test
@@ -260,7 +260,7 @@ public class GraphTest {
         var output = graph.addNode(TEST_NODE_TYPE);
         var conn = NodeConnection.create(input, "out", output, "in");
         graph.addConnection(conn);
-        Assertions.assertFalse(graph.validate());
+        Assertions.assertFalse(graph.validate().isEmpty());
     }
 
     @Test
@@ -288,7 +288,7 @@ public class GraphTest {
             );
         graph.addConnection(conn);
 
-        Assertions.assertTrue(graph.validate());
+        Assertions.assertTrue(graph.validate().isEmpty());
     }
 
     @Test
@@ -320,7 +320,7 @@ public class GraphTest {
             graph.addNode(TEST_NODE_TYPE);
         }
 
-        Assertions.assertTrue(graph.validate());
+        Assertions.assertTrue(graph.validate().isEmpty());
     }
 
     @Test
@@ -358,8 +358,8 @@ public class GraphTest {
         }
 
         var sorted = graph.getExecutionOrder();
-        Assertions.assertTrue(sorted.isPresent());
-        Assertions.assertEquals(list, sorted.get());
+        Assertions.assertTrue(sorted.isLeft());
+        Assertions.assertEquals(list, sorted.left());
     }
 
     @Test
@@ -371,8 +371,11 @@ public class GraphTest {
         graph.addConnection(conn);
         conn = NodeConnection.create(input, "out2", output, "in2");
         graph.addConnection(conn);
-        Assertions.assertTrue(graph.validate());
+        Assertions.assertTrue(graph.validate().isEmpty());
     }
+
+    //TODO: cycle detection test
+    //TODO: custom node validation test
 
     private static final class TestNodeType extends NodeType.Process {
         @Override

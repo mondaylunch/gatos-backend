@@ -58,7 +58,7 @@ public class GraphExecutor {
      * @throws IllegalArgumentException If the graph is {@link Graph#validate() invalid}.
      */
     public GraphExecutor(Graph graph) {
-        this(graph.getExecutionOrder().orElseThrow(IllegalArgumentException::new), graph.getConnections());
+        this(graph.getExecutionOrder().maybeL().orElseThrow(IllegalArgumentException::new), graph.getConnections());
     }
 
     /**
