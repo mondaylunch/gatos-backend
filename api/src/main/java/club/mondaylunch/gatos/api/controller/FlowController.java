@@ -42,6 +42,7 @@ import club.mondaylunch.gatos.core.graph.NodeMetadata;
 import club.mondaylunch.gatos.core.graph.WebhookStartNodeInput;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
+import club.mondaylunch.gatos.core.models.BasicFlowInfo;
 import club.mondaylunch.gatos.core.models.Flow;
 import club.mondaylunch.gatos.core.models.User;
 
@@ -57,17 +58,6 @@ public class FlowController {
         this.userRepository = userRepository;
     }
 
-    private record BasicFlowInfo(
-        @JsonProperty("_id") UUID id,
-        String name,
-        String description,
-        @JsonProperty("author_id") UUID authorId
-    ) {
-        BasicFlowInfo(Flow flow) {
-            this(flow.getId(), flow.getName(), flow.getDescription(), flow.getAuthorId());
-        }
-    }
-
     /**
      * Get all flows of the user.
      *
@@ -77,10 +67,7 @@ public class FlowController {
     @GetMapping
     public List<BasicFlowInfo> getFlows(@RequestHeader(name = "x-user-email") String userEmail) {
         User user = this.userRepository.getOrCreateUser(userEmail);
-        return Flow.objects.get("author_id", user.getId())
-            .stream()
-            .map(BasicFlowInfo::new)
-            .toList();
+        return Flow.objects.getBasicInfo("author_id", user.getId());
     }
 
     /**
@@ -129,7 +116,7 @@ public class FlowController {
     @PatchMapping("{flowId}")
     public BasicFlowInfo updateFlow(
         @RequestHeader(name = "x-user-email") String userEmail, @PathVariable UUID flowId,
-                                    @Valid @RequestBody BodyUpdateFlow data) {
+        @Valid @RequestBody BodyUpdateFlow data) {
         User user = this.userRepository.getOrCreateUser(userEmail);
         var flow = this.flowRepository.getFlow(user, flowId);
 
@@ -139,8 +126,7 @@ public class FlowController {
         partial.setGraph(null);
 
         Flow.objects.update(flow.getId(), partial);
-        var updated = Flow.objects.get(flow.getId());
-        return new BasicFlowInfo(updated);
+        return Flow.objects.getBasicInfo(flow.getId());
     }
 
     /**

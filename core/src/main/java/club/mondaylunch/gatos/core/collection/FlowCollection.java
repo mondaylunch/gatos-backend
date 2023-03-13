@@ -1,9 +1,15 @@
 package club.mondaylunch.gatos.core.collection;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import org.bson.Document;
 
+import club.mondaylunch.gatos.core.Database;
+import club.mondaylunch.gatos.core.models.BasicFlowInfo;
 import club.mondaylunch.gatos.core.models.Flow;
 
 /**
@@ -11,8 +17,40 @@ import club.mondaylunch.gatos.core.models.Flow;
  */
 public class FlowCollection extends BaseCollection<Flow> {
 
+    private final MongoCollection<Document> documentCollection;
+
     public FlowCollection() {
         super("flows", Flow.class);
+        this.documentCollection = Database.getCollection("flows");
+    }
+
+    public BasicFlowInfo getBasicInfo(UUID id) {
+        var document = this.documentCollection
+            .find(Filters.eq(id))
+            .limit(1)
+            .first();
+        if (document == null) {
+            return null;
+        } else {
+            return create(document);
+        }
+    }
+
+    public List<BasicFlowInfo> getBasicInfo(String field, Object value) {
+        List<BasicFlowInfo> flows = new ArrayList<>();
+        for (var document : this.documentCollection.find(Filters.eq(field, value))) {
+            flows.add(create(document));
+        }
+        return flows;
+    }
+
+    private static BasicFlowInfo create(Document document) {
+        return new BasicFlowInfo(
+            document.get("_id", UUID.class),
+            document.get("name", String.class),
+            document.get("description", String.class),
+            document.get("author_id", UUID.class)
+        );
     }
 
     /**
