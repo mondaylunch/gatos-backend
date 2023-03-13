@@ -56,8 +56,8 @@ public class GraphExecutorTest {
         graph.addConnection(conn);
 
         var executionOrderedNodes = graph.getExecutionOrder();
-        Assertions.assertTrue(executionOrderedNodes.isPresent());
-        var graphExecutor = new GraphExecutor(executionOrderedNodes.get(), graph.getConnections());
+        Assertions.assertTrue(executionOrderedNodes.isLeft());
+        var graphExecutor = new GraphExecutor(executionOrderedNodes.left(), graph.getConnections());
 
         CompletableFuture.runAsync(graphExecutor.execute()).join();
         Assertions.assertEquals(15, result.get());
@@ -89,8 +89,8 @@ public class GraphExecutorTest {
         graph.addConnection(conn);
 
         var executionOrderedNodes = graph.getExecutionOrder();
-        Assertions.assertTrue(executionOrderedNodes.isPresent());
-        var graphExecutor = new GraphExecutor(executionOrderedNodes.get(), graph.getConnections());
+        Assertions.assertTrue(executionOrderedNodes.isLeft());
+        var graphExecutor = new GraphExecutor(executionOrderedNodes.left(), graph.getConnections());
 
         CompletableFuture.runAsync(graphExecutor.execute()).join();
         Assertions.assertEquals(15, result.get());
@@ -130,8 +130,8 @@ public class GraphExecutorTest {
         connectInt(graph, adder4, "out", output, "in");
 
         var executionOrderedNodes = graph.getExecutionOrder();
-        Assertions.assertTrue(executionOrderedNodes.isPresent());
-        var graphExecutor = new GraphExecutor(executionOrderedNodes.get(), graph.getConnections());
+        Assertions.assertTrue(executionOrderedNodes.isLeft());
+        var graphExecutor = new GraphExecutor(executionOrderedNodes.left(), graph.getConnections());
 
         CompletableFuture.runAsync(graphExecutor.execute()).join();
         Assertions.assertEquals(32, result.get());
@@ -179,8 +179,8 @@ public class GraphExecutorTest {
         connectInt(graph, adder5, "out", output2, "in");
 
         var executionOrderedNodes = graph.getExecutionOrder();
-        Assertions.assertTrue(executionOrderedNodes.isPresent());
-        var graphExecutor = new GraphExecutor(executionOrderedNodes.get(), graph.getConnections());
+        Assertions.assertTrue(executionOrderedNodes.isLeft());
+        var graphExecutor = new GraphExecutor(executionOrderedNodes.left(), graph.getConnections());
 
         CompletableFuture.runAsync(graphExecutor.execute()).join();
         Assertions.assertEquals(32, result1.get());
@@ -229,8 +229,8 @@ public class GraphExecutorTest {
         connectString(graph, adder5, "out", output2, "in");
 
         var executionOrderedNodes = graph.getExecutionOrder();
-        Assertions.assertTrue(executionOrderedNodes.isPresent());
-        var graphExecutor = new GraphExecutor(executionOrderedNodes.get(), graph.getConnections());
+        Assertions.assertTrue(executionOrderedNodes.isLeft());
+        var graphExecutor = new GraphExecutor(executionOrderedNodes.left(), graph.getConnections());
 
         CompletableFuture.runAsync(graphExecutor.execute()).join();
         Assertions.assertEquals(32, result1.get());
