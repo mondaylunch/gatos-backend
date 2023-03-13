@@ -58,7 +58,7 @@ public class MathNodeType extends NodeType.Process {
         DIVISION("/") { @Override public double apply(double a, double b) {
                 return a / b; }
         },
-        EXPONENT("^") { @Override public double apply(double a, double b) {
+        EXPONENTIATION("^") { @Override public double apply(double a, double b) {
                 return Math.pow(a, b); }
         };
 
