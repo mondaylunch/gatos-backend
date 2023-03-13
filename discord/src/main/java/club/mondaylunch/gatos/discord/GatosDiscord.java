@@ -50,6 +50,7 @@ public class GatosDiscord implements GatosPlugin {
         DiscordDataTypes.init();
         NodeType.REGISTRY.register("discord.send_message", new SendDiscordMessageNode(() -> this.jda));
         NodeType.REGISTRY.register("discord.command", new DiscordCommandNodeType(this));
+        NodeType.REGISTRY.register("discord.reply_to_command", new DiscordCommandReplyNodeType(this));
     }
 
     private String getToken() {
