@@ -246,6 +246,41 @@ public class GraphSerializationTest {
     }
 
     @Test
+    public void canAddAndRemoveConnection() {
+        var flow = createFlow();
+        var id = flow.getId();
+        var graph = flow.getGraph();
+        var node1 = graph.addNode(TestNodeTypes.NO_INPUTS);
+        var node2 = graph.addNode(TestNodeTypes.PROCESS);
+        var node3 = graph.addNode(TestNodeTypes.END);
+        var connection1 = NodeConnection.create(node1, "start_output", node2, "process_input");
+        graph.addConnection(connection1);
+        Flow.objects.insert(flow);
+        assertFlowCount(1);
+        var retrievedFlow = Flow.objects.get(id);
+        Assertions.assertEquals(flow, retrievedFlow);
+        var retrievedGraph = retrievedFlow.getGraph();
+        Assertions.assertEquals(graph, retrievedGraph);
+        Assertions.assertEquals(3, retrievedGraph.nodeCount());
+        Assertions.assertEquals(1, retrievedGraph.connectionCount());
+        assertContainsNodes(retrievedGraph, node1, node2, node3);
+        var connection2 = NodeConnection.create(node2, "process_output", node3, "end_input");
+        retrievedGraph.addConnection(connection2);
+        Assertions.assertEquals(2, retrievedGraph.connectionCount());
+        retrievedGraph.removeConnection(connection1);
+        Assertions.assertEquals(1, retrievedGraph.connectionCount());
+        Flow.objects.updateGraph(retrievedFlow);
+        assertFlowCount(1);
+        var finalFlow = Flow.objects.get(id);
+        Assertions.assertEquals(retrievedFlow, finalFlow);
+        var finalGraph = finalFlow.getGraph();
+        Assertions.assertEquals(1, finalGraph.connectionCount());
+        var connections = finalGraph.getConnections();
+        Assertions.assertEquals(1, connections.size());
+        Assertions.assertTrue(connections.contains(connection2));
+    }
+
+    @Test
     public void canSaveFlowWithMetaData() {
         var flow = createFlow();
         var id = flow.getId();

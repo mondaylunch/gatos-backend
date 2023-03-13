@@ -210,8 +210,7 @@ public class GraphObserver {
         this.updateModifyMetadata(bsonUpdates);
         this.updateRemoveMetadata(bsonUpdates);
 
-        if (!bsonUpdates.isEmpty()) {
-            var update = Updates.combine(bsonUpdates);
+        for (var update : bsonUpdates) {
             writeModelUpdates.add(new UpdateOneModel<>(flowIdFilter, update));
         }
         if (!writeModelUpdates.isEmpty()) {
@@ -280,7 +279,7 @@ public class GraphObserver {
     private static <T> Set<T> intersection(Set<T> set1, Set<T> set2, Set<T>... sets) {
         Set<T> result = new HashSet<>(set1);
         result.retainAll(set2);
-        for (Set<T> set : sets) {
+        for (var set : sets) {
             result.retainAll(set);
         }
         return result;
