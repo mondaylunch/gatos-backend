@@ -45,7 +45,7 @@ public class RegexNodeType extends NodeType.Process {
     }
 
     @Override
-    public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings) {
+    public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         return Set.of(
             new NodeConnector.Input<>(nodeId, "regex",  DataType.STRING),
             new NodeConnector.Input<>(nodeId, "word",   DataType.STRING)
@@ -53,8 +53,8 @@ public class RegexNodeType extends NodeType.Process {
     }
 
     @Override
-    public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings) {
-        Set<NodeConnector.Output<?>> standardOut =  Set.of(
+    public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+        Set<NodeConnector.Output<?>> standardOut = Set.of(
             new NodeConnector.Output<>(nodeId, "isMatch",   DataType.BOOLEAN),
             new NodeConnector.Output<>(nodeId, "match",     DataType.STRING),
             new NodeConnector.Output<>(nodeId, "group",     DataType.STRING.listOf())
@@ -85,7 +85,7 @@ public class RegexNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {        
+    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {        
         var regex = Pattern.compile(DataBox.get(settings, "regex", DataType.STRING).orElseThrow());        
         var word  = DataBox.get(settings, "word",  DataType.STRING).orElseThrow();
         var matcher = regex.matcher(word);
@@ -147,5 +147,9 @@ public class RegexNodeType extends NodeType.Process {
         } catch (Exception e) {
             return "";
         }
+    }
+
+    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+        return compute(inputs, settings, Map.of());
     }
 }
