@@ -33,7 +33,7 @@ public class ParseStringToNumberNodeType extends NodeType.Process {
         double output = 0;
         try {
             output = Double.parseDouble(String.join("", DataBox.get(inputs, "input", DataType.STRING).orElse("").split(",")));
-        } catch(NumberFormatException e) {
+        } catch (NumberFormatException e) {
             output = Double.NaN;
         }
         return Map.of(
@@ -41,6 +41,6 @@ public class ParseStringToNumberNodeType extends NodeType.Process {
     }
 
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs) {
-        return compute(inputs, Map.of(), Map.of());
+        return this.compute(inputs, Map.of(), Map.of());
     }
 }
