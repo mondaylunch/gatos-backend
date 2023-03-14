@@ -254,6 +254,21 @@ public class Graph {
     }
 
     /**
+     * Gets a connection from one node connector to another node connector.
+     * @param fromId    the ID of the node the connection is from
+     * @param fromName  the name of the connector the connection is from
+     * @param toId      the ID of the node the connection is to
+     * @param toName    the name of the connector the connection is to
+     * @return          the connection, if it exists
+     */
+    public <T> Optional<NodeConnection<T>> getConnection(UUID fromId, String fromName, UUID toId, String toName) {
+        return this.getConnectionsForNode(fromId).stream()
+            .filter(conn -> conn.from().name().equals(fromName) && conn.to().nodeId().equals(toId) && conn.to().name().equals(toName))
+            .map(conn -> (NodeConnection<T>) conn)
+            .findFirst();
+    }
+
+    /**
      * Gets the <em>mutable</em> set of connections associated with a node UUID, or
      * creates it if it does not exist.
      * <p>

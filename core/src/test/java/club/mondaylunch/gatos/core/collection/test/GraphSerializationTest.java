@@ -208,6 +208,100 @@ public class GraphSerializationTest {
     }
 
     @Test
+    public void canChangeConnectionThatChangesOtherConnections() {
+        var flow = createFlow();
+        var id = flow.getId();
+        var graph = flow.getGraph();
+        Flow.objects.insert(flow);
+        assertFlowCount(1);
+        var retrievedFlow = Flow.objects.get(id);
+        Assertions.assertEquals(flow, retrievedFlow);
+        var retrievedGraph = retrievedFlow.getGraph();
+        Assertions.assertEquals(graph, retrievedGraph);
+        Assertions.assertEquals(0, graph.nodeCount());
+        Assertions.assertEquals(0, graph.connectionCount());
+
+        var node1 = retrievedGraph.addNode(TestNodeTypes.NO_INPUTS);
+        var node2 = retrievedGraph.addNode(TestNodeTypes.TEST_VARYING_OUTPUT_NODE_TYPE);
+        var node3 = retrievedGraph.addNode(TestNodeTypes.END_STRING);
+
+        var connection1 = NodeConnection.create(node1, "start_output", node2, "in");
+        retrievedGraph.addConnection(connection1);
+        node2 = retrievedGraph.getNode(node2.id()).orElseThrow();
+        var connection2 = NodeConnection.create(node2, "out", node3, "end_input");
+        retrievedGraph.addConnection(connection2);
+        Assertions.assertEquals(3, retrievedGraph.nodeCount());
+        Assertions.assertEquals(2, retrievedGraph.connectionCount());
+        Flow.objects.updateGraph(retrievedFlow);
+        assertFlowCount(1);
+
+        var secondRetrievedFlow = Flow.objects.get(id);
+        Assertions.assertEquals(retrievedFlow, secondRetrievedFlow);
+        var secondRetrievedGraph = secondRetrievedFlow.getGraph();
+        Assertions.assertEquals(3, secondRetrievedGraph.nodeCount());
+        Assertions.assertEquals(2, secondRetrievedGraph.connectionCount());
+
+        secondRetrievedGraph.removeConnection(secondRetrievedGraph.getConnection(node1.id(), "start_output", node2.id(), "in").orElseThrow());
+        Assertions.assertEquals(1, secondRetrievedGraph.connectionCount());
+        connection2 = secondRetrievedGraph.getConnectionsForNode(node2.id()).stream().findFirst().orElseThrow();
+        Flow.objects.updateGraph(secondRetrievedFlow);
+        assertFlowCount(1);
+
+        var finalFlow = Flow.objects.get(id);
+        Assertions.assertEquals(secondRetrievedFlow, finalFlow);
+        var finalGraph = finalFlow.getGraph();
+        Assertions.assertEquals(3, finalGraph.nodeCount());
+        Assertions.assertEquals(1, finalGraph.connectionCount());
+        assertContainsConnections(finalGraph, connection2);
+    }
+
+    @Test
+    public void canChangeConnectionThatRemovesOtherConnections() {
+        var flow = createFlow();
+        var id = flow.getId();
+        var graph = flow.getGraph();
+        Flow.objects.insert(flow);
+        assertFlowCount(1);
+        var retrievedFlow = Flow.objects.get(id);
+        Assertions.assertEquals(flow, retrievedFlow);
+        var retrievedGraph = retrievedFlow.getGraph();
+        Assertions.assertEquals(graph, retrievedGraph);
+        Assertions.assertEquals(0, graph.nodeCount());
+        Assertions.assertEquals(0, graph.connectionCount());
+
+        var node1 = retrievedGraph.addNode(TestNodeTypes.NO_INPUTS);
+        var node2 = retrievedGraph.addNode(TestNodeTypes.TEST_VARYING_OUTPUT_NODE_TYPE);
+        var node3 = retrievedGraph.addNode(TestNodeTypes.END);
+
+        var connection1 = NodeConnection.create(node1, "start_output", node2, "in");
+        retrievedGraph.addConnection(connection1);
+        node2 = retrievedGraph.getNode(node2.id()).orElseThrow();
+        var connection2 = NodeConnection.create(node2, "out", node3, "end_input");
+        retrievedGraph.addConnection(connection2);
+        Assertions.assertEquals(3, retrievedGraph.nodeCount());
+        Assertions.assertEquals(2, retrievedGraph.connectionCount());
+        Flow.objects.updateGraph(retrievedFlow);
+        assertFlowCount(1);
+
+        var secondRetrievedFlow = Flow.objects.get(id);
+        Assertions.assertEquals(retrievedFlow, secondRetrievedFlow);
+        var secondRetrievedGraph = secondRetrievedFlow.getGraph();
+        Assertions.assertEquals(3, secondRetrievedGraph.nodeCount());
+        Assertions.assertEquals(2, secondRetrievedGraph.connectionCount());
+
+        secondRetrievedGraph.removeConnection(secondRetrievedGraph.getConnection(node1.id(), "start_output", node2.id(), "in").orElseThrow());
+        Assertions.assertEquals(0, secondRetrievedGraph.connectionCount());
+        Flow.objects.updateGraph(secondRetrievedFlow);
+        assertFlowCount(1);
+
+        var finalFlow = Flow.objects.get(id);
+        Assertions.assertEquals(secondRetrievedFlow, finalFlow);
+        var finalGraph = finalFlow.getGraph();
+        Assertions.assertEquals(3, finalGraph.nodeCount());
+        Assertions.assertEquals(0, finalGraph.connectionCount());
+    }
+
+    @Test
     public void canRemoveConnections() {
         var flow = createFlow();
         var id = flow.getId();
