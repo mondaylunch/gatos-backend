@@ -22,6 +22,7 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
     public static final DataType<DataType<?>> DATA_TYPE = register("data_type", DataType.class);
     public static final DataType<AtomicReference<?>> REFERENCE = register("reference", AtomicReference.class);
     static {
+        Conversions.register(ANY, STRING, Object::toString);
         Conversions.register(NUMBER, STRING, Object::toString);
         Conversions.register(BOOLEAN, STRING, Object::toString);
         Conversions.register(JSON_OBJECT, STRING, Object::toString);
@@ -39,7 +40,9 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
     protected DataType(String name, Class<? super T> clazz) {
         this.name = name;
         this.clazz = clazz;
-        Conversions.register(this, ANY, $ -> $);
+        if (!Objects.equals(name, "any")) {
+            Conversions.register(this, ANY, $ -> $);
+        }
     }
 
     public static <T> DataType<T> register(String name, Class<? super T> clazz) {

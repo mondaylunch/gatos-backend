@@ -24,6 +24,7 @@ import org.bson.codecs.configuration.CodecRegistry;
 import org.jetbrains.annotations.Nullable;
 
 import club.mondaylunch.gatos.core.codec.SerializationUtils;
+import club.mondaylunch.gatos.core.data.Conversions;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeCategory;
@@ -113,15 +114,9 @@ public class Graph {
         }
 
         this.nodes.put(id, result);
-        var invalidConns = this.getConnectionsForNode(id);
-        invalidConns.removeIf(c -> isConnectionValid(node, c));
-        this.connections.removeAll(invalidConns);
-        this.connectionsByNode.get(id).removeAll(invalidConns);
+        this.updateNodeConnections(id);
 
         this.observer.nodeModified(result);
-        for (var invalidConn : invalidConns) {
-            this.observer.connectionRemoved(invalidConn);
-        }
 
         return result;
     }
@@ -205,11 +200,60 @@ public class Graph {
         this.getOrCreateConnectionsForNode(nodeFrom.id()).add(connection);
         var destinationNodeConnections = this.getOrCreateConnectionsForNode(nodeTo.id());
         destinationNodeConnections.add(connection);
+        this.observer.connectionAdded(connection);
+
         this.modifyNode(nodeTo.id(), n -> n.updateInputTypes(destinationNodeConnections.stream()
             .filter(c -> c.to().nodeId().equals(nodeTo.id()))
             .collect(Collectors.toMap(c -> c.to().name(), c -> this.getCanonicalConnector(c.from()).type()))));
+    }
 
-        this.observer.connectionAdded(connection);
+    /**
+     * Removes invalid connections to and from this node,
+     * and updates the types of any which are of the wrong type
+     * but are compatible.
+     * @param nodeId the node to update
+     */
+    private void updateNodeConnections(UUID nodeId) {
+        var node = this.getNode(nodeId).orElseThrow();
+        var connections = this.getConnectionsForNode(nodeId);
+        Set<NodeConnection<?>> newConns = new HashSet<>();
+        for (var conn : connections) {
+            if (conn.from().nodeId().equals(nodeId)) {
+                var connector = node.getOutputWithName(conn.from().name());
+                if (connector.filter(newConnector -> newConnector.isCompatible(conn.from())).isPresent()) {
+                    newConns.add(conn);
+                }
+            } else if (conn.to().nodeId().equals(nodeId)) {
+                node.getInputWithName(conn.to().name()).ifPresent(connector -> {
+                    if (!(connector.type().equals(conn.to().type()))) {
+                        var canonicalFrom = this.getCanonicalConnector(conn.from());
+                        if (Conversions.canConvert(canonicalFrom.type(), connector.type())) { // the 'from' here is on purpose
+                            newConns.add(NodeConnection.create(this.getNode(conn.from().nodeId()).orElseThrow(), conn.from().name(), node, conn.to().name()));
+                        }
+                    } else {
+                        newConns.add(conn);
+                    }
+                });
+            }
+        }
+
+        for (var conn : connections) {
+            if (!newConns.contains(conn)) {
+                this.connections.remove(conn);
+                this.getOrCreateConnectionsForNode(conn.from().nodeId()).remove(conn);
+                this.getOrCreateConnectionsForNode(conn.to().nodeId()).remove(conn);
+                this.observer.connectionRemoved(conn);
+            }
+        }
+
+        for (var conn : newConns) {
+            if (!this.connections.contains(conn)) {
+                this.connections.add(conn);
+                this.getOrCreateConnectionsForNode(conn.from().nodeId()).add(conn);
+                this.getOrCreateConnectionsForNode(conn.to().nodeId()).add(conn);
+                this.observer.connectionAdded(conn);
+            }
+        }
     }
 
     /**
@@ -222,15 +266,16 @@ public class Graph {
         this.getOrCreateConnectionsForNode(connection.from().nodeId()).remove(connection);
         var destinationNodeConnections = this.getOrCreateConnectionsForNode(connection.to().nodeId());
         destinationNodeConnections.remove(connection);
+        if (removed) {
+            this.observer.connectionRemoved(connection);
+        }
+
         if (this.containsNode(connection.to().nodeId())) {
             this.modifyNode(connection.to().nodeId(), n -> n.updateInputTypes(destinationNodeConnections.stream()
                 .filter(c -> c.to().nodeId().equals(connection.to().nodeId()))
                 .collect(Collectors.toMap(c -> c.to().name(), c -> this.getCanonicalConnector(c.from()).type()))));
         }
 
-        if (removed) {
-            this.observer.connectionRemoved(connection);
-        }
     }
 
     /**
