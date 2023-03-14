@@ -257,7 +257,10 @@ public class Graph {
     }
 
     /**
-     * Removes a node connection, if it exists.
+     * Removes a node connection, if it exists. Beware that a connection you added
+     * may not still be in the graph, even if nothing else changed the graph: best
+     * to get the connection with {@link #getConnection(UUID, String, UUID, String)}
+     * first.
      *
      * @param connection the connection to remove
      */
@@ -275,7 +278,6 @@ public class Graph {
                 .filter(c -> c.to().nodeId().equals(connection.to().nodeId()))
                 .collect(Collectors.toMap(c -> c.to().name(), c -> this.getCanonicalConnector(c.from()).type()))));
         }
-
     }
 
     /**
