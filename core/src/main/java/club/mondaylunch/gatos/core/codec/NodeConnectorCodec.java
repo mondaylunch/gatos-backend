@@ -40,7 +40,7 @@ public class NodeConnectorCodec implements Codec<NodeConnector<?>> {
     public void encode(BsonWriter writer, NodeConnector<?> value, EncoderContext encoderContext) {
         Codec<UUID> uuidCodec = this.registry.get(UUID.class);
         SerializationUtils.writeDocument(writer, () -> {
-            writer.writeName("nodeId");
+            writer.writeName("node_id");
             encoderContext.encodeWithChildContext(uuidCodec, writer, value.nodeId());
             writer.writeName("name");
             writer.writeString(value.name());

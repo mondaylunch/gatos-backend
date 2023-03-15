@@ -19,9 +19,9 @@ import org.bson.codecs.configuration.CodecRegistry;
 import org.jetbrains.annotations.Unmodifiable;
 
 import club.mondaylunch.gatos.core.codec.SerializationUtils;
+import club.mondaylunch.gatos.core.data.Conversions;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
-import club.mondaylunch.gatos.core.data.Conversions;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
@@ -113,12 +113,14 @@ public final class Node {
      * @return the new node
      */
     public Node updateInputTypes(Map<String, DataType<?>> newInputTypes) {
+        var newInputs = NodeType.inputsOrEmpty(this.type, this.id, this.settings, newInputTypes);
+        var filteredInputTypes = filterValidInputTypes(newInputTypes, newInputs.stream().collect(Collectors.toMap(NodeConnector::name, Function.identity())));
         return new Node(
             this.id,
             this.type,
             this.settings,
-            Set.copyOf(this.inputs.values()),
-            NodeType.outputsOrEmpty(this.type, this.id, this.settings, newInputTypes),
+            newInputs,
+            NodeType.outputsOrEmpty(this.type, this.id, this.settings, filteredInputTypes),
             newInputTypes);
     }
 
@@ -271,9 +273,11 @@ public final class Node {
 
     public static final class NodeCodec implements Codec<Node> {
         private final CodecRegistry registry;
+        private final boolean isForDb;
 
-        public NodeCodec(CodecRegistry registry) {
+        public NodeCodec(CodecRegistry registry, boolean isForDb) {
             this.registry = registry;
+            this.isForDb = isForDb;
         }
 
         @Override
@@ -285,17 +289,32 @@ public final class Node {
                 NodeType type = decoderContext.decodeWithChildContext(this.registry.get(NodeType.class), reader);
                 reader.readName("settings");
                 Map<String, DataBox<?>> settings = SerializationUtils.readMap(reader, decoderContext, DataBox.class, Function.identity(), this.registry);
-                reader.readName("inputTypes");
-                Map<String, DataType<?>> inputTypes = SerializationUtils.readMap(reader, decoderContext, DataType.class, Function.identity(), this.registry);
-                var inputs = NodeType.inputsOrEmpty(type, id, settings, inputTypes);
-                return new Node(
-                    id,
-                    type,
-                    settings,
-                    inputs,
-                    NodeType.outputsOrEmpty(type, id, settings, Map.of()),
-                    filterValidInputTypes(inputTypes, inputs.stream().collect(Collectors.toMap(NodeConnector::name, Function.identity())))
-                );
+                if (this.isForDb) {
+                    reader.readName("input_types");
+                    Map<String, DataType<?>> inputTypes = SerializationUtils.readMap(reader, decoderContext, DataType.class, Function.identity(), this.registry);
+                    var inputs = NodeType.inputsOrEmpty(type, id, settings, inputTypes);
+                    return new Node(
+                        id,
+                        type,
+                        settings,
+                        inputs,
+                        NodeType.outputsOrEmpty(type, id, settings, Map.of()),
+                        filterValidInputTypes(inputTypes, inputs.stream().collect(Collectors.toMap(NodeConnector::name, Function.identity())))
+                    );
+                } else {
+                    reader.readName("inputs");
+                    Map<String, NodeConnector.Input<?>> inputs = SerializationUtils.readMap(reader, decoderContext, NodeConnector.Input.class, Function.identity(), this.registry);
+                    reader.readName("outputs");
+                    Map<String, NodeConnector.Output<?>> outputs = SerializationUtils.readMap(reader, decoderContext, NodeConnector.Output.class, Function.identity(), this.registry);
+                    return new Node(
+                        id,
+                        type,
+                        settings,
+                        Set.copyOf(inputs.values()),
+                        Set.copyOf(outputs.values()),
+                        filterValidInputTypes(Map.of(), inputs)
+                    );
+                }
             });
         }
 
@@ -308,8 +327,15 @@ public final class Node {
                 encoderContext.encodeWithChildContext(this.registry.get(NodeType.class), writer, value.type);
                 writer.writeName("settings");
                 SerializationUtils.writeMap(writer, encoderContext, DataBox.class, Function.identity(), this.registry, value.settings);
-                writer.writeName("inputTypes");
-                SerializationUtils.writeMap(writer, encoderContext, DataType.class, Function.identity(), this.registry, value.inputTypes);
+                if (this.isForDb) {
+                    writer.writeName("input_types");
+                    SerializationUtils.writeMap(writer, encoderContext, DataType.class, Function.identity(), this.registry, value.inputTypes);
+                } else {
+                    writer.writeName("inputs");
+                    SerializationUtils.writeMap(writer, encoderContext, NodeConnector.Input.class, Function.identity(), this.registry, value.inputs);
+                    writer.writeName("outputs");
+                    SerializationUtils.writeMap(writer, encoderContext, NodeConnector.Output.class, Function.identity(), this.registry, value.outputs);
+                }
             });
         }
 

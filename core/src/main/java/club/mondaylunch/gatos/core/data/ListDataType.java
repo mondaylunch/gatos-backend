@@ -3,6 +3,7 @@ package club.mondaylunch.gatos.core.data;
 import java.util.List;
 
 public final class ListDataType<T> extends DataType<List<T>> {
+    public static final String PREFIX = "list$";
     public static final DataType<List<?>> GENERIC_LIST = DataType.register("list", List.class);
     private final DataType<T> contains;
 
@@ -21,7 +22,7 @@ public final class ListDataType<T> extends DataType<List<T>> {
      * @return      the name of a list type for the type
      */
     public static String makeName(DataType<?> type) {
-        return "list$"+type.name();
+        return PREFIX+type.name();
     }
 
     /**

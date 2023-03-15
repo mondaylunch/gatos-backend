@@ -6,7 +6,9 @@ plugins {
 
 dependencies {
 	implementation project(":core")
-    implementation project(":basic_nodes")
+
+    // gson
+    implementation 'com.google.code.gson:gson:2.10.1'
 
 	// validation
 	implementation 'javax.validation:validation-api:2.0.1.Final'
@@ -19,14 +21,30 @@ dependencies {
 	// web
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
+    // basic ndoes in tests
+    implementation project(":basic_nodes")
+
+    // GSON
+    implementation 'com.google.code.gson:gson:2.10.1'
 
     testImplementation project(":test_shared")
 
 	// spring testing
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
 
-    // GSON
-    testImplementation 'com.google.code.gson:gson:2.10.1'
+processResources {
+    filesMatching('**/*') {
+        expand getSecrets()
+    }
+}
+
+static def getSecrets() {
+    def secrets = new Properties()
+    secrets.load(new FileInputStream("secrets.properties"))
+    return secrets
 }
 
 tasks.named('test') {

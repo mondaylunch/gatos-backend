@@ -60,7 +60,7 @@ public enum Database {
                 NodeConnectorCodecProvider.INSTANCE,
                 NodeConnectionCodecProvider.INSTANCE,
                 GraphCodecProvider.INSTANCE,
-                NodeCodecProvider.INSTANCE,
+                NodeCodecProvider.FOR_DB,
                 DataBoxCodecProvider.INSTANCE,
                 RegistryObjectCodec.Provider.INSTANCE
             ),

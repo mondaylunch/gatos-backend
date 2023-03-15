@@ -3,6 +3,7 @@ package club.mondaylunch.gatos.core.data;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.gson.JsonObject;
 
@@ -12,14 +13,16 @@ import club.mondaylunch.gatos.core.Registry;
  * A type of value which can be stored in a {@link DataBox}.
  */
 public sealed class DataType<T> permits ListDataType, OptionalDataType {
-    public static final Registry<DataType<?>> REGISTRY = Registry.create("data_type", DataType.class);
+    public static final DataTypeRegistry REGISTRY = Registry.REGISTRIES.register("data_type", new DataTypeRegistry());
     public static final DataType<Object> ANY = register("any", Object.class);
     public static final DataType<Double> NUMBER = register("number", Double.class);
     public static final DataType<Boolean> BOOLEAN = register("boolean", Boolean.class);
     public static final DataType<String> STRING = register("string", String.class);
     public static final DataType<JsonObject> JSON_OBJECT = register("json_object", JsonObject.class);
     public static final DataType<DataType<?>> DATA_TYPE = register("data_type", DataType.class);
+    public static final DataType<AtomicReference<?>> REFERENCE = register("reference", AtomicReference.class);
     static {
+        Conversions.register(ANY, STRING, Object::toString);
         Conversions.register(NUMBER, STRING, Object::toString);
         Conversions.register(BOOLEAN, STRING, Object::toString);
         Conversions.register(JSON_OBJECT, STRING, Object::toString);
@@ -37,7 +40,9 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
     protected DataType(String name, Class<? super T> clazz) {
         this.name = name;
         this.clazz = clazz;
-        Conversions.register(this, ANY, $ -> $);
+        if (!Objects.equals(name, "any")) {
+            Conversions.register(this, ANY, $ -> $);
+        }
     }
 
     public static <T> DataType<T> register(String name, Class<? super T> clazz) {
@@ -76,7 +81,7 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
     @SuppressWarnings("unchecked")
     public DataType<List<T>> listOf() {
         String listName = ListDataType.makeName(this);
-        Optional<DataType<?>> listType = REGISTRY.get(listName);
+        Optional<DataType<?>> listType = REGISTRY.getWithoutGenerating(listName);
         if (listType.isPresent()) {
             return (DataType<List<T>>) listType.get();
         } else {
@@ -93,7 +98,7 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
     @SuppressWarnings("unchecked")
     public DataType<Optional<T>> optionalOf() {
         String optionalName = OptionalDataType.makeName(this);
-        Optional<DataType<?>> optionalType = REGISTRY.get(optionalName);
+        Optional<DataType<?>> optionalType = REGISTRY.getWithoutGenerating(optionalName);
         if (optionalType.isPresent()) {
             return (DataType<Optional<T>>) optionalType.get();
         } else {

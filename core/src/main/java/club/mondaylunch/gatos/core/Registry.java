@@ -13,7 +13,7 @@ public class Registry<T> {
     private final Map<T, String> reverseMap = new HashMap<>();
     private final Class<? super T> clazz;
 
-    private Registry(Class<? super T> clazz) {
+    protected Registry(Class<? super T> clazz) {
         this.clazz = clazz;
     }
 
