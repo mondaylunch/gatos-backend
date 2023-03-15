@@ -85,4 +85,29 @@ public class ListSortNodeTest {
             Map.of("input", DataType.JSON_OBJECT.listOf()));
         Assertions.assertEquals(TEST_JSN_LIST, output.get("output").join().value());
     }
+
+    @Test
+    public void outputListIsDifferentFromOriginal() {
+        var node = Node.create(BasicNodes.LIST_SORT);
+        Map<String, DataBox<?>> input = Map.of(
+            "input", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST)
+        );
+        var output = BasicNodes.LIST_SORT.compute(input, node.settings(),
+            Map.of("input", DataType.NUMBER.listOf()));
+        var outputList = output.get("output").join().value();
+        Assertions.assertNotEquals(TEST_NUM_LIST, outputList);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void outputListIsImmutable() {
+        var node = Node.create(BasicNodes.LIST_SORT);
+        Map<String, DataBox<?>> input = Map.of(
+            "input", ListDataType.GENERIC_LIST.create(TEST_STR_LIST)
+        );
+        var output = BasicNodes.LIST_SORT.compute(input, node.settings(),
+            Map.of("input", DataType.STRING.listOf()));
+        var outputList = (List<String>) output.get("output").join().value();
+        Assertions.assertThrows(Exception.class, () -> outputList.add("allan please add details"));
+    }
 }

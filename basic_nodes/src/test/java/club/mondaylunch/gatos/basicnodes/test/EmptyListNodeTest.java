@@ -35,7 +35,7 @@ public class EmptyListNodeTest {
         var output = BasicNodes.EMPTY_LIST.compute(Map.of(), Map.of(), Map.of());
         var createdList = (List<String>) output.get("output").join().value();
         Assertions.assertThrows(Exception.class, () -> {
-            createdList.add("ip ip ip ip tsha ik");
+            createdList.add("turi ip ip ip");
             createdList.add("ip ip ip ip tsha ik");
             createdList.add("ip tsha ip ik");
         });
