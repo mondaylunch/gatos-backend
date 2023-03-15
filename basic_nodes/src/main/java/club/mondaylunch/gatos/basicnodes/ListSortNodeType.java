@@ -17,7 +17,7 @@ import club.mondaylunch.gatos.core.graph.type.NodeType;
 public class ListSortNodeType extends NodeType.Process {
     @Override
     public Map<String, DataBox<?>> settings() {
-        return Map.of();
+        return Map.of("Sort Ascendingly?", DataType.BOOLEAN.create(true));
     }
 
     @Override
@@ -28,7 +28,7 @@ public class ListSortNodeType extends NodeType.Process {
 
     @Override
     public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        var outputType = inputTypes.get("input");
+        var outputType = inputTypes.getOrDefault("input", ListDataType.GENERIC_LIST);
         return Set.of(
             new NodeConnector.Output<>(nodeId, "output", outputType));
     }
@@ -36,10 +36,13 @@ public class ListSortNodeType extends NodeType.Process {
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        var inputListCopy = new ArrayList<>(DataBox.get(inputs, "input", ListDataType.GENERIC_LIST).orElse(List.of()));
+        var inputListCopy = new ArrayList<>(DataBox.get(inputs, "input", ListDataType.GENERIC_LIST).orElseThrow());
         var outputType = inputTypes.get("input");
+        var isSortingAscendingly = DataBox.get(settings, "Sort Ascendingly?", DataType.BOOLEAN).orElse(true);
         if (!inputListCopy.isEmpty() && this.containsOnlyComparables(inputListCopy)) {
-            Collections.sort((List<Comparable>) inputListCopy);
+            Collections.sort((List<Comparable>) inputListCopy, (object1, object2) ->
+                isSortingAscendingly ? object1.compareTo(object2) : -1 * object1.compareTo(object2)
+            );
         }
         return Map.of("output", CompletableFuture.completedFuture(
             this.getGenericListBox(inputListCopy.stream().toList(), outputType))
@@ -52,6 +55,6 @@ public class ListSortNodeType extends NodeType.Process {
     }
 
     private boolean containsOnlyComparables(List<?> list) {
-        return list.stream().filter(item -> !(item instanceof Comparable)).toList().isEmpty();
+        return list.stream().allMatch(Comparable.class::isInstance);
     }
 }

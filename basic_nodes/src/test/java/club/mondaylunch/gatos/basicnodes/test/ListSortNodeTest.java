@@ -76,6 +76,18 @@ public class ListSortNodeTest {
     }
 
     @Test
+    public void correctlySortsDescendingly() {
+        var node = Node.create(BasicNodes.LIST_SORT)
+            .modifySetting("Sort Ascendingly?", DataType.BOOLEAN.create(false));
+        Map<String, DataBox<?>> input = Map.of(
+            "input", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST)
+        );
+        var output = BasicNodes.LIST_SORT.compute(input, node.settings(),
+            Map.of("input", DataType.NUMBER.listOf()));
+        Assertions.assertEquals(List.of(5., 4., 3., 2., 1.), output.get("output").join().value());
+    }
+
+    @Test
     public void doesntSortUncomparableTypes() {
         var node = Node.create(BasicNodes.LIST_SORT);
         Map<String, DataBox<?>> input = Map.of(
