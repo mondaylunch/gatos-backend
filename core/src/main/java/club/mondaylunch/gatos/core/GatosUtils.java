@@ -1,5 +1,6 @@
 package club.mondaylunch.gatos.core;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -28,6 +29,6 @@ public final class GatosUtils {
      */
     @SafeVarargs
     public static <E> Set<E> union(Collection<E>... collections) {
-        return Set.of(collections).stream().flatMap(Collection::stream).collect(Collectors.toSet());
+        return Arrays.stream(collections).flatMap(Collection::stream).collect(Collectors.toSet());
     }
 }
