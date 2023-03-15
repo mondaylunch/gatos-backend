@@ -61,4 +61,13 @@ public class OptionalCreationNodeTest {
             Assertions.assertEquals(entry.getValue().type().optionalOf(), output.get("output").join().type());
         }
     }
+
+    @Test
+    public void correctlySpecialisesTypes() {
+        for (var entry : sampleValues.entrySet()) {
+            var node = Node.create(BasicNodes.OPTIONAL_CREATION)
+                .updateInputTypes(Map.of("input", entry.getValue().type()));
+            Assertions.assertEquals(entry.getValue().type().optionalOf(), node.getOutputWithName("output").orElseThrow().type());
+        }
+    }
 }
