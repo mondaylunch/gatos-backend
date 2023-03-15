@@ -60,6 +60,8 @@ public final class BasicNodes implements GatosPlugin {
         .register("webhook_start", new WebhookStartNodeType());
     public static final WebhookEndNodeType WEBHOOK_END = NodeType.REGISTRY
         .register("webhook_end", new WebhookEndNodeType());
+    public static final EmptyListNodeType EMPTY_LIST = NodeType.REGISTRY
+        .register("empty_list", new EmptyListNodeType());
 
     @VisibleForTesting
     public static final Set<DataBox<?>> VALUE_PROVIDER_TYPES_WITH_DEFAULTS = Set.of(
