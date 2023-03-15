@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
@@ -16,6 +17,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOneModel;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.model.WriteModel;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.conversions.Bson;
 
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
@@ -439,9 +441,41 @@ public class GraphObserver {
             + '}';
     }
 
+    public GraphChanges getChanges() {
+        var addedNodes = new HashSet<Node>();
+        addedNodes.addAll(this.addedNodes.values());
+        addedNodes.addAll(this.modifiedNodes.values());
+
+        var addedConnections = new HashSet<NodeConnection<?>>();
+        addedConnections.addAll(this.addedConnections.values());
+        addedConnections.addAll(this.modifiedConnections.values());
+
+        var addedMetadata = new HashMap<String, NodeMetadata>();
+        for (var entry : this.addedMetadata.entrySet()) {
+            addedMetadata.put(entry.getKey().toString(), entry.getValue());
+        }
+        for (var entry : this.modifiedMetadata.entrySet()) {
+            addedMetadata.put(entry.getKey().toString(), entry.getValue());
+        }
+
+        return new GraphChanges(
+            this.removedNodes.keySet().stream().map(UUID::toString).collect(Collectors.toSet()),
+            Set.copyOf(addedNodes),
+            Set.copyOf(this.removedConnections.values()),
+            Set.copyOf(addedConnections),
+            this.removedMetadata.keySet().stream().map(UUID::toString).collect(Collectors.toSet()),
+            Map.copyOf(addedMetadata)
+        );
+    }
+
     private record ConnectionId(UUID fromId, String fromName, UUID toId, String toName) {
         ConnectionId(NodeConnection<?> connection) {
             this(connection.from().nodeId(), connection.from().name(), connection.to().nodeId(), connection.to().name());
         }
+    }
+
+    public record GraphChanges(@BsonProperty("removed_nodes") Set<String> removedNodes, @BsonProperty("added_nodes") Set<Node> addedNodes,
+                               @BsonProperty("removed_connections") Set<NodeConnection<?>> removedConnections, @BsonProperty("added_connections") Set<NodeConnection<?>> addedConnections,
+                               @BsonProperty("removed_metadata") Set<String> removedMetadata, @BsonProperty("added_metadata") Map<String, NodeMetadata> addedMetadata) {
     }
 }
