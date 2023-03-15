@@ -16,9 +16,9 @@ import club.mondaylunch.gatos.core.graph.type.NodeType;
 public class NodeTypesController {
     public static final Map<String, String> ENGLISH_DISPLAY_NAMES = getTranslatedDisplayNameMap("en_gb");
 
-    public record NodeTypeInfo(String name, String category) {
+    public record NodeTypeInfo(String name, String category, String displayName) {
         public NodeTypeInfo(Map.Entry<String, NodeType> entry) {
-            this(entry.getKey(), getDisplayName(entry.getValue().category().toString().toLowerCase()));
+            this(entry.getKey(), entry.getValue().category().toString().toLowerCase(), getDisplayName(entry.getKey()));
         }
 
         // currently only english is implemented. can be expanded if language selection is added.
