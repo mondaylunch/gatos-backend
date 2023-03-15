@@ -120,18 +120,20 @@ public class Flow extends BaseModel {
     }
 
     public void setupTriggers() {
-        if (!this.graph.validate()) {
+        this.graph.observer().getRemovedNodes().stream()
+            .filter(n -> n.type().category() == NodeCategory.START)
+            .forEach(n -> ((NodeType.Start<?>) n.type()).teardownFlow(this, n));
+
+        if (this.graph.validate().isEmpty()) {
+            var executor = new GraphExecutor(this.graph);
+            this.graph.nodes().stream()
+                .filter(n -> n.type().category() == NodeCategory.START)
+                .forEach(n -> ((NodeType.Start<?>) n.type()).setupFlow(this, executor.execute(n.id()), n));
+        } else {
             this.graph.nodes().stream()
                 .filter(n -> n.type().category() == NodeCategory.START)
                 .forEach(n -> ((NodeType.Start<?>) n.type()).teardownFlow(this, n));
-
-            return;
         }
-
-        var executor = new GraphExecutor(this.graph);
-        this.graph.nodes().stream()
-            .filter(n -> n.type().category() == NodeCategory.START)
-            .forEach(n -> ((NodeType.Start<?>) n.type()).setupFlow(this, executor.execute(n.id()), n));
     }
 
     @Override
