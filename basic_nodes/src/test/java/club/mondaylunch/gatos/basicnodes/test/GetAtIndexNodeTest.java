@@ -13,6 +13,7 @@ import club.mondaylunch.gatos.basicnodes.BasicNodes;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.data.ListDataType;
+import club.mondaylunch.gatos.core.data.OptionalDataType;
 import club.mondaylunch.gatos.core.graph.Node;
 
 public class GetAtIndexNodeTest {
@@ -71,11 +72,10 @@ public class GetAtIndexNodeTest {
         );
 
         var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), Map.of());
-        Assertions.assertEquals(0, output.get("output").join().value());
-        Assertions.assertEquals(output.get("output").join().type(), DataType.ANY);
+        Assertions.assertEquals(Optional.of(0), output.get("output").join().value());
 
         var output2 = BasicNodes.GET_AT_INDEX.compute(input2, Map.of(), Map.of());
-        Assertions.assertEquals(1, output2.get("output").join().value());
+        Assertions.assertEquals(Optional.of(1), output2.get("output").join().value());
     }
 
     @Test
@@ -96,12 +96,9 @@ public class GetAtIndexNodeTest {
         );
 
         var node = Node.create(BasicNodes.GET_AT_INDEX).updateInputTypes(inputTypes);
-        var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), node.inputTypes());
-        Assertions.assertEquals(0, output.get("output").join().value());
-        // System.out.println(node.inputTypes());
-        // System.out.println(node.getOutputWithName("output").get().type());
-
-        Assertions.assertEquals(DataType.NUMBER, node.getOutputWithName("output").orElseThrow().type());
+        var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), inputTypes);
+        Assertions.assertEquals(Optional.of(0), output.get("output").join().value());
+        Assertions.assertEquals(OptionalDataType.GENERIC_OPTIONAL, node.getOutputWithName("output").orElseThrow().type());
     }
 
     @Test
@@ -137,8 +134,7 @@ public class GetAtIndexNodeTest {
         );
 
         var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), inputTypes);
-        Assertions.assertEquals("i0", output.get("output").join().value());
-        Assertions.assertEquals(output.get("output").join().type(), DataType.STRING);
+        Assertions.assertEquals(Optional.of("i0"), output.get("output").join().value());
     }
 
 }
