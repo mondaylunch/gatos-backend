@@ -96,8 +96,9 @@ public class GetAtIndexNodeTest {
         );
 
         var node = Node.create(BasicNodes.GET_AT_INDEX).updateInputTypes(inputTypes);
-        var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), inputTypes);
+        var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), node.inputTypes());
         Assertions.assertEquals(Optional.of(0), output.get("output").join().value());
+        Assertions.assertEquals(DataType.NUMBER, node.inputTypes().get("input"));
         Assertions.assertEquals(OptionalDataType.GENERIC_OPTIONAL, node.getOutputWithName("output").orElseThrow().type());
     }
 
