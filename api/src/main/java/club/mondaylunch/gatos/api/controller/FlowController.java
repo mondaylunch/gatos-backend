@@ -38,6 +38,7 @@ import club.mondaylunch.gatos.core.codec.SerializationUtils;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.executor.GraphExecutor;
 import club.mondaylunch.gatos.core.graph.Graph;
+import club.mondaylunch.gatos.core.graph.GraphValidityError;
 import club.mondaylunch.gatos.core.graph.NodeMetadata;
 import club.mondaylunch.gatos.core.graph.WebhookStartNodeInput;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
@@ -370,6 +371,21 @@ public class FlowController {
         }
         var metadata = graph.getOrCreateMetadataForNode(nodeId);
         return SerializationUtils.toJson(metadata);
+    }
+
+    public record GraphErrorInfo(@JsonProperty("errors") List<GraphValidityError> errors) {
+    }
+
+    @GetMapping(value = "{flowId}/validate", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String validateFlow(
+        @RequestHeader("x-user-email") String userEmail,
+        @PathVariable UUID flowId
+    ) {
+        User user = this.userRepository.getOrCreateUser(userEmail);
+        var flow = this.flowRepository.getFlow(user, flowId);
+        var graph = flow.getGraph();
+        var errors = graph.validate();
+        return SerializationUtils.toJson(new GraphErrorInfo(errors));
     }
 
     /**

@@ -1,7 +1,10 @@
 package club.mondaylunch.gatos.core.graph.test;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -15,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Graph;
+import club.mondaylunch.gatos.core.graph.GraphValidityError;
 import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.NodeMetadata;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
@@ -24,7 +28,7 @@ import club.mondaylunch.gatos.core.models.Flow;
 import club.mondaylunch.gatos.testshared.graph.type.test.TestNodeTypes;
 
 public class GraphTest {
-    private static final NodeType TEST_NUMBER_NODE_TYPE = new TestNodeType(DataType.NUMBER);
+    private static final NodeType TEST_NUMBER_NODE_TYPE = new TestNodeType(1, DataType.NUMBER);
     private static final NodeType START_NODE_TYPE = new TestStartNodeType();
     private static final NodeType END_NODE_TYPE = new TestEndNodeType();
     private static final NodeType START_TWO_OUTPUTS_NODE_TYPE = new TestStartTwoOutputsNodeType();
@@ -209,7 +213,7 @@ public class GraphTest {
         var graph = new Graph();
         var node1 = graph.addNode(TEST_NUMBER_NODE_TYPE);
         var node2 = graph.addNode(TestNodeTypes.TEST_VARYING_OUTPUT_NODE_TYPE);
-        var node3 = graph.addNode(new TestNodeType(DataType.STRING));
+        var node3 = graph.addNode(new TestNodeType(1, DataType.STRING));
 
         var conn1 = NodeConnection.create(node1, "out", node2, "in");
         graph.addConnection(conn1);
@@ -264,7 +268,7 @@ public class GraphTest {
         var output = graph.addNode(END_NODE_TYPE);
         var conn = NodeConnection.create(input, "out", output, "in");
         graph.addConnection(conn);
-        Assertions.assertTrue(graph.validate());
+        Assertions.assertTrue(graph.validate().isEmpty());
     }
 
     @Test
@@ -272,7 +276,7 @@ public class GraphTest {
         var graph = new Graph();
         graph.addNode(START_NODE_TYPE);
         graph.addNode(END_NODE_TYPE);
-        Assertions.assertFalse(graph.validate());
+        Assertions.assertFalse(graph.validate().isEmpty());
     }
 
     @Test
@@ -282,7 +286,7 @@ public class GraphTest {
         var output = graph.addNode(END_NODE_TYPE);
         var conn = NodeConnection.create(input, "out", output, "in");
         graph.addConnection(conn);
-        Assertions.assertFalse(graph.validate());
+        Assertions.assertFalse(graph.validate().isEmpty());
     }
 
     @Test
@@ -292,7 +296,7 @@ public class GraphTest {
         var output = graph.addNode(TEST_NUMBER_NODE_TYPE);
         var conn = NodeConnection.create(input, "out", output, "in");
         graph.addConnection(conn);
-        Assertions.assertFalse(graph.validate());
+        Assertions.assertFalse(graph.validate().isEmpty());
     }
 
     @Test
@@ -320,7 +324,7 @@ public class GraphTest {
             );
         graph.addConnection(conn);
 
-        Assertions.assertTrue(graph.validate());
+        Assertions.assertTrue(graph.validate().isEmpty());
     }
 
     @Test
@@ -352,7 +356,7 @@ public class GraphTest {
             graph.addNode(TEST_NUMBER_NODE_TYPE);
         }
 
-        Assertions.assertTrue(graph.validate());
+        Assertions.assertTrue(graph.validate().isEmpty());
     }
 
     @Test
@@ -390,8 +394,8 @@ public class GraphTest {
         }
 
         var sorted = graph.getExecutionOrder();
-        Assertions.assertTrue(sorted.isPresent());
-        Assertions.assertEquals(list, sorted.get());
+        Assertions.assertTrue(sorted.isLeft());
+        Assertions.assertEquals(list, sorted.left());
     }
 
     @Test
@@ -403,20 +407,67 @@ public class GraphTest {
         graph.addConnection(conn);
         conn = NodeConnection.create(input, "out2", output, "in2");
         graph.addConnection(conn);
-        Assertions.assertTrue(graph.validate());
+        Assertions.assertTrue(graph.validate().isEmpty());
     }
 
-    private static final class TestNodeType extends NodeType.Process {
+    @Test
+    public void graphWithCycleIsInvalid() {
+        var graph = new Graph();
+        var input = graph.addNode(START_TWO_OUTPUTS_NODE_TYPE);
+        var middle1 = graph.addNode(new TestNodeType(2, DataType.NUMBER));
+        var middle2 = graph.addNode(TEST_NUMBER_NODE_TYPE);
+        var output = graph.addNode(END_NODE_TYPE);
+        var conn = NodeConnection.create(input, "out1", middle1, "in1");
+        graph.addConnection(conn);
+        conn = NodeConnection.create(middle1, "out", middle2, "in");
+        graph.addConnection(conn);
+        conn = NodeConnection.create(middle2, "out", output, "in");
+        graph.addConnection(conn);
+        conn = NodeConnection.create(middle2, "out", middle1, "in2");
+        graph.addConnection(conn);
+        var errors = graph.validate();
+        Assertions.assertTrue(errors.stream().anyMatch(e -> e.message().toLowerCase(Locale.ROOT).contains("cycle")));
+    }
+
+    @Test
+    public void graphWithNodeSpecificErrorIsInvalid() {
+        var graph = new Graph();
+        var input = graph.addNode(START_NODE_TYPE);
+        var middle = graph.addNode(new TestNodeType(1, DataType.NUMBER) {
+            @Override
+            public Collection<GraphValidityError> isValid(Node node, Graph graph) {
+                return List.of(new GraphValidityError(node.id(), "Test error"));
+            }
+        });
+        var output = graph.addNode(END_NODE_TYPE);
+        var conn = NodeConnection.create(input, "out", middle, "in");
+        graph.addConnection(conn);
+        conn = NodeConnection.create(middle, "out", output, "in");
+        graph.addConnection(conn);
+        var errors = graph.validate();
+        Assertions.assertTrue(errors.stream().anyMatch(e -> e.message().equals("Test error")));
+    }
+
+    private static class TestNodeType extends NodeType.Process {
+        private final int numInputs;
         private final DataType<?> type;
 
-        private TestNodeType(DataType<?> type) {
+        private TestNodeType(int numInputs, DataType<?> type) {
+            this.numInputs = numInputs;
             this.type = type;
         }
 
         @Override
         public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-            return Set.of(
-                    new NodeConnector.Input<>(nodeId, "in", this.type));
+            var inputs = new HashSet<NodeConnector.Input<?>>();
+            if (this.numInputs == 1) {
+                inputs.add(new NodeConnector.Input<>(nodeId, "in", this.type));
+            } else {
+                for (int i = 0; i < this.numInputs; i++) {
+                    inputs.add(new NodeConnector.Input<>(nodeId, "in" + (i + 1), this.type));
+                }
+            }
+            return inputs;
         }
 
         @Override

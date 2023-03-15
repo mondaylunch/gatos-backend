@@ -23,6 +23,7 @@ import org.bson.codecs.EncoderContext;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.jetbrains.annotations.Nullable;
 
+import club.mondaylunch.gatos.core.Either;
 import club.mondaylunch.gatos.core.codec.SerializationUtils;
 import club.mondaylunch.gatos.core.data.Conversions;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
@@ -396,10 +397,15 @@ public class Graph {
      * node to
      * an {@link NodeCategory#END output} node, and there are no cycles.
      *
-     * @return whether this graph is valid
+     * @return a list of any errors in this graph
      */
-    public boolean validate() {
-        return this.getExecutionOrder().isPresent();
+    public List<GraphValidityError> validate() {
+        List<GraphValidityError> errors = this.getExecutionOrder().map($ -> new ArrayList<>(), ArrayList::new);
+        errors.addAll(this.nodes.values().stream()
+            .flatMap(n -> n.type().isValid(n, this).stream())
+            .toList());
+
+        return errors;
     }
 
     /**
@@ -407,9 +413,9 @@ public class Graph {
      * If the graph is not
      * {@link #validate() valid}, this will return an empty Optional.
      *
-     * @return a topological sort of this graph
+     * @return a topological sort of this graph, or a list of errors
      */
-    public Optional<List<Node>> getExecutionOrder() {
+    public Either<List<Node>, List<GraphValidityError>> getExecutionOrder() {
         Set<UUID> relevantNodes = new HashSet<>(this.nodes.keySet());
         relevantNodes.removeIf(n -> this.getConnectionsForNode(n).isEmpty());
         Set<NodeConnection<?>> deduplicatedConnections = new HashSet<>();
@@ -462,11 +468,25 @@ public class Graph {
             }
         }
 
-        if (!hasSeenInput || !hasSeenOutput || !visitedConnections.containsAll(deduplicatedConnections)) {
-            return Optional.empty();
+        List<GraphValidityError> errors = new ArrayList<>();
+
+        if (!hasSeenInput) {
+            errors.add(GraphValidityError.noStart());
         }
 
-        return Optional.of(res);
+        if (!hasSeenOutput) {
+            errors.add(GraphValidityError.noEnd());
+        }
+
+        if (!visitedConnections.containsAll(deduplicatedConnections)) {
+            errors.add(GraphValidityError.cycle());
+        }
+
+        if (!errors.isEmpty()) {
+            return Either.right(errors);
+        }
+
+        return Either.left(res);
     }
 
     /**
@@ -526,7 +546,7 @@ public class Graph {
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
-        } else if (obj == null || getClass() != obj.getClass()) {
+        } else if (obj == null || this.getClass() != obj.getClass()) {
             return false;
         } else {
             Graph graph = (Graph) obj;
