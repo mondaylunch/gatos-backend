@@ -31,6 +31,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import club.mondaylunch.gatos.api.BaseMvcTest;
 import club.mondaylunch.gatos.api.TestSecurity;
+import club.mondaylunch.gatos.api.controller.FlowController;
 import club.mondaylunch.gatos.api.helpers.UserCreationHelper;
 import club.mondaylunch.gatos.core.GatosCore;
 import club.mondaylunch.gatos.core.codec.SerializationUtils;
@@ -712,6 +713,24 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
             .andExpect(MockMvcResultMatchers.status().isOk());
         var responseBody = result.andReturn().getResponse().getContentAsString();
         JSONAssert.assertEquals(inputBodyString, responseBody, JSONCompareMode.NON_EXTENSIBLE);
+    }
+
+    @Test
+    public void canGetErrors() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        Assertions.assertEquals(0, graph.nodeCount());
+        Flow.objects.insert(flow);
+        this.addNode(flow.getId(), "webhook_start");
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/" + flow.getId() + "/validate")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + TestSecurity.FAKE_TOKEN)
+                .header("x-user-email", this.user.getEmail())
+                .contentType(MediaType.APPLICATION_JSON)
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var responseBody = result.andReturn().getResponse().getContentAsString();
+        var responseErrors = SerializationUtils.fromJson(responseBody, FlowController.GraphErrorInfo.class);
+        Assertions.assertFalse(responseErrors.errors().isEmpty());
     }
 
     private Node addNode(UUID flowId, String nodeType) {

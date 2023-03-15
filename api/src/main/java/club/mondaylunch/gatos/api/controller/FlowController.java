@@ -376,7 +376,6 @@ public class FlowController {
     public record GraphErrorInfo(@JsonProperty("errors") List<GraphValidityError> errors) {
     }
 
-    //TODO: test for this
     @GetMapping(value = "{flowId}/validate", produces = MediaType.APPLICATION_JSON_VALUE)
     public String validateFlow(
         @RequestHeader("x-user-email") String userEmail,
