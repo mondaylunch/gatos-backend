@@ -26,14 +26,14 @@ public class SendDiscordMessageNode extends NodeType.End {
     @Override
     public Map<String, DataBox<?>> settings() {
         return Map.of(
-            "guild_id", DiscordDataTypes.GUILD_ID.create(""),
-            "channel_id", DiscordDataTypes.CHANNEL_ID.create("")
+            "guild_id", DiscordDataTypes.GUILD_ID.create("")
         );
     }
 
     @Override
     public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         return Set.of(
+            new NodeConnector.Input<>(nodeId, "channel_id", DiscordDataTypes.CHANNEL_ID),
             new NodeConnector.Input<>(nodeId, "message", DataType.STRING)
         );
     }
@@ -41,7 +41,7 @@ public class SendDiscordMessageNode extends NodeType.End {
     @Override
     public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
         String guildId = DataBox.get(settings, "guild_id", DiscordDataTypes.GUILD_ID).orElseThrow();
-        String channelId = DataBox.get(settings, "channel_id", DiscordDataTypes.CHANNEL_ID).orElseThrow();
+        String channelId = DataBox.get(inputs, "channel_id", DiscordDataTypes.CHANNEL_ID).orElseThrow();
         String message = DataBox.get(inputs, "message", DataType.STRING).orElseThrow();
         Guild guild = this.jda.get().getGuildById(guildId);
         if (guild == null) {
