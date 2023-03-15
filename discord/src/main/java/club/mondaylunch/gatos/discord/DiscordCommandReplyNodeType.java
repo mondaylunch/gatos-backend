@@ -1,12 +1,17 @@
 package club.mondaylunch.gatos.discord;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import club.mondaylunch.gatos.core.GatosUtils;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.graph.Graph;
+import club.mondaylunch.gatos.core.graph.GraphValidityError;
+import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
@@ -15,6 +20,12 @@ public class DiscordCommandReplyNodeType extends NodeType.End {
 
     public DiscordCommandReplyNodeType(GatosDiscord gatosDiscord) {
         this.gatosDiscord = gatosDiscord;
+    }
+
+    @Override
+    public Collection<GraphValidityError> isValid(Node node, Graph graph) {
+        var canFindReceive = graph.nodes().stream().anyMatch(n -> n.type().equals(this.gatosDiscord.getNodeTypes().receiveCommand()));
+        return GatosUtils.union(super.isValid(node, graph), canFindReceive ? Set.of() : Set.of(new GraphValidityError(node.id(), "No receive command node found.")));
     }
 
     @Override

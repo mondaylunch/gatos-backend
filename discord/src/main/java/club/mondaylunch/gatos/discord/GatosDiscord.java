@@ -16,12 +16,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import club.mondaylunch.gatos.core.GatosPlugin;
-import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 public class GatosDiscord implements GatosPlugin {
     public static final Logger LOGGER = LoggerFactory.getLogger("Gatos Discord");
     private JDA jda;
     private GatosCommands commands;
+    private DiscordNodeTypes nodeTypes;
 
     @Override
     public void init() {
@@ -48,9 +48,7 @@ public class GatosDiscord implements GatosPlugin {
         this.jda.getGuilds().forEach(g -> g.updateCommands().queue());
 
         DiscordDataTypes.init();
-        NodeType.REGISTRY.register("discord.send_message", new SendDiscordMessageNode(() -> this.jda));
-        NodeType.REGISTRY.register("discord.command", new DiscordCommandNodeType(this));
-        NodeType.REGISTRY.register("discord.reply_to_command", new DiscordCommandReplyNodeType(this));
+        this.nodeTypes = new DiscordNodeTypes(this);
     }
 
     private String getToken() {
@@ -65,6 +63,10 @@ public class GatosDiscord implements GatosPlugin {
 
     public JDA getJda() {
         return this.jda;
+    }
+
+    public DiscordNodeTypes getNodeTypes() {
+        return this.nodeTypes;
     }
 
     public void createSlashCommandListener(UUID id, String commandName, Guild guild, Consumer<@Nullable SlashCommandInteractionEvent> function) {

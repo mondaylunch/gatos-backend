@@ -1,5 +1,6 @@
 package club.mondaylunch.gatos.discord;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -10,18 +11,27 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.Nullable;
 
+import club.mondaylunch.gatos.core.GatosUtils;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.graph.Graph;
+import club.mondaylunch.gatos.core.graph.GraphValidityError;
 import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 import club.mondaylunch.gatos.core.models.Flow;
 
-public class DiscordCommandNodeType extends NodeType.Start<SlashCommandInteractionEvent> {
+public class DiscordReceiveCommandNodeType extends NodeType.Start<SlashCommandInteractionEvent> {
     private final GatosDiscord gatosDiscord;
 
-    public DiscordCommandNodeType(GatosDiscord gatosDiscord) {
+    public DiscordReceiveCommandNodeType(GatosDiscord gatosDiscord) {
         this.gatosDiscord = gatosDiscord;
+    }
+
+    @Override
+    public Collection<GraphValidityError> isValid(Node node, Graph graph) {
+        var canFindReply = graph.nodes().stream().anyMatch(n -> n.type().equals(this.gatosDiscord.getNodeTypes().commandReply()));
+        return GatosUtils.union(super.isValid(node, graph), canFindReply ? Set.of() : Set.of(new GraphValidityError(node.id(), "No command reply node found.")));
     }
 
     @Override
