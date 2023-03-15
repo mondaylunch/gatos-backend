@@ -43,6 +43,7 @@ public class NodeTypesController {
         try {
             return gson.fromJson(new FileReader(file == null ? "" : file.getFile()), Map.class);
         } catch (Exception e) {
+            System.out.println("Failed to load language file: " + langFile);
             e.printStackTrace();
             return Map.of();
         }
