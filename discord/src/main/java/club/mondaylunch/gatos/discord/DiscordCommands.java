@@ -11,14 +11,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.hooks.EventListener;
 import net.dv8tion.jda.api.interactions.commands.Command;
 
-public class GatosCommands implements EventListener {
+public class DiscordCommands implements EventListener {
 
     private final Map<Command, Consumer<SlashCommandInteractionEvent>> commandHandlers = new HashMap<net.dv8tion.jda.api.interactions.commands.Command, Consumer<SlashCommandInteractionEvent>>();
     private final Map<UUID, Command> commandsById = new HashMap<>();
 
     private final GatosDiscord gatosDiscord;
 
-    public GatosCommands(GatosDiscord gatosDiscord) {
+    public DiscordCommands(GatosDiscord gatosDiscord) {
         this.gatosDiscord = gatosDiscord;
     }
 

@@ -1,4 +1,4 @@
-package club.mondaylunch.gatos.discord;
+package club.mondaylunch.gatos.discord.nodes;
 
 import java.util.Collection;
 import java.util.Map;
@@ -14,11 +14,13 @@ import club.mondaylunch.gatos.core.graph.GraphValidityError;
 import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
+import club.mondaylunch.gatos.discord.DiscordDataTypes;
+import club.mondaylunch.gatos.discord.GatosDiscord;
 
-public class DiscordCommandReplyNodeType extends NodeType.End {
+public class CommandReplyNodeType extends NodeType.End {
     private final GatosDiscord gatosDiscord;
 
-    public DiscordCommandReplyNodeType(GatosDiscord gatosDiscord) {
+    public CommandReplyNodeType(GatosDiscord gatosDiscord) {
         this.gatosDiscord = gatosDiscord;
     }
 

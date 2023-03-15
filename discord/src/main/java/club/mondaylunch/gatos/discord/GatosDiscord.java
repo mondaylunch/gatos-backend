@@ -20,7 +20,7 @@ import club.mondaylunch.gatos.core.GatosPlugin;
 public class GatosDiscord implements GatosPlugin {
     public static final Logger LOGGER = LoggerFactory.getLogger("Gatos Discord");
     private JDA jda;
-    private GatosCommands commands;
+    private DiscordCommands commands;
     private DiscordNodeTypes nodeTypes;
 
     @Override
@@ -30,7 +30,7 @@ public class GatosDiscord implements GatosPlugin {
             this.jda.shutdown();
         }
 
-        this.commands = new GatosCommands(this);
+        this.commands = new DiscordCommands(this);
 
         try {
             LOGGER.info("Constructing new JDA instance");
