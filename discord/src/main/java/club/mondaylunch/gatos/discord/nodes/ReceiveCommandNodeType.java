@@ -57,13 +57,14 @@ public class ReceiveCommandNodeType extends NodeType.Start<SlashCommandInteracti
     public void setupFlow(Flow flow, Consumer<@Nullable SlashCommandInteractionEvent> function, Node node) {
         String guildId = DataBox.get(node.settings(), "guild_id", DiscordDataTypes.GUILD_ID).orElseThrow();
         String commandName = DataBox.get(node.settings(), "command_name", DataType.STRING).orElseThrow();
-        Guild guild = this.gatosDiscord.getJda().getGuildById(guildId);
-        if (guild == null) {
-            throw new IllegalStateException("Guild not found: " + guildId);
+        if (!guildId.isEmpty()) {
+            Guild guild = this.gatosDiscord.getJda().getGuildById(guildId);
+            if (guild != null) {
+                this.gatosDiscord.createSlashCommandListener(node.id(), commandName, guild, s -> {
+                    function.accept(s);
+                });
+            }
         }
-        this.gatosDiscord.createSlashCommandListener(node.id(), commandName, guild, s -> {
-            function.accept(s);
-        });
     }
 
     @Override
