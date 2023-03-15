@@ -1,6 +1,7 @@
 package club.mondaylunch.gatos.basicnodes;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -32,6 +33,6 @@ public class EmptyListNodeType extends NodeType.Process {
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        return Map.of("output", CompletableFuture.completedFuture(ListDataType.GENERIC_LIST.create(new ArrayList<>())));
+        return Map.of("output", CompletableFuture.completedFuture(ListDataType.GENERIC_LIST.create(List.of())));
     }
 }

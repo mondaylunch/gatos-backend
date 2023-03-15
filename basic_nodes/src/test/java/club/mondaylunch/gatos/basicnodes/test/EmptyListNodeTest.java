@@ -31,12 +31,13 @@ public class EmptyListNodeTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void canModifyEmptyList() {
+    public void cannotModifyEmptyList() {
         var output = BasicNodes.EMPTY_LIST.compute(Map.of(), Map.of(), Map.of());
         var createdList = (List<String>) output.get("output").join().value();
-        createdList.add("turi ip ip ip");
-        createdList.add("ip ip ip ip tsha ik");
-        createdList.add("ip tsha ip ik");
-        Assertions.assertEquals(3, createdList.size());
+        Assertions.assertThrows(Exception.class, () -> {
+            createdList.add("ip ip ip ip tsha ik");
+            createdList.add("ip ip ip ip tsha ik");
+            createdList.add("ip tsha ip ik");
+        });
     }
 }
