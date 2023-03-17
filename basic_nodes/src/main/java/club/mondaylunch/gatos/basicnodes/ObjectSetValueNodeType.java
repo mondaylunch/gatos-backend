@@ -5,7 +5,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import club.mondaylunch.gatos.core.data.DataBox;
@@ -50,7 +49,7 @@ public class ObjectSetValueNodeType extends NodeType.Process {
         if (!("".equals(key)) && jsonElement.isPresent()) {
             jsonObject.add(key, jsonElement.get());
         }
-        
+
         return Map.of("output", CompletableFuture.completedFuture(DataType.JSON_OBJECT.create(jsonObject)));
     }
     
