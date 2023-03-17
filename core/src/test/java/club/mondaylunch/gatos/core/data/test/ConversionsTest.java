@@ -109,6 +109,16 @@ public class ConversionsTest {
         Assertions.assertEquals(baz, Conversions.convert(foo, BAZ_TYPE));
     }
 
+    @Test
+    public void testPreferDirectConversion() {
+        Conversions.register(FOO_TYPE, BAR_TYPE, foo -> new Bar(foo.name()));
+        Conversions.register(BAR_TYPE, BAZ_TYPE, bar -> new Baz(bar.name()));
+        Conversions.register(FOO_TYPE, BAZ_TYPE, foo -> new Baz("direct " + foo.name()));
+        var foo = FOO_TYPE.create(new Foo("hello!"));
+        var baz = BAZ_TYPE.create(new Baz("direct hello!"));
+        Assertions.assertEquals(baz, Conversions.convert(foo, BAZ_TYPE));
+    }
+
     @SuppressWarnings("UnstableApiUsage")
     @Test
     public void testCanGetPath() {
