@@ -6,6 +6,7 @@ import club.mondaylunch.gatos.discord.nodes.CommandReplyNodeType;
 import club.mondaylunch.gatos.discord.nodes.ReactToMessageNodeType;
 import club.mondaylunch.gatos.discord.nodes.ReceiveCommandNodeType;
 import club.mondaylunch.gatos.discord.nodes.ReceiveMessageNodeType;
+import club.mondaylunch.gatos.discord.nodes.ReplyToMessageNodeType;
 import club.mondaylunch.gatos.discord.nodes.SendMessageNodeType;
 import club.mondaylunch.gatos.discord.nodes.UsersWithRoleNodeType;
 
@@ -17,6 +18,7 @@ public class DiscordNodeTypes {
     private final UsersWithRoleNodeType usersWithRoleNodeType;
     private final ReceiveMessageNodeType receiveMessageNodeType;
     private final ReactToMessageNodeType reactToMessageNodeType;
+    private final ReplyToMessageNodeType replyToMessageNodeType;
 
     public DiscordNodeTypes(GatosDiscord gatosDiscord) {
         this.receiveCommandNodeType = NodeType.REGISTRY.register("discord.receive_command", new ReceiveCommandNodeType(gatosDiscord));
@@ -26,6 +28,7 @@ public class DiscordNodeTypes {
         this.usersWithRoleNodeType = NodeType.REGISTRY.register("discord.users_with_role", new UsersWithRoleNodeType(gatosDiscord));
         this.receiveMessageNodeType = NodeType.REGISTRY.register("discord.receive_message", new ReceiveMessageNodeType(gatosDiscord));
         this.reactToMessageNodeType = NodeType.REGISTRY.register("discord.react_to_message", new ReactToMessageNodeType(gatosDiscord));
+        this.replyToMessageNodeType = NodeType.REGISTRY.register("discord.reply_to_message", new ReplyToMessageNodeType(gatosDiscord));
     }
 
     public SendMessageNodeType sendDiscordMessage() {
@@ -54,5 +57,9 @@ public class DiscordNodeTypes {
 
     public ReactToMessageNodeType reactToMessage() {
         return this.reactToMessageNodeType;
+    }
+
+    public ReplyToMessageNodeType replyToMessage() {
+        return this.replyToMessageNodeType;
     }
 }
