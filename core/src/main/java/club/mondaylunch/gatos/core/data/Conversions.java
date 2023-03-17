@@ -209,6 +209,7 @@ public final class Conversions {
     /**
      * Thrown when there is an error in DataType conversion.
      */
+    @SuppressWarnings("unused")
     public static class ConversionException extends RuntimeException {
 
         public ConversionException(String message) {
