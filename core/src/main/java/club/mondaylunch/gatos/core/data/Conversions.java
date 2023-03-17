@@ -18,6 +18,14 @@ import com.google.common.graph.ValueGraphBuilder;
 @SuppressWarnings("UnstableApiUsage")
 public final class Conversions {
 
+    /**
+     * A directed graph of {@code DataType} conversions.
+     * The nodes of the graph are the {@code DataType}s,
+     * and the edges are the conversion functions between
+     * {@code DataType}s.
+     * {@code DataType}s are connected by an edge if there
+     * is a direct conversion between them.
+     */
     private static final MutableValueGraph<DataType<?>, Function<?, ?>> TYPE_CONVERSIONS = ValueGraphBuilder
         .directed()
         .allowsSelfLoops(true)
