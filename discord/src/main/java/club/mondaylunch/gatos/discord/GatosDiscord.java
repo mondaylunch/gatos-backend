@@ -21,6 +21,7 @@ public class GatosDiscord implements GatosPlugin {
     public static final Logger LOGGER = LoggerFactory.getLogger("Gatos Discord");
     private JDA jda;
     private DiscordCommands commands;
+    private DiscordEvents events;
     private DiscordNodeTypes nodeTypes;
 
     @Override
@@ -37,7 +38,7 @@ public class GatosDiscord implements GatosPlugin {
             this.jda = JDABuilder.createDefault(this.getToken())
                 .setActivity(Activity.competing("SEG"))
                 .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES)
-                .addEventListeners(this.commands)
+                .addEventListeners(this.commands, this.events)
                 .build()
                 .awaitReady();
             LOGGER.info("JDA ready");
@@ -75,5 +76,13 @@ public class GatosDiscord implements GatosPlugin {
 
     public void removeSlashCommandListener(UUID id) {
         this.commands.removeSlashCommandListener(id);
+    }
+
+    public <T> void createEventListener(UUID id, Class<T> eventClass, Consumer<@Nullable T> function) {
+        this.events.createEventListener(id, eventClass, function);
+    }
+
+    public void removeEventListener(UUID id) {
+        this.events.removeEventListener(id);
     }
 }

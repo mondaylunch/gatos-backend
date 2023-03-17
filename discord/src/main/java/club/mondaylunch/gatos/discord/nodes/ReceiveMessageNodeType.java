@@ -1,6 +1,6 @@
 package club.mondaylunch.gatos.discord.nodes;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -8,14 +8,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.Nullable;
 
-import club.mondaylunch.gatos.core.GatosUtils;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
-import club.mondaylunch.gatos.core.graph.Graph;
-import club.mondaylunch.gatos.core.graph.GraphValidityError;
 import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
@@ -23,24 +20,18 @@ import club.mondaylunch.gatos.core.models.Flow;
 import club.mondaylunch.gatos.discord.DiscordDataTypes;
 import club.mondaylunch.gatos.discord.GatosDiscord;
 
-public class ReceiveCommandNodeType extends NodeType.Start<SlashCommandInteractionEvent> {
+public class ReceiveMessageNodeType extends NodeType.Start<MessageReceivedEvent> {
     private final GatosDiscord gatosDiscord;
 
-    public ReceiveCommandNodeType(GatosDiscord gatosDiscord) {
+    public ReceiveMessageNodeType(GatosDiscord gatosDiscord) {
         this.gatosDiscord = gatosDiscord;
-    }
-
-    @Override
-    public Collection<GraphValidityError> isValid(Node node, Graph graph) {
-        var canFindReply = graph.nodes().stream().anyMatch(n -> n.type().equals(this.gatosDiscord.getNodeTypes().commandReply()));
-        return GatosUtils.union(super.isValid(node, graph), canFindReply ? Set.of() : Set.of(new GraphValidityError(node.id(), "No command reply node found.")));
     }
 
     @Override
     public Map<String, DataBox<?>> settings() {
         return Map.of(
             "guild_id", DiscordDataTypes.GUILD_ID.create(""),
-            "command_name", DataType.STRING.create("")
+            "channel_ids", DiscordDataTypes.CHANNEL_ID.listOf().create(List.of())
         );
     }
 
@@ -54,34 +45,38 @@ public class ReceiveCommandNodeType extends NodeType.Start<SlashCommandInteracti
     }
 
     @Override
-    public void setupFlow(Flow flow, Consumer<@Nullable SlashCommandInteractionEvent> function, Node node) {
+    public void setupFlow(Flow flow, Consumer<@Nullable MessageReceivedEvent> function, Node node) {
         String guildId = DataBox.get(node.settings(), "guild_id", DiscordDataTypes.GUILD_ID).orElseThrow();
-        String commandName = DataBox.get(node.settings(), "command_name", DataType.STRING).orElseThrow();
+        List<String> channelIds = DataBox.get(node.settings(), "channel_ids", DiscordDataTypes.CHANNEL_ID.listOf()).orElseThrow();
         if (!guildId.isEmpty()) {
             Guild guild = this.gatosDiscord.getJda().getGuildById(guildId);
             if (guild != null) {
-                this.gatosDiscord.createSlashCommandListener(node.id(), commandName, guild, function);
+                this.gatosDiscord.createEventListener(node.id(), MessageReceivedEvent.class, m -> {
+                    if (m != null
+                        && m.isFromGuild() && m.getGuild().getId().equals(guildId)
+                        && (channelIds.isEmpty() || channelIds.contains(m.getChannel().getId()))) {
+                        function.accept(m);
+                    }
+                });
             }
         }
     }
 
     @Override
     public void teardownFlow(Flow flow, Node node) {
-        this.gatosDiscord.removeSlashCommandListener(node.id());
+        this.gatosDiscord.removeEventListener(node.id());
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable SlashCommandInteractionEvent event, Map<String, DataBox<?>> settings) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable MessageReceivedEvent event, Map<String, DataBox<?>> settings) {
         if (event == null) {
-            return Map.of(
-                "user", CompletableFuture.completedFuture(DiscordDataTypes.USER_ID.create("")),
-                "channel", CompletableFuture.completedFuture(DiscordDataTypes.CHANNEL_ID.create(""))
-            );
+            throw new IllegalStateException();
         }
+
         return Map.of(
-            "user", CompletableFuture.completedFuture(DiscordDataTypes.USER_ID.create(event.getUser().getId())),
+            "user", CompletableFuture.completedFuture(DiscordDataTypes.USER_ID.create(event.getAuthor().getId())),
             "channel", CompletableFuture.completedFuture(DiscordDataTypes.CHANNEL_ID.create(event.getChannel().getId())),
-            "command_event", CompletableFuture.completedFuture(DiscordDataTypes.SLASH_COMMAND_EVENT.create(event))
+            "message", CompletableFuture.completedFuture(DiscordDataTypes.MESSAGE.create(event.getMessage()))
         );
     }
 }
