@@ -1,9 +1,7 @@
 package club.mondaylunch.gatos.core.data;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -19,7 +17,7 @@ import com.google.common.graph.ValueGraphBuilder;
  */
 @SuppressWarnings("UnstableApiUsage")
 public final class Conversions {
-    private static final Map<ConversionPair, Function<?, ?>> MAP = new HashMap<>();
+
     private static final MutableValueGraph<DataType<?>, Function<?, ?>> TYPE_CONVERSIONS = ValueGraphBuilder
         .directed()
         .allowsSelfLoops(true)
@@ -35,7 +33,6 @@ public final class Conversions {
      * @param <B>                the second type
      */
     public static <A, B> void register(DataType<A> typeA, DataType<B> typeB, Function<A, B> conversionFunction) {
-        MAP.put(new ConversionPair(typeA, typeB), conversionFunction);
         TYPE_CONVERSIONS.putEdgeValue(typeA, typeB, conversionFunction);
     }
 
@@ -183,7 +180,17 @@ public final class Conversions {
      * @return a list of all registered conversions
      */
     public static List<ConversionPair> getAllConversions() {
-        return List.copyOf(MAP.keySet());
+        List<ConversionPair> conversions = new ArrayList<>();
+        var traverser = Traverser.forGraph(TYPE_CONVERSIONS);
+        for (var node : TYPE_CONVERSIONS.nodes()) {
+            var nodePaths = traverser.depthFirstPreOrder(node);
+            for (var connectedNode : nodePaths) {
+                if (!connectedNode.equals(node)) {
+                    conversions.add(new ConversionPair(node, connectedNode));
+                }
+            }
+        }
+        return conversions;
     }
 
     private Conversions() {
@@ -196,6 +203,7 @@ public final class Conversions {
      * Thrown when there is an error in DataType conversion.
      */
     public static class ConversionException extends RuntimeException {
+
         public ConversionException(String message) {
             super(message);
         }
