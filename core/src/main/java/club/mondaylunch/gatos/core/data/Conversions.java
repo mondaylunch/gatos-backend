@@ -26,8 +26,7 @@ public final class Conversions {
      * {@code DataType}s are connected by an edge if there
      * is a direct conversion between them.
      */
-    private static final MutableValueGraph<DataType<?>, Function<?, ?>> TYPE_CONVERSIONS = ValueGraphBuilder
-        .directed()
+    private static final MutableValueGraph<DataType<?>, Function<?, ?>> TYPE_CONVERSIONS = ValueGraphBuilder.directed()
         .allowsSelfLoops(true)
         .build();
 
