@@ -133,7 +133,6 @@ public final class Conversions {
         var traverser = Traverser.forGraph(graph);
         var nodePaths = traverser.depthFirstPreOrder(start);
         List<V> edgePath = new ArrayList<>();
-        var found = false;
         var currentNode = start;
         for (var node : nodePaths) {
             /*
@@ -167,18 +166,13 @@ public final class Conversions {
                 we've found a path.
                  */
                 if (node.equals(end)) {
-                    found = true;
-                    break;
+                    return Optional.of(edgePath);
                 } else {
                     currentNode = node;
                 }
             }
         }
-        if (found) {
-            return Optional.of(edgePath);
-        } else {
-            return Optional.empty();
-        }
+        return Optional.empty();
     }
 
     /**
