@@ -33,6 +33,13 @@ public class ConversionsTest {
     }
 
     @Test
+    public void canConvertIsCorrectTransitive() {
+        Conversions.register(FOO_TYPE, BAR_TYPE, foo -> new Bar(foo.name()));
+        Conversions.register(BAR_TYPE, BAZ_TYPE, bar -> new Baz(bar.name()));
+        Assertions.assertTrue(Conversions.canConvert(FOO_TYPE, BAZ_TYPE));
+    }
+
+    @Test
     public void canConvertToSelf() {
         Assertions.assertTrue(Conversions.canConvert(FOO_TYPE, FOO_TYPE));
         var foo = FOO_TYPE.create(new Foo("hello!"));
