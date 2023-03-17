@@ -46,6 +46,8 @@ public final class BasicNodes implements GatosPlugin {
         .register("list_head_separation", new ListHeadSeparationNodeType());
     public static final ListTailSeparationNodeType LIST_TAIL_SEPARATION = NodeType.REGISTRY
         .register("list_tail_separation", new ListTailSeparationNodeType());
+    public static final RemoveElementFromListNodeType REMOVE_ELEM_FROM_LIST = NodeType.REGISTRY
+        .register("remove_element_from_list", new RemoveElementFromListNodeType());
     public static final EqualsNodeType EQUALS = NodeType.REGISTRY
         .register("equals", new EqualsNodeType());
     public static final TruthinessNodeType TRUTHINESS = NodeType.REGISTRY
