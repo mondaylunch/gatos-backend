@@ -118,14 +118,14 @@ public final class Conversions {
     }
 
     /**
-     * Get the path between two nodes in a graph.
+     * Get the edge path between two nodes in a graph.
      *
      * @param graph The graph.
      * @param start The start node.
      * @param end   The end node.
      * @param <N>   The type of the nodes.
      * @param <V>   The type of the edges.
-     * @return An {@code Optional} describing the path.
+     * @return An {@code Optional} describing the edge path.
      * If there is no path, the {@code Optional} will be empty.
      */
     @SuppressWarnings("SameParameterValue")
