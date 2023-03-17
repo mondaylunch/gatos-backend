@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import club.mondaylunch.gatos.core.Registry;
@@ -22,6 +23,9 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
     public static final DataType<JsonObject> JSON_OBJECT = register("json_object", JsonObject.class);
     public static final DataType<DataType<?>> DATA_TYPE = register("data_type", DataType.class);
     public static final DataType<AtomicReference<?>> REFERENCE = register("reference", AtomicReference.class);
+    // test for now
+    public static final DataType<JsonElement> JSON_ELEMENT = register("reference", JsonElement.class);
+
     static {
         Conversions.register(ANY, STRING, Object::toString);
         Conversions.register(NUMBER, STRING, Object::toString);
