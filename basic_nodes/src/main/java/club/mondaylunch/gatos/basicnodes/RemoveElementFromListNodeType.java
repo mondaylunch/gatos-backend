@@ -1,21 +1,16 @@
 package club.mondaylunch.gatos.basicnodes;
 
-import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import club.mondaylunch.gatos.core.codec.NodeConnectionCodec;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.data.ListDataType;
-import club.mondaylunch.gatos.core.data.OptionalDataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
@@ -63,7 +58,7 @@ public class RemoveElementFromListNodeType extends NodeType.Process {
         var listType = outputType == DataType.ANY ? ListDataType.GENERIC_LIST : outputType.listOf();
         int index = -1;
 
-        if(mode == Mode.ELEMENT) {
+        if (mode == Mode.ELEMENT) {
             var inputElem = DataBox.get(inputs, "element", DataType.ANY).orElseThrow();
             try {
                 index = inputList.indexOf(inputElem);
@@ -74,11 +69,11 @@ public class RemoveElementFromListNodeType extends NodeType.Process {
             }
         }
 
-        if(mode == Mode.INDEX) index = (int) (double) DataBox.get(inputs, "index", DataType.NUMBER).orElseThrow();
+        if (mode == Mode.INDEX) index = (int) (double) DataBox.get(inputs, "index", DataType.NUMBER).orElseThrow();
 
         System.out.println(index);
 
-        if(index == -1) return Map.of("output", CompletableFuture.completedFuture(this.getGenericListBox(inputList, listType)));
+        if (index == -1) return Map.of("output", CompletableFuture.completedFuture(this.getGenericListBox(inputList, listType)));
    
         return Map.of(
             "output", CompletableFuture.completedFuture(this.getGenericListBox(
