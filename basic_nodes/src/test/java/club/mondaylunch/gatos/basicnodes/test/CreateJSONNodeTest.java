@@ -1,8 +1,11 @@
 package club.mondaylunch.gatos.basicnodes.test;
 
+import java.util.Map;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import com.google.gson.JsonObject;
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
 import club.mondaylunch.gatos.core.graph.Node;
 
@@ -22,4 +25,9 @@ public class CreateJSONNodeTest {
         Assertions.assertTrue(node.getOutputs().containsKey("output"));
     }
 
+    @Test
+    public void identifiesEqualStrings() {
+        var output = BasicNodes.CREATE_JSON.compute(Map.of(), Map.of(), Map.of());
+        Assertions.assertEquals(new JsonObject(), output.get("output").join().value());
+    }
 }
