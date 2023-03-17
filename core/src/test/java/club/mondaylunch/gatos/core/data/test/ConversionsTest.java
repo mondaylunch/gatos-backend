@@ -89,6 +89,15 @@ public class ConversionsTest {
         });
     }
 
+    @Test
+    public void canConvertTransitive() {
+        Conversions.register(FOO_TYPE, BAR_TYPE, foo -> new Bar(foo.name()));
+        Conversions.register(BAR_TYPE, BAZ_TYPE, bar -> new Baz(bar.name()));
+        var foo = FOO_TYPE.create(new Foo("hello!"));
+        var baz = BAZ_TYPE.create(new Baz("hello!"));
+        Assertions.assertEquals(baz, Conversions.convert(foo, BAZ_TYPE));
+    }
+
     private record Foo(String name) {}
     private record Bar(String name) {}
     private record Baz(String name) {}
