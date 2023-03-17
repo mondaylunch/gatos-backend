@@ -1,6 +1,8 @@
 package club.mondaylunch.gatos.api.controller;
 
+import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map;
 
@@ -39,9 +41,9 @@ public class NodeTypesController {
     @SuppressWarnings("unchecked")
     public static Map<String, String> getTranslatedDisplayNameMap(String langFile) {
         Gson gson = new Gson();
-        var file = NodeTypesController.class.getClassLoader().getResource("display_names/" + langFile + ".json");
+        var file = NodeTypesController.class.getClassLoader().getResourceAsStream("display_names/" + langFile + ".json");
         try {
-            return gson.fromJson(new FileReader(file == null ? "" : file.getFile()), Map.class);
+            return gson.fromJson(new InputStreamReader(file), Map.class);
         } catch (Exception e) {
             System.out.println("Failed to load language file: " + langFile);
             e.printStackTrace();
