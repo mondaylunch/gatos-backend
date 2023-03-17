@@ -20,9 +20,9 @@ public class ConversionsTest {
 
     @Test
     public void canRegisterConversion() {
-        Assertions.assertDoesNotThrow(() -> {
-            Conversions.register(FOO_TYPE, BAR_TYPE, foo -> new Bar(foo.name()));
-        });
+        Assertions.assertDoesNotThrow(() ->
+            Conversions.register(FOO_TYPE, BAR_TYPE, foo -> new Bar(foo.name()))
+        );
     }
 
     @Test
@@ -51,18 +51,20 @@ public class ConversionsTest {
     public void incorrectConversionFails() {
         Conversions.register(FOO_TYPE, BAR_TYPE, foo -> new Bar(foo.name()));
         var bar = BAR_TYPE.create(new Bar("hello!"));
-        Assertions.assertThrows(Conversions.ConversionException.class, () -> {
-            Conversions.convert(bar, FOO_TYPE);
-        });
+        Assertions.assertThrows(
+            Conversions.ConversionException.class,
+            () -> Conversions.convert(bar, FOO_TYPE)
+        );
     }
 
     @Test
     public void nullConversionFails() {
         Conversions.register(FOO_TYPE, BAZ_TYPE, foo -> null);
         var foo = FOO_TYPE.create(new Foo("hello!"));
-        Assertions.assertThrows(Conversions.ConversionException.class, () -> {
-            Conversions.convert(foo, BAZ_TYPE);
-        });
+        Assertions.assertThrows(
+            Conversions.ConversionException.class,
+            () -> Conversions.convert(foo, BAZ_TYPE)
+        );
     }
 
     @Test
