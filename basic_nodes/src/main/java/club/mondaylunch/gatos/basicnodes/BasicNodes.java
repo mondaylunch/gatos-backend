@@ -75,12 +75,12 @@ public final class BasicNodes implements GatosPlugin {
     public static final Map<DataType<?>, ValueProviderNodeType<?>> VALUE_PROVIDERS = VALUE_PROVIDER_TYPES_WITH_DEFAULTS.stream()
         .collect(Collectors.toMap(
             DataBox::type,
-            box -> NodeType.REGISTRY.register("value_provider_"+DataType.REGISTRY.getName(box.type()), new ValueProviderNodeType<>(box))
+            box -> NodeType.REGISTRY.register("value_provider_"+DataType.REGISTRY.getName(box.type()).orElseThrow(), new ValueProviderNodeType<>(box))
         ));
 
     public static final Map<DataType<?>, ValueReplacerNodeType<?>> VALUE_REPLACERS = VALUE_PROVIDER_TYPES_WITH_DEFAULTS.stream()
         .collect(Collectors.toMap(
             DataBox::type,
-            box -> NodeType.REGISTRY.register("value_replacer_"+DataType.REGISTRY.getName(box.type()), new ValueReplacerNodeType<>(box))
+            box -> NodeType.REGISTRY.register("value_replacer_"+DataType.REGISTRY.getName(box.type()).orElseThrow(), new ValueReplacerNodeType<>(box))
         ));
 }
