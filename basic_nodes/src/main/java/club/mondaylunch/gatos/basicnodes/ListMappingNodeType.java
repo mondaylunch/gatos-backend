@@ -21,22 +21,27 @@ import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 public class ListMappingNodeType extends NodeType.Process {
 
+    private static final String MAPPING_NODE_SETTING = "mapping_node";
+    private static final String INPUT_CONNECTOR_SETTING = "input_connector";
+    private static final String OUTPUT_CONNECTOR_SETTING = "output_connector";
+    private static final String LIST_INPUT = "list_input";
+    private static final String MAPPED_LIST_OUTPUT = "mapped_list";
+
     @Override
     public Map<String, DataBox<?>> settings() {
         return Map.of(
-            "mapping_node", DataType.PROCESS_NODE_TYPE.create(BasicNodes.TRUTHINESS),
-            "input_connector", DataType.STRING.create("input"),
-            "output_connector", DataType.STRING.create("output")
+            MAPPING_NODE_SETTING, DataType.PROCESS_NODE_TYPE.create(BasicNodes.TRUTHINESS),
+            INPUT_CONNECTOR_SETTING, DataType.STRING.create("input"),
+            OUTPUT_CONNECTOR_SETTING, DataType.STRING.create("output")
         );
     }
 
     @Override
     public Collection<GraphValidityError> isValid(Node node, Graph graph) {
         Set<GraphValidityError> errors = new HashSet<>(super.isValid(node, graph));
-        var mappingNodeType = DataBox.get(node.settings(), "mapping_node", DataType.PROCESS_NODE_TYPE).orElseThrow();
-        var inputConnectorName = DataBox.get(node.settings(), "input_connector", DataType.STRING).orElseThrow();
-        var outputConnectorName = DataBox.get(node.settings(), "output_connector", DataType.STRING).orElseThrow();
-        var mappingNode = Node.create(mappingNodeType);
+        var inputConnectorName = DataBox.get(node.settings(), INPUT_CONNECTOR_SETTING, DataType.STRING).orElseThrow();
+        var outputConnectorName = DataBox.get(node.settings(), OUTPUT_CONNECTOR_SETTING, DataType.STRING).orElseThrow();
+        var mappingNode = getMappingNode(node.settings());
         var inputConnector = mappingNode.getInputWithName(inputConnectorName);
         var outputConnector = mappingNode.getOutputWithName(outputConnectorName);
         if (inputConnector.isEmpty()) {
@@ -50,13 +55,12 @@ public class ListMappingNodeType extends NodeType.Process {
 
     @Override
     public Set<Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        var mappingNodeType = DataBox.get(settings, "mapping_node", DataType.PROCESS_NODE_TYPE).orElseThrow();
-        var inputConnectorName = DataBox.get(settings, "input_connector", DataType.STRING).orElseThrow();
-        var mappingNode = Node.create(mappingNodeType);
+        var inputConnectorName = DataBox.get(settings, INPUT_CONNECTOR_SETTING, DataType.STRING).orElseThrow();
+        var mappingNode = getMappingNode(settings);
         var inputConnector = mappingNode.getInputWithName(inputConnectorName);
         if (inputConnector.isEmpty()) {
             return Set.of(
-                new Input<>(nodeId, "list_input", ListDataType.GENERIC_LIST)
+                new Input<>(nodeId, LIST_INPUT, ListDataType.GENERIC_LIST)
             );
         }
 
@@ -64,11 +68,10 @@ public class ListMappingNodeType extends NodeType.Process {
             .filter(input -> !input.equals(inputConnector.get()))
             .toList();
 
-        var inputConnectorType = inputConnector.get().type();
-        var listInputType = inputConnectorType == DataType.ANY ? ListDataType.GENERIC_LIST : inputConnectorType.listOf();
+        var listInputType = getListType(inputConnector.get().type());
 
         Set<Input<?>> inputs = new HashSet<>();
-        inputs.add(new Input<>(nodeId, "list_input", listInputType));
+        inputs.add(new Input<>(nodeId, LIST_INPUT, listInputType));
         for (var otherInput : otherInputs) {
             inputs.add(new Input<>(nodeId, otherInput.name(), otherInput.type()));
         }
@@ -77,13 +80,12 @@ public class ListMappingNodeType extends NodeType.Process {
 
     @Override
     public Set<Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        var mappingNodeType = DataBox.get(settings, "mapping_node", DataType.PROCESS_NODE_TYPE).orElseThrow();
-        var outputConnectorName = DataBox.get(settings, "output_connector", DataType.STRING).orElseThrow();
-        var mappingNode = Node.create(mappingNodeType);
+        var outputConnectorName = DataBox.get(settings, OUTPUT_CONNECTOR_SETTING, DataType.STRING).orElseThrow();
+        var mappingNode = getMappingNode(settings);
         var outputConnector = mappingNode.getOutputWithName(outputConnectorName);
         if (outputConnector.isEmpty()) {
             return Set.of(
-                new Output<>(nodeId, "mapped_list", ListDataType.GENERIC_LIST)
+                new Output<>(nodeId, MAPPED_LIST_OUTPUT, ListDataType.GENERIC_LIST)
             );
         }
 
@@ -91,11 +93,10 @@ public class ListMappingNodeType extends NodeType.Process {
             .filter(output -> !output.equals(outputConnector.get()))
             .toList();
 
-        var outputConnectorType = outputConnector.get().type();
-        var listOutputType = outputConnectorType == DataType.ANY ? ListDataType.GENERIC_LIST : outputConnectorType.listOf();
+        var listOutputType = getListType(outputConnector.get().type());
 
         Set<Output<?>> outputs = new HashSet<>();
-        outputs.add(new Output<>(nodeId, "mapped_list", listOutputType));
+        outputs.add(new Output<>(nodeId, MAPPED_LIST_OUTPUT, listOutputType));
         for (var otherOutput : otherOutputs) {
             outputs.add(new Output<>(nodeId, otherOutput.name(), otherOutput.type()));
         }
@@ -105,29 +106,33 @@ public class ListMappingNodeType extends NodeType.Process {
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        var mappingNodeType = DataBox.get(settings, "mapping_node", DataType.PROCESS_NODE_TYPE).orElseThrow();
-        var inputConnectorName = DataBox.get(settings, "input_connector", DataType.STRING).orElseThrow();
-        var outputConnectorName = DataBox.get(settings, "output_connector", DataType.STRING).orElseThrow();
-        var mappingNode = Node.create(mappingNodeType);
+        var inputConnectorName = DataBox.get(settings, INPUT_CONNECTOR_SETTING, DataType.STRING).orElseThrow();
+        var outputConnectorName = DataBox.get(settings, OUTPUT_CONNECTOR_SETTING, DataType.STRING).orElseThrow();
+        var mappingNode = getMappingNode(settings);
         var inputConnector = mappingNode.getInputWithName(inputConnectorName).orElseThrow();
         var outputConnector = mappingNode.getOutputWithName(outputConnectorName).orElseThrow();
-        DataType<List<Object>> listOutputType = (DataType<List<Object>>) (outputConnector.type() == DataType.ANY ? ListDataType.GENERIC_LIST : outputConnector.type().listOf());
+        DataType<List<Object>> listOutputType = getListType(outputConnector.type());
 
-        var inputListBox = inputs.get("list_input");
+        var inputListBox = inputs.get(LIST_INPUT);
         var inputListType = inputListBox.type();
         DataType<?> contentsType = inputListType instanceof ListDataType<?> listDataType ? listDataType.contains() : DataType.ANY;
-        List<CompletableFuture<Object>> resultList = this.mapInput((List<?>) inputListBox.value(), mappingNode, inputs, inputConnector, outputConnector, contentsType, mappingNodeType);
+        List<CompletableFuture<Object>> resultList = mapInput((List<?>) inputListBox.value(), mappingNode, inputs, inputConnector, outputConnector, contentsType, (NodeType.Process) mappingNode.type());
         CompletableFuture<Void> resultFuture = CompletableFuture.allOf(resultList.toArray(CompletableFuture[]::new));
-        return Map.of("mapped_list", resultFuture.thenApply(v -> listOutputType.create(resultList.stream().map(CompletableFuture::join).toList())));
+        return Map.of(MAPPED_LIST_OUTPUT, resultFuture.thenApply(v -> listOutputType.create(resultList.stream().map(CompletableFuture::join).toList())));
     }
 
     @SuppressWarnings("unchecked")
-    private <E1, E2> List<CompletableFuture<E2>> mapInput(List<?> inputList, Node mappingNode, Map<String, DataBox<?>> inputs, Input<?> inputConnector, Output<?> outputConnector, DataType<?> contentsType, NodeType.Process mappingNodeType) {
-        return ((List<E1>) inputList).stream().map(element -> (CompletableFuture<E2>) this.mapSingleElement(element, mappingNode, inputs, inputConnector, outputConnector, (DataType<E1>) contentsType, mappingNodeType)).toList();
+    private static DataType<List<Object>> getListType(DataType<?> type) {
+        return (DataType<List<Object>>) (type == DataType.ANY ? ListDataType.GENERIC_LIST : type.listOf());
     }
 
     @SuppressWarnings("unchecked")
-    private <E1, E2> CompletableFuture<E2> mapSingleElement(E1 element,
+    private static <E1, E2> List<CompletableFuture<E2>> mapInput(List<?> inputList, Node mappingNode, Map<String, DataBox<?>> inputs, Input<?> inputConnector, Output<?> outputConnector, DataType<?> contentsType, NodeType.Process mappingNodeType) {
+        return ((List<E1>) inputList).stream().map(element -> (CompletableFuture<E2>) mapSingleElement(element, mappingNode, inputs, inputConnector, outputConnector, (DataType<E1>) contentsType, mappingNodeType)).toList();
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <E1, E2> CompletableFuture<E2> mapSingleElement(E1 element,
                                                             Node mappingNode,
                                                             Map<String, DataBox<?>> inputs,
                                                             Input<?> inputConnector,
@@ -144,5 +149,9 @@ public class ListMappingNodeType extends NodeType.Process {
         }
         var results = mappingNodeType.compute(mappingNodeInputs, mappingNode.settings(), mappingNode.inputTypes());
         return (CompletableFuture<E2>) results.get(outputConnector.name()).thenApply(DataBox::value);
+    }
+
+    private static Node getMappingNode(Map<String, DataBox<?>> settings) {
+        return Node.create(DataBox.get(settings, MAPPING_NODE_SETTING, DataType.PROCESS_NODE_TYPE).orElseThrow());
     }
 }
