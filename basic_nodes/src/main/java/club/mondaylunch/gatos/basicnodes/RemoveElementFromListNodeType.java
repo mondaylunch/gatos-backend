@@ -28,7 +28,7 @@ public class RemoveElementFromListNodeType extends NodeType.Process {
     @Override
     public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var mode = DataBox.get(settings, "mode", ELEMENT_REFERENCE).orElse(Mode.ELEMENT);
-        if(mode == Mode.ELEMENT) {
+        if (mode == Mode.ELEMENT) {
             return Set.of(
                 new NodeConnector.Input<>(nodeId, "list", ListDataType.GENERIC_LIST),
                 new NodeConnector.Input<>(nodeId, "element", DataType.ANY)
