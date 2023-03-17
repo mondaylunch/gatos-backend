@@ -3,6 +3,8 @@ package club.mondaylunch.gatos.core.data.test;
 import java.util.List;
 import java.util.Optional;
 
+import com.google.common.graph.ValueGraph;
+import com.google.common.graph.ValueGraphBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -96,6 +98,45 @@ public class ConversionsTest {
         var foo = FOO_TYPE.create(new Foo("hello!"));
         var baz = BAZ_TYPE.create(new Baz("hello!"));
         Assertions.assertEquals(baz, Conversions.convert(foo, BAZ_TYPE));
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    @Test
+    public void testCanGetPath() {
+        var graph = ValueGraphBuilder.directed()
+            .<String, String>immutable()
+            .putEdgeValue("node1", "node2", "edge1")
+            .putEdgeValue("node3", "node4", "edge2")
+            .putEdgeValue("node5", "node6", "edge3")
+            .putEdgeValue("node6", "node7", "edge4")
+            .build();
+        var path = getPath(graph, "node5", "node7").orElseThrow();
+        Assertions.assertIterableEquals(List.of("edge3", "edge4"), path);
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    @Test
+    public void testCannotGetPath() {
+        var graph = ValueGraphBuilder.directed()
+            .<String, String>immutable()
+            .putEdgeValue("node1", "node2", "edge1")
+            .putEdgeValue("node3", "node4", "edge2")
+            .putEdgeValue("node5", "node6", "edge3")
+            .putEdgeValue("node6", "node7", "edge4")
+            .build();
+        var pathOptional = getPath(graph, "node1", "node3");
+        Assertions.assertTrue(pathOptional.isEmpty());
+    }
+
+    @SuppressWarnings({"unchecked", "UnstableApiUsage"})
+    private static <N, V> Optional<List<V>> getPath(ValueGraph<N, V> graph, N start, N end) {
+        try {
+            var method = Conversions.class.getDeclaredMethod("getPath", ValueGraph.class, Object.class, Object.class);
+            method.setAccessible(true);
+            return (Optional<List<V>>) method.invoke(null, graph, start, end);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private record Foo(String name) {}
