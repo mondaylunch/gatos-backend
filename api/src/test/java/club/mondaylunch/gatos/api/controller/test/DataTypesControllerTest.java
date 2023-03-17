@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import club.mondaylunch.gatos.api.BaseMvcTest;
 import club.mondaylunch.gatos.api.TestSecurity;
 import club.mondaylunch.gatos.api.controller.DataTypesController;
-import club.mondaylunch.gatos.basicnodes.BasicNodes;
+import club.mondaylunch.gatos.core.GatosCore;
 import club.mondaylunch.gatos.core.data.Conversions;
 import club.mondaylunch.gatos.core.data.DataType;
 
@@ -32,7 +32,7 @@ public class DataTypesControllerTest extends BaseMvcTest {
 
     @BeforeAll
     public static void init() {
-        BasicNodes.init();
+        GatosCore.init();
     }
 
     @BeforeEach
