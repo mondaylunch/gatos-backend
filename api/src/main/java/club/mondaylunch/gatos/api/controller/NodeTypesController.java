@@ -39,7 +39,7 @@ public class NodeTypesController {
     @SuppressWarnings("unchecked")
     public static Map<String, String> getTranslatedDisplayNameMap(String langFile) {
         Gson gson = new Gson();
-        var file = ClassLoader.getSystemClassLoader().getResource("display_names/" + langFile + ".json");
+        var file = NodeTypesController.class.getClassLoader().getResource("display_names/" + langFile + ".json");
         try {
             return gson.fromJson(new FileReader(file == null ? "" : file.getFile()), Map.class);
         } catch (Exception e) {
