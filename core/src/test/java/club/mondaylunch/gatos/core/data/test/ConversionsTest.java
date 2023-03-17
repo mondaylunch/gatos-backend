@@ -130,6 +130,20 @@ public class ConversionsTest {
         Assertions.assertTrue(pathOptional.isEmpty());
     }
 
+    @SuppressWarnings("UnstableApiUsage")
+    @Test
+    public void testCannotGetReversePath() {
+        var graph = ValueGraphBuilder.directed()
+            .<String, String>immutable()
+            .putEdgeValue("node1", "node2", "edge1")
+            .putEdgeValue("node3", "node4", "edge2")
+            .putEdgeValue("node5", "node6", "edge3")
+            .putEdgeValue("node6", "node7", "edge4")
+            .build();
+        var pathOptional = getPath(graph, "node7", "node5");
+        Assertions.assertTrue(pathOptional.isEmpty());
+    }
+
     @SuppressWarnings({"unchecked", "UnstableApiUsage"})
     private static <N, V> Optional<List<V>> getPath(ValueGraph<N, V> graph, N start, N end) {
         try {
