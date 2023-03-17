@@ -7,8 +7,11 @@ import java.util.function.Consumer;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.jetbrains.annotations.Nullable;
@@ -16,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import club.mondaylunch.gatos.core.GatosPlugin;
+import club.mondaylunch.gatos.core.models.User;
 
 public class GatosDiscord implements GatosPlugin {
     public static final Logger LOGGER = LoggerFactory.getLogger("Gatos Discord");
@@ -68,6 +72,15 @@ public class GatosDiscord implements GatosPlugin {
 
     public DiscordNodeTypes getNodeTypes() {
         return this.nodeTypes;
+    }
+
+    public boolean userHasAdminPermission(User user, Guild guild) {
+        String id = user.getDiscordId();
+        if (id == null) {
+            return false;
+        }
+        Member member = guild.getMember(UserSnowflake.fromId(id));
+        return member != null && member.hasPermission(Permission.ADMINISTRATOR);
     }
 
     public void createSlashCommandListener(UUID id, String commandName, Guild guild, Consumer<@Nullable SlashCommandInteractionEvent> function) {
