@@ -14,7 +14,9 @@ import club.mondaylunch.gatos.core.Registry;
  * A type of value which can be stored in a {@link DataBox}.
  */
 public sealed class DataType<T> permits ListDataType, OptionalDataType {
+
     public static final DataTypeRegistry REGISTRY = Registry.REGISTRIES.register("data_type", new DataTypeRegistry());
+
     public static final DataType<Object> ANY = register("any", Object.class);
     public static final DataType<Double> NUMBER = register("number", Double.class);
     public static final DataType<Boolean> BOOLEAN = register("boolean", Boolean.class);
@@ -22,12 +24,9 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
     public static final DataType<JsonObject> JSON_OBJECT = register("json_object", JsonObject.class);
     public static final DataType<DataType<?>> DATA_TYPE = register("data_type", DataType.class);
     public static final DataType<AtomicReference<?>> REFERENCE = register("reference", AtomicReference.class);
+
     static {
         Conversions.register(ANY, STRING, Object::toString);
-        Conversions.register(NUMBER, STRING, Object::toString);
-        Conversions.register(BOOLEAN, STRING, Object::toString);
-        Conversions.register(JSON_OBJECT, STRING, Object::toString);
-        Conversions.register(DATA_TYPE, STRING, Object::toString);
     }
 
     private final String name;

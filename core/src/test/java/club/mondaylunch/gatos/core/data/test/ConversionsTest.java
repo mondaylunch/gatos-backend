@@ -101,6 +101,12 @@ public class ConversionsTest {
     }
 
     @Test
+    public void canConvertToString() {
+        var foo = FOO_TYPE.create(new Foo("Hello!"));
+        Assertions.assertEquals(foo.value().toString(), Conversions.convert(foo, DataType.STRING).value());
+    }
+
+    @Test
     public void canConvertTransitive() {
         Conversions.register(FOO_TYPE, BAR_TYPE, foo -> new Bar(foo.name()));
         Conversions.register(BAR_TYPE, BAZ_TYPE, bar -> new Baz(bar.name()));
