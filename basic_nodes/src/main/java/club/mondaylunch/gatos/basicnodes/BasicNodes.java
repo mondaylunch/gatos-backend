@@ -16,6 +16,11 @@ public final class BasicNodes implements GatosPlugin {
     public void init() {
     }
 
+    @Override
+    public String name() {
+        return "basic_nodes";
+    }
+
     public static final StringInterpolationNodeType STRING_INTERPOLATION = NodeType.REGISTRY
         .register("string_interpolation", new StringInterpolationNodeType());
     public static final VariableExtractionNodeType VARIABLE_EXTRACTION = NodeType.REGISTRY
