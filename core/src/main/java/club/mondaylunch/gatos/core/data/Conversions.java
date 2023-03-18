@@ -67,20 +67,7 @@ public final class Conversions {
         }
     }
 
-    /**
-     * Convert a DataBox of one type to another.
-     *
-     * @param a     the DataBox to convert
-     * @param typeB the DataType to convert to
-     * @param <A>   the first type
-     * @param <B>   the second type
-     * @return the converted DataBox
-     */
-    @SuppressWarnings("unchecked")
     public static <A, B> DataBox<B> convert(DataBox<A> a, DataType<B> typeB) {
-        if (a.type().equals(typeB)) {
-            return (DataBox<B>) a;
-        }
         var func = getConversionFunction(a.type(), typeB)
             .orElseThrow(() -> new ConversionException("Cannot convert %s to %s".formatted(a.type(), typeB)));
         B result = func.apply(a.value());
