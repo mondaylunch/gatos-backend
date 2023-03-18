@@ -53,8 +53,7 @@ public class DataTypesControllerTest extends BaseMvcTest {
             .andExpect(MockMvcResultMatchers.status().isOk());
         var body = result.andReturn().getResponse().getContentAsString();
         var gson = new Gson();
-        var type = new TypeToken<HashSet<DataTypesController.ConversionInfo>>() {
-        }.getType();
+        var type = new TypeToken<HashSet<DataTypesController.ConversionInfo>>() {};
         Set<DataTypesController.ConversionInfo> conversions = gson.fromJson(body, type);
         assertContainsConversion(conversions, type1, type2);
         assertContainsConversion(conversions, type2, type3);
