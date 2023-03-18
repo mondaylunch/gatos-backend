@@ -72,9 +72,14 @@ public final class Conversions {
     public static <A, B> DataBox<B> convert(DataBox<A> a, DataType<B> typeB) {
         var func = getConversionFunction(a.type(), typeB)
             .orElseThrow(() -> new ConversionException("Cannot convert %s to %s".formatted(a.type(), typeB)));
-        B result = func.apply(a.value());
+        B result;
+        try {
+            result = func.apply(a.value());
+        } catch (Exception e) {
+            throw new ConversionException("Failed to convert %s to %s".formatted(a.type(), typeB), e);
+        }
         if (result == null) {
-            throw new ConversionException("Conversion function %s -> %s on %s returned null!".formatted(a.type(), typeB, a.value()));
+            throw new ConversionException("Conversion function %s -> %s on %s returned null".formatted(a.type(), typeB, a.value()));
         }
 
         return typeB.create(result);
@@ -101,7 +106,7 @@ public final class Conversions {
             return Optional.empty();
         } else {
             return getPath(TYPE_CONVERSIONS, a, b).flatMap(conversions -> conversions.stream()
-                .map(function -> (Function<Object, Object>) function)
+                .map(Function.class::cast)
                 .reduce(Function::andThen)
                 .map(function -> (Function<A, B>) function)
             );
@@ -214,7 +219,6 @@ public final class Conversions {
     /**
      * Thrown when there is an error in DataType conversion.
      */
-    @SuppressWarnings("unused")
     public static class ConversionException extends RuntimeException {
 
         public ConversionException(String message) {
@@ -223,10 +227,6 @@ public final class Conversions {
 
         public ConversionException(String message, Throwable cause) {
             super(message, cause);
-        }
-
-        public ConversionException(Throwable cause) {
-            super(cause);
         }
     }
 }
