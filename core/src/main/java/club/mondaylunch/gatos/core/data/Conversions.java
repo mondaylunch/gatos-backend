@@ -55,6 +55,8 @@ public final class Conversions {
             return true;
         } else if (TYPE_CONVERSIONS.hasEdgeConnecting(a, b)) {
             return true;
+        } else if (!TYPE_CONVERSIONS.nodes().contains(a) || !TYPE_CONVERSIONS.nodes().contains(b)) {
+            return false;
         } else {
             var traverser = Traverser.forGraph(TYPE_CONVERSIONS);
             var nodePath = traverser.depthFirstPreOrder(a);
@@ -95,6 +97,8 @@ public final class Conversions {
             return Optional.of((Function<A, B>) Function.identity());
         } else if (TYPE_CONVERSIONS.hasEdgeConnecting(a, b)) {
             return (Optional<Function<A, B>>) (Optional<?>) TYPE_CONVERSIONS.edgeValue(a, b);
+        } else if (!TYPE_CONVERSIONS.nodes().contains(a) || !TYPE_CONVERSIONS.nodes().contains(b)) {
+            return Optional.empty();
         } else {
             return getPath(TYPE_CONVERSIONS, a, b).flatMap(conversions -> conversions.stream()
                 .map(function -> (Function<Object, Object>) function)
