@@ -4,16 +4,16 @@ import java.util.List;
 
 public final class ListDataType<T> extends DataType<List<T>> {
     public static final String PREFIX = "list$";
-    public static final DataType<List<?>> GENERIC_LIST = DataType.register("list", List.class);
+    @SuppressWarnings("unchecked")
+    public static final DataType<List<?>> GENERIC_LIST = (DataType<List<?>>) (DataType<?>) DataType.ANY.listOf();
     private final DataType<T> contains;
 
     /**
      * @param contains the datatype that this list will contain
      */
-    public ListDataType(DataType<T> contains) {
-        super(makeName(contains), List.class);
+    public ListDataType(DataType<T> contains, boolean registerSimpleConversion) {
+        super(makeName(contains), List.class, registerSimpleConversion);
         this.contains = contains;
-        Conversions.register(this, GENERIC_LIST, $ -> $);
     }
 
     /**

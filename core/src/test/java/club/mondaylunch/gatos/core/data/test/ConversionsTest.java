@@ -107,6 +107,13 @@ public class ConversionsTest {
     }
 
     @Test
+    public void canConvertToStringList() {
+        var foo = new Foo("Hello!");
+        var fooListBox = FOO_TYPE.listOf().create(List.of(foo));
+        Assertions.assertEquals(List.of(foo.toString()), Conversions.convert(fooListBox, DataType.STRING.listOf()).value());
+    }
+
+    @Test
     public void canConvertTransitive() {
         Conversions.register(FOO_TYPE, BAR_TYPE, foo -> new Bar(foo.name()));
         Conversions.register(BAR_TYPE, BAZ_TYPE, bar -> new Baz(bar.name()));

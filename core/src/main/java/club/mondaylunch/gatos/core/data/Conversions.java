@@ -32,6 +32,9 @@ public final class Conversions {
 
     /**
      * Register a conversion between two types.
+     * A conversion for {@link DataType#listOf() lists}
+     * and {@link DataType#optionalOf() optionals}
+     * of the two types will also be registered.
      *
      * @param typeA              the first DataType
      * @param typeB              the second DataType
@@ -40,7 +43,36 @@ public final class Conversions {
      * @param <B>                the second type
      */
     public static <A, B> void register(DataType<A> typeA, DataType<B> typeB, Function<A, B> conversionFunction) {
+        Function<List<A>, List<B>> listConversionFunction = elements -> convertList(elements, conversionFunction);
+        Function<Optional<A>, Optional<B>> optionalConversionFunction = optional -> convertOptional(optional, conversionFunction);
+
+        registerSimple(typeA, typeB, conversionFunction);
+        registerSimple(typeA.listOf(), typeB.listOf(), listConversionFunction);
+        registerSimple(typeA.optionalOf(), typeB.optionalOf(), optionalConversionFunction);
+    }
+
+    /**
+     * Register a conversion between two types.
+     *
+     * @param typeA              the first DataType
+     * @param typeB              the second DataType
+     * @param conversionFunction a function to convert from A to B
+     * @param <A>                the first type
+     * @param <B>                the second type
+     */
+    public static <A, B> void registerSimple(DataType<A> typeA, DataType<B> typeB, Function<A, B> conversionFunction) {
         TYPE_CONVERSIONS.putEdgeValue(typeA, typeB, conversionFunction);
+    }
+
+    private static <A, B> List<B> convertList(List<A> elements, Function<A, B> conversionFunction) {
+        return elements.stream()
+            .map(conversionFunction)
+            .toList();
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private static <A, B> Optional<B> convertOptional(Optional<A> optional, Function<A, B> conversionFunction) {
+        return optional.map(conversionFunction);
     }
 
     /**

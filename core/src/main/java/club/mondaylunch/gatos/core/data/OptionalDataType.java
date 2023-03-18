@@ -4,16 +4,16 @@ import java.util.Optional;
 
 public final class OptionalDataType<T> extends DataType<Optional<T>> {
     public static final String PREFIX = "optional$";
-    public static final DataType<Optional<?>> GENERIC_OPTIONAL = DataType.register("optional", Optional.class);
+    @SuppressWarnings("unchecked")
+    public static final DataType<Optional<?>> GENERIC_OPTIONAL = (DataType<Optional<?>>) (DataType<?>) DataType.ANY.optionalOf();
     private final DataType<T> contains;
 
     /**
      * @param contains the datatype that this optional will contain
      */
-    public OptionalDataType(DataType<T> contains) {
-        super(makeName(contains), Optional.class);
+    public OptionalDataType(DataType<T> contains, boolean registerSimpleConversion) {
+        super(makeName(contains), Optional.class, registerSimpleConversion);
         this.contains = contains;
-        Conversions.register(this, GENERIC_OPTIONAL, $ -> $);
     }
 
     /**

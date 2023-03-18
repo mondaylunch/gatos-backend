@@ -54,9 +54,11 @@ public class DataTypeTest {
         }
 
         var type = DataType.register("no_generation_foo", Foo.class);
-        var listType = DataType.REGISTRY.getWithoutGenerating(ListDataType.makeName(type));
-        var optionalType = DataType.REGISTRY.getWithoutGenerating(OptionalDataType.makeName(type));
-        Assertions.assertFalse(listType.isPresent());
-        Assertions.assertFalse(optionalType.isPresent());
+        var listType = DataType.REGISTRY.getWithoutGenerating(ListDataType.makeName(type)).orElseThrow();
+        var optionalType = DataType.REGISTRY.getWithoutGenerating(OptionalDataType.makeName(type)).orElseThrow();
+        var listListTypeOptional = DataType.REGISTRY.getWithoutGenerating(ListDataType.makeName(listType));
+        var optionalOptionalTypeOptional = DataType.REGISTRY.getWithoutGenerating(OptionalDataType.makeName(optionalType));
+        Assertions.assertTrue(listListTypeOptional.isEmpty());
+        Assertions.assertTrue(optionalOptionalTypeOptional.isEmpty());
     }
 }

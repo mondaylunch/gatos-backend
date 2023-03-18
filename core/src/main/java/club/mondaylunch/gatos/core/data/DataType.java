@@ -23,7 +23,6 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
     public static final DataType<String> STRING = register("string", String.class);
     public static final DataType<JsonObject> JSON_OBJECT = register("json_object", JsonObject.class);
     public static final DataType<JsonElement> JSON_ELEMENT = register("json_element", JsonElement.class);
-    public static final DataType<DataType<?>> DATA_TYPE = register("data_type", DataType.class);
     public static final DataType<AtomicReference<?>> REFERENCE = register("reference", AtomicReference.class);
 
     static {
@@ -35,23 +34,32 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
 
     /**
      * Creates a new DataType.
-     * @param name  the name for the type this represents
-     * @param clazz the class for this type
+     *
+     * @param name                     the name for the type this represents
+     * @param clazz                    the class for this type
+     * @param registerSimpleConversion {@code true} if {@link Conversions#registerSimple}
+     *                                 should be used, {@code false} if {@link Conversions#register}
+     *                                 should be used
      */
-    protected DataType(String name, Class<? super T> clazz) {
+    protected DataType(String name, Class<? super T> clazz, boolean registerSimpleConversion) {
         this.name = name;
         this.clazz = clazz;
         if (!Objects.equals(name, "any")) {
-            Conversions.register(this, ANY, $ -> $);
+            if (registerSimpleConversion) {
+                Conversions.registerSimple(this, ANY, $ -> $);
+            } else {
+                Conversions.register(this, ANY, $ -> $);
+            }
         }
     }
 
     public static <T> DataType<T> register(String name, Class<? super T> clazz) {
-        return REGISTRY.register(name, new DataType<>(name, clazz));
+        return REGISTRY.register(name, new DataType<>(name, clazz, false));
     }
 
     /**
      * Creates a new {@link DataBox} with this type and a given value.
+     *
      * @param value the value
      * @return a data box
      */
@@ -61,6 +69,7 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
 
     /**
      * The unique name of this data type.
+     *
      * @return the unique name of this data type
      */
     public String name() {
@@ -69,7 +78,8 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
 
     /**
      * The class of this data type.
-     * @return  the class of this data type
+     *
+     * @return the class of this data type
      */
     public Class<? super T> clazz() {
         return this.clazz;
@@ -77,6 +87,7 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
 
     /**
      * Returns the DataType for a list that holds data of this type.
+     *
      * @return the DataType for a list that holds data of this type
      */
     @SuppressWarnings("unchecked")
@@ -86,7 +97,7 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
         if (listType.isPresent()) {
             return (DataType<List<T>>) listType.get();
         } else {
-            var newListType = new ListDataType<>(this);
+            var newListType = new ListDataType<>(this, true);
             REGISTRY.register(newListType.name(), newListType);
             return newListType;
         }
@@ -94,6 +105,7 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
 
     /**
      * Returns the DataType for an optional that holds data of this type.
+     *
      * @return the DataType for an optional that holds data of this type
      */
     @SuppressWarnings("unchecked")
@@ -103,7 +115,7 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
         if (optionalType.isPresent()) {
             return (DataType<Optional<T>>) optionalType.get();
         } else {
-            var newOptionalType = new OptionalDataType<>(this);
+            var newOptionalType = new OptionalDataType<>(this, true);
             REGISTRY.register(newOptionalType.name(), newOptionalType);
             return newOptionalType;
         }
