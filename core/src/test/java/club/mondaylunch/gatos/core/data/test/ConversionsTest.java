@@ -3,6 +3,8 @@ package club.mondaylunch.gatos.core.data.test;
 import java.util.List;
 import java.util.Optional;
 
+import com.google.common.graph.ValueGraph;
+import com.google.common.graph.ValueGraphBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -18,9 +20,9 @@ public class ConversionsTest {
 
     @Test
     public void canRegisterConversion() {
-        Assertions.assertDoesNotThrow(() -> {
-            Conversions.register(FOO_TYPE, BAR_TYPE, foo -> new Bar(foo.name()));
-        });
+        Assertions.assertDoesNotThrow(() ->
+            Conversions.register(FOO_TYPE, BAR_TYPE, foo -> new Bar(foo.name()))
+        );
     }
 
     @Test
@@ -28,6 +30,13 @@ public class ConversionsTest {
         Conversions.register(FOO_TYPE, BAR_TYPE, foo -> new Bar(foo.name()));
         Assertions.assertTrue(Conversions.canConvert(FOO_TYPE, BAR_TYPE));
         Assertions.assertFalse(Conversions.canConvert(BAR_TYPE, FOO_TYPE));
+    }
+
+    @Test
+    public void canConvertIsCorrectTransitive() {
+        Conversions.register(FOO_TYPE, BAR_TYPE, foo -> new Bar(foo.name()));
+        Conversions.register(BAR_TYPE, BAZ_TYPE, bar -> new Baz(bar.name()));
+        Assertions.assertTrue(Conversions.canConvert(FOO_TYPE, BAZ_TYPE));
     }
 
     @Test
@@ -49,18 +58,20 @@ public class ConversionsTest {
     public void incorrectConversionFails() {
         Conversions.register(FOO_TYPE, BAR_TYPE, foo -> new Bar(foo.name()));
         var bar = BAR_TYPE.create(new Bar("hello!"));
-        Assertions.assertThrows(Conversions.ConversionException.class, () -> {
-            Conversions.convert(bar, FOO_TYPE);
-        });
+        Assertions.assertThrows(
+            Conversions.ConversionException.class,
+            () -> Conversions.convert(bar, FOO_TYPE)
+        );
     }
 
     @Test
     public void nullConversionFails() {
         Conversions.register(FOO_TYPE, BAZ_TYPE, foo -> null);
         var foo = FOO_TYPE.create(new Foo("hello!"));
-        Assertions.assertThrows(Conversions.ConversionException.class, () -> {
-            Conversions.convert(foo, BAZ_TYPE);
-        });
+        Assertions.assertThrows(
+            Conversions.ConversionException.class,
+            () -> Conversions.convert(foo, BAZ_TYPE)
+        );
     }
 
     @Test
@@ -89,7 +100,113 @@ public class ConversionsTest {
         });
     }
 
-    private record Foo(String name) {}
-    private record Bar(String name) {}
-    private record Baz(String name) {}
+    @Test
+    public void canConvertToString() {
+        var foo = FOO_TYPE.create(new Foo("Hello!"));
+        Assertions.assertEquals(foo.value().toString(), Conversions.convert(foo, DataType.STRING).value());
+    }
+
+    @Test
+    public void canConvertTransitive() {
+        Conversions.register(FOO_TYPE, BAR_TYPE, foo -> new Bar(foo.name()));
+        Conversions.register(BAR_TYPE, BAZ_TYPE, bar -> new Baz(bar.name()));
+        var foo = FOO_TYPE.create(new Foo("hello!"));
+        var baz = BAZ_TYPE.create(new Baz("hello!"));
+        Assertions.assertEquals(baz, Conversions.convert(foo, BAZ_TYPE));
+    }
+
+    @Test
+    public void preferDirectConversion() {
+        Conversions.register(FOO_TYPE, BAR_TYPE, foo -> new Bar(foo.name()));
+        Conversions.register(BAR_TYPE, BAZ_TYPE, bar -> new Baz(bar.name()));
+        Conversions.register(FOO_TYPE, BAZ_TYPE, foo -> new Baz("direct " + foo.name()));
+        var foo = FOO_TYPE.create(new Foo("hello!"));
+        var baz = BAZ_TYPE.create(new Baz("direct hello!"));
+        Assertions.assertEquals(baz, Conversions.convert(foo, BAZ_TYPE));
+    }
+
+    @Test
+    public void canGetPath() {
+        var graph = createGraph();
+        var path = getPath(graph, "node5", "node7").orElseThrow();
+        Assertions.assertIterableEquals(List.of("edge3", "edge4"), path);
+    }
+
+    @Test
+    public void cannotGetPath() {
+        var graph = createGraph();
+        var pathOptional = getPath(graph, "node1", "node3");
+        Assertions.assertTrue(pathOptional.isEmpty());
+    }
+
+    @Test
+    public void cannotGetReversePath() {
+        var graph = createGraph();
+        var pathOptional = getPath(graph, "node7", "node5");
+        Assertions.assertTrue(pathOptional.isEmpty());
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    @Test
+    public void canGetCyclePath() {
+        var graph = ValueGraphBuilder.directed()
+            .<String, String>immutable()
+            .putEdgeValue("node1", "node2", "edge1")
+            .putEdgeValue("node2", "node3", "edge2")
+            .putEdgeValue("node3", "node1", "edge3")
+            .build();
+        var path = getPath(graph, "node1", "node3").orElseThrow();
+        Assertions.assertIterableEquals(List.of("edge1", "edge2"), path);
+    }
+
+    @Test
+    public void canGetSelfPath() {
+        var graph = createGraph();
+        var path = getPath(graph, "node1", "node1").orElseThrow();
+        Assertions.assertTrue(path.isEmpty());
+    }
+
+    @Test
+    public void cannotGetNonExistentNodePath() {
+        var graph = createGraph();
+        Assertions.assertThrows(
+            IllegalArgumentException.class,
+            () -> getPath(graph, "start", "end")
+        );
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    private static ValueGraph<String, String> createGraph() {
+        return ValueGraphBuilder.directed()
+            .<String, String>immutable()
+            .putEdgeValue("node1", "node2", "edge1")
+            .putEdgeValue("node3", "node4", "edge2")
+            .putEdgeValue("node5", "node6", "edge3")
+            .putEdgeValue("node6", "node7", "edge4")
+            .build();
+    }
+
+    @SuppressWarnings({"unchecked", "UnstableApiUsage"})
+    private static <N, V> Optional<List<V>> getPath(ValueGraph<N, V> graph, N start, N end) {
+        try {
+            var method = Conversions.class.getDeclaredMethod("getPath", ValueGraph.class, Object.class, Object.class);
+            method.setAccessible(true);
+            return (Optional<List<V>>) method.invoke(null, graph, start, end);
+        } catch (Exception e) {
+            if (e.getCause() instanceof IllegalArgumentException) {
+                throw new IllegalArgumentException(e);
+            } else {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private record Foo(String name) {
+    }
+
+    private record Bar(String name) {
+    }
+
+    private record Baz(String name) {
+    }
 }

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -15,22 +14,20 @@ import club.mondaylunch.gatos.core.Registry;
  * A type of value which can be stored in a {@link DataBox}.
  */
 public sealed class DataType<T> permits ListDataType, OptionalDataType {
+
     public static final DataTypeRegistry REGISTRY = Registry.REGISTRIES.register("data_type", new DataTypeRegistry());
+
     public static final DataType<Object> ANY = register("any", Object.class);
     public static final DataType<Double> NUMBER = register("number", Double.class);
     public static final DataType<Boolean> BOOLEAN = register("boolean", Boolean.class);
     public static final DataType<String> STRING = register("string", String.class);
     public static final DataType<JsonObject> JSON_OBJECT = register("json_object", JsonObject.class);
+    public static final DataType<JsonElement> JSON_ELEMENT = register("json_element", JsonElement.class);
     public static final DataType<DataType<?>> DATA_TYPE = register("data_type", DataType.class);
     public static final DataType<AtomicReference<?>> REFERENCE = register("reference", AtomicReference.class);
-    public static final DataType<JsonElement> JSON_ELEMENT = register("json_element", JsonElement.class);
 
     static {
         Conversions.register(ANY, STRING, Object::toString);
-        Conversions.register(NUMBER, STRING, Object::toString);
-        Conversions.register(BOOLEAN, STRING, Object::toString);
-        Conversions.register(JSON_OBJECT, STRING, Object::toString);
-        Conversions.register(DATA_TYPE, STRING, Object::toString);
     }
 
     private final String name;
@@ -47,7 +44,6 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
         if (!Objects.equals(name, "any")) {
             Conversions.register(this, ANY, $ -> $);
         }
-        Conversions.register(this, this, Function.identity());
     }
 
     public static <T> DataType<T> register(String name, Class<? super T> clazz) {
