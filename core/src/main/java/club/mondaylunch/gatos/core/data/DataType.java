@@ -5,8 +5,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import club.mondaylunch.gatos.core.Registry;
 
@@ -27,6 +29,15 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
 
     static {
         Conversions.register(ANY, STRING, Object::toString);
+        Conversions.register(NUMBER, JSON_ELEMENT, JsonPrimitive::new);
+        Conversions.register(BOOLEAN, JSON_ELEMENT, JsonPrimitive::new);
+        Conversions.register(STRING, JSON_ELEMENT, JsonPrimitive::new);
+        Conversions.register(JSON_OBJECT, JSON_ELEMENT, $ -> $);
+        Conversions.registerSimple(JSON_ELEMENT.listOf(), JSON_ELEMENT, elements -> elements.stream().collect(
+            JsonArray::new,
+            JsonArray::add,
+            JsonArray::addAll
+        ));
     }
 
     private final String name;

@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.google.common.graph.ValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
+import com.google.gson.JsonArray;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -130,6 +131,18 @@ public class ConversionsTest {
         var foo = FOO_TYPE.create(new Foo("hello!"));
         var baz = BAZ_TYPE.create(new Baz("direct hello!"));
         Assertions.assertEquals(baz, Conversions.convert(foo, BAZ_TYPE));
+    }
+
+    @Test
+    public void canConvertToJsonArray() {
+        var numbers = List.of(1.0, 2.0, 3.0);
+        var numbersBox = DataType.NUMBER.listOf().create(numbers);
+        var jsonBox = DataType.JSON_ELEMENT.create(numbers.stream().collect(
+            JsonArray::new,
+            JsonArray::add,
+            JsonArray::addAll
+        ));
+        Assertions.assertEquals(jsonBox, Conversions.convert(numbersBox, DataType.JSON_ELEMENT));
     }
 
     @Test
