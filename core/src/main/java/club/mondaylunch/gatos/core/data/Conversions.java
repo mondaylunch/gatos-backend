@@ -114,9 +114,26 @@ public final class Conversions {
      * @param <V>   The type of the edges.
      * @return An {@code Optional} describing the edge path.
      * If there is no path, the {@code Optional} will be empty.
+     * @throws IllegalArgumentException if the start or end node is not in the graph.
      */
     @SuppressWarnings("SameParameterValue")
     private static <N, V> Optional<List<V>> getPath(ValueGraph<N, V> graph, N start, N end) {
+        var graphNodes = graph.nodes();
+        if (!graphNodes.contains(start)) {
+            throw new IllegalArgumentException("Start node %s is not in the graph".formatted(start));
+        }
+        if (!graphNodes.contains(end)) {
+            throw new IllegalArgumentException("End node %s is not in the graph".formatted(end));
+        }
+
+        /*
+        If the start node is the end node,
+        return an empty path.
+         */
+        if (start.equals(end)) {
+            return Optional.of(List.of());
+        }
+
         var traverser = Traverser.forGraph(graph);
         var nodePaths = traverser.depthFirstPreOrder(start);
         List<V> edgePath = new ArrayList<>();
@@ -126,39 +143,42 @@ public final class Conversions {
             The first node in the iterable is
             the start node, so we skip it.
              */
-            if (!node.equals(start)) {
-                /*
-                If the node is next to the start node,
-                it means we're going down a new path.
-                 */
-                if (graph.hasEdgeConnecting(start, node)) {
-                    edgePath.clear();
-                    currentNode = start;
-                }
-
-                /*
-                Add the edge to the path between the
-                nodes to the path.
-                 */
-                var finalCurrentNode = currentNode;
-                var edge = graph.edgeValue(currentNode, node).orElseThrow(
-                    () -> new IllegalStateException(
-                        "No edge found between %s and %s".formatted(finalCurrentNode, node)
-                    )
-                );
-                edgePath.add(edge);
-
-                /*
-                If the node is the same as the end node,
-                we've found a path.
-                 */
-                if (node.equals(end)) {
-                    return Optional.of(edgePath);
-                } else {
-                    currentNode = node;
-                }
+            if (node.equals(start)) {
+                continue;
             }
+
+            /*
+            If the node is next to the start node,
+            it means we're going down a new path.
+             */
+            if (graph.hasEdgeConnecting(start, node)) {
+                edgePath.clear();
+                currentNode = start;
+            }
+
+            /*
+            Add the edge to the path between the
+            nodes to the path.
+             */
+            var finalCurrentNode = currentNode;
+            var edge = graph.edgeValue(currentNode, node).orElseThrow(
+                () -> new IllegalStateException(
+                    "No edge found between %s and %s".formatted(finalCurrentNode, node)
+                )
+            );
+            edgePath.add(edge);
+
+            /*
+            If the node is the same as the end node,
+            we've found a path.
+             */
+            if (node.equals(end)) {
+                return Optional.of(edgePath);
+            }
+
+            currentNode = node;
         }
+
         return Optional.empty();
     }
 
