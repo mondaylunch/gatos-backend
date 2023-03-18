@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 
 import com.google.gson.JsonObject;
 
@@ -43,7 +42,6 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
         if (!Objects.equals(name, "any")) {
             Conversions.register(this, ANY, $ -> $);
         }
-        Conversions.register(this, this, Function.identity());
     }
 
     public static <T> DataType<T> register(String name, Class<? super T> clazz) {
