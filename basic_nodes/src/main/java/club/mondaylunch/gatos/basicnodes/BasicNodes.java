@@ -48,6 +48,12 @@ public final class BasicNodes implements GatosPlugin {
         .register("list_tail_separation", new ListTailSeparationNodeType());
     public static final ListSortNodeType LIST_SORT = NodeType.REGISTRY
         .register("list_sort", new ListSortNodeType());
+    public static final ListReverseNodeType LIST_REVERSE = NodeType.REGISTRY
+        .register("list_reverse", new ListReverseNodeType());
+    public static final ListDistinctNodeType LIST_DISTINCT = NodeType.REGISTRY
+        .register("list_distinct", new ListDistinctNodeType());
+    public static final ListContainsNodeType LIST_CONTAINS = NodeType.REGISTRY
+        .register("list_contains", new ListContainsNodeType());
     public static final EqualsNodeType EQUALS = NodeType.REGISTRY
         .register("equals", new EqualsNodeType());
     public static final TruthinessNodeType TRUTHINESS = NodeType.REGISTRY
