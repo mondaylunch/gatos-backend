@@ -114,7 +114,7 @@ public final class Conversions {
      * @param <V>   The type of the edges.
      * @return An {@code Optional} describing the edge path.
      * If there is no path, the {@code Optional} will be empty.
-     * @throws IllegalArgumentException if the start or end node is not in the graph.
+     * @throws IllegalArgumentException if the {@code start} or {@code end} node is not in the graph.
      */
     @SuppressWarnings("SameParameterValue")
     private static <N, V> Optional<List<V>> getPath(ValueGraph<N, V> graph, N start, N end) {
