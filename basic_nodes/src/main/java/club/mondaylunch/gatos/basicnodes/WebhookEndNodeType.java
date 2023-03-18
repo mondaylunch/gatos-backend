@@ -21,7 +21,7 @@ public class WebhookEndNodeType extends NodeType.End {
     @Override
     public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         return Set.of(
-            new NodeConnector.Input<>(nodeId, "graphOutput", DataType.ANY),
+            new NodeConnector.Input<>(nodeId, "graphOutput", DataType.JSON_OBJECT),
             new NodeConnector.Input<>(nodeId, "outputReference", DataType.REFERENCE)
         );
     }
@@ -31,7 +31,7 @@ public class WebhookEndNodeType extends NodeType.End {
         var graphOutput = DataBox.get(
             inputs,
             "graphOutput",
-            DataType.ANY
+            DataType.JSON_OBJECT
         ).orElseThrow();
         @SuppressWarnings("unchecked")
         var outputReference = (AtomicReference<Object>) DataBox.get(
