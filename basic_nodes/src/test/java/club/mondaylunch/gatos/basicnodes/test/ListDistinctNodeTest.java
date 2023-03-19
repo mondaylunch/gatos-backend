@@ -4,15 +4,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.JsonObject;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.data.ListDataType;
 import club.mondaylunch.gatos.core.graph.Node;
-
-import com.google.gson.JsonObject;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 public class ListDistinctNodeTest {
     private static final List<Double> TEST_NUM_LIST = Arrays.asList(4., 4., 1., 2., 3., 3., 3.);
