@@ -6,11 +6,13 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.Nullable;
 
+import club.mondaylunch.gatos.core.Either;
 import club.mondaylunch.gatos.core.GatosUtils;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
@@ -31,16 +33,21 @@ public class ReceiveCommandNodeType extends NodeType.Start<SlashCommandInteracti
     }
 
     @Override
-    public Collection<GraphValidityError> isValid(Node node, Graph graph) {
-        var canFindReply = graph.nodes().stream().anyMatch(n -> n.type().equals(this.gatosDiscord.getNodeTypes().commandReply()));
-        return GatosUtils.union(super.isValid(node, graph), canFindReply ? Set.of() : Set.of(new GraphValidityError(node.id(), "No command reply node found.")));
-    }
-
-    @Override
     public Map<String, DataBox<?>> settings() {
         return Map.of(
             "guild_id", DiscordDataTypes.GUILD_ID.create(""),
             "command_name", DataType.STRING.create("")
+        );
+    }
+
+    @Override
+    public Collection<GraphValidityError> isValid(Node node, Either<Flow, Graph> flowOrGraph) {
+        var graph = flowOrGraph.map(Flow::getGraph, Function.identity());
+        var canFindReceive = graph.nodes().stream().anyMatch(n -> n.type().equals(this.gatosDiscord.getNodeTypes().commandReply()));
+        return GatosUtils.union(
+            super.isValid(node, flowOrGraph),
+            canFindReceive ? Set.of() : Set.of(new GraphValidityError(node.id(), "No receive command node found.")),
+            this.gatosDiscord.validateUserHasPermission(node, "guild_id", flowOrGraph)
         );
     }
 

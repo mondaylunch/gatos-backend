@@ -5,7 +5,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
+import club.mondaylunch.gatos.core.Either;
 import club.mondaylunch.gatos.core.GatosUtils;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
@@ -14,6 +16,7 @@ import club.mondaylunch.gatos.core.graph.GraphValidityError;
 import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
+import club.mondaylunch.gatos.core.models.Flow;
 import club.mondaylunch.gatos.discord.DiscordDataTypes;
 import club.mondaylunch.gatos.discord.GatosDiscord;
 
@@ -25,15 +28,19 @@ public class CommandReplyNodeType extends NodeType.End {
     }
 
     @Override
-    public Collection<GraphValidityError> isValid(Node node, Graph graph) {
-        var canFindReceive = graph.nodes().stream().anyMatch(n -> n.type().equals(this.gatosDiscord.getNodeTypes().receiveCommand()));
-        return GatosUtils.union(super.isValid(node, graph), canFindReceive ? Set.of() : Set.of(new GraphValidityError(node.id(), "No receive command node found.")));
-    }
-
-    @Override
     public Map<String, DataBox<?>> settings() {
         return Map.of(
             "is_ephemeral", DataType.BOOLEAN.create(false)
+        );
+    }
+
+    @Override
+    public Collection<GraphValidityError> isValid(Node node, Either<Flow, Graph> flowOrGraph) {
+        var graph = flowOrGraph.map(Flow::getGraph, Function.identity());
+        var canFindReceive = graph.nodes().stream().anyMatch(n -> n.type().equals(this.gatosDiscord.getNodeTypes().receiveCommand()));
+        return GatosUtils.union(
+            super.isValid(node, flowOrGraph),
+            canFindReceive ? Set.of() : Set.of(new GraphValidityError(node.id(), "No receive command node found."))
         );
     }
 

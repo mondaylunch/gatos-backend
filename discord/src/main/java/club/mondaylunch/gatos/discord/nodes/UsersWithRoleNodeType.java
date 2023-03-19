@@ -1,5 +1,6 @@
 package club.mondaylunch.gatos.discord.nodes;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,10 +12,16 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.utils.concurrent.Task;
 
+import club.mondaylunch.gatos.core.Either;
+import club.mondaylunch.gatos.core.GatosUtils;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.graph.Graph;
+import club.mondaylunch.gatos.core.graph.GraphValidityError;
+import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
+import club.mondaylunch.gatos.core.models.Flow;
 import club.mondaylunch.gatos.discord.DiscordDataTypes;
 import club.mondaylunch.gatos.discord.GatosDiscord;
 
@@ -29,6 +36,14 @@ public class UsersWithRoleNodeType extends NodeType.Process {
     public Map<String, DataBox<?>> settings() {
         return Map.of(
             "guild_id", DiscordDataTypes.GUILD_ID.create("")
+        );
+    }
+
+    @Override
+    public Collection<GraphValidityError> isValid(Node node, Either<Flow, Graph> flowOrGraph) {
+        return GatosUtils.union(
+            super.isValid(node, flowOrGraph),
+            this.gatosDiscord.validateUserHasPermission(node, "guild_id", flowOrGraph)
         );
     }
 

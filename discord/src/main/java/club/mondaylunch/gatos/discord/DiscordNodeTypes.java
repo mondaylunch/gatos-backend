@@ -23,8 +23,8 @@ public class DiscordNodeTypes {
     public DiscordNodeTypes(GatosDiscord gatosDiscord) {
         this.receiveCommandNodeType = NodeType.REGISTRY.register("discord.receive_command", new ReceiveCommandNodeType(gatosDiscord));
         this.commandReplyNodeType = NodeType.REGISTRY.register("discord.reply_to_command", new CommandReplyNodeType(gatosDiscord));
-        this.sendMessageNodeTypeType = NodeType.REGISTRY.register("discord.send_message", new SendMessageNodeType(gatosDiscord::getJda));
-        this.applyRoleNodeType = NodeType.REGISTRY.register("discord.apply_role", new ApplyRoleNodeType(gatosDiscord::getJda));
+        this.sendMessageNodeTypeType = NodeType.REGISTRY.register("discord.send_message", new SendMessageNodeType(gatosDiscord));
+        this.applyRoleNodeType = NodeType.REGISTRY.register("discord.apply_role", new ApplyRoleNodeType(gatosDiscord));
         this.usersWithRoleNodeType = NodeType.REGISTRY.register("discord.users_with_role", new UsersWithRoleNodeType(gatosDiscord));
         this.receiveMessageNodeType = NodeType.REGISTRY.register("discord.receive_message", new ReceiveMessageNodeType(gatosDiscord));
         this.reactToMessageNodeType = NodeType.REGISTRY.register("discord.react_to_message", new ReactToMessageNodeType(gatosDiscord));

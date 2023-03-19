@@ -1,5 +1,6 @@
 package club.mondaylunch.gatos.discord.nodes;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,8 +12,12 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.Nullable;
 
+import club.mondaylunch.gatos.core.Either;
+import club.mondaylunch.gatos.core.GatosUtils;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.graph.Graph;
+import club.mondaylunch.gatos.core.graph.GraphValidityError;
 import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
@@ -32,6 +37,14 @@ public class ReceiveMessageNodeType extends NodeType.Start<MessageReceivedEvent>
         return Map.of(
             "guild_id", DiscordDataTypes.GUILD_ID.create(""),
             "channel_ids", DiscordDataTypes.CHANNEL_ID.listOf().create(List.of())
+        );
+    }
+
+    @Override
+    public Collection<GraphValidityError> isValid(Node node, Either<Flow, Graph> flowOrGraph) {
+        return GatosUtils.union(
+            super.isValid(node, flowOrGraph),
+            this.gatosDiscord.validateUserHasPermission(node, "guild_id", flowOrGraph)
         );
     }
 

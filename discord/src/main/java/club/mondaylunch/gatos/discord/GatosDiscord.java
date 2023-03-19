@@ -1,6 +1,7 @@
 package club.mondaylunch.gatos.discord;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -18,7 +19,13 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import club.mondaylunch.gatos.core.Either;
 import club.mondaylunch.gatos.core.GatosPlugin;
+import club.mondaylunch.gatos.core.data.DataBox;
+import club.mondaylunch.gatos.core.graph.Graph;
+import club.mondaylunch.gatos.core.graph.GraphValidityError;
+import club.mondaylunch.gatos.core.graph.Node;
+import club.mondaylunch.gatos.core.models.Flow;
 import club.mondaylunch.gatos.core.models.User;
 
 public class GatosDiscord implements GatosPlugin {
@@ -81,6 +88,19 @@ public class GatosDiscord implements GatosPlugin {
         }
         Member member = guild.getMember(UserSnowflake.fromId(id));
         return member != null && member.hasPermission(Permission.ADMINISTRATOR);
+    }
+
+    public List<GraphValidityError> validateUserHasPermission(Node node, String guildIdKey, Either<Flow, Graph> flow) {
+        if (flow.isRight()) {
+            return List.of();
+        }
+        User user = User.objects.getUserByUserId(flow.left().getAuthorId().toString());
+
+        return DataBox.get(node.settings(), guildIdKey, DiscordDataTypes.GUILD_ID)
+            .map(this.jda::getGuildById)
+            .filter(guild -> !this.userHasAdminPermission(user, guild))
+            .map(guild -> new GraphValidityError(node.id(), "You do not have Administrator permission in this Discord server."))
+            .stream().toList();
     }
 
     public void createSlashCommandListener(UUID id, String commandName, Guild guild, Consumer<@Nullable SlashCommandInteractionEvent> function) {
