@@ -19,6 +19,9 @@ dependencies {
     // Jackson
     implementation group: "com.fasterxml.jackson.core", name: "jackson-databind", version: "2.14.2"
 
+    // Guava
+    implementation("com.google.guava:guava:31.1-jre")
+
 	// Tests
     testImplementation project(":test_shared")
 
