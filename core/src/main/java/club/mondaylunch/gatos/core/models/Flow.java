@@ -124,7 +124,7 @@ public class Flow extends BaseModel {
             .filter(n -> n.type().category() == NodeCategory.START)
             .forEach(n -> ((NodeType.Start<?>) n.type()).teardownFlow(this, n));
 
-        if (this.graph.validate().isEmpty()) {
+        if (this.graph.validate(this).isEmpty()) {
             var executor = new GraphExecutor(this.graph);
             this.graph.nodes().stream()
                 .filter(n -> n.type().category() == NodeCategory.START)

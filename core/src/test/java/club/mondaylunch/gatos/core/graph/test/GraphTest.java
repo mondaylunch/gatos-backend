@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import club.mondaylunch.gatos.core.Either;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Graph;
@@ -449,7 +450,7 @@ public class GraphTest {
         var input = graph.addNode(START_NODE_TYPE);
         var middle = graph.addNode(new TestNodeType(1, DataType.NUMBER) {
             @Override
-            public Collection<GraphValidityError> isValid(Node node, Graph graph) {
+            public Collection<GraphValidityError> isValid(Node node, Either<Flow, Graph> graph) {
                 return List.of(new GraphValidityError(node.id(), "Test error"));
             }
         });

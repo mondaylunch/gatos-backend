@@ -30,6 +30,7 @@ import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeCategory;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
+import club.mondaylunch.gatos.core.models.Flow;
 
 /**
  * A flow graph.
@@ -405,15 +406,24 @@ public class Graph {
      * node to
      * an {@link NodeCategory#END output} node, and there are no cycles.
      *
+     * @param flow the flow for this graph (or null)
      * @return a list of any errors in this graph
      */
-    public List<GraphValidityError> validate() {
+    public List<GraphValidityError> validate(@Nullable Flow flow) {
         List<GraphValidityError> errors = this.getExecutionOrder().map($ -> new ArrayList<>(), ArrayList::new);
         errors.addAll(this.nodes.values().stream()
-            .flatMap(n -> n.type().isValid(n, this).stream())
+            .flatMap(n -> n.type().isValid(n, Either.of(flow, this)).stream())
             .toList());
 
         return errors;
+    }
+
+    /**
+     * Convenience overload for {@link #validate(Flow)} that passes null for the flow.
+     * @return  a list of any errors in this graph
+     */
+    public List<GraphValidityError> validate() {
+        return this.validate(null);
     }
 
     /**
