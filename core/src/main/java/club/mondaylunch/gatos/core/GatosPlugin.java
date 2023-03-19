@@ -32,7 +32,7 @@ public interface GatosPlugin {
      * @return          the contents of the resource, or null if the resource does not exist
      */
     static @Nullable String getResource(GatosPlugin plugin, String path) {
-        String qualifiedPath = plugin.name() + "/" + path;
+        String qualifiedPath = "/" + plugin.name() + "/" + path;
         var stream = plugin.getClass().getResourceAsStream(qualifiedPath);
         if (stream == null) {
             return null;
