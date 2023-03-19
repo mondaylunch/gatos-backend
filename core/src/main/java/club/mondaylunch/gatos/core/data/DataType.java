@@ -46,26 +46,19 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
     /**
      * Creates a new DataType.
      *
-     * @param name                     the name for the type this represents
-     * @param clazz                    the class for this type
-     * @param registerSimpleConversion {@code true} if {@link Conversions#registerSimple}
-     *                                 should be used, {@code false} if {@link Conversions#register}
-     *                                 should be used
+     * @param name  the name for the type this represents
+     * @param clazz the class for this type
      */
-    protected DataType(String name, Class<? super T> clazz, boolean registerSimpleConversion) {
+    protected DataType(String name, Class<? super T> clazz) {
         this.name = name;
         this.clazz = clazz;
         if (!Objects.equals(name, "any")) {
-            if (registerSimpleConversion) {
-                Conversions.registerSimple(this, ANY, $ -> $);
-            } else {
-                Conversions.register(this, ANY, $ -> $);
-            }
+            Conversions.registerSimple(this, ANY, $ -> $);
         }
     }
 
     public static <T> DataType<T> register(String name, Class<? super T> clazz) {
-        return REGISTRY.register(name, new DataType<>(name, clazz, false));
+        return REGISTRY.register(name, new DataType<>(name, clazz));
     }
 
     /**
@@ -108,7 +101,7 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
         if (listType.isPresent()) {
             return (DataType<List<T>>) listType.get();
         } else {
-            var newListType = new ListDataType<>(this, true);
+            var newListType = new ListDataType<>(this);
             REGISTRY.register(newListType.name(), newListType);
             return newListType;
         }
@@ -126,7 +119,7 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
         if (optionalType.isPresent()) {
             return (DataType<Optional<T>>) optionalType.get();
         } else {
-            var newOptionalType = new OptionalDataType<>(this, true);
+            var newOptionalType = new OptionalDataType<>(this);
             REGISTRY.register(newOptionalType.name(), newOptionalType);
             return newOptionalType;
         }
