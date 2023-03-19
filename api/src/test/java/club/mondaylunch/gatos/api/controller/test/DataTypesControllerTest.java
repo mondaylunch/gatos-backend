@@ -3,6 +3,8 @@ package club.mondaylunch.gatos.api.controller.test;
 import static org.mockito.ArgumentMatchers.anyString;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.gson.Gson;
@@ -39,6 +41,18 @@ public class DataTypesControllerTest extends BaseMvcTest {
     @BeforeEach
     public void setupMockJwt() {
         Mockito.when(this.decoder.decode(anyString())).thenReturn(TestSecurity.jwt());
+    }
+
+    @Test
+    public void canGetDataTypes() throws Exception {
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT)
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + TestSecurity.FAKE_TOKEN))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var body = result.andReturn().getResponse().getContentAsString();
+        var gson = new Gson();
+        var type = new TypeToken<List<String>>(){}.getType();
+        List<String> dataTypes = gson.fromJson(body, type);
+        Assertions.assertTrue(DataType.REGISTRY.getEntries().stream().map(Map.Entry::getKey).allMatch(dataTypes::contains));
     }
 
     @Test
