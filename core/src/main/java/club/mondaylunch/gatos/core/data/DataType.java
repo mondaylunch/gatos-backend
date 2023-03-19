@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
@@ -31,9 +32,12 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
     public static final DataType<NodeType.Process> PROCESS_NODE_TYPE = register("process_node_type", NodeType.class);
 
     static {
+        // Conversions to string
         Conversions.register(ANY, STRING, Object::toString);
         Conversions.register(DATA_TYPE, STRING, DataType::name);
         Conversions.register(PROCESS_NODE_TYPE, STRING, n -> NodeType.REGISTRY.getName(n).orElse(n.toString()));
+
+        // Conversions to JSON element
         Conversions.register(NUMBER, JSON_ELEMENT, JsonPrimitive::new);
         Conversions.register(BOOLEAN, JSON_ELEMENT, JsonPrimitive::new);
         Conversions.register(STRING, JSON_ELEMENT, JsonPrimitive::new);
@@ -43,6 +47,7 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
             JsonArray::add,
             JsonArray::addAll
         ));
+        Conversions.registerSimple(JSON_ELEMENT.optionalOf(), JSON_ELEMENT, optional -> optional.orElse(JsonNull.INSTANCE));
     }
 
     private final String name;
