@@ -28,5 +28,7 @@
 	"variable_extraction": "Extract Variable",
 	"variable_remapping": "Remap Variable",
 	"webhook_end": "Respond to Webhook",
-	"webhook_start": "Trigger Webhook"
+	"webhook_start": "Trigger Webhook",
+	"object_set_value": "Set JSON Field",
+    "list_mapping": "List Mapping"
 }

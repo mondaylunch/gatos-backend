@@ -11,6 +11,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import club.mondaylunch.gatos.core.Registry;
+import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 /**
  * A type of value which can be stored in a {@link DataBox}.
@@ -25,10 +26,14 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
     public static final DataType<String> STRING = register("string", String.class);
     public static final DataType<JsonObject> JSON_OBJECT = register("json_object", JsonObject.class);
     public static final DataType<JsonElement> JSON_ELEMENT = register("json_element", JsonElement.class);
+    public static final DataType<DataType<?>> DATA_TYPE = register("data_type", DataType.class);
     public static final DataType<AtomicReference<?>> REFERENCE = register("reference", AtomicReference.class);
+    public static final DataType<NodeType.Process> PROCESS_NODE_TYPE = register("process_node_type", NodeType.class);
 
     static {
         Conversions.register(ANY, STRING, Object::toString);
+        Conversions.register(DATA_TYPE, STRING, DataType::name);
+        Conversions.register(PROCESS_NODE_TYPE, STRING, n -> NodeType.REGISTRY.getName(n).orElse(n.toString()));
         Conversions.register(NUMBER, JSON_ELEMENT, JsonPrimitive::new);
         Conversions.register(BOOLEAN, JSON_ELEMENT, JsonPrimitive::new);
         Conversions.register(STRING, JSON_ELEMENT, JsonPrimitive::new);

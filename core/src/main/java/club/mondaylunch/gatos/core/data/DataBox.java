@@ -10,6 +10,7 @@ import java.util.Optional;
  * @param <T>   the type of the data stored
  */
 public record DataBox<T>(T value, DataType<T> type) {
+
     /**
      * Creates a new instance the same as this one, but with the given value.
      * @param value the value
@@ -32,9 +33,8 @@ public record DataBox<T>(T value, DataType<T> type) {
      */
     public static <K, T> Optional<T> get(Map<K, DataBox<?>> boxes, K key, DataType<T> type) {
         var res = boxes.get(key);
-        if (res != null && res.type == type) {
-            // noinspection unchecked
-            return Optional.of((T) res.value());
+        if (res != null && Conversions.canConvert(res.type, type)) {
+            return Optional.of(Conversions.convert(res, type).value());
         }
         return Optional.empty();
     }
