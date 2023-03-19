@@ -85,11 +85,13 @@ public final class Conversions {
     public static boolean canConvert(DataType<?> a, DataType<?> b) {
         if (a.equals(b)) {
             return true;
-        } else if (TYPE_CONVERSIONS.hasEdgeConnecting(a, b)) {
+        }
+
+        if (TYPE_CONVERSIONS.hasEdgeConnecting(a, b)) {
             return true;
-        } else if (!TYPE_CONVERSIONS.nodes().contains(a) || !TYPE_CONVERSIONS.nodes().contains(b)) {
-            return false;
-        } else {
+        }
+
+        if (TYPE_CONVERSIONS.nodes().contains(a) && TYPE_CONVERSIONS.nodes().contains(b)) {
             var traverser = Traverser.forGraph(TYPE_CONVERSIONS);
             var nodePath = traverser.depthFirstPreOrder(a);
             for (var node : nodePath) {
@@ -97,8 +99,9 @@ public final class Conversions {
                     return true;
                 }
             }
-            return false;
         }
+
+        return false;
     }
 
     public static <A, B> DataBox<B> convert(DataBox<A> a, DataType<B> typeB) {
@@ -132,17 +135,22 @@ public final class Conversions {
     private static <A, B> Optional<Function<A, B>> getConversionFunction(DataType<A> a, DataType<B> b) {
         if (a.equals(b)) {
             return Optional.of((Function<A, B>) Function.identity());
-        } else if (TYPE_CONVERSIONS.hasEdgeConnecting(a, b)) {
-            return (Optional<Function<A, B>>) (Optional<?>) TYPE_CONVERSIONS.edgeValue(a, b);
-        } else if (!TYPE_CONVERSIONS.nodes().contains(a) || !TYPE_CONVERSIONS.nodes().contains(b)) {
-            return Optional.empty();
-        } else {
+        }
+
+        var conversionFuntionOptional = TYPE_CONVERSIONS.edgeValue(a, b);
+        if (conversionFuntionOptional.isPresent()) {
+            return (Optional<Function<A, B>>) (Optional<?>) conversionFuntionOptional;
+        }
+
+        if (TYPE_CONVERSIONS.nodes().contains(a) && TYPE_CONVERSIONS.nodes().contains(b)) {
             return getPath(TYPE_CONVERSIONS, a, b).flatMap(conversions -> conversions.stream()
                 .map(Function.class::cast)
                 .reduce(Function::andThen)
                 .map(function -> (Function<A, B>) function)
             );
         }
+
+        return Optional.empty();
     }
 
     /**
