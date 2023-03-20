@@ -2,11 +2,11 @@ package club.mondaylunch.gatos.core.collection.test;
 
 import java.util.UUID;
 
+import com.mongodb.MongoWriteException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import com.mongodb.MongoWriteException;
 
 import club.mondaylunch.gatos.core.models.Flow;
 
@@ -112,7 +112,8 @@ public class FlowCollectionTest {
         Flow flowUpdate = new Flow();
         String newName = "New Name";
         flowUpdate.setName(newName);
-        Flow updated = Flow.objects.update(flow.getId(), flowUpdate);
+        Flow.objects.update(flow.getId(), flowUpdate);
+        Flow updated = Flow.objects.get(flow.getId());
         Assertions.assertEquals(newName, updated.getName());
     }
 
@@ -123,7 +124,8 @@ public class FlowCollectionTest {
         Flow flowUpdate = new Flow();
         UUID newAuthorId = UUID.randomUUID();
         flowUpdate.setAuthorId(newAuthorId);
-        Flow updated = Flow.objects.update(flow.getId(), flowUpdate);
+        Flow.objects.update(flow.getId(), flowUpdate);
+        Flow updated = Flow.objects.get(flow.getId());
         Assertions.assertEquals(newAuthorId, updated.getAuthorId());
     }
 
@@ -132,7 +134,10 @@ public class FlowCollectionTest {
         Flow flowUpdate = new Flow();
         String newName = "New Name";
         flowUpdate.setName(newName);
-        Assertions.assertNull(Flow.objects.update(UUID.randomUUID(), flowUpdate));
+        UUID id = UUID.randomUUID();
+        Flow.objects.update(id, flowUpdate);
+        Flow updated = Flow.objects.get(id);
+        Assertions.assertNull(updated);
     }
 
     @Test
@@ -149,6 +154,21 @@ public class FlowCollectionTest {
     public void canDeleteNonExistentFlow() {
         Flow.objects.delete(UUID.randomUUID());
         this.assertFlowCountChange(0);
+    }
+
+    @Test
+    public void containsFlow() {
+        var flow = createFlow();
+        Flow.objects.insert(flow);
+        this.assertFlowCountChange(1);
+        var flowId = flow.getId();
+        Assertions.assertTrue(Flow.objects.contains(flowId));
+    }
+
+    @Test
+    public void doesNotContainFlow() {
+        var flowId = UUID.randomUUID();
+        Assertions.assertFalse(Flow.objects.contains(flowId));
     }
 
     private void assertFlowCountChange(long change) {

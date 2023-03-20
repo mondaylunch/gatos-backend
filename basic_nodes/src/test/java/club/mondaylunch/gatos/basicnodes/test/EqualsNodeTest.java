@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
 import club.mondaylunch.gatos.core.data.DataBox;
@@ -83,7 +83,7 @@ public class EqualsNodeTest {
             "inputA", DataType.ANY.create(1.0),
             "inputB", DataType.ANY.create(0.0)
         );
-        
+
         var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
         Assertions.assertEquals(false, output.get("output").join().value());
     }
@@ -94,7 +94,7 @@ public class EqualsNodeTest {
             "inputA", DataType.ANY.create(true),
             "inputB", DataType.ANY.create(true)
         );
-        
+
         var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
         Assertions.assertEquals(true, output.get("output").join().value());
     }
@@ -105,7 +105,7 @@ public class EqualsNodeTest {
             "inputA", DataType.ANY.create(true),
             "inputB", DataType.ANY.create(false)
         );
-        
+
         var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
         Assertions.assertEquals(false, output.get("output").join().value());
     }
@@ -124,7 +124,7 @@ public class EqualsNodeTest {
             "inputA", DataType.ANY.create(firstObject),
             "inputB", DataType.ANY.create(secondObject)
         );
-        
+
         var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
         Assertions.assertEquals(true, output.get("output").join().value());
     }
@@ -172,7 +172,7 @@ public class EqualsNodeTest {
             "inputA", DataType.ANY.create(TEST_JSON_OBJECT_1),
             "inputB", DataType.ANY.create(TEST_JSON_OBJECT_1)
         );
-        
+
         Map<String, DataBox<?>> input_2 = Map.of(
             "inputA", DataType.ANY.create(TEST_JSON_OBJECT_2),
             "inputB", DataType.ANY.create(TEST_JSON_OBJECT_2)

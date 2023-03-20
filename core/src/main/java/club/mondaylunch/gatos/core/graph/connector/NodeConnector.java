@@ -3,8 +3,8 @@ package club.mondaylunch.gatos.core.graph.connector;
 import java.util.Objects;
 import java.util.UUID;
 
-import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.data.Conversions;
+import club.mondaylunch.gatos.core.data.DataType;
 
 /**
  * Represents an input or output on a node.
@@ -64,6 +64,15 @@ public abstract sealed class NodeConnector<T> {
     @Override
     public int hashCode() {
         return Objects.hash(this.nodeId, this.name, this.dataType);
+    }
+
+    @Override
+    public String toString() {
+        return "NodeConnector{"
+            + "nodeId=" + this.nodeId
+            + ", name='" + this.name
+            + ", dataType=" + this.dataType
+            + '}';
     }
 
     /**

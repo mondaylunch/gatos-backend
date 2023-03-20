@@ -37,3 +37,4 @@ out/
 /.nb-gradle/
 
 nginx.conf
+secrets.properties

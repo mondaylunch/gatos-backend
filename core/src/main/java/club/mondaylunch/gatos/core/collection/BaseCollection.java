@@ -1,7 +1,5 @@
 package club.mondaylunch.gatos.core.collection;
 
-import static com.mongodb.client.model.Filters.eq;
-
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -14,6 +12,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.CountOptions;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import org.bson.codecs.pojo.annotations.BsonProperty;
@@ -68,7 +67,7 @@ public class BaseCollection<T extends BaseModel> {
      * @return The POJO.
      */
     public T get(UUID id) {
-        return this.getCollection().find(Filters.eq(id)).first();
+        return this.getCollection().find(Filters.eq(id)).limit(1).first();
     }
 
     /**
@@ -80,7 +79,7 @@ public class BaseCollection<T extends BaseModel> {
      */
     public List<T> get(String field, Object value) {
         return this.getCollection()
-            .find(eq(field, value))
+            .find(Filters.eq(field, value))
             .into(new ArrayList<>());
     }
 
@@ -90,14 +89,12 @@ public class BaseCollection<T extends BaseModel> {
      *
      * @param id  The ID of the document to update.
      * @param obj The POJO to update with.
-     * @return The updated POJO.
      */
-    public T update(UUID id, T obj) {
+    public void update(UUID id, T obj) {
         List<Bson> updates = getNonNullUpdates(obj);
         if (!updates.isEmpty()) {
             this.getCollection().updateOne(Filters.eq(id), Updates.combine(updates));
         }
-        return this.get(id);
     }
 
     /**
@@ -107,6 +104,16 @@ public class BaseCollection<T extends BaseModel> {
      */
     public void delete(UUID id) {
         this.getCollection().deleteOne(Filters.eq(id));
+    }
+
+    /**
+     * Checks if a document with the given ID exists.
+     *
+     * @param id The ID of the document.
+     * @return {@code true} if the document exists, {@code false} otherwise.
+     */
+    public boolean contains(UUID id) {
+        return this.getCollection().countDocuments(Filters.eq(id), new CountOptions().limit(1)) > 0;
     }
 
     /**
