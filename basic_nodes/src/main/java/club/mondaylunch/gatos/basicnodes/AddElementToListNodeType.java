@@ -38,9 +38,9 @@ public class AddElementToListNodeType extends NodeType.Process {
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        if (inputTypes.get("element").listOf() != inputTypes.get("list"))
+        if (inputTypes.get("element").listOf() != inputTypes.get("list")) {
             throw new IllegalArgumentException("The Element's Type does not match that of the List");
-        
+        }
         return Map.of(
             "output", CompletableFuture.completedFuture(this.getGenericListBox(
                 Stream.concat(
