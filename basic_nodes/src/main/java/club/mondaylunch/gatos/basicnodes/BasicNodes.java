@@ -40,12 +40,16 @@ public final class BasicNodes implements GatosPlugin {
         .register("boolean_operation", new BooleanOperationNodeType());
     public static final ListLengthNodeType LIST_LENGTH = NodeType.REGISTRY
         .register("list_length", new ListLengthNodeType());
+    public static final ListMappingNodeType LIST_MAPPING = NodeType.REGISTRY
+        .register("list_mapping", new ListMappingNodeType());
     public static final OptionalOrElseNodeType OPTIONAL_OR_ELSE = NodeType.REGISTRY
         .register("optional_or_else", new OptionalOrElseNodeType());
     public static final ListHeadSeparationNodeType LIST_HEAD_SEPARATION = NodeType.REGISTRY
         .register("list_head_separation", new ListHeadSeparationNodeType());
     public static final ListTailSeparationNodeType LIST_TAIL_SEPARATION = NodeType.REGISTRY
         .register("list_tail_separation", new ListTailSeparationNodeType());
+    public static final ListSortNodeType LIST_SORT = NodeType.REGISTRY
+        .register("list_sort", new ListSortNodeType());
     public static final AddElementToListNodeType ADD_ELEM_TO_LIST = NodeType.REGISTRY
         .register("add_element_to_list", new AddElementToListNodeType());
     public static final RemoveElementFromListNodeType REMOVE_ELEM_FROM_LIST = NodeType.REGISTRY
@@ -56,12 +60,18 @@ public final class BasicNodes implements GatosPlugin {
         .register("truthiness", new TruthinessNodeType());
     public static final NegationNodeType NEGATION = NodeType.REGISTRY
         .register("negation", new NegationNodeType());
+    public static final ParseStringToNumberNodeType PARSE_STRING_TO_NUMBER = NodeType.REGISTRY
+        .register("parse_string_to_number", new ParseStringToNumberNodeType());
     public static final HTTPRequestNodeType HTTP_REQUEST = NodeType.REGISTRY
         .register("http_request", new HTTPRequestNodeType());
     public static final WebhookStartNodeType WEBHOOK_START = NodeType.REGISTRY
         .register("webhook_start", new WebhookStartNodeType());
     public static final WebhookEndNodeType WEBHOOK_END = NodeType.REGISTRY
         .register("webhook_end", new WebhookEndNodeType());
+    public static final EmptyListNodeType EMPTY_LIST = NodeType.REGISTRY
+        .register("empty_list", new EmptyListNodeType());
+    public static final ObjectSetValueNodeType OBJECT_SET_VALUE = NodeType.REGISTRY
+        .register("object_set_value", new ObjectSetValueNodeType());
 
     @VisibleForTesting
     public static final Set<DataBox<?>> VALUE_PROVIDER_TYPES_WITH_DEFAULTS = Set.of(
@@ -73,12 +83,12 @@ public final class BasicNodes implements GatosPlugin {
     public static final Map<DataType<?>, ValueProviderNodeType<?>> VALUE_PROVIDERS = VALUE_PROVIDER_TYPES_WITH_DEFAULTS.stream()
         .collect(Collectors.toMap(
             DataBox::type,
-            box -> NodeType.REGISTRY.register("value_provider_"+DataType.REGISTRY.getName(box.type()), new ValueProviderNodeType<>(box))
+            box -> NodeType.REGISTRY.register("value_provider_"+DataType.REGISTRY.getName(box.type()).orElseThrow(), new ValueProviderNodeType<>(box))
         ));
 
     public static final Map<DataType<?>, ValueReplacerNodeType<?>> VALUE_REPLACERS = VALUE_PROVIDER_TYPES_WITH_DEFAULTS.stream()
         .collect(Collectors.toMap(
             DataBox::type,
-            box -> NodeType.REGISTRY.register("value_replacer_"+DataType.REGISTRY.getName(box.type()), new ValueReplacerNodeType<>(box))
+            box -> NodeType.REGISTRY.register("value_replacer_"+DataType.REGISTRY.getName(box.type()).orElseThrow(), new ValueReplacerNodeType<>(box))
         ));
 }

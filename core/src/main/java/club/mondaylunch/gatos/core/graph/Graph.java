@@ -23,7 +23,9 @@ import org.bson.codecs.EncoderContext;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.jetbrains.annotations.Nullable;
 
+import club.mondaylunch.gatos.core.Either;
 import club.mondaylunch.gatos.core.codec.SerializationUtils;
+import club.mondaylunch.gatos.core.data.Conversions;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeCategory;
@@ -113,15 +115,9 @@ public class Graph {
         }
 
         this.nodes.put(id, result);
-        var invalidConns = this.getConnectionsForNode(id);
-        invalidConns.removeIf(c -> isConnectionValid(node, c));
-        this.connections.removeAll(invalidConns);
-        this.connectionsByNode.get(id).removeAll(invalidConns);
+        this.updateNodeConnections(id);
 
         this.observer.nodeModified(result);
-        for (var invalidConn : invalidConns) {
-            this.observer.connectionRemoved(invalidConn);
-        }
 
         return result;
     }
@@ -205,15 +201,67 @@ public class Graph {
         this.getOrCreateConnectionsForNode(nodeFrom.id()).add(connection);
         var destinationNodeConnections = this.getOrCreateConnectionsForNode(nodeTo.id());
         destinationNodeConnections.add(connection);
+        this.observer.connectionAdded(connection);
+
         this.modifyNode(nodeTo.id(), n -> n.updateInputTypes(destinationNodeConnections.stream()
             .filter(c -> c.to().nodeId().equals(nodeTo.id()))
             .collect(Collectors.toMap(c -> c.to().name(), c -> this.getCanonicalConnector(c.from()).type()))));
-
-        this.observer.connectionAdded(connection);
     }
 
     /**
-     * Removes a node connection, if it exists.
+     * Removes invalid connections to and from this node,
+     * and updates the types of any which are of the wrong type
+     * but are compatible.
+     * @param nodeId the node to update
+     */
+    private void updateNodeConnections(UUID nodeId) {
+        var node = this.getNode(nodeId).orElseThrow();
+        var connections = this.getConnectionsForNode(nodeId);
+        Set<NodeConnection<?>> newConns = new HashSet<>();
+        for (var conn : connections) {
+            if (conn.from().nodeId().equals(nodeId)) {
+                var connector = node.getOutputWithName(conn.from().name());
+                if (connector.filter(newConnector -> newConnector.isCompatible(conn.from())).isPresent()) {
+                    newConns.add(conn);
+                }
+            } else if (conn.to().nodeId().equals(nodeId)) {
+                node.getInputWithName(conn.to().name()).ifPresent(connector -> {
+                    if (!(connector.type().equals(conn.to().type()))) {
+                        var canonicalFrom = this.getCanonicalConnector(conn.from());
+                        if (Conversions.canConvert(canonicalFrom.type(), connector.type())) { // the 'from' here is on purpose
+                            newConns.add(NodeConnection.create(this.getNode(conn.from().nodeId()).orElseThrow(), conn.from().name(), node, conn.to().name()));
+                        }
+                    } else {
+                        newConns.add(conn);
+                    }
+                });
+            }
+        }
+
+        for (var conn : connections) {
+            if (!newConns.contains(conn)) {
+                this.connections.remove(conn);
+                this.getOrCreateConnectionsForNode(conn.from().nodeId()).remove(conn);
+                this.getOrCreateConnectionsForNode(conn.to().nodeId()).remove(conn);
+                this.observer.connectionRemoved(conn);
+            }
+        }
+
+        for (var conn : newConns) {
+            if (!this.connections.contains(conn)) {
+                this.connections.add(conn);
+                this.getOrCreateConnectionsForNode(conn.from().nodeId()).add(conn);
+                this.getOrCreateConnectionsForNode(conn.to().nodeId()).add(conn);
+                this.observer.connectionAdded(conn);
+            }
+        }
+    }
+
+    /**
+     * Removes a node connection, if it exists. Beware that a connection you added
+     * may not still be in the graph, even if nothing else changed the graph: best
+     * to get the connection with {@link #getConnection(UUID, String, UUID, String)}
+     * first.
      *
      * @param connection the connection to remove
      */
@@ -222,14 +270,14 @@ public class Graph {
         this.getOrCreateConnectionsForNode(connection.from().nodeId()).remove(connection);
         var destinationNodeConnections = this.getOrCreateConnectionsForNode(connection.to().nodeId());
         destinationNodeConnections.remove(connection);
+        if (removed) {
+            this.observer.connectionRemoved(connection);
+        }
+
         if (this.containsNode(connection.to().nodeId())) {
             this.modifyNode(connection.to().nodeId(), n -> n.updateInputTypes(destinationNodeConnections.stream()
                 .filter(c -> c.to().nodeId().equals(connection.to().nodeId()))
                 .collect(Collectors.toMap(c -> c.to().name(), c -> this.getCanonicalConnector(c.from()).type()))));
-        }
-
-        if (removed) {
-            this.observer.connectionRemoved(connection);
         }
     }
 
@@ -251,6 +299,21 @@ public class Graph {
      */
     public Set<NodeConnection<?>> getConnectionsForNode(UUID nodeId) {
         return new HashSet<>(this.getOrCreateConnectionsForNode(nodeId));
+    }
+
+    /**
+     * Gets a connection from one node connector to another node connector.
+     * @param fromId    the ID of the node the connection is from
+     * @param fromName  the name of the connector the connection is from
+     * @param toId      the ID of the node the connection is to
+     * @param toName    the name of the connector the connection is to
+     * @return          the connection, if it exists
+     */
+    public <T> Optional<NodeConnection<T>> getConnection(UUID fromId, String fromName, UUID toId, String toName) {
+        return this.getConnectionsForNode(fromId).stream()
+            .filter(conn -> conn.from().name().equals(fromName) && conn.to().nodeId().equals(toId) && conn.to().name().equals(toName))
+            .map(conn -> (NodeConnection<T>) conn)
+            .findFirst();
     }
 
     /**
@@ -334,10 +397,15 @@ public class Graph {
      * node to
      * an {@link NodeCategory#END output} node, and there are no cycles.
      *
-     * @return whether this graph is valid
+     * @return a list of any errors in this graph
      */
-    public boolean validate() {
-        return this.getExecutionOrder().isPresent();
+    public List<GraphValidityError> validate() {
+        List<GraphValidityError> errors = this.getExecutionOrder().map($ -> new ArrayList<>(), ArrayList::new);
+        errors.addAll(this.nodes.values().stream()
+            .flatMap(n -> n.type().isValid(n, this).stream())
+            .toList());
+
+        return errors;
     }
 
     /**
@@ -345,9 +413,9 @@ public class Graph {
      * If the graph is not
      * {@link #validate() valid}, this will return an empty Optional.
      *
-     * @return a topological sort of this graph
+     * @return a topological sort of this graph, or a list of errors
      */
-    public Optional<List<Node>> getExecutionOrder() {
+    public Either<List<Node>, List<GraphValidityError>> getExecutionOrder() {
         Set<UUID> relevantNodes = new HashSet<>(this.nodes.keySet());
         relevantNodes.removeIf(n -> this.getConnectionsForNode(n).isEmpty());
         Set<NodeConnection<?>> deduplicatedConnections = new HashSet<>();
@@ -400,11 +468,25 @@ public class Graph {
             }
         }
 
-        if (!hasSeenInput || !hasSeenOutput || !visitedConnections.containsAll(deduplicatedConnections)) {
-            return Optional.empty();
+        List<GraphValidityError> errors = new ArrayList<>();
+
+        if (!hasSeenInput) {
+            errors.add(GraphValidityError.noStart());
         }
 
-        return Optional.of(res);
+        if (!hasSeenOutput) {
+            errors.add(GraphValidityError.noEnd());
+        }
+
+        if (!visitedConnections.containsAll(deduplicatedConnections)) {
+            errors.add(GraphValidityError.cycle());
+        }
+
+        if (!errors.isEmpty()) {
+            return Either.right(errors);
+        }
+
+        return Either.left(res);
     }
 
     /**
@@ -464,7 +546,7 @@ public class Graph {
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
-        } else if (obj == null || getClass() != obj.getClass()) {
+        } else if (obj == null || this.getClass() != obj.getClass()) {
             return false;
         } else {
             Graph graph = (Graph) obj;
@@ -499,7 +581,21 @@ public class Graph {
                 Set<NodeConnection<?>> connections = SerializationUtils.readSet(reader, decoderContext, NodeConnection.class, this.registry);
                 reader.readName("metadata");
                 Map<UUID, NodeMetadata> metadata = SerializationUtils.readMap(reader, decoderContext, NodeMetadata.class, UUID::fromString, this.registry);
-                return new Graph(nodes, metadata, connections);
+
+                // adding connections in certain ways makes the graph sad, lets filter out connections that would do that
+                var nodeIds = nodes.stream().map(Node::id).collect(Collectors.toSet());
+                // list for faster iteration b/c we're gonna be doing a lot of streams
+                List<NodeConnection<?>> filteredConnections = new ArrayList<>();
+                for (var conn : connections) {
+                    if (nodeIds.contains(conn.from().nodeId())
+                        && nodeIds.contains(conn.to().nodeId())
+                        && filteredConnections.stream().noneMatch(c -> c.to().equals(conn.to()))
+                    ) {
+                        filteredConnections.add(conn);
+                    }
+                }
+
+                return new Graph(nodes, metadata, filteredConnections);
             });
         }
 

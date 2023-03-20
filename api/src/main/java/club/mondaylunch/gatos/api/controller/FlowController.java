@@ -38,10 +38,12 @@ import club.mondaylunch.gatos.core.codec.SerializationUtils;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.executor.GraphExecutor;
 import club.mondaylunch.gatos.core.graph.Graph;
+import club.mondaylunch.gatos.core.graph.GraphValidityError;
 import club.mondaylunch.gatos.core.graph.NodeMetadata;
 import club.mondaylunch.gatos.core.graph.WebhookStartNodeInput;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
+import club.mondaylunch.gatos.core.models.BasicFlowInfo;
 import club.mondaylunch.gatos.core.models.Flow;
 import club.mondaylunch.gatos.core.models.User;
 
@@ -57,17 +59,6 @@ public class FlowController {
         this.userRepository = userRepository;
     }
 
-    private record BasicFlowInfo(
-        @JsonProperty("_id") UUID id,
-        String name,
-        String description,
-        @JsonProperty("author_id") UUID authorId
-    ) {
-        BasicFlowInfo(Flow flow) {
-            this(flow.getId(), flow.getName(), flow.getDescription(), flow.getAuthorId());
-        }
-    }
-
     /**
      * Get all flows of the user.
      *
@@ -77,10 +68,7 @@ public class FlowController {
     @GetMapping
     public List<BasicFlowInfo> getFlows(@RequestHeader(name = "x-user-email") String userEmail) {
         User user = this.userRepository.getOrCreateUser(userEmail);
-        return Flow.objects.get("author_id", user.getId())
-            .stream()
-            .map(BasicFlowInfo::new)
-            .toList();
+        return Flow.objects.getBasicInfo("author_id", user.getId());
     }
 
     /**
@@ -129,7 +117,7 @@ public class FlowController {
     @PatchMapping("{flowId}")
     public BasicFlowInfo updateFlow(
         @RequestHeader(name = "x-user-email") String userEmail, @PathVariable UUID flowId,
-                                    @Valid @RequestBody BodyUpdateFlow data) {
+        @Valid @RequestBody BodyUpdateFlow data) {
         User user = this.userRepository.getOrCreateUser(userEmail);
         var flow = this.flowRepository.getFlow(user, flowId);
 
@@ -139,8 +127,7 @@ public class FlowController {
         partial.setGraph(null);
 
         Flow.objects.update(flow.getId(), partial);
-        var updated = Flow.objects.get(flow.getId());
-        return new BasicFlowInfo(updated);
+        return Flow.objects.getBasicInfo(flow.getId());
     }
 
     /**
@@ -195,9 +182,10 @@ public class FlowController {
         var graph = flow.getGraph();
         var nodeType = NodeType.REGISTRY.get(body.nodeType)
             .orElseThrow(InvalidNodeTypeException::new);
-        var node = graph.addNode(nodeType);
+        graph.addNode(nodeType);
+        var changes = flow.getGraph().observer().getChanges();
         Flow.objects.updateGraph(flow);
-        return SerializationUtils.toJson(node);
+        return SerializationUtils.toJson(changes);
     }
 
     /**
@@ -237,16 +225,18 @@ public class FlowController {
                 }
             });
         }
+        var changes = flow.getGraph().observer().getChanges();
         Flow.objects.updateGraph(flow);
-        var node = graph.getNode(nodeId).orElseThrow();
-        return SerializationUtils.toJson(node);
+        return SerializationUtils.toJson(changes);
     }
 
     /**
      * Deletes a node from the flow graph.
+     *
+     * @return
      */
     @DeleteMapping("{flowId}/nodes/{nodeId}")
-    public void deleteNode(
+    public String deleteNode(
         @RequestHeader("x-user-email") String userEmail,
         @PathVariable UUID flowId,
         @PathVariable UUID nodeId
@@ -255,7 +245,9 @@ public class FlowController {
         var flow = this.flowRepository.getFlow(user, flowId);
         var graph = flow.getGraph();
         graph.removeNode(nodeId);
+        var changes = flow.getGraph().observer().getChanges();
         Flow.objects.updateGraph(flow);
+        return SerializationUtils.toJson(changes);
     }
 
     /**
@@ -313,15 +305,18 @@ public class FlowController {
         } catch (Exception e) {
             throw new InvalidConnectionException(e.getMessage());
         }
+        var changes = flow.getGraph().observer().getChanges();
         Flow.objects.updateGraph(flow);
-        return SerializationUtils.toJson(connection);
+        return SerializationUtils.toJson(changes);
     }
 
     /**
      * Deletes a connection between two nodes.
+     *
+     * @return
      */
     @DeleteMapping("{flowId}/connections")
-    public void deleteConnection(
+    public String deleteConnection(
         @RequestHeader("x-user-email") String userEmail,
         @PathVariable UUID flowId,
         @RequestBody BodyConnection body
@@ -335,7 +330,9 @@ public class FlowController {
         } catch (Exception e) {
             throw new InvalidConnectionException(e.getMessage());
         }
+        var changes = flow.getGraph().observer().getChanges();
         Flow.objects.updateGraph(flow);
+        return SerializationUtils.toJson(changes);
     }
 
     private static NodeConnection<?> createConnection(Graph graph, BodyConnection body) {
@@ -376,6 +373,21 @@ public class FlowController {
         return SerializationUtils.toJson(metadata);
     }
 
+    public record GraphErrorInfo(@JsonProperty("errors") List<GraphValidityError> errors) {
+    }
+
+    @GetMapping(value = "{flowId}/validate", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String validateFlow(
+        @RequestHeader("x-user-email") String userEmail,
+        @PathVariable UUID flowId
+    ) {
+        User user = this.userRepository.getOrCreateUser(userEmail);
+        var flow = this.flowRepository.getFlow(user, flowId);
+        var graph = flow.getGraph();
+        var errors = graph.validate();
+        return SerializationUtils.toJson(new GraphErrorInfo(errors));
+    }
+
     /**
      * Modifies a node's metadata.
      *
@@ -395,8 +407,9 @@ public class FlowController {
             throw new NodeNotFoundException();
         }
         graph.setMetadata(nodeId, metadata);
+        var changes = flow.getGraph().observer().getChanges();
         Flow.objects.updateGraph(flow);
-        return SerializationUtils.toJson(metadata);
+        return SerializationUtils.toJson(changes);
     }
 
     /**

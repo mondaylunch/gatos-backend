@@ -29,7 +29,7 @@ public class WebhookEndNodeTest {
         var graphOutput = inputs.get("graphOutput");
         Assertions.assertEquals(nodeId, graphOutput.nodeId());
         Assertions.assertEquals("graphOutput", graphOutput.name());
-        Assertions.assertEquals(DataType.ANY, graphOutput.type());
+        Assertions.assertEquals(DataType.JSON_OBJECT, graphOutput.type());
         var outputReference = inputs.get("outputReference");
         Assertions.assertEquals(nodeId, outputReference.nodeId());
         Assertions.assertEquals("outputReference", outputReference.name());
