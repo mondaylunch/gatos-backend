@@ -40,6 +40,8 @@ public final class BasicNodes implements GatosPlugin {
         .register("boolean_operation", new BooleanOperationNodeType());
     public static final ListLengthNodeType LIST_LENGTH = NodeType.REGISTRY
         .register("list_length", new ListLengthNodeType());
+    public static final GetAtIndexNodeType GET_AT_INDEX = NodeType.REGISTRY
+        .register("get_at_index", new GetAtIndexNodeType());
     public static final ListMappingNodeType LIST_MAPPING = NodeType.REGISTRY
         .register("list_mapping", new ListMappingNodeType());
     public static final OptionalOrElseNodeType OPTIONAL_OR_ELSE = NodeType.REGISTRY
