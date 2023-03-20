@@ -15,13 +15,13 @@ jobs:
             - name: Make envfilection@master"
               uses: SpicyPizza/create-envfile@v1.3
               with:
-                envkey_AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
-                envkey_AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
-                envkey_AUTH0_ISSUER: ${{ vars.AUTH0_ISSUER }}
-                envkey_AUTH0_AUDIENCE: ${{ vars.AUTH0_AUDIENCE }}
-                envkey_AUTH0_TOKEN_URL: ${{ vars.AUTH0_TOKEN_URL }}
-                envkey_AUTH0_MANAGEMENT_AUDIENCE: ${{ vars.AUTH0_MANAGEMENT_AUDIENCE }}
-                file_name: secrets.properties
+                  envkey_AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
+                  envkey_AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
+                  envkey_AUTH0_ISSUER: ${{ vars.AUTH0_ISSUER }}
+                  envkey_AUTH0_AUDIENCE: ${{ vars.AUTH0_AUDIENCE }}
+                  envkey_AUTH0_TOKEN_URL: ${{ vars.AUTH0_TOKEN_URL }}
+                  envkey_AUTH0_MANAGEMENT_AUDIENCE: ${{ vars.AUTH0_MANAGEMENT_AUDIENCE }}
+                  file_name: .env
             - name: Run services in background
               run: |
                   docker-compose up -d
