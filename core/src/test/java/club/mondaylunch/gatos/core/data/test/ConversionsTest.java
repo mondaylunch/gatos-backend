@@ -5,6 +5,9 @@ import java.util.Optional;
 
 import com.google.common.graph.ValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonNull;
+import com.google.gson.JsonPrimitive;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -107,6 +110,13 @@ public class ConversionsTest {
     }
 
     @Test
+    public void canConvertToStringList() {
+        var foo = new Foo("Hello!");
+        var fooListBox = FOO_TYPE.listOf().create(List.of(foo));
+        Assertions.assertEquals(List.of(foo.toString()), Conversions.convert(fooListBox, DataType.STRING.listOf()).value());
+    }
+
+    @Test
     public void canConvertTransitive() {
         Conversions.register(FOO_TYPE, BAR_TYPE, foo -> new Bar(foo.name()));
         Conversions.register(BAR_TYPE, BAZ_TYPE, bar -> new Baz(bar.name()));
@@ -123,6 +133,34 @@ public class ConversionsTest {
         var foo = FOO_TYPE.create(new Foo("hello!"));
         var baz = BAZ_TYPE.create(new Baz("direct hello!"));
         Assertions.assertEquals(baz, Conversions.convert(foo, BAZ_TYPE));
+    }
+
+    @Test
+    public void canConvertToJsonArray() {
+        var numbers = List.of(1.0, 2.0, 3.0);
+        var numbersBox = DataType.NUMBER.listOf().create(numbers);
+        var jsonBox = DataType.JSON_ELEMENT.create(numbers.stream().collect(
+            JsonArray::new,
+            JsonArray::add,
+            JsonArray::addAll
+        ));
+        Assertions.assertEquals(jsonBox, Conversions.convert(numbersBox, DataType.JSON_ELEMENT));
+    }
+
+    @Test
+    public void canConvertToJsonOptional() {
+        var numberOptional = Optional.of(1.0);
+        var numberOptionalBox = DataType.NUMBER.optionalOf().create(numberOptional);
+        var jsonBox = DataType.JSON_ELEMENT.create(new JsonPrimitive(1));
+        Assertions.assertEquals(jsonBox, Conversions.convert(numberOptionalBox, DataType.JSON_ELEMENT));
+    }
+
+    @Test
+    public void canConvertToJsonEmptyOptional() {
+        Optional<Double> numberOptional = Optional.empty();
+        var numberOptionalBox = DataType.NUMBER.optionalOf().create(numberOptional);
+        var jsonBox = DataType.JSON_ELEMENT.create(JsonNull.INSTANCE);
+        Assertions.assertEquals(jsonBox, Conversions.convert(numberOptionalBox, DataType.JSON_ELEMENT));
     }
 
     @Test

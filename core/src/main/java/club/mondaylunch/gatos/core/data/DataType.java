@@ -5,10 +5,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import club.mondaylunch.gatos.core.Registry;
+import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 /**
  * A type of value which can be stored in a {@link DataBox}.
@@ -25,9 +29,25 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
     public static final DataType<JsonElement> JSON_ELEMENT = register("json_element", JsonElement.class);
     public static final DataType<DataType<?>> DATA_TYPE = register("data_type", DataType.class);
     public static final DataType<AtomicReference<?>> REFERENCE = register("reference", AtomicReference.class);
+    public static final DataType<NodeType.Process> PROCESS_NODE_TYPE = register("process_node_type", NodeType.class);
 
     static {
+        // Conversions to string
         Conversions.register(ANY, STRING, Object::toString);
+        Conversions.register(DATA_TYPE, STRING, DataType::name);
+        Conversions.register(PROCESS_NODE_TYPE, STRING, n -> NodeType.REGISTRY.getName(n).orElse(n.toString()));
+
+        // Conversions to JSON element
+        Conversions.register(NUMBER, JSON_ELEMENT, JsonPrimitive::new);
+        Conversions.register(BOOLEAN, JSON_ELEMENT, JsonPrimitive::new);
+        Conversions.register(STRING, JSON_ELEMENT, JsonPrimitive::new);
+        Conversions.register(JSON_OBJECT, JSON_ELEMENT, $ -> $);
+        Conversions.registerSimple(JSON_ELEMENT.listOf(), JSON_ELEMENT, elements -> elements.stream().collect(
+            JsonArray::new,
+            JsonArray::add,
+            JsonArray::addAll
+        ));
+        Conversions.registerSimple(JSON_ELEMENT.optionalOf(), JSON_ELEMENT, optional -> optional.orElse(JsonNull.INSTANCE));
     }
 
     private final String name;
@@ -35,6 +55,7 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
 
     /**
      * Creates a new DataType.
+     *
      * @param name  the name for the type this represents
      * @param clazz the class for this type
      */
@@ -42,7 +63,7 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
         this.name = name;
         this.clazz = clazz;
         if (!Objects.equals(name, "any")) {
-            Conversions.register(this, ANY, $ -> $);
+            Conversions.registerSimple(this, ANY, $ -> $);
         }
     }
 
@@ -52,6 +73,7 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
 
     /**
      * Creates a new {@link DataBox} with this type and a given value.
+     *
      * @param value the value
      * @return a data box
      */
@@ -61,6 +83,7 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
 
     /**
      * The unique name of this data type.
+     *
      * @return the unique name of this data type
      */
     public String name() {
@@ -69,7 +92,8 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
 
     /**
      * The class of this data type.
-     * @return  the class of this data type
+     *
+     * @return the class of this data type
      */
     public Class<? super T> clazz() {
         return this.clazz;
@@ -77,6 +101,7 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
 
     /**
      * Returns the DataType for a list that holds data of this type.
+     *
      * @return the DataType for a list that holds data of this type
      */
     @SuppressWarnings("unchecked")
@@ -94,6 +119,7 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
 
     /**
      * Returns the DataType for an optional that holds data of this type.
+     *
      * @return the DataType for an optional that holds data of this type
      */
     @SuppressWarnings("unchecked")

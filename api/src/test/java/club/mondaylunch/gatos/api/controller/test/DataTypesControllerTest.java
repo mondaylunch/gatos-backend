@@ -3,6 +3,8 @@ package club.mondaylunch.gatos.api.controller.test;
 import static org.mockito.ArgumentMatchers.anyString;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.gson.Gson;
@@ -42,6 +44,18 @@ public class DataTypesControllerTest extends BaseMvcTest {
     }
 
     @Test
+    public void canGetDataTypes() throws Exception {
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT)
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + TestSecurity.FAKE_TOKEN))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var body = result.andReturn().getResponse().getContentAsString();
+        var gson = new Gson();
+        var type = new TypeToken<List<String>>(){}.getType();
+        List<String> dataTypes = gson.fromJson(body, type);
+        Assertions.assertTrue(DataType.REGISTRY.getEntries().stream().map(Map.Entry::getKey).allMatch(dataTypes::contains));
+    }
+
+    @Test
     public void canGetConversions() throws Exception {
         var type1 = DataType.register("foo", Class1.class);
         var type2 = DataType.register("bar", Class2.class);
@@ -53,8 +67,7 @@ public class DataTypesControllerTest extends BaseMvcTest {
             .andExpect(MockMvcResultMatchers.status().isOk());
         var body = result.andReturn().getResponse().getContentAsString();
         var gson = new Gson();
-        var type = new TypeToken<HashSet<DataTypesController.ConversionInfo>>() {
-        }.getType();
+        var type = new TypeToken<HashSet<DataTypesController.ConversionInfo>>() {};
         Set<DataTypesController.ConversionInfo> conversions = gson.fromJson(body, type);
         assertContainsConversion(conversions, type1, type2);
         assertContainsConversion(conversions, type2, type3);
