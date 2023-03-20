@@ -55,7 +55,7 @@ public class ApplyRoleNodeType extends NodeType.End {
         String guildId = DataBox.get(settings, "guild_id", DiscordDataTypes.GUILD_ID).orElseThrow();
         String userId = DataBox.get(inputs, "user_id", DiscordDataTypes.USER_ID).orElseThrow();
         String roleId = DataBox.get(inputs, "role_id", DiscordDataTypes.ROLE_ID).orElseThrow();
-        Guild guild = this.gatosDiscord.get().getGuildById(guildId);
+        Guild guild = this.gatosDiscord.getJda().getGuildById(guildId);
         if (guild == null) {
             throw new IllegalStateException("Guild not found: " + guildId);
         }
