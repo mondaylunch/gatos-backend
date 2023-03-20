@@ -1,11 +1,19 @@
 package club.mondaylunch.gatos.core.data;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Queue;
+import java.util.Set;
 import java.util.function.Function;
 
+import com.google.common.collect.Lists;
 import com.google.common.graph.MutableValueGraph;
+import com.google.common.graph.SuccessorsFunction;
 import com.google.common.graph.Traverser;
 import com.google.common.graph.ValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
@@ -137,16 +145,10 @@ public final class Conversions {
             return Optional.of((Function<A, B>) Function.identity());
         }
 
-        var conversionFuntionOptional = TYPE_CONVERSIONS.edgeValue(a, b);
-        if (conversionFuntionOptional.isPresent()) {
-            return (Optional<Function<A, B>>) (Optional<?>) conversionFuntionOptional;
-        }
-
         if (TYPE_CONVERSIONS.nodes().contains(a) && TYPE_CONVERSIONS.nodes().contains(b)) {
-            return getPath(TYPE_CONVERSIONS, a, b).flatMap(conversions -> conversions.stream()
+            return getPath(TYPE_CONVERSIONS, a, b).map(conversions -> conversions.stream()
                 .map(Function.class::cast)
-                .reduce(Function::andThen)
-                .map(function -> (Function<A, B>) function)
+                .reduce(Function.identity(), Function::andThen)
             );
         }
 
@@ -183,49 +185,86 @@ public final class Conversions {
             return Optional.of(List.of());
         }
 
-        var traverser = Traverser.forGraph(graph);
-        var nodePaths = traverser.depthFirstPreOrder(start);
+        /*
+        If there is an edge between the start
+        and end nodes, return a path with that edge.
+         */
+        var edgeOptional = graph.edgeValue(start, end);
+        if (edgeOptional.isPresent()) {
+            return edgeOptional.map(List::of);
+        }
+
+        return getShortestPath(graph, start, end).map(nodePath -> getEdgePath(graph, nodePath));
+    }
+
+    private static <N, V> List<V> getEdgePath(ValueGraph<N, V> graph, List<N> nodePath) {
+        if (nodePath.size() < 2) {
+            return List.of();
+        }
+
         List<V> edgePath = new ArrayList<>();
-        var currentNode = start;
-        for (var node : nodePaths) {
-            /*
-            The first node in the iterable is
-            the start node, so we skip it.
-             */
-            if (node.equals(start)) {
-                continue;
-            }
-
-            /*
-            If the node is next to the start node,
-            it means we're going down a new path.
-             */
-            if (graph.hasEdgeConnecting(start, node)) {
-                edgePath.clear();
-                currentNode = start;
-            }
-
-            /*
-            Add the edge to the path between the
-            nodes to the path.
-             */
-            var finalCurrentNode = currentNode;
-            var edge = graph.edgeValue(currentNode, node).orElseThrow(
-                () -> new IllegalStateException(
-                    "No edge found between %s and %s".formatted(finalCurrentNode, node)
-                )
-            );
+        for (int i = 0; i < nodePath.size() - 1; i++) {
+            var node1 = nodePath.get(i);
+            var node2 = nodePath.get(i + 1);
+            var edge = graph.edgeValue(node1, node2)
+                .orElseThrow(() -> new IllegalStateException("No edge found between %s and %s".formatted(node1, node2)));
             edgePath.add(edge);
+        }
+        return edgePath;
+    }
 
-            /*
-            If the node is the same as the end node,
-            we've found a path.
-             */
-            if (node.equals(end)) {
-                return Optional.of(edgePath);
+    private static <N> Optional<List<N>> getShortestPath(SuccessorsFunction<N> graph, N start, N end) {
+        return breadthFirstSearch(graph, start, end).map(predecessors -> getPath(end, predecessors));
+    }
+
+    private static <N> List<N> getPath(N end, Map<N, N> predecessors) {
+        List<N> reversePath = new ArrayList<>();
+        N crawl = end;
+        reversePath.add(crawl);
+        while (predecessors.containsKey(crawl)) {
+            crawl = predecessors.get(crawl);
+            reversePath.add(crawl);
+        }
+        return Lists.reverse(reversePath);
+    }
+
+    /**
+     * A modified version of breadth first search that returns
+     * predecessor of each node visited. The search starts from
+     * the {@code start} node and ends when the {@code end} node
+     * is found.
+     *
+     * @param graph The graph to search.
+     * @param start The start node.
+     * @param end   The end node.
+     * @param <N>   The type of the nodes.
+     * @return An {@code Optional} containing the predecessors map,
+     * mapping a node to its predecessor. If there is no path between
+     * the {@code start} and {@code end} nodes, the {@code Optional}
+     * will be empty.
+     */
+    private static <N> Optional<Map<N, N>> breadthFirstSearch(SuccessorsFunction<N> graph, N start, N end) {
+        Map<N, N> predecessors = new HashMap<>();
+
+        Queue<N> nodeQueue = new ArrayDeque<>();
+        Set<N> visitedNodes = new HashSet<>();
+
+        visitedNodes.add(start);
+        nodeQueue.add(start);
+
+        while (!nodeQueue.isEmpty()) {
+            N visiting = nodeQueue.remove();
+            for (N adjacentNode : graph.successors(visiting)) {
+                if (!visitedNodes.contains(adjacentNode)) {
+                    visitedNodes.add(adjacentNode);
+                    predecessors.put(adjacentNode, visiting);
+                    nodeQueue.add(adjacentNode);
+
+                    if (adjacentNode.equals(end)) {
+                        return Optional.of(predecessors);
+                    }
+                }
             }
-
-            currentNode = node;
         }
 
         return Optional.empty();
