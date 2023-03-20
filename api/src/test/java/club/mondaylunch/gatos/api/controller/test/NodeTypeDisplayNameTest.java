@@ -12,7 +12,7 @@ import club.mondaylunch.gatos.core.graph.type.NodeType;
 public class NodeTypeDisplayNameTest {
     @BeforeAll
     public static void init() {
-        GatosCore.init();
+        GatosCore.gatosInit();
     }
 
     @Test

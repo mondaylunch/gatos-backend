@@ -2,8 +2,7 @@ package club.mondaylunch.gatos.api.controller.test;
 
 import static org.mockito.ArgumentMatchers.anyString;
 
-import java.util.HashSet;
-import java.util.stream.Collectors;
+import java.util.HashMap;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -20,15 +19,13 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import club.mondaylunch.gatos.api.BaseMvcTest;
 import club.mondaylunch.gatos.api.TestSecurity;
-import club.mondaylunch.gatos.api.controller.NodeTypesController;
 import club.mondaylunch.gatos.core.GatosCore;
-import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class NodeTypeControllerTest extends BaseMvcTest {
+public class DisplayNamesControllerTest extends BaseMvcTest {
 
-    private static final String ENDPOINT = "/api/v1/node-types";
+    private static final String ENDPOINT = "/api/v1/display-names";
 
     @BeforeAll
     public static void init() {
@@ -41,18 +38,16 @@ public class NodeTypeControllerTest extends BaseMvcTest {
     }
 
     @Test
-    public void canGetNodeTypes() throws Exception {
+    public void canGetDisplayNames() throws Exception {
         var result = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + TestSecurity.FAKE_TOKEN))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + TestSecurity.FAKE_TOKEN)
+                .header(HttpHeaders.ACCEPT_LANGUAGE, "en"))
             .andExpect(MockMvcResultMatchers.status().isOk());
         var body = result.andReturn().getResponse().getContentAsString();
         var gson = new Gson();
-        var type = new TypeToken<HashSet<NodeTypesController.NodeTypeInfo>>(){}.getType();
-        var nodeTypes = gson.fromJson(body, type);
-        var registeredNodeTypes = NodeType.REGISTRY.getEntries()
-            .stream()
-            .map(NodeTypesController.NodeTypeInfo::new)
-            .collect(Collectors.toSet());
-        Assertions.assertEquals(registeredNodeTypes, nodeTypes);
+        var type = new TypeToken<HashMap<String, String>>(){}.getType();
+        var names = gson.fromJson(body, type);
+        var actualNames = GatosCore.getLang().getTranslations("en");
+        Assertions.assertEquals(actualNames, names);
     }
 }
