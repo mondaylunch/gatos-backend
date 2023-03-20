@@ -51,10 +51,10 @@ This repository comes equipped with CI to automatically build production Docker 
 To build this yourself, simply run:
 
 ```bash
-docker build -t gatos-backend-api -f Dockerfile.api .
+docker build -t ghcr.io/mondaylunch/gatos-backend-api:master -f Dockerfile.api .
 ```
 
-Now you can use `gatos-backend-api` in your deployment instead of `ghcr.io/mondaylunch/gatos-backend-api`.
+You may want to use a different tag, but this will replace your deployment image if you are using the default configuration.
 
 ## Run Tests
 
