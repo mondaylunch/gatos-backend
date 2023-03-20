@@ -55,7 +55,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
 
     @BeforeAll
     public static void init() {
-        GatosCore.init();
+        GatosCore.gatosInit();
     }
 
     @BeforeEach

@@ -1,0 +1,9 @@
+{
+    "data_type.any": "Any",
+    "data_type.number": "Number",
+    "data_type.boolean": "Boolean",
+    "data_type.string": "String",
+    "data_type.json_object": "Object",
+    "data_type.data_type": "Data Type",
+    "data_type.reference": "Reference"
+}
