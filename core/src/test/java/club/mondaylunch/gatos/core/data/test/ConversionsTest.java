@@ -6,6 +6,8 @@ import java.util.Optional;
 import com.google.common.graph.ValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonNull;
+import com.google.gson.JsonPrimitive;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -143,6 +145,22 @@ public class ConversionsTest {
             JsonArray::addAll
         ));
         Assertions.assertEquals(jsonBox, Conversions.convert(numbersBox, DataType.JSON_ELEMENT));
+    }
+
+    @Test
+    public void canConvertToJsonOptional() {
+        var numberOptional = Optional.of(1.0);
+        var numberOptionalBox = DataType.NUMBER.optionalOf().create(numberOptional);
+        var jsonBox = DataType.JSON_ELEMENT.create(new JsonPrimitive(1));
+        Assertions.assertEquals(jsonBox, Conversions.convert(numberOptionalBox, DataType.JSON_ELEMENT));
+    }
+
+    @Test
+    public void canConvertToJsonEmptyOptional() {
+        Optional<Double> numberOptional = Optional.empty();
+        var numberOptionalBox = DataType.NUMBER.optionalOf().create(numberOptional);
+        var jsonBox = DataType.JSON_ELEMENT.create(JsonNull.INSTANCE);
+        Assertions.assertEquals(jsonBox, Conversions.convert(numberOptionalBox, DataType.JSON_ELEMENT));
     }
 
     @Test
