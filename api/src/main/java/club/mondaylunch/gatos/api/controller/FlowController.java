@@ -233,7 +233,7 @@ public class FlowController {
     /**
      * Deletes a node from the flow graph.
      *
-     * @return
+     * @return The changes that were made to the graph.
      */
     @DeleteMapping("{flowId}/nodes/{nodeId}")
     public String deleteNode(
@@ -313,7 +313,7 @@ public class FlowController {
     /**
      * Deletes a connection between two nodes.
      *
-     * @return
+     * @return The changes that were made to the graph.
      */
     @DeleteMapping("{flowId}/connections")
     public String deleteConnection(
@@ -450,7 +450,7 @@ public class FlowController {
         }
         AtomicReference<?> outputReference = new AtomicReference<>();
         var webhookStartInput = new WebhookStartNodeInput(inputJson, outputReference);
-        executeFunction.accept(webhookStartInput);
+        executeFunction.apply(webhookStartInput).join();
         var output = outputReference.get();
         if (output == null) {
             return new JsonObject().toString();

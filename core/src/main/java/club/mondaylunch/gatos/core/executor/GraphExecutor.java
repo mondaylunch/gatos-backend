@@ -7,9 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.Nullable;
@@ -36,16 +35,17 @@ public class GraphExecutor {
 
     /**
      * Creates a new GraphExecutor.
+     *
      * @param nodes       the nodes to execute, in execution order
      * @param connections a set of all connections between nodes
      */
     public GraphExecutor(List<Node> nodes, Set<NodeConnection<?>> connections) {
         this.connections = List.copyOf(connections);
         this.nodeDependencies = nodes.stream().collect(Collectors.toMap(
-                Function.identity(),
-                n -> n.inputs().values().stream().flatMap(
-                        connector -> this.connections.stream().filter(connection -> connection.to().equals(connector)))
-                        .toList()));
+            Function.identity(),
+            n -> n.inputs().values().stream().flatMap(
+                    connector -> this.connections.stream().filter(connection -> connection.to().equals(connector)))
+                .toList()));
         this.nonEndNodes = nodes.stream().filter(n -> n.type() instanceof NodeType.WithOutputs).toList();
         this.endNodes = nodes.stream().filter(n -> n.type().category() == NodeCategory.END).toList();
         this.startNodes = nodes.stream().filter(n -> n.type().category() == NodeCategory.START).toList();
@@ -62,118 +62,153 @@ public class GraphExecutor {
     }
 
     /**
-     * Creates a function which, when run, executes this flow graph from a certain input node using a given input.
+     * Creates a function which, when run, executes this flow graph asynchronously, from a certain input node using a given input.
+     *
      * @param triggerNodeId the UUID of the start node that should take in the input
      * @param <T>           the type of the input
-     * @return              an execution function
+     * @return an execution function
      */
-    public <T> Consumer<@Nullable T> execute(@Nullable UUID triggerNodeId) {
-        Map<NodeConnection<?>, CompletableFuture<DataBox<?>>> results = new ConcurrentHashMap<>();
-
+    public <T> Function<@Nullable T, CompletableFuture<Void>> execute(@Nullable UUID triggerNodeId) {
         final Node triggerNode;
         if (triggerNodeId != null) {
-            triggerNode = this.startNodes.stream().filter(n -> n.id().equals(triggerNodeId)).findFirst().orElseThrow();
+            triggerNode = this.startNodes.stream()
+                .filter(n -> n.id().equals(triggerNodeId))
+                .findFirst()
+                .orElseThrow();
         } else {
             triggerNode = null;
         }
 
         return input -> {
+            CompletableFuture<Map<NodeConnection<?>, DataBox<?>>> resultsFuture = CompletableFuture.completedFuture(new HashMap<>());
             for (var node : this.nonEndNodes) {
+                CompletableFuture<Map<NodeConnection<?>, DataBox<?>>> resultFuture;
                 if (node == triggerNode) {
-                    @SuppressWarnings("unchecked") Map<String, CompletableFuture<DataBox<?>>> outputs
-                        = (((NodeType.Start<T>) node.type()).compute(input, node.settings()));
-                    results.putAll(this.associateResultsWithConnections(node, outputs));
+                    @SuppressWarnings("unchecked")
+                    var outputs = (((NodeType.Start<T>) node.type()).compute(input, node.settings()));
+                    resultFuture = this.associateResultsWithConnections(node, allOf(outputs));
                 } else {
-                    var inputs = this.collectInputsForNode(node, results);
-                    var res = this.getNodeResults(node, inputs);
-                    results.putAll(res);
+                    var inputs = this.collectInputsForNode(node, resultsFuture);
+                    resultFuture = this.getNodeResults(node, inputs);
                 }
+                resultsFuture = resultsFuture.thenCompose(results -> resultFuture.thenApply(result -> {
+                    results.putAll(result);
+                    return results;
+                }));
             }
-
-            CompletableFuture.allOf(this.endNodes.stream().map(node -> {
-                var inputs = this.collectInputsForNode(node, results);
-                return ((NodeType.End) node.type()).compute(inputs, node.settings());
-            }).toArray(CompletableFuture[]::new)).join();
+            return resultsFuture
+                .thenApply(results -> this.endNodes.stream().map(node -> {
+                    var inputsFuture = this.collectInputsForNode(
+                        node,
+                        CompletableFuture.completedFuture(results)
+                    );
+                    return inputsFuture.thenCompose(inputs ->
+                        ((NodeType.End) node.type()).compute(inputs, node.settings())
+                    );
+                }).toArray(CompletableFuture[]::new))
+                .thenCompose(CompletableFuture::allOf);
         };
     }
 
     /**
-     * Convenience overload of {@link #execute(UUID)} which returns a Runnable instead, and triggers no start node.
-     * @return a Runnable which, when run, executes this flow graph
+     * Convenience overload of {@link #execute(UUID)} which returns a Supplier instead, and triggers no start node.
+     *
+     * @return a Supplier which, when run, executes this flow graph asynchronously
      */
-    public Runnable execute() {
-        Consumer<@Nullable Object> func = this.execute(null);
-        return () -> func.accept(null);
+    public Supplier<CompletableFuture<Void>> execute() {
+        var function = this.execute(null);
+        return () -> function.apply(null);
     }
 
     /**
-     * Waits for the dependencies of a node to be completed, then returns them in a
-     * map associated by their input
-     * connector name.
-     * @param node       the node
-     * @param allResults the map of node connection results, for retrieving input
-     *                   values from
-     * @return the input values, associated by connector name
+     * Returns a future of the dependencies of a node in
+     * a map associated by their input connector name.
+     *
+     * @param node             the node
+     * @param allResultsFuture a future of the map of node connection
+     *                         results, for retrieving input values from
+     * @return a future of the input values, associated by connector name
      */
-    private Map<String, DataBox<?>> collectInputsForNode(
-            Node node,
-            Map<NodeConnection<?>, CompletableFuture<DataBox<?>>> allResults) {
-        Map<String, DataBox<?>> inputs = new HashMap<>();
-        for (var dep : this.nodeDependencies.get(node)) {
-            var resForDep = allResults.get(dep);
-            var depInputName = dep.to().name();
-            inputs.put(depInputName, Conversions.convert(resForDep.join(), dep.to().type()));
-        }
-
-        return inputs;
+    private CompletableFuture<Map<String, DataBox<?>>> collectInputsForNode(
+        Node node,
+        CompletableFuture<Map<NodeConnection<?>, DataBox<?>>> allResultsFuture
+    ) {
+        return allResultsFuture.thenApply(allResults -> {
+            Map<String, DataBox<?>> inputs = new HashMap<>();
+            for (var dep : this.nodeDependencies.get(node)) {
+                var resForDep = allResults.get(dep);
+                var depInputName = dep.to().name();
+                inputs.put(depInputName, Conversions.convert(resForDep, dep.to().type()));
+            }
+            return inputs;
+        });
     }
 
     /**
-     * Creates a map of each of a node's output connections to a CompletableFuture
-     * of their output data.
-     * @param node   the node
-     * @param inputs a map of inputs to the node
+     * Creates future of a map of each of a node's
+     * output connections to their output data.
+     *
+     * @param node         the node
+     * @param inputsFuture a future of a map of inputs to the node
      * @return a map from each output connection to that connection's output
      */
-    private Map<NodeConnection<?>, CompletableFuture<DataBox<?>>> getNodeResults(Node node,
-            Map<String, DataBox<?>> inputs) {
-        Map<String, CompletableFuture<DataBox<?>>> resultsByConnectorName = node
-                .type() instanceof NodeType.WithOutputs outputs
-                        ? outputs.compute(inputs, node.settings(), node.inputTypes())
-                        : Map.of();
-        return this.associateResultsWithConnections(node, resultsByConnectorName);
+    private CompletableFuture<Map<NodeConnection<?>, DataBox<?>>> getNodeResults(
+        Node node,
+        CompletableFuture<Map<String, DataBox<?>>> inputsFuture
+    ) {
+        var resultsByConnectorNameFuture = inputsFuture.thenApply(inputs -> {
+            Map<String, CompletableFuture<DataBox<?>>> resultsByConnectorName;
+            if (node.type() instanceof NodeType.WithOutputs outputs) {
+                resultsByConnectorName = outputs.compute(inputs, node.settings(), node.inputTypes());
+            } else {
+                resultsByConnectorName = Map.of();
+            }
+            return resultsByConnectorName;
+        }).thenCompose(GraphExecutor::allOf);
+        return this.associateResultsWithConnections(node, resultsByConnectorNameFuture);
     }
 
     /**
-     * Creates a map of connections to results from a map of connector names to results.
-     * @param node                      the node
-     * @param resultsByConnectorName    the outputs of the node by connector name
-     * @return                          the outputs of the node by connection
+     * Creates future of a map of connections to results
+     * from a map of connector names to results.
+     *
+     * @param node                         the node
+     * @param resultsByConnectorNameFuture a future of the outputs of the node by connector name
+     * @return the outputs of the node by connection
      */
-    private Map<NodeConnection<?>, CompletableFuture<DataBox<?>>> associateResultsWithConnections(
+    private CompletableFuture<Map<NodeConnection<?>, DataBox<?>>> associateResultsWithConnections(
         Node node,
-        Map<String, CompletableFuture<DataBox<?>>> resultsByConnectorName) {
-
-        Map<NodeConnection<?>, CompletableFuture<DataBox<?>>> resultsByConnection = new HashMap<>();
-        for (var entry : resultsByConnectorName.entrySet()) {
-            for (var conn : this.getOutputConnectionsByName(node, entry.getKey())) {
-                resultsByConnection.put(conn, entry.getValue());
+        CompletableFuture<Map<String, DataBox<?>>> resultsByConnectorNameFuture
+    ) {
+        return resultsByConnectorNameFuture.thenApply(resultsByConnectorName -> {
+            Map<NodeConnection<?>, DataBox<?>> resultsByConnection = new HashMap<>();
+            for (var entry : resultsByConnectorName.entrySet()) {
+                for (var conn : this.getOutputConnectionsByName(node, entry.getKey())) {
+                    resultsByConnection.put(conn, entry.getValue());
+                }
             }
-        }
-
-        return resultsByConnection;
+            return resultsByConnection;
+        });
     }
 
     /**
      * Creates an iterable of all connections associated with an output connector on
      * a node.
+     *
      * @param node the node
      * @param name the name of the output connector on the node
      * @return an iterable of all connections from that output connector
      */
     private Iterable<NodeConnection<?>> getOutputConnectionsByName(Node node, String name) {
         return node.getOutputWithName(name).stream()
-                .flatMap(c -> this.connections.stream().filter(a -> c.isCompatible(a.from())))
-                .toList();
+            .flatMap(c -> this.connections.stream().filter(a -> c.isCompatible(a.from())))
+            .toList();
+    }
+
+    private static <K, V> CompletableFuture<Map<K, V>> allOf(Map<K, CompletableFuture<V>> futuresMap) {
+        var allFuturesResult = CompletableFuture.allOf(futuresMap.values().toArray(CompletableFuture[]::new));
+        return allFuturesResult.thenApply($ -> futuresMap.entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().join()))
+        );
     }
 }
