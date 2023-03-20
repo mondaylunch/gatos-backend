@@ -49,7 +49,12 @@ public class AddElementToListNodeTest {
             "list", ListDataType.GENERIC_LIST.create(TEST_EMPTY_LIST),
             "element", DataType.ANY.create(true)
         );
-        var output = BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), Map.of("input", DataType.BOOLEAN));
+
+        Map<String, DataType<?>> inputTypes = Map.of(
+            "list", DataType.BOOLEAN.listOf(),
+            "element", DataType.BOOLEAN
+        );
+        var output = BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), inputTypes);
         Assertions.assertEquals(List.of(true), output.get("output").join().value());
     }
 
@@ -60,7 +65,11 @@ public class AddElementToListNodeTest {
             "list", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST),
             "element", DataType.ANY.create(4)
         );
-        var output = BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), Map.of("input", DataType.NUMBER));
+        Map<String, DataType<?>> inputTypes = Map.of(
+            "list", DataType.NUMBER.listOf(),
+            "element", DataType.NUMBER
+        );
+        var output = BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), inputTypes);
         Assertions.assertEquals(List.of(1,2,3,4), output.get("output").join().value());
     }
 
@@ -71,7 +80,11 @@ public class AddElementToListNodeTest {
             "list", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST),
             "element", DataType.ANY.create(true)
         );
-        var output = BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), Map.of("input", DataType.BOOLEAN));
-        Assertions.assertEquals(TEST_NUM_LIST, output.get("output").join().value());
+
+        Map<String, DataType<?>> inputTypes = Map.of(
+            "list", DataType.NUMBER.listOf(),
+            "element", DataType.BOOLEAN
+        );
+        Assertions.assertThrows(IllegalArgumentException.class, () -> BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), inputTypes));
     }
 }
