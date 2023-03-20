@@ -453,7 +453,7 @@ public class FlowController {
         executeFunction.apply(webhookStartInput).join();
         var output = outputReference.get();
         if (output == null) {
-            return new JsonObject().toString();
+            return "{}";
         } else {
             return SerializationUtils.toJson(output);
         }
