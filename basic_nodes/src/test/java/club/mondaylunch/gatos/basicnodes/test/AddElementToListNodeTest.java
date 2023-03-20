@@ -3,7 +3,6 @@ package club.mondaylunch.gatos.basicnodes.test;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -16,8 +15,7 @@ import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.Node;
 
 public class AddElementToListNodeTest {
-    private static final List<Number> TEST_NUM_LIST = List.of(1,2,3);
-    private static final List<String> TEST_STR_LIST = List.of("CHEESE");
+    private static final List<Number> TEST_NUM_LIST = List.of(1, 2, 3);
     private static final List<Boolean> TEST_EMPTY_LIST = new LinkedList<>();
 
     @Test
@@ -70,7 +68,7 @@ public class AddElementToListNodeTest {
             "element", DataType.NUMBER
         );
         var output = BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), inputTypes);
-        Assertions.assertEquals(List.of(1,2,3,4), output.get("output").join().value());
+        Assertions.assertEquals(List.of(1, 2, 3, 4), output.get("output").join().value());
     }
 
     @Test

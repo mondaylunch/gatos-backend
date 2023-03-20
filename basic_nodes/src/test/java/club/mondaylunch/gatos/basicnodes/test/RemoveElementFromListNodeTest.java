@@ -2,6 +2,7 @@ package club.mondaylunch.gatos.basicnodes.test;
 
 import java.util.List;
 import java.util.Map;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +18,7 @@ public class RemoveElementFromListNodeTest {
     private static final Node TEST_ELEMENT_REMOVE = Node.create(BasicNodes.REMOVE_ELEM_FROM_LIST).modifySetting("mode", RemoveElementFromListNodeType.ELEMENT_REFERENCE.create(RemoveElementFromListNodeType.Mode.ELEMENT));
     private static final Node TEST_INDEX_REMOVE = Node.create(BasicNodes.REMOVE_ELEM_FROM_LIST).modifySetting("mode", RemoveElementFromListNodeType.ELEMENT_REFERENCE.create(RemoveElementFromListNodeType.Mode.INDEX));
 
-    private static final List<Number> TEST_NUM_LIST = List.of(1,2,3);
+    private static final List<Number> TEST_NUM_LIST = List.of(1, 2, 3);
 
     @Test
     public void canAddNodeToGraph() {
