@@ -8,8 +8,6 @@ import java.util.function.Function;
 
 import javax.validation.Valid;
 
-import club.mondaylunch.gatos.api.exception.flow.FlowExecutionException;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -30,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import club.mondaylunch.gatos.api.exception.InvalidBodyException;
+import club.mondaylunch.gatos.api.exception.flow.FlowExecutionException;
 import club.mondaylunch.gatos.api.exception.flow.InvalidConnectionException;
 import club.mondaylunch.gatos.api.exception.flow.InvalidNodeSettingException;
 import club.mondaylunch.gatos.api.exception.flow.InvalidNodeTypeException;
