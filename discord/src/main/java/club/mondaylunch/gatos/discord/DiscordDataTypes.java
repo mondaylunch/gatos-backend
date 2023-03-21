@@ -1,10 +1,13 @@
 package club.mondaylunch.gatos.discord;
 
+import java.util.function.Function;
+
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import org.jetbrains.annotations.Nullable;
 
+import club.mondaylunch.gatos.core.data.Conversions;
 import club.mondaylunch.gatos.core.data.DataType;
 
 public class DiscordDataTypes {
@@ -18,6 +21,10 @@ public class DiscordDataTypes {
     public static final DataType<EmbedBuilder> MESSAGE_EMBED = DataType.register("discord.message_embed", EmbedBuilder.class);
 
     static void init() {
-
+        Conversions.register(DataType.STRING, GUILD_ID, Function.identity());
+        Conversions.register(DataType.STRING, CHANNEL_ID, Function.identity());
+        Conversions.register(DataType.STRING, USER_ID, Function.identity());
+        Conversions.register(DataType.STRING, ROLE_ID, Function.identity());
+        Conversions.register(DataType.STRING, EMOJI_ID, Function.identity());
     }
 }
