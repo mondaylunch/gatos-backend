@@ -14,6 +14,10 @@ dependencies {
     implementation group: 'com.sun.net.httpserver', name: 'http', version: '20070405'
 }
 
+jar {
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+}
+
 tasks.named('test') {
     useJUnitPlatform()
 }
