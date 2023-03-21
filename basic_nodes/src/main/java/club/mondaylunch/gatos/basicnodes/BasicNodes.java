@@ -63,6 +63,8 @@ public final class BasicNodes implements GatosPlugin {
         .register("list_distinct", new ListDistinctNodeType());
     public static final ListContainsNodeType LIST_CONTAINS = NodeType.REGISTRY
         .register("list_contains", new ListContainsNodeType());
+    public static final ListSetOperationNodeType LIST_SET_OPERATION = NodeType.REGISTRY
+        .register("list_set_operation", new ListSetOperationNodeType());
     public static final EqualsNodeType EQUALS = NodeType.REGISTRY
         .register("equals", new EqualsNodeType());
     public static final TruthinessNodeType TRUTHINESS = NodeType.REGISTRY
