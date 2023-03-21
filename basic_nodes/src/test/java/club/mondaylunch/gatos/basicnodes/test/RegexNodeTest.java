@@ -11,7 +11,7 @@ import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
 
-public class RegexTest {
+public class RegexNodeTest {
 
     @Test   
     public void nodeAddsToGraph() {
