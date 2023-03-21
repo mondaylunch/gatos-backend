@@ -207,7 +207,7 @@ public final class Conversions {
             var node1 = nodePath.get(i);
             var node2 = nodePath.get(i + 1);
             var edge = graph.edgeValue(node1, node2)
-                .orElseThrow(() -> new IllegalStateException("No edge found between %s and %s".formatted(node1, node2)));
+                .orElseThrow(() -> new IllegalArgumentException("No edge found between %s and %s".formatted(node1, node2)));
             edgePath.add(edge);
         }
         return edgePath;
