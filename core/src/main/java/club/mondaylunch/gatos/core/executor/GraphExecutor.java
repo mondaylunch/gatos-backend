@@ -96,12 +96,10 @@ public class GraphExecutor {
                     return results;
                 }));
             }
+            final var finalResultsFuture = resultsFuture;
             return resultsFuture
                 .thenApply(results -> this.endNodes.stream().map(node -> {
-                    var inputsFuture = this.collectInputsForNode(
-                        node,
-                        CompletableFuture.completedFuture(results)
-                    );
+                    var inputsFuture = this.collectInputsForNode(node, finalResultsFuture);
                     return inputsFuture.thenCompose(inputs ->
                         ((NodeType.End) node.type()).compute(inputs, node.settings())
                     );
