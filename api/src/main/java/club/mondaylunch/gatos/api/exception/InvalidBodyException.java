@@ -10,7 +10,7 @@ public class InvalidBodyException extends RuntimeException {
         super("Invalid body");
     }
 
-    public InvalidBodyException(String message) {
-        super(message);
+    public InvalidBodyException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

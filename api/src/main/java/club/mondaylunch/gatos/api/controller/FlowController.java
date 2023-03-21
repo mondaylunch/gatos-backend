@@ -443,11 +443,10 @@ public class FlowController {
         if (input == null) {
             inputJson = new JsonObject();
         } else {
-            var inputJsonElement = JsonParser.parseString(input);
-            if (inputJsonElement.isJsonObject()) {
-                inputJson = inputJsonElement.getAsJsonObject();
-            } else {
-                throw new InvalidBodyException("Body must be a JSON object");
+            try {
+                inputJson = JsonParser.parseString(input).getAsJsonObject();
+            } catch (Exception e) {
+                throw new InvalidBodyException("Body must be a JSON object", e);
             }
         }
         AtomicReference<?> outputReference = new AtomicReference<>();
