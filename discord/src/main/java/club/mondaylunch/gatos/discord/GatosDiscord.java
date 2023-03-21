@@ -1,8 +1,6 @@
 package club.mondaylunch.gatos.discord;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Properties;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -20,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import club.mondaylunch.gatos.core.Either;
+import club.mondaylunch.gatos.core.Environment;
 import club.mondaylunch.gatos.core.GatosPlugin;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.graph.Graph;
@@ -64,14 +63,13 @@ public class GatosDiscord implements GatosPlugin {
         this.nodeTypes = new DiscordNodeTypes(this);
     }
 
+    @Override
+    public String name() {
+        return "discord";
+    }
+
     private String getToken() {
-        var properties = new Properties();
-        try (var stream = this.getClass().getResourceAsStream("/gatos_discord.properties")) {
-            properties.load(stream);
-        } catch (IOException e) {
-            throw new RuntimeException("Failure loading discord token", e);
-        }
-        return properties.getProperty("DISCORD_TOKEN");
+        return Environment.getDiscordToken();
     }
 
     public JDA getJda() {
