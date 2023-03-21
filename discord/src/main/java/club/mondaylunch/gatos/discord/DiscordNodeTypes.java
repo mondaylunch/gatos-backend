@@ -3,6 +3,7 @@ package club.mondaylunch.gatos.discord;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 import club.mondaylunch.gatos.discord.nodes.ApplyRoleNodeType;
 import club.mondaylunch.gatos.discord.nodes.CommandReplyNodeType;
+import club.mondaylunch.gatos.discord.nodes.CreateEmbedNodeType;
 import club.mondaylunch.gatos.discord.nodes.ReactToMessageNodeType;
 import club.mondaylunch.gatos.discord.nodes.ReceiveCommandNodeType;
 import club.mondaylunch.gatos.discord.nodes.ReceiveMessageNodeType;
@@ -19,6 +20,7 @@ public class DiscordNodeTypes {
     private final ReceiveMessageNodeType receiveMessageNodeType;
     private final ReactToMessageNodeType reactToMessageNodeType;
     private final ReplyToMessageNodeType replyToMessageNodeType;
+    private final CreateEmbedNodeType createEmbedNodeType;
 
     public DiscordNodeTypes(GatosDiscord gatosDiscord) {
         this.receiveCommandNodeType = NodeType.REGISTRY.register("discord.receive_command", new ReceiveCommandNodeType(gatosDiscord));
@@ -29,6 +31,7 @@ public class DiscordNodeTypes {
         this.receiveMessageNodeType = NodeType.REGISTRY.register("discord.receive_message", new ReceiveMessageNodeType(gatosDiscord));
         this.reactToMessageNodeType = NodeType.REGISTRY.register("discord.react_to_message", new ReactToMessageNodeType(gatosDiscord));
         this.replyToMessageNodeType = NodeType.REGISTRY.register("discord.reply_to_message", new ReplyToMessageNodeType(gatosDiscord));
+        this.createEmbedNodeType = NodeType.REGISTRY.register("discord.create_embed", new CreateEmbedNodeType(gatosDiscord));
     }
 
     public SendMessageNodeType sendDiscordMessage() {
@@ -61,5 +64,9 @@ public class DiscordNodeTypes {
 
     public ReplyToMessageNodeType replyToMessage() {
         return this.replyToMessageNodeType;
+    }
+
+    public CreateEmbedNodeType createEmbed() {
+        return this.createEmbedNodeType;
     }
 }
