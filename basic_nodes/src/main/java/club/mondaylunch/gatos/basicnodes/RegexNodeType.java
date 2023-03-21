@@ -38,10 +38,7 @@ import club.mondaylunch.gatos.core.graph.type.NodeType;
 public class RegexNodeType extends NodeType.Process {
     @Override
     public Map<String, DataBox<?>> settings() {
-        return Map.of(
-            "regex", DataType.STRING.create(""),
-            "word", DataType.STRING.create("")
-        );
+        return Map.of();
     }
 
     @Override
@@ -54,13 +51,13 @@ public class RegexNodeType extends NodeType.Process {
 
     @Override
     public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        Set<NodeConnector.Output<?>> standardOut = Set.of(
-            new NodeConnector.Output<>(nodeId, "isMatch",   DataType.BOOLEAN),
-            new NodeConnector.Output<>(nodeId, "match",     DataType.STRING),
-            new NodeConnector.Output<>(nodeId, "group",     DataType.STRING.listOf())
+        return Set.of(
+            new NodeConnector.Output<>(nodeId, "isMatch", DataType.BOOLEAN),
+            new NodeConnector.Output<>(nodeId, "match", DataType.STRING),
+            new NodeConnector.Output<>(nodeId, "group", DataType.STRING.listOf())
         );
 
-        Matcher matcher = Pattern
+        /*Matcher matcher = Pattern
             .compile(DataBox.get(settings, "regex", DataType.STRING).orElseThrow())
             .matcher(DataBox.get(settings, "word", DataType.STRING).orElseThrow());
         var matches = matcher.results().toList();
@@ -81,49 +78,28 @@ public class RegexNodeType extends NodeType.Process {
                 .map(match -> new NodeConnector.Output<>(nodeId, getNameForPlaceholder(m -> matches.indexOf(m) + 1, match), DataType.STRING))
                 .collect(Collectors.toSet())
             );
-        }};
+        }};*/
     }
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {        
-        var regex = Pattern.compile(DataBox.get(settings, "regex", DataType.STRING).orElseThrow());        
-        var word  = DataBox.get(settings, "word",  DataType.STRING).orElseThrow();
+        var regex = Pattern.compile(DataBox.get(inputs, "regex", DataType.STRING).orElseThrow());        
+        var word  = DataBox.get(inputs, "word",  DataType.STRING).orElseThrow();
         var matcher = regex.matcher(word);
 
         if(!matcher.find()) {
-            Map<String, CompletableFuture<DataBox<?>>> mapOut = Map.of(
+            return Map.of(
                 "isMatch",  CompletableFuture.completedFuture(DataType.BOOLEAN.create(false)),
                 "match",    CompletableFuture.completedFuture(DataType.STRING.create(null)),
-                "group",    CompletableFuture.completedFuture(DataType.STRING.listOf().create(null)),
-                "group 1",  CompletableFuture.completedFuture(DataType.STRING.create(null))
+                "groups",    CompletableFuture.completedFuture(DataType.STRING.listOf().create(null))
             );
-            
-            AtomicInteger j = new AtomicInteger(0);
-            for(MatchResult match : matcher.results().toList()) {
-                mapOut.put(
-                    DataBox.get(inputs, getNameForPlaceholder($ -> j.getAndIncrement(), match), DataType.STRING).orElse(""),
-                    CompletableFuture.completedFuture(DataType.STRING.create(null))
-                );
-            }
-
-            return mapOut;
         }
 
-        Map<String, CompletableFuture<DataBox<?>>> mapOut = Map.of(
+        return Map.of(
             "isMatch",  CompletableFuture.completedFuture(DataType.BOOLEAN.create(true)),
             "match",    CompletableFuture.completedFuture(DataType.STRING.create(matcher.group())),
-            "group",    CompletableFuture.completedFuture(DataType.STRING.listOf().create(getGroups(matcher)))
+            "groups",    CompletableFuture.completedFuture(DataType.STRING.listOf().create(getGroups(matcher)))
         );
-
-        AtomicInteger j = new AtomicInteger(0);
-        for(MatchResult match : matcher.results().toList()) {
-            mapOut.put(
-                DataBox.get(inputs, getNameForPlaceholder($ -> j.getAndIncrement(), match), DataType.STRING).orElse(""),
-                CompletableFuture.completedFuture(DataType.STRING.create(match.toString()))
-            );
-        }
-
-        return mapOut;
     }
 
     /**
@@ -140,16 +116,20 @@ public class RegexNodeType extends NodeType.Process {
         return lst;
     }
 
-    private static String getNameForPlaceholder(ToIntFunction<MatchResult> placeholderIndexer, MatchResult placeholder) {
+    /*private static String getNameForPlaceholder(ToIntFunction<MatchResult> placeholderIndexer, MatchResult placeholder) {
         try {
             String name = placeholder.group(1);
             return name.isBlank() ? "group " + (placeholderIndexer.applyAsInt(placeholder)) : name;
         } catch (Exception e) {
             return "";
         }
-    }
+    }*/
 
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
-        return compute(inputs, settings, Map.of());
+        return this.compute(inputs, settings, Map.of());
+    }
+
+    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs) {
+        return this.compute(inputs, Map.of(), Map.of());
     }
 }
