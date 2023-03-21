@@ -43,6 +43,7 @@ public class GatosDiscord implements GatosPlugin {
         }
 
         this.commands = new DiscordCommands(this);
+        this.events = new DiscordEvents();
 
         try {
             LOGGER.info("Constructing new JDA instance");
