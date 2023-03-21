@@ -73,7 +73,7 @@ public class GraphExecutor {
         if (triggerNodeId != null) {
             triggerNode = this.startNodes.stream()
                 .filter(n -> n.id().equals(triggerNodeId))
-                .findFirst()
+                .findAny()
                 .orElseThrow();
         } else {
             triggerNode = null;
