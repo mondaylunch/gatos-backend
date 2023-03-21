@@ -97,14 +97,13 @@ public class GraphExecutor {
                 }));
             }
             final var finalResultsFuture = resultsFuture;
-            return resultsFuture
-                .thenApply(results -> this.endNodes.stream().map(node -> {
-                    var inputsFuture = this.collectInputsForNode(node, finalResultsFuture);
-                    return inputsFuture.thenCompose(inputs ->
-                        ((NodeType.End) node.type()).compute(inputs, node.settings())
-                    );
-                }).toArray(CompletableFuture[]::new))
-                .thenCompose(CompletableFuture::allOf);
+            var computedEndNodeFutures = this.endNodes.stream().map(node -> {
+                var inputsFuture = this.collectInputsForNode(node, finalResultsFuture);
+                return inputsFuture.thenCompose(inputs ->
+                    ((NodeType.End) node.type()).compute(inputs, node.settings())
+                );
+            }).toArray(CompletableFuture[]::new);
+            return CompletableFuture.allOf(computedEndNodeFutures);
         };
     }
 
