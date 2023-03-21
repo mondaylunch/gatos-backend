@@ -39,8 +39,8 @@ public class RegexNodeType extends NodeType.Process {
     @Override
     public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         return Set.of(
-            new NodeConnector.Input<>(nodeId, "regex",  DataType.STRING),
-            new NodeConnector.Input<>(nodeId, "word",   DataType.STRING)
+            new NodeConnector.Input<>(nodeId, "regex", DataType.STRING),
+            new NodeConnector.Input<>(nodeId, "word", DataType.STRING)
         );
     }
 
@@ -56,10 +56,10 @@ public class RegexNodeType extends NodeType.Process {
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {        
         var regex = Pattern.compile(DataBox.get(inputs, "regex", DataType.STRING).orElseThrow());        
-        var word  = DataBox.get(inputs, "word",  DataType.STRING).orElseThrow();
+        var word = DataBox.get(inputs, "word", DataType.STRING).orElseThrow();
         var matcher = regex.matcher(word);
 
-        if(!matcher.find()) return Map.of(
+        if (!matcher.find()) return Map.of(
             "isMatch", CompletableFuture.completedFuture(DataType.BOOLEAN.create(false)),
             "match", CompletableFuture.completedFuture(DataType.STRING.create(null)),
             "groups", CompletableFuture.completedFuture(DataType.STRING.listOf().create(null))
@@ -68,22 +68,21 @@ public class RegexNodeType extends NodeType.Process {
         return Map.of(
             "isMatch", CompletableFuture.completedFuture(DataType.BOOLEAN.create(true)),
             "match", CompletableFuture.completedFuture(DataType.STRING.create(matcher.group())),
-            "groups", CompletableFuture.completedFuture(DataType.STRING.listOf().create(getGroups(matcher)))
+            "groups", CompletableFuture.completedFuture(DataType.STRING.listOf().create(this.getGroups(matcher)))
         );
     }
 
     /**
-     * A function method to gather all the groups a regular expression
-     * finds in an input word as a list 
+     * A function method to gather all the groups a regular expression finds in an input word as a list. 
      * @param matcher a Matcher given a word set to a regex Pattern
-     * @return a List<String> of groups
+     * @return a List of Strings
      */
     public List<String> getGroups(Matcher matcher) {
         int groups = matcher.groupCount();
-        if(groups == 0) return null;
+        if (groups == 0) return null;
 
         ArrayList<String> lst = new ArrayList<String>();
-        for(int i = 1; i <= groups; i++) lst.add(matcher.group(i));
+        for (int i = 1; i <= groups; i++) lst.add(matcher.group(i));
         
         return lst;
     }
