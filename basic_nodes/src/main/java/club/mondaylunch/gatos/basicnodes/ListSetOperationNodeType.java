@@ -86,6 +86,7 @@ public class ListSetOperationNodeType extends NodeType.Process {
     }
 
     public static DataBox<SetOperation> getOperationSettingDataBox(String operation) {
-        return SET_OPERATION.create(SetOperation.valueOf(operation.toUpperCase()));
+        var op = SetOperation.valueOf(operation.toUpperCase());
+        return SET_OPERATION.create(op != null ? op : SetOperation.UNION);
     }
 }
