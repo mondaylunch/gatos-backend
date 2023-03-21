@@ -38,6 +38,7 @@ public class GetAtIndexNodeType extends NodeType.Process {
             new NodeConnector.Output<>(nodeId, "output", outType));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var inputList = DataBox.get(inputs, "input", ListDataType.GENERIC_LIST).orElse(new ArrayList<>());
