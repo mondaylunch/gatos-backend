@@ -8,6 +8,8 @@ import java.util.function.Function;
 
 import javax.validation.Valid;
 
+import club.mondaylunch.gatos.api.exception.flow.FlowExecutionException;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -433,7 +435,7 @@ public class FlowController {
             .map(nodeType -> startNode.type().equals(nodeType))
             .orElse(false);
         if (!isWebhookStart) {
-            throw new InvalidNodeTypeException("Node with ID " + startNodeId + " is not a webhook start node.");
+            throw new InvalidNodeTypeException("Node with ID " + startNodeId + " is not a webhook start node");
         }
         var executor = new GraphExecutor(graph);
         var executeFunction = executor.execute(startNodeId);
@@ -450,7 +452,11 @@ public class FlowController {
         }
         AtomicReference<?> outputReference = new AtomicReference<>();
         var webhookStartInput = new WebhookStartNodeInput(inputJson, outputReference);
-        executeFunction.apply(webhookStartInput).join();
+        try {
+            executeFunction.apply(webhookStartInput).join();
+        } catch (Exception e) {
+            throw new FlowExecutionException(e);
+        }
         var output = outputReference.get();
         if (output == null) {
             return "{}";
