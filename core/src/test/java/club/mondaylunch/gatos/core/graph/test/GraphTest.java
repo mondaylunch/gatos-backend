@@ -443,7 +443,6 @@ public class GraphTest {
         Assertions.assertTrue(graph.validate().isEmpty());
     }
 
-    private static final class TestNodeType extends NodeType.Process {
     @Test
     public void graphWithNodeSpecificErrorIsInvalid() {
         var graph = new Graph();
@@ -522,6 +521,11 @@ public class GraphTest {
         }
 
         @Override
+        public void teardownFlow(Flow flow, Node node) {
+
+        }
+
+        @Override
         public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable Object o, Map<String, DataBox<?>> settings) {
             return Map.of();
         }
@@ -562,6 +566,11 @@ public class GraphTest {
 
         @Override
         public void setupFlow(Flow flow, Consumer<@Nullable Object> function, Node node) {
+        }
+
+        @Override
+        public void teardownFlow(Flow flow, Node node) {
+
         }
 
         @Override
