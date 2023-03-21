@@ -1,7 +1,6 @@
 package club.mondaylunch.gatos.basicnodes;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -22,16 +21,18 @@ public class WebhookEndNodeType extends NodeType.End {
     @Override
     public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         return Set.of(
-            new NodeConnector.Input<>(nodeId, "graphOutput", DataType.ANY),
+            new NodeConnector.Input<>(nodeId, "graphOutput", DataType.JSON_OBJECT),
             new NodeConnector.Input<>(nodeId, "outputReference", DataType.REFERENCE)
         );
     }
 
     @Override
     public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
-        var outputDataBox = inputs.get("graphOutput");
-        Objects.requireNonNull(outputDataBox);
-        var graphOutput = outputDataBox.value();
+        var graphOutput = DataBox.get(
+            inputs,
+            "graphOutput",
+            DataType.JSON_OBJECT
+        ).orElseThrow();
         @SuppressWarnings("unchecked")
         var outputReference = (AtomicReference<Object>) DataBox.get(
             inputs,

@@ -31,11 +31,13 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import club.mondaylunch.gatos.api.BaseMvcTest;
 import club.mondaylunch.gatos.api.TestSecurity;
+import club.mondaylunch.gatos.api.controller.FlowController;
 import club.mondaylunch.gatos.api.helpers.UserCreationHelper;
 import club.mondaylunch.gatos.core.GatosCore;
 import club.mondaylunch.gatos.core.codec.SerializationUtils;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Graph;
+import club.mondaylunch.gatos.core.graph.GraphObserver;
 import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.NodeMetadata;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
@@ -53,7 +55,7 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
 
     @BeforeAll
     public static void init() {
-        GatosCore.init();
+        GatosCore.gatosInit();
     }
 
     @BeforeEach
@@ -374,10 +376,11 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         var updatedGraph = updatedFlow.getGraph();
         Assertions.assertEquals(1, updatedGraph.nodeCount());
         var body = result.andReturn().getResponse().getContentAsString();
-        var actualNode = SerializationUtils.fromJson(body, Node.class);
-        var nodeId = actualNode.id();
-        var expectedNode = updatedGraph.getNode(nodeId).orElseThrow();
-        Assertions.assertEquals(expectedNode, actualNode);
+        var changes = SerializationUtils.fromJson(body, GraphObserver.GraphChanges.class);
+        var responseNode = changes.addedNodes().stream().filter(n -> n.type().equals(NodeType.REGISTRY.get(nodeType).orElseThrow())).findFirst();
+        Assertions.assertTrue(responseNode.isPresent());
+        var expectedNode = updatedGraph.getNode(responseNode.get().id()).orElseThrow();
+        Assertions.assertEquals(expectedNode, responseNode.get());
     }
 
     @Test
@@ -409,8 +412,8 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         var updatedNode = updatedGraph.getNode(nodeId).orElseThrow();
         Assertions.assertEquals(1, updatedNode.getSetting("setting", DataType.NUMBER).value());
         var responseBody = result.andReturn().getResponse().getContentAsString();
-        var responseNode = SerializationUtils.fromJson(responseBody, Node.class);
-        Assertions.assertEquals(updatedNode, responseNode);
+        var changes = SerializationUtils.fromJson(responseBody, GraphObserver.GraphChanges.class);
+        Assertions.assertTrue(changes.addedNodes().contains(updatedNode));
     }
 
     @Test
@@ -496,8 +499,8 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         var expectedConnection = NodeConnection.create(start, "start_output", end, "end_input");
         Assertions.assertEquals(expectedConnection, startConnections.iterator().next());
         var responseBody = result.andReturn().getResponse().getContentAsString();
-        var responseConnection = SerializationUtils.fromJson(responseBody, NodeConnection.class);
-        Assertions.assertEquals(expectedConnection, responseConnection);
+        var responseConnection = SerializationUtils.fromJson(responseBody, GraphObserver.GraphChanges.class);
+        Assertions.assertTrue(responseConnection.addedConnections().contains(expectedConnection));
     }
 
     @Test
@@ -625,8 +628,8 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         actualMetadata = updatedGraph.getOrCreateMetadataForNode(nodeId);
         Assertions.assertEquals(expectedMetadata, actualMetadata);
         var responseBody = result.andReturn().getResponse().getContentAsString();
-        var responseMetadata = SerializationUtils.fromJson(responseBody, NodeMetadata.class);
-        Assertions.assertEquals(expectedMetadata, responseMetadata);
+        var changes = SerializationUtils.fromJson(responseBody, GraphObserver.GraphChanges.class);
+        Assertions.assertTrue(changes.addedMetadata().containsValue(expectedMetadata));
     }
 
     @Test
@@ -659,8 +662,8 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         actualMetadata = updatedGraph.getOrCreateMetadataForNode(nodeId);
         Assertions.assertEquals(expectedMetadata, actualMetadata);
         var responseBody = result.andReturn().getResponse().getContentAsString();
-        var responseMetadata = SerializationUtils.fromJson(responseBody, NodeMetadata.class);
-        Assertions.assertEquals(expectedMetadata, responseMetadata);
+        var responseMetadata = SerializationUtils.fromJson(responseBody, GraphObserver.GraphChanges.class);
+        Assertions.assertTrue(responseMetadata.addedMetadata().containsValue(expectedMetadata));
     }
 
     @Test
@@ -712,6 +715,24 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
         JSONAssert.assertEquals(inputBodyString, responseBody, JSONCompareMode.NON_EXTENSIBLE);
     }
 
+    @Test
+    public void canGetErrors() throws Exception {
+        var flow = createFlow(this.user);
+        var graph = flow.getGraph();
+        Assertions.assertEquals(0, graph.nodeCount());
+        Flow.objects.insert(flow);
+        this.addNode(flow.getId(), "webhook_start");
+        var result = this.mockMvc.perform(MockMvcRequestBuilders.get(ENDPOINT + "/" + flow.getId() + "/validate")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + TestSecurity.FAKE_TOKEN)
+                .header("x-user-email", this.user.getEmail())
+                .contentType(MediaType.APPLICATION_JSON)
+            )
+            .andExpect(MockMvcResultMatchers.status().isOk());
+        var responseBody = result.andReturn().getResponse().getContentAsString();
+        var responseErrors = SerializationUtils.fromJson(responseBody, FlowController.GraphErrorInfo.class);
+        Assertions.assertFalse(responseErrors.errors().isEmpty());
+    }
+
     private Node addNode(UUID flowId, String nodeType) {
         var requestBody = new JsonObject();
         requestBody.addProperty("type", nodeType);
@@ -726,9 +747,10 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
                 .andExpect(MockMvcResultMatchers.status().isOk());
             Assertions.assertEquals(nodeCountBefore + 1, getNodeCount(flowId));
             var responseBody = result.andReturn().getResponse().getContentAsString();
-            var responseNode = SerializationUtils.fromJson(responseBody, Node.class);
-            Assertions.assertEquals(NodeType.REGISTRY.get(nodeType).orElseThrow(), responseNode.type());
-            return responseNode;
+            var responseChanges = SerializationUtils.fromJson(responseBody, GraphObserver.GraphChanges.class);
+            var responseNode = responseChanges.addedNodes().stream().filter(n -> n.type().equals(NodeType.REGISTRY.get(nodeType).orElseThrow())).findFirst();
+            Assertions.assertTrue(responseNode.isPresent());
+            return responseNode.get();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -752,12 +774,15 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
                 .andExpect(MockMvcResultMatchers.status().isOk());
             Assertions.assertEquals(connectionCountBefore + 1, getConnectionCount(flowId));
             var responseBody = result.andReturn().getResponse().getContentAsString();
-            NodeConnection<?> responseConnection = SerializationUtils.fromJson(responseBody, NodeConnection.class);
-            Assertions.assertEquals(fromNodeId, responseConnection.from().nodeId());
-            Assertions.assertEquals(fromName, responseConnection.from().name());
-            Assertions.assertEquals(toNodeId, responseConnection.to().nodeId());
-            Assertions.assertEquals(toName, responseConnection.to().name());
-            return responseConnection;
+            var changes = SerializationUtils.fromJson(responseBody, GraphObserver.GraphChanges.class);
+            Optional<NodeConnection<?>> responseConnection = changes.addedConnections().stream()
+                .filter(conn -> conn.from().nodeId().equals(fromNodeId)
+                    && conn.from().name().equals(fromName)
+                    && conn.to().nodeId().equals(toNodeId)
+                    && conn.to().name().equals(toName)
+                ).findAny();
+            Assertions.assertTrue(responseConnection.isPresent());
+            return responseConnection.get();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

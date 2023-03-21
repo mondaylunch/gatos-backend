@@ -19,6 +19,7 @@ dependencies {
 	implementation group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.70'
 
 	// web
+	implementation "me.paulschwarz:spring-dotenv:3.0.0"
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
@@ -33,18 +34,6 @@ dependencies {
 
 	// spring testing
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-}
-
-processResources {
-    filesMatching('**/*') {
-        expand getSecrets()
-    }
-}
-
-static def getSecrets() {
-    def secrets = new Properties()
-    secrets.load(new FileInputStream("secrets.properties"))
-    return secrets
 }
 
 tasks.named('test') {
