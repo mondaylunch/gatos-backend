@@ -42,8 +42,8 @@ public class ListSetOperationNodeType extends NodeType.Process {
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var outputType = this.getOutputListTypeOrThrow(inputTypes, "list_first", "list_second");
         var currentOp = DataBox.get(settings, "set_operation", SET_OPERATION).orElseThrow();
-        List<Object> first = new ArrayList<>(DataBox.get(inputs, "list_first", ListDataType.GENERIC_LIST).orElseThrow());
-        List<Object> second = new ArrayList<>(DataBox.get(inputs, "list_second", ListDataType.GENERIC_LIST).orElseThrow());
+        List<Object> first = new ArrayList<>(DataBox.get(inputs, "list_first", ListDataType.GENERIC_LIST).orElseThrow().stream().distinct().toList());
+        List<Object> second = new ArrayList<>(DataBox.get(inputs, "list_second", ListDataType.GENERIC_LIST).orElseThrow().stream().distinct().toList());
         return Map.of("output",
             CompletableFuture.completedFuture(this.getGenericListBox(currentOp.compute(first, second), outputType))
         );
@@ -73,13 +73,13 @@ public class ListSetOperationNodeType extends NodeType.Process {
         INTERSECTION {
             @Override
             public <T> List<T> compute(List<T> first, List<T> second) {
-                return first.stream().distinct().filter(second::contains).toList();
+                return first.stream().filter(second::contains).toList();
             }
         },
         DIFFERENCE {
             @Override
             public <T> List<T> compute(List<T> first, List<T> second) {
-                return first.stream().distinct().filter(o -> !second.contains(o)).toList();
+                return first.stream().filter(o -> !second.contains(o)).toList();
             }
         };
         protected abstract <T> List<T> compute(List<T> first, List<T> second);
