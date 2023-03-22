@@ -81,7 +81,7 @@ public class ReceiveMessageNodeType extends NodeType.Start<MessageReceivedEvent>
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable MessageReceivedEvent event, Map<String, DataBox<?>> settings) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, @Nullable MessageReceivedEvent event, Map<String, DataBox<?>> settings) {
         if (event == null) {
             throw new IllegalStateException();
         }

@@ -51,7 +51,7 @@ public class ApplyRoleNodeType extends NodeType.End {
     }
 
     @Override
-    public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+    public CompletableFuture<Void> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
         String guildId = DataBox.get(settings, "guild_id", DiscordDataTypes.GUILD_ID).orElseThrow();
         String userId = DataBox.get(inputs, "user_id", DiscordDataTypes.USER_ID).orElseThrow();
         String roleId = DataBox.get(inputs, "role_id", DiscordDataTypes.ROLE_ID).orElseThrow();

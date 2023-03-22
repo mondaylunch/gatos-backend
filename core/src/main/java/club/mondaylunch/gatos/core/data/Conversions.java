@@ -113,16 +113,20 @@ public final class Conversions {
     }
 
     public static <A, B> DataBox<B> convert(DataBox<A> a, DataType<B> typeB) {
+        var valueA = a.value();
+        if (valueA == null) {
+            throw new ConversionException("Cannot convert null");
+        }
         var func = getConversionFunction(a.type(), typeB)
             .orElseThrow(() -> new ConversionException("Cannot convert %s to %s".formatted(a.type(), typeB)));
         B result;
         try {
-            result = func.apply(a.value());
+            result = func.apply(valueA);
         } catch (Exception e) {
             throw new ConversionException("Failed to convert %s to %s".formatted(a.type(), typeB), e);
         }
         if (result == null) {
-            throw new ConversionException("Conversion function %s -> %s on %s returned null".formatted(a.type(), typeB, a.value()));
+            throw new ConversionException("Conversion function %s -> %s on %s returned null".formatted(a.type(), typeB, valueA));
         }
 
         return typeB.create(result);

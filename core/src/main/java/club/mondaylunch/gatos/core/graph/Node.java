@@ -202,7 +202,7 @@ public final class Node {
      *
      * @return the outputs of this node
      */
-    public @Unmodifiable Map<String, NodeConnector.Output<?>> getOutputs() {
+    public @Unmodifiable Map<String, NodeConnector.Output<?>> outputs() {
         return this.outputs;
     }
 

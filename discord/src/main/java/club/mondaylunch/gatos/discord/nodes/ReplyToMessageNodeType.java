@@ -42,7 +42,7 @@ public class ReplyToMessageNodeType extends NodeType.End {
     }
 
     @Override
-    public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+    public CompletableFuture<Void> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
         Message message = DataBox.get(inputs, "message", DiscordDataTypes.MESSAGE).orElseThrow();
         String replyText = DataBox.get(inputs, "reply_text", DataType.STRING).orElseThrow();
         Optional<EmbedBuilder> replyEmbed = DataBox.get(inputs, "reply_embed", DiscordDataTypes.MESSAGE_EMBED.optionalOf()).flatMap(Function.identity());
