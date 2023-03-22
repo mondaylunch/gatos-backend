@@ -7,8 +7,6 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
@@ -79,15 +77,6 @@ public class RemoveElementFromListNodeType extends NodeType.Process {
                 copyList, listType
             ))
         );
-
-        /*return Map.of(
-            "output", CompletableFuture.completedFuture(this.getGenericListBox(
-                Stream.concat(
-                    inputList.subList(0, index).stream(),
-                    inputList.subList(index + 1, inputList.size()).stream())
-                    .collect(Collectors.toList()),
-                listType))
-        );*/
     }
 
     @SuppressWarnings({"unchecked", "ListUsedAsFieldOrParameterType"})
