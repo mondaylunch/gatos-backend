@@ -94,7 +94,6 @@ public class AddElementToListNodeTest {
             "list", DataType.NUMBER.listOf(),
             "element", DataType.STRING
         );
-        
         Assertions.assertThrows(NoSuchElementException.class, () -> BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), inputTypes));
     }
 }
