@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.VisibleForTesting;
 
+import club.mondaylunch.gatos.basicnodes.end.SetFlowDataNodeType;
 import club.mondaylunch.gatos.basicnodes.end.WebhookEndNodeType;
 import club.mondaylunch.gatos.basicnodes.process.BooleanOperationNodeType;
 import club.mondaylunch.gatos.basicnodes.process.EmptyListNodeType;
@@ -107,6 +108,8 @@ public final class BasicNodes implements GatosPlugin {
         .register("empty_list", new EmptyListNodeType());
     public static final ObjectSetValueNodeType OBJECT_SET_VALUE = NodeType.REGISTRY
         .register("object_set_value", new ObjectSetValueNodeType());
+    public static final SetFlowDataNodeType SET_FLOW_DATA = NodeType.REGISTRY
+        .register("set_flow_data", new SetFlowDataNodeType());
 
     @VisibleForTesting
     public static final Set<DataBox<?>> VALUE_PROVIDER_TYPES_WITH_DEFAULTS = Set.of(
