@@ -85,12 +85,12 @@ public class FlowDataCollection {
 
     public boolean contains(UUID flowId, String key) {
         var id = new FlowData.Id(flowId, key);
-        return collection.countDocuments(Filters.eq(id), new CountOptions().limit(1)) > 0;
+        return this.collection.countDocuments(Filters.eq(id), new CountOptions().limit(1)) > 0;
     }
 
     public boolean contains(UUID flowId, String key, DataType<?> type) {
         var id = new FlowData.Id(flowId, key);
-        return collection.countDocuments(
+        return this.collection.countDocuments(
             Filters.and(
                 Filters.eq(id),
                 Filters.eq("value.type", type.name())
