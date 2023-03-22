@@ -1,0 +1,19 @@
+{
+    "node_type.discord.receive_command": "Discord - Receive Command",
+    "node_type.discord.reply_to_command": "Discord - Reply to Command",
+    "node_type.discord.send_message": "Discord - Send Message",
+    "node_type.discord.apply_role": "Discord - Apply Role",
+    "node_type.discord.users_with_role": "Discord - Users with Role",
+    "node_type.discord.receive_message": "Discord - Receive Message",
+    "node_type.discord.react_to_message": "Discord - React to Message",
+    "node_type.discord.reply_to_message": "Discord - Reply to Message",
+    "node_type.discord.create_embed": "Discord - Create Embed",
+    "data_type.discord.guild_id": "Discord Server",
+    "data_type.discord.channel_id": "Discord Channel",
+    "data_type.discord.user_id": "Discord User",
+    "data_type.discord.role_id": "Discord Role",
+    "data_type.discord.emoji_id": "Discord Custom Emoji",
+    "data_type.discord.slash_command_event": "Discord Slash Command Event",
+    "data_type.discord.message": "Discord Message",
+    "data_type.discord.message_embed": "Discord Embed"
+}
