@@ -57,6 +57,8 @@ public final class BasicNodes implements GatosPlugin {
         .register("list_tail_separation", new ListTailSeparationNodeType());
     public static final ListSortNodeType LIST_SORT = NodeType.REGISTRY
         .register("list_sort", new ListSortNodeType());
+    public static final ListSetOperationNodeType LIST_SET_OPERATION = NodeType.REGISTRY
+        .register("list_set_operation", new ListSetOperationNodeType());
     public static final AddElementToListNodeType ADD_ELEM_TO_LIST = NodeType.REGISTRY
         .register("add_element_to_list", new AddElementToListNodeType());
     public static final RemoveElementFromListNodeType REMOVE_ELEM_FROM_LIST = NodeType.REGISTRY

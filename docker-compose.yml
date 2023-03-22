@@ -7,16 +7,3 @@ services:
             - ./.data/db:/data/db
         ports:
             - 27017:27017
-
-    redis:
-        image: eqalpha/keydb
-        ports:
-            - 6379:6379
-
-    minio:
-        image: minio/minio
-        command: server /data
-        volumes:
-            - ./.data/s3:/data
-        ports:
-            - 9000:9000

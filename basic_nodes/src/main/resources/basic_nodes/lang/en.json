@@ -30,5 +30,6 @@
 	"node_type.webhook_end": "Respond to Webhook",
 	"node_type.webhook_start": "Trigger Webhook",
     "node_type.object_set_value": "Set JSON Field",
-    "node_type.list_mapping": "List Mapping"
+    "node_type.list_mapping": "List Mapping",
+    "node_type.get_at_index": "Get Item From List"
 }
