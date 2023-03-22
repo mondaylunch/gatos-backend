@@ -77,6 +77,8 @@ public final class BasicNodes implements GatosPlugin {
         .register("empty_list", new EmptyListNodeType());
     public static final ObjectSetValueNodeType OBJECT_SET_VALUE = NodeType.REGISTRY
         .register("object_set_value", new ObjectSetValueNodeType());
+    public static final RegexNodeType REGEX = NodeType.REGISTRY
+        .register("regex", new RegexNodeType());
 
     @VisibleForTesting
     public static final Set<DataBox<?>> VALUE_PROVIDER_TYPES_WITH_DEFAULTS = Set.of(
@@ -96,4 +98,5 @@ public final class BasicNodes implements GatosPlugin {
             DataBox::type,
             box -> NodeType.REGISTRY.register("value_replacer_"+DataType.REGISTRY.getName(box.type()).orElseThrow(), new ValueReplacerNodeType<>(box))
         ));
+    
 }
