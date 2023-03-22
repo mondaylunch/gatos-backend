@@ -8,5 +8,6 @@ public class ApiApplicationTests {
 
     @Test
     void contextLoads() {
+        System.out.println("context loads");
     }
 }

@@ -65,18 +65,18 @@ public class GraphTest {
     public void modifyingNonexistentNodeThrows() {
         var graph = new Graph();
         graph.addNode(TEST_NUMBER_NODE_TYPE);
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            graph.modifyNode(UUID.randomUUID(), n -> n.modifySetting("setting_1", DataType.NUMBER.create(100.)));
-        });
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+            graph.modifyNode(UUID.randomUUID(), n -> n.modifySetting("setting_1", DataType.NUMBER.create(100.)))
+        );
     }
 
     @Test
     public void modifyingNodeWithNullThrows() {
         var graph = new Graph();
         var node = graph.addNode(TEST_NUMBER_NODE_TYPE);
-        Assertions.assertThrows(NullPointerException.class, () -> {
-            graph.modifyNode(node.id(), n -> null);
-        });
+        Assertions.assertThrows(NullPointerException.class, () ->
+            graph.modifyNode(node.id(), n -> null)
+        );
     }
 
     @Test
@@ -101,15 +101,15 @@ public class GraphTest {
 
         var conn1 = NodeConnection.create(node1, "out", node2, "in");
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            graph.addConnection(conn1);
-        });
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+            graph.addConnection(conn1)
+        );
 
         var conn2 = NodeConnection.create(node2, "out", node1, "in");
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            graph.addConnection(conn2);
-        });
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+            graph.addConnection(conn2)
+        );
     }
 
     @Test
@@ -125,9 +125,9 @@ public class GraphTest {
 
         var conn2 = NodeConnection.create(node2, "out", node3, "in");
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            graph.addConnection(conn2);
-        });
+        Assertions.assertThrows(IllegalArgumentException.class, () ->
+            graph.addConnection(conn2)
+        );
     }
 
     @Test
@@ -247,9 +247,9 @@ public class GraphTest {
     public void modifyingMetadataWithNullThrows() {
         var graph = new Graph();
         var node = graph.addNode(TEST_NUMBER_NODE_TYPE);
-        Assertions.assertThrows(NullPointerException.class, () -> {
-            graph.modifyMetadata(node.id(), n -> null);
-        });
+        Assertions.assertThrows(NullPointerException.class, () ->
+            graph.modifyMetadata(node.id(), n -> null)
+        );
     }
 
     @Test

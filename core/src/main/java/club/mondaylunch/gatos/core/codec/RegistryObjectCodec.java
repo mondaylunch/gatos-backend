@@ -45,6 +45,7 @@ public class RegistryObjectCodec<T> implements Codec<T> {
         INSTANCE;
 
         @Override
+        @SuppressWarnings("unchecked")
         public <T> Codec<T> get(Class<T> clazz, CodecRegistry registry) {
             return (Codec<T>) Registry.getRegistryByClass(clazz).map(RegistryObjectCodec::new).orElse(null);
         }

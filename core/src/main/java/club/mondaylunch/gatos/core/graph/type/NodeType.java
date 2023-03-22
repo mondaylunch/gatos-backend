@@ -102,7 +102,7 @@ public interface NodeType {
          * (Asynchronously) compute the outputs of this node in a map of output
          * connector name to value.
          *
-         * @param flowId
+         * @param flowId     unique ID of the flow
          * @param inputs     a map of input connector name to value
          * @param settings   a map of node settings
          * @param inputTypes what type of output connector the input connectors to this node are connected to, if any
@@ -142,7 +142,7 @@ public interface NodeType {
          * (Asynchronously) compute the outputs of this node in a map of output
          * connector name to value.
          *
-         * @param flowId
+         * @param flowId     unique ID of the flow
          * @param startInput whatever input this start node has. This can be null, if this node is not the one triggering the flow!
          * @param settings   a map of node settings
          * @return a CompletableFuture of each output in a map by name
@@ -196,7 +196,7 @@ public interface NodeType {
         /**
          * (Asynchronously) compute this node.
          *
-         * @param flowId
+         * @param flowId   unique ID of the flow
          * @param inputs   a map of input connector name to value
          * @param settings a map of node settings
          * @return a CompletableFuture of this node's computation
