@@ -36,12 +36,12 @@ public class ListContainsNodeTest {
     public void correctlyFindsIfElementPresent() {
         var node = Node.create(BasicNodes.LIST_CONTAINS);
         Map<String, DataBox<?>> dataInputs = Map.of(
-            "list", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST),
-            "element", DataType.ANY.create(21.)
+            "list", DataType.STRING.listOf().create(TEST_STR_LIST),
+            "element", DataType.STRING.create("x")
         );
         Map<String, DataType<?>> typeInputs = Map.of(
-            "list", DataType.NUMBER.listOf(),
-            "element", DataType.NUMBER
+            "list", DataType.STRING.listOf(),
+            "element", DataType.STRING
         );
         var output = BasicNodes.LIST_CONTAINS.compute(dataInputs, node.settings(), typeInputs);
         Assertions.assertTrue((boolean) output.get("output").join().value());
@@ -51,8 +51,8 @@ public class ListContainsNodeTest {
     public void correctlyFindsIfElementAbsent() {
         var node = Node.create(BasicNodes.LIST_CONTAINS);
         Map<String, DataBox<?>> dataInputs = Map.of(
-            "list", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST),
-            "element", DataType.ANY.create(69.)
+            "list", DataType.NUMBER.listOf().create(TEST_NUM_LIST),
+            "element", DataType.NUMBER.create(69.)
         );
         Map<String, DataType<?>> typeInputs = Map.of(
             "list", DataType.NUMBER.listOf(),
