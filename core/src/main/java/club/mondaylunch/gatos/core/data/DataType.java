@@ -1,6 +1,7 @@
 package club.mondaylunch.gatos.core.data;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -12,6 +13,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import club.mondaylunch.gatos.core.Registry;
+import club.mondaylunch.gatos.core.graph.type.NodeCategory;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 /**
@@ -48,6 +50,18 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
             JsonArray::addAll
         ));
         Conversions.registerSimple(JSON_ELEMENT.optionalOf(), JSON_ELEMENT, optional -> optional.orElse(JsonNull.INSTANCE));
+
+        // Widgets
+        SettingWidgets.register(NUMBER, SettingWidgets.Widget.NUMBERBOX);
+        SettingWidgets.register(BOOLEAN, SettingWidgets.Widget.CHECKBOX);
+        SettingWidgets.register(STRING, SettingWidgets.Widget.TEXTBOX);
+        SettingWidgets.register(JSON_OBJECT, SettingWidgets.Widget.TEXTAREA);
+        SettingWidgets.register(DATA_TYPE, SettingWidgets.Widget.dropdown(u ->
+            DataType.REGISTRY.getEntries().stream().map(Map.Entry::getKey).toList()));
+        SettingWidgets.register(PROCESS_NODE_TYPE, SettingWidgets.Widget.dropdown(u ->
+            NodeType.REGISTRY.getEntries().stream()
+                .filter(kv -> kv.getValue().category() == NodeCategory.PROCESS)
+                .map(Map.Entry::getKey).toList()));
     }
 
     private final String name;
