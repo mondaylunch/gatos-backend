@@ -16,6 +16,11 @@ public final class BasicNodes implements GatosPlugin {
     public void init() {
     }
 
+    @Override
+    public String name() {
+        return "basic_nodes";
+    }
+
     public static final StringInterpolationNodeType STRING_INTERPOLATION = NodeType.REGISTRY
         .register("string_interpolation", new StringInterpolationNodeType());
     public static final VariableExtractionNodeType VARIABLE_EXTRACTION = NodeType.REGISTRY
@@ -40,12 +45,26 @@ public final class BasicNodes implements GatosPlugin {
         .register("boolean_operation", new BooleanOperationNodeType());
     public static final ListLengthNodeType LIST_LENGTH = NodeType.REGISTRY
         .register("list_length", new ListLengthNodeType());
+    public static final GetAtIndexNodeType GET_AT_INDEX = NodeType.REGISTRY
+        .register("get_at_index", new GetAtIndexNodeType());
+    public static final ListMappingNodeType LIST_MAPPING = NodeType.REGISTRY
+        .register("list_mapping", new ListMappingNodeType());
     public static final OptionalOrElseNodeType OPTIONAL_OR_ELSE = NodeType.REGISTRY
         .register("optional_or_else", new OptionalOrElseNodeType());
     public static final ListHeadSeparationNodeType LIST_HEAD_SEPARATION = NodeType.REGISTRY
         .register("list_head_separation", new ListHeadSeparationNodeType());
     public static final ListTailSeparationNodeType LIST_TAIL_SEPARATION = NodeType.REGISTRY
         .register("list_tail_separation", new ListTailSeparationNodeType());
+    public static final ListSortNodeType LIST_SORT = NodeType.REGISTRY
+        .register("list_sort", new ListSortNodeType());
+    public static final ListReverseNodeType LIST_REVERSE = NodeType.REGISTRY
+        .register("list_reverse", new ListReverseNodeType());
+    public static final ListDistinctNodeType LIST_DISTINCT = NodeType.REGISTRY
+        .register("list_distinct", new ListDistinctNodeType());
+    public static final ListContainsNodeType LIST_CONTAINS = NodeType.REGISTRY
+        .register("list_contains", new ListContainsNodeType());
+    public static final ListSetOperationNodeType LIST_SET_OPERATION = NodeType.REGISTRY
+        .register("list_set_operation", new ListSetOperationNodeType());
     public static final EqualsNodeType EQUALS = NodeType.REGISTRY
         .register("equals", new EqualsNodeType());
     public static final TruthinessNodeType TRUTHINESS = NodeType.REGISTRY
@@ -66,6 +85,10 @@ public final class BasicNodes implements GatosPlugin {
         .register("empty_optional", new EmptyOptionalNodeType());
     public static final OptionalCreationNodeType OPTIONAL_CREATION = NodeType.REGISTRY
         .register("optional_creation", new OptionalCreationNodeType());
+    public static final ObjectSetValueNodeType OBJECT_SET_VALUE = NodeType.REGISTRY
+        .register("object_set_value", new ObjectSetValueNodeType());
+    public static final RegexNodeType REGEX = NodeType.REGISTRY
+        .register("regex", new RegexNodeType());
 
     @VisibleForTesting
     public static final Set<DataBox<?>> VALUE_PROVIDER_TYPES_WITH_DEFAULTS = Set.of(
@@ -77,12 +100,13 @@ public final class BasicNodes implements GatosPlugin {
     public static final Map<DataType<?>, ValueProviderNodeType<?>> VALUE_PROVIDERS = VALUE_PROVIDER_TYPES_WITH_DEFAULTS.stream()
         .collect(Collectors.toMap(
             DataBox::type,
-            box -> NodeType.REGISTRY.register("value_provider_"+DataType.REGISTRY.getName(box.type()), new ValueProviderNodeType<>(box))
+            box -> NodeType.REGISTRY.register("value_provider_"+DataType.REGISTRY.getName(box.type()).orElseThrow(), new ValueProviderNodeType<>(box))
         ));
 
     public static final Map<DataType<?>, ValueReplacerNodeType<?>> VALUE_REPLACERS = VALUE_PROVIDER_TYPES_WITH_DEFAULTS.stream()
         .collect(Collectors.toMap(
             DataBox::type,
-            box -> NodeType.REGISTRY.register("value_replacer_"+DataType.REGISTRY.getName(box.type()), new ValueReplacerNodeType<>(box))
+            box -> NodeType.REGISTRY.register("value_replacer_"+DataType.REGISTRY.getName(box.type()).orElseThrow(), new ValueReplacerNodeType<>(box))
         ));
+    
 }

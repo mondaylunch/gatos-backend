@@ -42,15 +42,15 @@ public class GraphExecutorTest {
         graph.modifyNode(adder.id(), node -> node.modifySetting("value_to_add", DataType.NUMBER.create(5.)));
 
         var conn = NodeConnection.create(
-                input, "out",
-                adder, "in"
+            input, "out",
+            adder, "in"
         );
         Assertions.assertTrue(true);
         graph.addConnection(conn);
 
         conn = NodeConnection.create(
-                adder, "out",
-                output, "in"
+            adder, "out",
+            output, "in"
         );
         Assertions.assertTrue(true);
         graph.addConnection(conn);
@@ -59,7 +59,7 @@ public class GraphExecutorTest {
         Assertions.assertTrue(executionOrderedNodes.isLeft());
         var graphExecutor = new GraphExecutor(executionOrderedNodes.left(), graph.getConnections());
 
-        CompletableFuture.runAsync(graphExecutor.execute()).join();
+        graphExecutor.execute().get().join();
         Assertions.assertEquals(15, result.get());
     }
 
@@ -75,15 +75,15 @@ public class GraphExecutorTest {
         graph.modifyNode(adder.id(), node -> node.modifySetting("value_to_add", DataType.NUMBER.create(5.)));
 
         var conn = NodeConnection.create(
-                input, "out",
-                adder, "in"
+            input, "out",
+            adder, "in"
         );
         Assertions.assertTrue(true);
         graph.addConnection(conn);
 
         conn = NodeConnection.create(
-                adder, "out",
-                output, "in"
+            adder, "out",
+            output, "in"
         );
         Assertions.assertTrue(true);
         graph.addConnection(conn);
@@ -92,7 +92,7 @@ public class GraphExecutorTest {
         Assertions.assertTrue(executionOrderedNodes.isLeft());
         var graphExecutor = new GraphExecutor(executionOrderedNodes.left(), graph.getConnections());
 
-        CompletableFuture.runAsync(graphExecutor.execute()).join();
+        graphExecutor.execute().get().join();
         Assertions.assertEquals(15, result.get());
     }
 
@@ -103,12 +103,12 @@ public class GraphExecutorTest {
         var output = graph.addNode(new OutputIntNodeType(result));
 
         var inputs = IntStream.of(2, 4, 8, 16, 2)
-                .mapToObj(i -> {
-                    var input = graph.addNode(INPUT_NUM);
-                    return graph.modifyNode(input.id(),
-                            node -> node.modifySetting("value", DataType.NUMBER.create((double) i)));
-                })
-                .toList();
+            .mapToObj(i -> {
+                var input = graph.addNode(INPUT_NUM);
+                return graph.modifyNode(input.id(),
+                    node -> node.modifySetting("value", DataType.NUMBER.create((double) i)));
+            })
+            .toList();
 
         var adder1 = graph.addNode(ADD_NUMS_2INPUT);
         var adder2 = graph.addNode(ADD_NUMS_2INPUT);
@@ -133,7 +133,7 @@ public class GraphExecutorTest {
         Assertions.assertTrue(executionOrderedNodes.isLeft());
         var graphExecutor = new GraphExecutor(executionOrderedNodes.left(), graph.getConnections());
 
-        CompletableFuture.runAsync(graphExecutor.execute()).join();
+        graphExecutor.execute().get().join();
         Assertions.assertEquals(32, result.get());
     }
 
@@ -146,12 +146,12 @@ public class GraphExecutorTest {
         var output2 = graph.addNode(new OutputIntNodeType(result2));
 
         var inputs = IntStream.of(2, 4, 8, 16, 2)
-                .mapToObj(i -> {
-                    var input = graph.addNode(INPUT_NUM);
-                    return graph.modifyNode(input.id(),
-                            node -> node.modifySetting("value", DataType.NUMBER.create((double) i)));
-                })
-                .toList();
+            .mapToObj(i -> {
+                var input = graph.addNode(INPUT_NUM);
+                return graph.modifyNode(input.id(),
+                    node -> node.modifySetting("value", DataType.NUMBER.create((double) i)));
+            })
+            .toList();
 
         var adder1 = graph.addNode(ADD_NUMS_2INPUT);
         var adder2 = graph.addNode(ADD_NUMS_2INPUT);
@@ -182,7 +182,7 @@ public class GraphExecutorTest {
         Assertions.assertTrue(executionOrderedNodes.isLeft());
         var graphExecutor = new GraphExecutor(executionOrderedNodes.left(), graph.getConnections());
 
-        CompletableFuture.runAsync(graphExecutor.execute()).join();
+        graphExecutor.execute().get().join();
         Assertions.assertEquals(32, result1.get());
         Assertions.assertEquals(48, result2.get());
     }
@@ -232,15 +232,15 @@ public class GraphExecutorTest {
         Assertions.assertTrue(executionOrderedNodes.isLeft());
         var graphExecutor = new GraphExecutor(executionOrderedNodes.left(), graph.getConnections());
 
-        CompletableFuture.runAsync(graphExecutor.execute()).join();
+        graphExecutor.execute().get().join();
         Assertions.assertEquals(32, result1.get());
         Assertions.assertEquals("48.0", result2.get());
     }
 
     private static void connectInt(Graph graph, Node a, String connectorA, Node b, String connectorB) {
         var conn = NodeConnection.create(
-                a, connectorA,
-                b, connectorB
+            a, connectorA,
+            b, connectorB
         );
         Assertions.assertTrue(true);
         graph.addConnection(conn);
@@ -259,28 +259,28 @@ public class GraphExecutorTest {
         @Override
         public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
-                    new NodeConnector.Input<>(nodeId, "in", DataType.NUMBER));
+                new NodeConnector.Input<>(nodeId, "in", DataType.NUMBER));
         }
 
         @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
-                    new NodeConnector.Output<>(nodeId, "out", DataType.NUMBER));
+                new NodeConnector.Output<>(nodeId, "out", DataType.NUMBER));
         }
 
         @Override
         public Map<String, DataBox<?>> settings() {
             return Map.of(
-                    "value_to_add", DataType.NUMBER.create((double) 0));
+                "value_to_add", DataType.NUMBER.create((double) 0));
         }
 
         @Override
         public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
-                Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+                                                                  Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Map.of(
-                    "out", CompletableFuture.completedFuture(DataType.NUMBER.create(
-                            DataBox.get(settings, "value_to_add", DataType.NUMBER).orElseThrow()
-                                    + DataBox.get(inputs, "in", DataType.NUMBER).orElseThrow())));
+                "out", CompletableFuture.completedFuture(DataType.NUMBER.create(
+                    DataBox.get(settings, "value_to_add", DataType.NUMBER).orElseThrow()
+                        + DataBox.get(inputs, "in", DataType.NUMBER).orElseThrow())));
         }
     }
 
@@ -288,14 +288,14 @@ public class GraphExecutorTest {
         @Override
         public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
-                    new NodeConnector.Input<>(nodeId, "in1", DataType.NUMBER),
-                    new NodeConnector.Input<>(nodeId, "in2", DataType.NUMBER));
+                new NodeConnector.Input<>(nodeId, "in1", DataType.NUMBER),
+                new NodeConnector.Input<>(nodeId, "in2", DataType.NUMBER));
         }
 
         @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
-                    new NodeConnector.Output<>(nodeId, "out", DataType.NUMBER));
+                new NodeConnector.Output<>(nodeId, "out", DataType.NUMBER));
         }
 
         @Override
@@ -305,11 +305,11 @@ public class GraphExecutorTest {
 
         @Override
         public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
-                Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+                                                                  Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Map.of(
-                    "out", CompletableFuture.completedFuture(DataType.NUMBER.create(
-                            DataBox.get(inputs, "in1", DataType.NUMBER).orElseThrow()
-                                    + DataBox.get(inputs, "in2", DataType.NUMBER).orElseThrow())));
+                "out", CompletableFuture.completedFuture(DataType.NUMBER.create(
+                    DataBox.get(inputs, "in1", DataType.NUMBER).orElseThrow()
+                        + DataBox.get(inputs, "in2", DataType.NUMBER).orElseThrow())));
         }
     }
 
@@ -317,28 +317,28 @@ public class GraphExecutorTest {
         @Override
         public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
-                    new NodeConnector.Input<>(nodeId, "in", DataType.NUMBER));
+                new NodeConnector.Input<>(nodeId, "in", DataType.NUMBER));
         }
 
         @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
-                    new NodeConnector.Output<>(nodeId, "out", DataType.NUMBER));
+                new NodeConnector.Output<>(nodeId, "out", DataType.NUMBER));
         }
 
         @Override
         public Map<String, DataBox<?>> settings() {
             return Map.of(
-                    "value_to_add", DataType.NUMBER.create((double) 0));
+                "value_to_add", DataType.NUMBER.create((double) 0));
         }
 
         @Override
         public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
-                Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+                                                                  Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Map.of(
-                    "out", CompletableFuture.supplyAsync(this.addIntsSlowly(
-                            DataBox.get(settings, "value_to_add", DataType.NUMBER).orElseThrow(),
-                            DataBox.get(inputs, "in", DataType.NUMBER).orElseThrow())));
+                "out", CompletableFuture.supplyAsync(this.addIntsSlowly(
+                    DataBox.get(settings, "value_to_add", DataType.NUMBER).orElseThrow(),
+                    DataBox.get(inputs, "in", DataType.NUMBER).orElseThrow())));
         }
 
         private Supplier<DataBox<?>> addIntsSlowly(double a, double b) {
@@ -357,24 +357,29 @@ public class GraphExecutorTest {
         @Override
         public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
-                    new NodeConnector.Output<>(nodeId, "out", DataType.NUMBER));
+                new NodeConnector.Output<>(nodeId, "out", DataType.NUMBER));
         }
 
         @Override
         public Map<String, DataBox<?>> settings() {
             return Map.of(
-                    "value", DataType.NUMBER.create(0.));
+                "value", DataType.NUMBER.create(0.));
         }
 
         @Override
         public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable Object input, Map<String, DataBox<?>> settings) {
             return Map.of(
-                    "out", CompletableFuture.completedFuture(
-                            DataType.NUMBER.create(DataBox.get(settings, "value", DataType.NUMBER).orElseThrow())));
+                "out", CompletableFuture.completedFuture(
+                    DataType.NUMBER.create(DataBox.get(settings, "value", DataType.NUMBER).orElseThrow())));
         }
 
         @Override
         public void setupFlow(Flow flow, Consumer<@Nullable Object> function, Node node) {
+        }
+
+        @Override
+        public void teardownFlow(Flow flow, Node node) {
+
         }
     }
 
@@ -390,7 +395,7 @@ public class GraphExecutorTest {
         @Override
         public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Set.of(
-                    new NodeConnector.Input<>(nodeId, "in", DataType.NUMBER));
+                new NodeConnector.Input<>(nodeId, "in", DataType.NUMBER));
         }
 
         @Override

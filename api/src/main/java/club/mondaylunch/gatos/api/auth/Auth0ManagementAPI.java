@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.util.Map;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -27,15 +28,15 @@ public class Auth0ManagementAPI {
     private static final Logger LOGGER = LoggerFactory.getLogger(Auth0ManagementAPI.class);
     private static final String USER_AGENT = "Gatos/1.0";
     @Value("${auth0.management.token_request_url}")
-    private static String TOKEN_REQUEST_URL;
+    private String tokenRequestUrl;
     @Value("${auth0.management.client_id}")
-    private static String CLIENT_ID;
+    private String clientId;
     @Value("${auth0.management.client_secret}")
-    private static String CLIENT_SECRET;
+    private String clientSecret;
     @Value("${auth0.management.audience}")
-    private static String AUDIENCE;
+    private String audience;
 
-    private final HttpClient CLIENT = HttpClient.newBuilder().build();
+    private final HttpClient client = HttpClient.newBuilder().build();
 
     private String token;
     private Instant tokenExpiration;
@@ -47,16 +48,16 @@ public class Auth0ManagementAPI {
     private String getToken() {
         if (this.token == null || this.tokenExpiration == null || Instant.now().isAfter(this.tokenExpiration)) {
             LOGGER.info("Requesting a new Auth0 Management API token");
-            var req = HttpRequest.newBuilder(URI.create(TOKEN_REQUEST_URL))
+            var req = HttpRequest.newBuilder(URI.create(this.tokenRequestUrl))
                 .header("User-Agent", USER_AGENT)
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .POST(HttpRequest.BodyPublishers.ofString(
                     "grant_type=client_credentials&client_id=%s&client_secret=%s&audience=%s"
-                        .formatted(CLIENT_ID, CLIENT_SECRET, AUDIENCE)))
+                        .formatted(this.clientId, this.clientSecret, this.audience)))
                 .build();
             HttpResponse<String> response;
             try {
-                response = this.CLIENT.send(req, HttpResponse.BodyHandlers.ofString());
+                response = this.client.send(req, HttpResponse.BodyHandlers.ofString());
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException("Failed to get Auth0 Management API token: ", e);
             }
@@ -88,7 +89,7 @@ public class Auth0ManagementAPI {
                 .header("Authorization", "Bearer " + this.getToken())
                 .GET()
                 .build();
-            return this.CLIENT.send(req, HttpResponse.BodyHandlers.ofString()).body();
+            return this.client.send(req, HttpResponse.BodyHandlers.ofString()).body();
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Failed to get Auth0 Management API resource: " + url, e);
         }
@@ -100,6 +101,16 @@ public class Auth0ManagementAPI {
      * @return       the user profile
      */
     public JsonObject getUserProfile(String userId) {
-        return new Gson().fromJson(this.get(AUDIENCE + "users-by-email?email=" + URLEncoder.encode(userId, StandardCharsets.UTF_8)), JsonObject.class);
+        try {
+            JsonArray array = new Gson().fromJson(this.get(this.audience + "users-by-email?email=" + URLEncoder.encode(userId, StandardCharsets.UTF_8)), JsonArray.class);
+            if (array.size() == 0 || !array.get(0).isJsonObject()) {
+                return new JsonObject();
+            } else {
+                return array.get(0).getAsJsonObject();
+            }
+        } catch (JsonSyntaxException e) {
+            LOGGER.warn("Failed to get user profile for {}: invalid JSON returned", userId, e);
+            return new JsonObject();
+        }
     }
 }

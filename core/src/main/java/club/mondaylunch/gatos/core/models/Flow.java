@@ -7,7 +7,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
 import club.mondaylunch.gatos.core.collection.FlowCollection;
+import club.mondaylunch.gatos.core.executor.GraphExecutor;
 import club.mondaylunch.gatos.core.graph.Graph;
+import club.mondaylunch.gatos.core.graph.type.NodeCategory;
+import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 /**
  * POJO for flows.
@@ -114,6 +117,23 @@ public class Flow extends BaseModel {
      */
     public void setGraph(Graph graph) {
         this.graph = graph;
+    }
+
+    public void setupTriggers() {
+        this.graph.observer().getRemovedNodes().stream()
+            .filter(n -> n.type().category() == NodeCategory.START)
+            .forEach(n -> ((NodeType.Start<?>) n.type()).teardownFlow(this, n));
+
+        if (this.graph.validate(this).isEmpty()) {
+            var executor = new GraphExecutor(this.graph);
+            this.graph.nodes().stream()
+                .filter(n -> n.type().category() == NodeCategory.START)
+                .forEach(n -> ((NodeType.Start<?>) n.type()).setupFlow(this, executor.execute(n.id())::apply, n));
+        } else {
+            this.graph.nodes().stream()
+                .filter(n -> n.type().category() == NodeCategory.START)
+                .forEach(n -> ((NodeType.Start<?>) n.type()).teardownFlow(this, n));
+        }
     }
 
     @Override

@@ -32,7 +32,7 @@ public class NodeTypeControllerTest extends BaseMvcTest {
 
     @BeforeAll
     public static void init() {
-        GatosCore.init();
+        GatosCore.gatosInit();
     }
 
     @BeforeEach

@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import club.mondaylunch.gatos.api.exception.InvalidBodyException;
+import club.mondaylunch.gatos.api.exception.flow.FlowExecutionException;
 import club.mondaylunch.gatos.api.exception.flow.InvalidConnectionException;
 import club.mondaylunch.gatos.api.exception.flow.InvalidNodeSettingException;
 import club.mondaylunch.gatos.api.exception.flow.InvalidNodeTypeException;
@@ -233,7 +234,7 @@ public class FlowController {
     /**
      * Deletes a node from the flow graph.
      *
-     * @return
+     * @return The changes that were made to the graph.
      */
     @DeleteMapping("{flowId}/nodes/{nodeId}")
     public String deleteNode(
@@ -313,7 +314,7 @@ public class FlowController {
     /**
      * Deletes a connection between two nodes.
      *
-     * @return
+     * @return The changes that were made to the graph.
      */
     @DeleteMapping("{flowId}/connections")
     public String deleteConnection(
@@ -384,7 +385,7 @@ public class FlowController {
         User user = this.userRepository.getOrCreateUser(userEmail);
         var flow = this.flowRepository.getFlow(user, flowId);
         var graph = flow.getGraph();
-        var errors = graph.validate();
+        var errors = graph.validate(flow);
         return SerializationUtils.toJson(new GraphErrorInfo(errors));
     }
 
@@ -433,7 +434,7 @@ public class FlowController {
             .map(nodeType -> startNode.type().equals(nodeType))
             .orElse(false);
         if (!isWebhookStart) {
-            throw new InvalidNodeTypeException("Node with ID " + startNodeId + " is not a webhook start node.");
+            throw new InvalidNodeTypeException("Node with ID " + startNodeId + " is not a webhook start node");
         }
         var executor = new GraphExecutor(graph);
         var executeFunction = executor.execute(startNodeId);
@@ -441,19 +442,22 @@ public class FlowController {
         if (input == null) {
             inputJson = new JsonObject();
         } else {
-            var inputJsonElement = JsonParser.parseString(input);
-            if (inputJsonElement.isJsonObject()) {
-                inputJson = inputJsonElement.getAsJsonObject();
-            } else {
-                throw new InvalidBodyException("Body must be a JSON object");
+            try {
+                inputJson = JsonParser.parseString(input).getAsJsonObject();
+            } catch (Exception e) {
+                throw new InvalidBodyException("Body must be a JSON object", e);
             }
         }
         AtomicReference<?> outputReference = new AtomicReference<>();
         var webhookStartInput = new WebhookStartNodeInput(inputJson, outputReference);
-        executeFunction.accept(webhookStartInput);
+        try {
+            executeFunction.apply(webhookStartInput).join();
+        } catch (Exception e) {
+            throw new FlowExecutionException(e);
+        }
         var output = outputReference.get();
         if (output == null) {
-            return new JsonObject().toString();
+            return "{}";
         } else {
             return SerializationUtils.toJson(output);
         }
