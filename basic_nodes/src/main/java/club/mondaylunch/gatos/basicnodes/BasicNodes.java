@@ -12,6 +12,7 @@ import club.mondaylunch.gatos.basicnodes.end.MultiplyFlowDataNodeType;
 import club.mondaylunch.gatos.basicnodes.end.RemoveFlowDataNodeType;
 import club.mondaylunch.gatos.basicnodes.end.SetFlowDataNodeType;
 import club.mondaylunch.gatos.basicnodes.end.WebhookEndNodeType;
+import club.mondaylunch.gatos.basicnodes.process.AddElementToListNodeType;
 import club.mondaylunch.gatos.basicnodes.process.BooleanOperationNodeType;
 import club.mondaylunch.gatos.basicnodes.process.ContainsFlowDataNodeType;
 import club.mondaylunch.gatos.basicnodes.process.EmptyListNodeType;
@@ -39,6 +40,7 @@ import club.mondaylunch.gatos.basicnodes.process.OptionalCreationNodeType;
 import club.mondaylunch.gatos.basicnodes.process.OptionalOrElseNodeType;
 import club.mondaylunch.gatos.basicnodes.process.ParseStringToNumberNodeType;
 import club.mondaylunch.gatos.basicnodes.process.RegexNodeType;
+import club.mondaylunch.gatos.basicnodes.process.RemoveElementFromListNodeType;
 import club.mondaylunch.gatos.basicnodes.process.StringCaseNodeType;
 import club.mondaylunch.gatos.basicnodes.process.StringConcatNodeType;
 import club.mondaylunch.gatos.basicnodes.process.StringContainsNodeType;
@@ -118,6 +120,10 @@ public final class BasicNodes implements GatosPlugin {
         .register("list_contains", new ListContainsNodeType());
     public static final ListSetOperationNodeType LIST_SET_OPERATION = NodeType.REGISTRY
         .register("list_set_operation", new ListSetOperationNodeType());
+    public static final AddElementToListNodeType ADD_ELEM_TO_LIST = NodeType.REGISTRY
+        .register("add_element_to_list", new AddElementToListNodeType());
+    public static final RemoveElementFromListNodeType REMOVE_ELEM_FROM_LIST = NodeType.REGISTRY
+        .register("remove_element_from_list", new RemoveElementFromListNodeType());
     public static final EqualsNodeType EQUALS = NodeType.REGISTRY
         .register("equals", new EqualsNodeType());
     public static final TruthinessNodeType TRUTHINESS = NodeType.REGISTRY
