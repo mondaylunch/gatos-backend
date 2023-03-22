@@ -57,6 +57,12 @@ public final class BasicNodes implements GatosPlugin {
         .register("list_tail_separation", new ListTailSeparationNodeType());
     public static final ListSortNodeType LIST_SORT = NodeType.REGISTRY
         .register("list_sort", new ListSortNodeType());
+    public static final ListReverseNodeType LIST_REVERSE = NodeType.REGISTRY
+        .register("list_reverse", new ListReverseNodeType());
+    public static final ListDistinctNodeType LIST_DISTINCT = NodeType.REGISTRY
+        .register("list_distinct", new ListDistinctNodeType());
+    public static final ListContainsNodeType LIST_CONTAINS = NodeType.REGISTRY
+        .register("list_contains", new ListContainsNodeType());
     public static final ListSetOperationNodeType LIST_SET_OPERATION = NodeType.REGISTRY
         .register("list_set_operation", new ListSetOperationNodeType());
     public static final AddElementToListNodeType ADD_ELEM_TO_LIST = NodeType.REGISTRY
@@ -81,6 +87,8 @@ public final class BasicNodes implements GatosPlugin {
         .register("empty_list", new EmptyListNodeType());
     public static final ObjectSetValueNodeType OBJECT_SET_VALUE = NodeType.REGISTRY
         .register("object_set_value", new ObjectSetValueNodeType());
+    public static final RegexNodeType REGEX = NodeType.REGISTRY
+        .register("regex", new RegexNodeType());
 
     @VisibleForTesting
     public static final Set<DataBox<?>> VALUE_PROVIDER_TYPES_WITH_DEFAULTS = Set.of(
@@ -100,4 +108,5 @@ public final class BasicNodes implements GatosPlugin {
             DataBox::type,
             box -> NodeType.REGISTRY.register("value_replacer_"+DataType.REGISTRY.getName(box.type()).orElseThrow(), new ValueReplacerNodeType<>(box))
         ));
+    
 }
