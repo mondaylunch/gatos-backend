@@ -1,8 +1,9 @@
-package club.mondaylunch.gatos.basicnodes.test;
+package club.mondaylunch.gatos.basicnodes.process.test;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Assertions;
@@ -29,8 +30,8 @@ public class ListDistinctNodeTest {
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.LIST_DISTINCT);
-        Assertions.assertEquals(1, node.getOutputs().size());
-        Assertions.assertTrue(node.getOutputs().containsKey("output"));
+        Assertions.assertEquals(1, node.outputs().size());
+        Assertions.assertTrue(node.outputs().containsKey("output"));
     }
 
     @Test
@@ -39,7 +40,7 @@ public class ListDistinctNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST)
         );
-        var output = BasicNodes.LIST_DISTINCT.compute(input, node.settings(),
+        var output = BasicNodes.LIST_DISTINCT.compute(UUID.randomUUID(), input, node.settings(),
             Map.of("input", DataType.NUMBER.listOf()));
         Assertions.assertEquals(List.of(4., 1., 2., 3.), output.get("output").join().value());
         Assertions.assertNotEquals(List.of(1., 2., 3., 4.), output.get("output").join().value());
@@ -52,7 +53,7 @@ public class ListDistinctNodeTest {
             "input", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST)
         );
         var inputType = DataType.NUMBER.listOf();
-        var output = BasicNodes.LIST_DISTINCT.compute(input, node.settings(),
+        var output = BasicNodes.LIST_DISTINCT.compute(UUID.randomUUID(), input, node.settings(),
             Map.of("input", inputType));
         var outputType = output.get("output").join().type();
         Assertions.assertEquals(inputType, outputType);
@@ -64,7 +65,7 @@ public class ListDistinctNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_BOO_LIST)
         );
-        var output = BasicNodes.LIST_DISTINCT.compute(input, node.settings(),
+        var output = BasicNodes.LIST_DISTINCT.compute(UUID.randomUUID(), input, node.settings(),
             Map.of("input", DataType.BOOLEAN.listOf()));
         var outputList = output.get("output").join().value();
         Assertions.assertEquals(List.of(false, true), outputList);
@@ -78,7 +79,7 @@ public class ListDistinctNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_JSN_LIST)
         );
-        var output = BasicNodes.LIST_DISTINCT.compute(input, node.settings(),
+        var output = BasicNodes.LIST_DISTINCT.compute(UUID.randomUUID(), input, node.settings(),
             Map.of("input", DataType.JSON_OBJECT.listOf()));
         var outputList = (List<JsonObject>) output.get("output").join().value();
         Assertions.assertEquals(List.of(new JsonObject()), outputList);

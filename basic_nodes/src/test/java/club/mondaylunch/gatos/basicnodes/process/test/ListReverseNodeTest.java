@@ -1,8 +1,9 @@
-package club.mondaylunch.gatos.basicnodes.test;
+package club.mondaylunch.gatos.basicnodes.process.test;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -27,8 +28,8 @@ public class ListReverseNodeTest {
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.LIST_REVERSE);
-        Assertions.assertEquals(1, node.getOutputs().size());
-        Assertions.assertTrue(node.getOutputs().containsKey("output"));
+        Assertions.assertEquals(1, node.outputs().size());
+        Assertions.assertTrue(node.outputs().containsKey("output"));
     }
 
     @Test
@@ -38,7 +39,7 @@ public class ListReverseNodeTest {
             "input", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST)
         );
         var inputType = DataType.NUMBER.listOf();
-        var output = BasicNodes.LIST_REVERSE.compute(input, node.settings(),
+        var output = BasicNodes.LIST_REVERSE.compute(UUID.randomUUID(), input, node.settings(),
             Map.of("input", inputType));
         var outputType = output.get("output").join().type();
         Assertions.assertEquals(List.of(5., 4., 26., 3., 2., 1.), output.get("output").join().value());
@@ -51,7 +52,7 @@ public class ListReverseNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_STR_LIST)
         );
-        var output = BasicNodes.LIST_REVERSE.compute(input, node.settings(),
+        var output = BasicNodes.LIST_REVERSE.compute(UUID.randomUUID(), input, node.settings(),
             Map.of("input", DataType.STRING.listOf()));
         var outputList = output.get("output").join().value();
         Assertions.assertEquals(List.of("e", "d", "z", "c", "b", "a"), outputList);
@@ -65,7 +66,7 @@ public class ListReverseNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_STR_LIST)
         );
-        var output = BasicNodes.LIST_REVERSE.compute(input, node.settings(),
+        var output = BasicNodes.LIST_REVERSE.compute(UUID.randomUUID(), input, node.settings(),
             Map.of("input", DataType.STRING.listOf()));
         var outputList = (List<String>) output.get("output").join().value();
         Assertions.assertThrows(UnsupportedOperationException.class, () -> outputList.add("f"));

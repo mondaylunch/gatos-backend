@@ -1,8 +1,9 @@
-package club.mondaylunch.gatos.basicnodes.test;
+package club.mondaylunch.gatos.basicnodes.process.test;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -27,8 +28,8 @@ public class ListContainsNodeTest {
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.LIST_CONTAINS);
-        Assertions.assertEquals(1, node.getOutputs().size());
-        Assertions.assertTrue(node.getOutputs().containsKey("output"));
+        Assertions.assertEquals(1, node.outputs().size());
+        Assertions.assertTrue(node.outputs().containsKey("output"));
     }
 
     @Test
@@ -42,7 +43,7 @@ public class ListContainsNodeTest {
             "list", DataType.STRING.listOf(),
             "element", DataType.STRING
         );
-        var output = BasicNodes.LIST_CONTAINS.compute(dataInputs, node.settings(), typeInputs);
+        var output = BasicNodes.LIST_CONTAINS.compute(UUID.randomUUID(), dataInputs, node.settings(), typeInputs);
         Assertions.assertTrue((boolean) output.get("output").join().value());
     }
 
@@ -57,7 +58,7 @@ public class ListContainsNodeTest {
             "list", DataType.NUMBER.listOf(),
             "element", DataType.NUMBER
         );
-        var output = BasicNodes.LIST_CONTAINS.compute(dataInputs, node.settings(), typeInputs);
+        var output = BasicNodes.LIST_CONTAINS.compute(UUID.randomUUID(), dataInputs, node.settings(), typeInputs);
         Assertions.assertFalse((boolean) output.get("output").join().value());
     }
 }

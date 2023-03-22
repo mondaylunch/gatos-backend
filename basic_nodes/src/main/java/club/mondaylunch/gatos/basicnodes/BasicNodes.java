@@ -20,9 +20,12 @@ import club.mondaylunch.gatos.basicnodes.process.GetFlowDataNodeType;
 import club.mondaylunch.gatos.basicnodes.process.HTTPRequestNodeType;
 import club.mondaylunch.gatos.basicnodes.process.IsFiniteNodeType;
 import club.mondaylunch.gatos.basicnodes.process.IsNanNodeType;
+import club.mondaylunch.gatos.basicnodes.process.ListContainsNodeType;
+import club.mondaylunch.gatos.basicnodes.process.ListDistinctNodeType;
 import club.mondaylunch.gatos.basicnodes.process.ListHeadSeparationNodeType;
 import club.mondaylunch.gatos.basicnodes.process.ListLengthNodeType;
 import club.mondaylunch.gatos.basicnodes.process.ListMappingNodeType;
+import club.mondaylunch.gatos.basicnodes.process.ListReverseNodeType;
 import club.mondaylunch.gatos.basicnodes.process.ListSetOperationNodeType;
 import club.mondaylunch.gatos.basicnodes.process.ListSortNodeType;
 import club.mondaylunch.gatos.basicnodes.process.ListTailSeparationNodeType;
@@ -32,6 +35,7 @@ import club.mondaylunch.gatos.basicnodes.process.NumberComparisonNodeType;
 import club.mondaylunch.gatos.basicnodes.process.ObjectSetValueNodeType;
 import club.mondaylunch.gatos.basicnodes.process.OptionalOrElseNodeType;
 import club.mondaylunch.gatos.basicnodes.process.ParseStringToNumberNodeType;
+import club.mondaylunch.gatos.basicnodes.process.RegexNodeType;
 import club.mondaylunch.gatos.basicnodes.process.StringConcatNodeType;
 import club.mondaylunch.gatos.basicnodes.process.StringContainsNodeType;
 import club.mondaylunch.gatos.basicnodes.process.StringInterpolationNodeType;
@@ -48,6 +52,7 @@ import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 public final class BasicNodes implements GatosPlugin {
+
     @Override
     public void init() {
     }
@@ -93,6 +98,12 @@ public final class BasicNodes implements GatosPlugin {
         .register("list_tail_separation", new ListTailSeparationNodeType());
     public static final ListSortNodeType LIST_SORT = NodeType.REGISTRY
         .register("list_sort", new ListSortNodeType());
+    public static final ListReverseNodeType LIST_REVERSE = NodeType.REGISTRY
+        .register("list_reverse", new ListReverseNodeType());
+    public static final ListDistinctNodeType LIST_DISTINCT = NodeType.REGISTRY
+        .register("list_distinct", new ListDistinctNodeType());
+    public static final ListContainsNodeType LIST_CONTAINS = NodeType.REGISTRY
+        .register("list_contains", new ListContainsNodeType());
     public static final ListSetOperationNodeType LIST_SET_OPERATION = NodeType.REGISTRY
         .register("list_set_operation", new ListSetOperationNodeType());
     public static final EqualsNodeType EQUALS = NodeType.REGISTRY
@@ -113,6 +124,8 @@ public final class BasicNodes implements GatosPlugin {
         .register("empty_list", new EmptyListNodeType());
     public static final ObjectSetValueNodeType OBJECT_SET_VALUE = NodeType.REGISTRY
         .register("object_set_value", new ObjectSetValueNodeType());
+    public static final RegexNodeType REGEX = NodeType.REGISTRY
+        .register("regex", new RegexNodeType());
     public static final GetFlowDataNodeType GET_FLOW_DATA = NodeType.REGISTRY
         .register("get_flow_data", new GetFlowDataNodeType());
     public static final SetFlowDataNodeType SET_FLOW_DATA = NodeType.REGISTRY

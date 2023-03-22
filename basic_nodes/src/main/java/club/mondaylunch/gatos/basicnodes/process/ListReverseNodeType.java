@@ -1,5 +1,7 @@
-package club.mondaylunch.gatos.basicnodes;
+package club.mondaylunch.gatos.basicnodes.process;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,7 +14,7 @@ import club.mondaylunch.gatos.core.data.ListDataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
-public class ListDistinctNodeType extends NodeType.Process {
+public class ListReverseNodeType extends NodeType.Process {
     @Override
     public Map<String, DataBox<?>> settings() {
         return Map.of();
@@ -32,11 +34,12 @@ public class ListDistinctNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        var inputListCopy = List.copyOf(DataBox.get(inputs, "input", ListDataType.GENERIC_LIST).orElseThrow().stream().distinct().toList());
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+        var inputListCopy = new ArrayList<>(DataBox.get(inputs, "input", ListDataType.GENERIC_LIST).orElseThrow());
         var outputType = inputTypes.getOrDefault("input", ListDataType.GENERIC_LIST);
+        Collections.reverse(inputListCopy);
         return Map.of("output", CompletableFuture.completedFuture(
-            this.getGenericListBox(inputListCopy, outputType))
+            this.getGenericListBox(inputListCopy.stream().toList(), outputType))
         );
     }
 

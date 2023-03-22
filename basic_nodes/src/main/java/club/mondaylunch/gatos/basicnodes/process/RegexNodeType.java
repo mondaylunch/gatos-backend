@@ -1,18 +1,19 @@
-package club.mondaylunch.gatos.basicnodes;
+package club.mondaylunch.gatos.basicnodes.process;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Optional;
 
-import club.mondaylunch.gatos.core.data.DataType;
-import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.data.DataBox;
+import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.graph.Node;
+import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 /**
@@ -55,8 +56,8 @@ public class RegexNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {        
-        var regex = Pattern.compile(DataBox.get(inputs, "regex", DataType.STRING).orElseThrow());        
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+        var regex = Pattern.compile(DataBox.get(inputs, "regex", DataType.STRING).orElseThrow());
         var word = DataBox.get(inputs, "word", DataType.STRING).orElseThrow();
         var matcher = regex.matcher(word);
 
@@ -89,15 +90,15 @@ public class RegexNodeType extends NodeType.Process {
 
         ArrayList<String> lst = new ArrayList<String>();
         for (int i = 1; i <= groups; i++) lst.add(matcher.group(i));
-        
+
         return Optional.of(lst);
     }
 
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
-        return this.compute(inputs, settings, Map.of());
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+        return this.compute(flowId, inputs, settings, Map.of());
     }
 
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs) {
-        return this.compute(inputs, Map.of(), Map.of());
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs) {
+        return this.compute(flowId, inputs, Map.of(), Map.of());
     }
 }
