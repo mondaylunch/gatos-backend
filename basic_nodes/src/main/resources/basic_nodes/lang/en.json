@@ -33,5 +33,9 @@
     "node_type.list_mapping": "List Mapping",
     "node_type.get_at_index": "Get Item From List",
     "node_type.get_flow_data": "Get Flow Data",
-    "node_type.set_flow_data": "Set Flow Data"
+    "node_type.set_flow_data": "Set Flow Data",
+    "node_type.contains_flow_data": "Contains Flow Data",
+    "node_type.remove_flow_data": "Remove Flow Data",
+    "node_type.increment_flow_data": "Increment Flow Data",
+    "node_type.multiply_flow_data": "Multiply Flow Data"
 }

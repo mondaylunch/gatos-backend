@@ -6,9 +6,13 @@ import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.VisibleForTesting;
 
+import club.mondaylunch.gatos.basicnodes.end.IncrementFlowDataNodeType;
+import club.mondaylunch.gatos.basicnodes.end.MultiplyFlowDataNodeType;
+import club.mondaylunch.gatos.basicnodes.end.RemoveFlowDataNodeType;
 import club.mondaylunch.gatos.basicnodes.end.SetFlowDataNodeType;
 import club.mondaylunch.gatos.basicnodes.end.WebhookEndNodeType;
 import club.mondaylunch.gatos.basicnodes.process.BooleanOperationNodeType;
+import club.mondaylunch.gatos.basicnodes.process.ContainsFlowDataNodeType;
 import club.mondaylunch.gatos.basicnodes.process.EmptyListNodeType;
 import club.mondaylunch.gatos.basicnodes.process.EqualsNodeType;
 import club.mondaylunch.gatos.basicnodes.process.GetAtIndexNodeType;
@@ -113,6 +117,14 @@ public final class BasicNodes implements GatosPlugin {
         .register("get_flow_data", new GetFlowDataNodeType());
     public static final SetFlowDataNodeType SET_FLOW_DATA = NodeType.REGISTRY
         .register("set_flow_data", new SetFlowDataNodeType());
+    public static final ContainsFlowDataNodeType CONTAINS_FLOW_DATA = NodeType.REGISTRY
+        .register("contains_flow_data", new ContainsFlowDataNodeType());
+    public static final RemoveFlowDataNodeType REMOVE_FLOW_DATA = NodeType.REGISTRY
+        .register("remove_flow_data", new RemoveFlowDataNodeType());
+    public static final IncrementFlowDataNodeType INCREMENT_FLOW_DATA = NodeType.REGISTRY
+        .register("increment_flow_data", new IncrementFlowDataNodeType());
+    public static final MultiplyFlowDataNodeType MULTIPLY_FLOW_DATA = NodeType.REGISTRY
+        .register("multiply_flow_data", new MultiplyFlowDataNodeType());
 
     @VisibleForTesting
     public static final Set<DataBox<?>> VALUE_PROVIDER_TYPES_WITH_DEFAULTS = Set.of(
