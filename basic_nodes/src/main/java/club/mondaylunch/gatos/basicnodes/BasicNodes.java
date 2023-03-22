@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.google.gson.JsonObject;
 import org.jetbrains.annotations.VisibleForTesting;
 
 import club.mondaylunch.gatos.basicnodes.end.IncrementFlowDataNodeType;
@@ -158,7 +159,8 @@ public final class BasicNodes implements GatosPlugin {
     public static final Set<DataBox<?>> VALUE_PROVIDER_TYPES_WITH_DEFAULTS = Set.of(
         DataType.STRING.create(""),
         DataType.NUMBER.create(0.0),
-        DataType.BOOLEAN.create(false)
+        DataType.BOOLEAN.create(false),
+        DataType.JSON_OBJECT.create(new JsonObject())
     );
 
     public static final Map<DataType<?>, ValueProviderNodeType<?>> VALUE_PROVIDERS = VALUE_PROVIDER_TYPES_WITH_DEFAULTS.stream()
