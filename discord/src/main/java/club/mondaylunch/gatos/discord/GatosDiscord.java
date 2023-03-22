@@ -3,6 +3,8 @@ package club.mondaylunch.gatos.discord;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -59,7 +61,7 @@ public class GatosDiscord implements GatosPlugin {
 
         this.jda.getGuilds().forEach(g -> g.updateCommands().queue());
 
-        DiscordDataTypes.init();
+        DiscordDataTypes.init(this);
         this.nodeTypes = new DiscordNodeTypes(this);
     }
 
@@ -80,12 +82,17 @@ public class GatosDiscord implements GatosPlugin {
         return this.nodeTypes;
     }
 
+    public Stream<Guild> getUserGuilds(User user) {
+        return this.jda.getGuilds().stream()
+            .filter(g -> this.userHasAdminPermission(user, g));
+    }
+
     public boolean userHasAdminPermission(User user, Guild guild) {
         String id = user.getDiscordId();
         if (id == null) {
             return false;
         }
-        Member member = guild.getMember(UserSnowflake.fromId(id));
+        Member member = guild.retrieveMember(UserSnowflake.fromId(id)).complete();
         return member != null && member.hasPermission(Permission.ADMINISTRATOR);
     }
 
@@ -94,12 +101,22 @@ public class GatosDiscord implements GatosPlugin {
             return List.of();
         }
         User user = User.objects.getUserByUserId(flow.left().getAuthorId().toString());
+        if (user == null) {
+            return List.of();
+        }
 
-        return DataBox.get(node.settings(), guildIdKey, DiscordDataTypes.GUILD_ID)
-            .map(this.jda::getGuildById)
-            .filter(guild -> !this.userHasAdminPermission(user, guild))
-            .map(guild -> new GraphValidityError(node.id(), "You do not have Administrator permission in this Discord server."))
-            .stream().toList();
+        var guildId = DataBox.get(node.settings(), guildIdKey, DiscordDataTypes.GUILD_ID)
+            .filter(Predicate.not(String::isBlank))
+            .map(String::trim);
+        if (guildId.isPresent()) {
+            return guildId
+                .map(this.jda::getGuildById)
+                .filter(guild -> !this.userHasAdminPermission(user, guild))
+                .map(guild -> new GraphValidityError(node.id(), "You do not have Administrator permission in this Discord server."))
+                .stream().toList();
+        } else {
+            return List.of(new GraphValidityError(node.id(), "You must specify a Discord server."));
+        }
     }
 
     public void createSlashCommandListener(UUID id, String commandName, Guild guild, Consumer<@Nullable SlashCommandInteractionEvent> function) {
