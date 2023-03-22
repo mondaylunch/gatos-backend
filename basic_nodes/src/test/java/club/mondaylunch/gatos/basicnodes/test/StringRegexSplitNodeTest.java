@@ -4,13 +4,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Node;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 public class StringRegexSplitNodeTest {
     private static final String TEST_STR = "I, EvaX humbly submit a toast to Nicholas Alexander";

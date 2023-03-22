@@ -1,16 +1,15 @@
 package club.mondaylunch.gatos.basicnodes.test;
 
-import java.util.Locale;
 import java.util.Map;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
 import club.mondaylunch.gatos.basicnodes.StringCaseNodeType;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Node;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 public class StringCaseNodeTest {
     private static final String TEST_STR = "A dog walked into a tavern and said, 'I can't see a thing. I'll open this one'";
