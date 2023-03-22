@@ -1,4 +1,4 @@
-package club.mondaylunch.gatos.basicnodes;
+package club.mondaylunch.gatos.basicnodes.process;
 
 import java.util.ArrayList;
 import java.util.List;
