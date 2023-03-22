@@ -81,6 +81,10 @@ public final class BasicNodes implements GatosPlugin {
         .register("webhook_end", new WebhookEndNodeType());
     public static final EmptyListNodeType EMPTY_LIST = NodeType.REGISTRY
         .register("empty_list", new EmptyListNodeType());
+    public static final EmptyOptionalNodeType EMPTY_OPTIONAL = NodeType.REGISTRY
+        .register("empty_optional", new EmptyOptionalNodeType());
+    public static final OptionalCreationNodeType OPTIONAL_CREATION = NodeType.REGISTRY
+        .register("optional_creation", new OptionalCreationNodeType());
     public static final ObjectSetValueNodeType OBJECT_SET_VALUE = NodeType.REGISTRY
         .register("object_set_value", new ObjectSetValueNodeType());
     public static final RegexNodeType REGEX = NodeType.REGISTRY
