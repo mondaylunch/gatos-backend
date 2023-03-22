@@ -20,7 +20,7 @@ public class ApiApplication {
     public static void main(String[] args) {
         Database.checkConnection();
         SpringApplication.run(ApiApplication.class, args);
-        GatosCore.init();
+        GatosCore.gatosInit();
     }
 
     @Bean
