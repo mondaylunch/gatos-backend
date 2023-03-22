@@ -24,9 +24,12 @@ public class AddElementToListNodeType extends NodeType.Process {
 
     @Override
     public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+        DataType<?> listType = inputTypes.getOrDefault("list", ListDataType.ANY);
+        DataType<?> elemType = inputTypes.getOrDefault("element", DataType.ANY);
+        
         return Set.of(
-            new NodeConnector.Input<>(nodeId, "list", ListDataType.GENERIC_LIST),
-            new NodeConnector.Input<>(nodeId, "element", DataType.ANY)
+            new NodeConnector.Input<>(nodeId, "list", listType),
+            new NodeConnector.Input<>(nodeId, "element", elemType)
         );
     }
 
@@ -42,9 +45,9 @@ public class AddElementToListNodeType extends NodeType.Process {
         var inputElem = DataBox.get(inputs, "element", DataType.ANY).orElseThrow();
         var inputList = DataBox.get(inputs, "list", ListDataType.GENERIC_LIST).orElseThrow();
         
-        if (inputTypes.get("element").listOf() != inputTypes.get("list")) {
+        /*if (inputTypes.get("element").listOf() != inputTypes.get("list")) {
             throw new IllegalArgumentException("The Element's Type does not match that of the List");
-        }
+        }*/
 
 
         List<Object> copyList = new ArrayList<>(inputList);
