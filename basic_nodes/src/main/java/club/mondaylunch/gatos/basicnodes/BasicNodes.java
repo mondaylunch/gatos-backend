@@ -12,6 +12,7 @@ import club.mondaylunch.gatos.basicnodes.process.BooleanOperationNodeType;
 import club.mondaylunch.gatos.basicnodes.process.EmptyListNodeType;
 import club.mondaylunch.gatos.basicnodes.process.EqualsNodeType;
 import club.mondaylunch.gatos.basicnodes.process.GetAtIndexNodeType;
+import club.mondaylunch.gatos.basicnodes.process.GetFlowDataNodeType;
 import club.mondaylunch.gatos.basicnodes.process.HTTPRequestNodeType;
 import club.mondaylunch.gatos.basicnodes.process.IsFiniteNodeType;
 import club.mondaylunch.gatos.basicnodes.process.IsNanNodeType;
@@ -108,6 +109,8 @@ public final class BasicNodes implements GatosPlugin {
         .register("empty_list", new EmptyListNodeType());
     public static final ObjectSetValueNodeType OBJECT_SET_VALUE = NodeType.REGISTRY
         .register("object_set_value", new ObjectSetValueNodeType());
+    public static final GetFlowDataNodeType GET_FLOW_DATA = NodeType.REGISTRY
+        .register("get_flow_data", new GetFlowDataNodeType());
     public static final SetFlowDataNodeType SET_FLOW_DATA = NodeType.REGISTRY
         .register("set_flow_data", new SetFlowDataNodeType());
 

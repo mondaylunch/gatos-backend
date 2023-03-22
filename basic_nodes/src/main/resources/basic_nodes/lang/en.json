@@ -32,5 +32,6 @@
     "node_type.object_set_value": "Set JSON Field",
     "node_type.list_mapping": "List Mapping",
     "node_type.get_at_index": "Get Item From List",
+    "node_type.get_flow_data": "Get Flow Data",
     "node_type.set_flow_data": "Set Flow Data"
 }
