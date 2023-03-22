@@ -105,7 +105,7 @@ public class ListMappingNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var inputConnectorName = DataBox.get(settings, INPUT_CONNECTOR_SETTING, DataType.STRING).orElseThrow();
         var outputConnectorName = DataBox.get(settings, OUTPUT_CONNECTOR_SETTING, DataType.STRING).orElseThrow();
         var mappingNode = getMappingNode(settings);
@@ -147,7 +147,7 @@ public class ListMappingNodeType extends NodeType.Process {
                 mappingNodeInputs.put(input.name(), inputs.get(input.name()));
             }
         }
-        var results = mappingNodeType.compute(mappingNodeInputs, mappingNode.settings(), mappingNode.inputTypes());
+        var results = mappingNodeType.compute(UUID.randomUUID(), mappingNodeInputs, mappingNode.settings(), mappingNode.inputTypes());
         return (CompletableFuture<E2>) results.get(outputConnector.name()).thenApply(DataBox::value);
     }
 

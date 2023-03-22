@@ -1,6 +1,7 @@
 package club.mondaylunch.gatos.basicnodes.test;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.gson.JsonObject;
@@ -48,7 +49,7 @@ public class WebhookStartNodeTest {
         json.addProperty("test", 1);
         AtomicReference<?> reference = new AtomicReference<>();
         var input = new WebhookStartNodeInput(json, reference);
-        var result = BasicNodes.WEBHOOK_START.compute(input, Map.of());
+        var result = BasicNodes.WEBHOOK_START.compute(UUID.randomUUID(), input, Map.of());
         var requestBody = result.get("requestBody");
         Assertions.assertEquals(json, requestBody.join().value());
         var endOutputReference = result.get("endOutputReference");

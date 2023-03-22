@@ -32,7 +32,7 @@ public class IsFiniteNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         double input = DataBox.get(inputs, "input", DataType.NUMBER).orElse(Double.NaN);
         return Map.of("output", CompletableFuture.completedFuture(DataType.BOOLEAN.create(Double.isFinite(input))));
     }

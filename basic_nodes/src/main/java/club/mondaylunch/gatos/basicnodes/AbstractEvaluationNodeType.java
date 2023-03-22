@@ -35,7 +35,7 @@ public abstract class AbstractEvaluationNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var inputType = inputTypes.getOrDefault("input", DataType.ANY);
         var input = inputType instanceof OptionalDataType<?>
             ? (Optional<?>) DataBox.get(inputs, "input_data", inputType).orElseThrow()

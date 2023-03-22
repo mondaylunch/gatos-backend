@@ -1,6 +1,7 @@
 package club.mondaylunch.gatos.basicnodes.test;
 
 import java.util.Map;
+import java.util.UUID;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -51,21 +52,21 @@ public class VariableRemappingNodeTest {
             "oldKey", DataType.STRING.create("firstKey"),
             "newKey", DataType.STRING.create("title")
         );
-        var result0 = BasicNodes.VARIABLE_REMAPPING.compute(input0, Map.of(), Map.of());
+        var result0 = BasicNodes.VARIABLE_REMAPPING.compute(UUID.randomUUID(), input0, Map.of(), Map.of());
 
         Map<String, DataBox<?>> input1 = Map.of(
             "input", DataType.JSON_OBJECT.create((JsonObject) result0.get("output").join().value()),
             "oldKey", DataType.STRING.create("secondKey"),
             "newKey", DataType.STRING.create("firstName")
         );
-        var result1 = BasicNodes.VARIABLE_REMAPPING.compute(input1, Map.of(), Map.of());
+        var result1 = BasicNodes.VARIABLE_REMAPPING.compute(UUID.randomUUID(), input1, Map.of(), Map.of());
 
         Map<String, DataBox<?>> input2 = Map.of(
             "input", DataType.JSON_OBJECT.create((JsonObject) result1.get("output").join().value()),
             "oldKey", DataType.STRING.create("thirdKey"),
             "newKey", DataType.STRING.create("lastName")
         );
-        var result2 = BasicNodes.VARIABLE_REMAPPING.compute(input2, Map.of(), Map.of());
+        var result2 = BasicNodes.VARIABLE_REMAPPING.compute(UUID.randomUUID(), input2, Map.of(), Map.of());
 
         Assertions.assertTrue(result2.get("output").join().value() instanceof JsonObject jsonObject
             && jsonObject.get("title").getAsString().equals("Doctor")
@@ -79,21 +80,21 @@ public class VariableRemappingNodeTest {
             "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
             "newKey", DataType.STRING.create("title")
         );
-        var result0 = BasicNodes.VARIABLE_REMAPPING.compute(input0, Map.of(), Map.of());
+        var result0 = BasicNodes.VARIABLE_REMAPPING.compute(UUID.randomUUID(), input0, Map.of(), Map.of());
         Assertions.assertEquals(result0.get("output").join().value(), TEST_JSON_OBJECT);
 
         Map<String, DataBox<?>> input1 = Map.of(
             "input", DataType.JSON_OBJECT.create(TEST_JSON_OBJECT),
             "oldKey", DataType.STRING.create("firstKey")
         );
-        var result1 = BasicNodes.VARIABLE_REMAPPING.compute(input1, Map.of(), Map.of());
+        var result1 = BasicNodes.VARIABLE_REMAPPING.compute(UUID.randomUUID(), input1, Map.of(), Map.of());
         Assertions.assertEquals(result1.get("output").join().value(), TEST_JSON_OBJECT);
 
         Map<String, DataBox<?>> input2 = Map.of(
             "oldKey", DataType.STRING.create("firstKey"),
             "newKey", DataType.STRING.create("title")
         );
-        var result2 = BasicNodes.VARIABLE_REMAPPING.compute(input2, Map.of(), Map.of());
+        var result2 = BasicNodes.VARIABLE_REMAPPING.compute(UUID.randomUUID(), input2, Map.of(), Map.of());
         Assertions.assertEquals(result2.get("output").join().value(), new JsonObject());
     }
 
@@ -104,7 +105,7 @@ public class VariableRemappingNodeTest {
             "oldKey", DataType.STRING.create("firstKey"),
             "newKey", DataType.STRING.create("firstKey")
         );
-        var result = BasicNodes.VARIABLE_REMAPPING.compute(input, Map.of(), Map.of());
+        var result = BasicNodes.VARIABLE_REMAPPING.compute(UUID.randomUUID(), input, Map.of(), Map.of());
         Assertions.assertEquals(result.get("output").join().value(), TEST_JSON_OBJECT);
     }
 
@@ -115,7 +116,7 @@ public class VariableRemappingNodeTest {
             "oldKey", DataType.STRING.create("thisDoesNotExist"),
             "newKey", DataType.STRING.create("title")
         );
-        var result = BasicNodes.VARIABLE_REMAPPING.compute(input, Map.of(), Map.of());
+        var result = BasicNodes.VARIABLE_REMAPPING.compute(UUID.randomUUID(), input, Map.of(), Map.of());
         Assertions.assertEquals(result.get("output").join().value(), TEST_JSON_OBJECT);
     }
 }

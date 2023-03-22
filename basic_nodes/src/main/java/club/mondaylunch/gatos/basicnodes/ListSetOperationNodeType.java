@@ -39,7 +39,7 @@ public class ListSetOperationNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var outputType = this.getOutputListTypeOrThrow(inputTypes, "list_first", "list_second");
         var currentOp = DataBox.get(settings, "set_operation", SET_OPERATION).orElseThrow();
         Set<Object> first = new LinkedHashSet<>(DataBox.get(inputs, "list_first", ListDataType.GENERIC_LIST).orElseThrow());

@@ -101,13 +101,19 @@ public interface NodeType {
         /**
          * (Asynchronously) compute the outputs of this node in a map of output
          * connector name to value.
-         * @param inputs   a map of input connector name to value
-         * @param settings a map of node settings
+         *
+         * @param flowId
+         * @param inputs     a map of input connector name to value
+         * @param settings   a map of node settings
          * @param inputTypes what type of output connector the input connectors to this node are connected to, if any
          * @return a CompletableFuture of each output in a map by name
          */
-        Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
-                Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes);
+        Map<String, CompletableFuture<DataBox<?>>> compute(
+            UUID flowId,
+            Map<String, DataBox<?>> inputs,
+            Map<String, DataBox<?>> settings,
+            Map<String, DataType<?>> inputTypes
+        );
     }
 
     /**
@@ -135,15 +141,26 @@ public interface NodeType {
         /**
          * (Asynchronously) compute the outputs of this node in a map of output
          * connector name to value.
+         *
+         * @param flowId
          * @param startInput whatever input this start node has. This can be null, if this node is not the one triggering the flow!
-         * @param settings a map of node settings
+         * @param settings   a map of node settings
          * @return a CompletableFuture of each output in a map by name
          */
-        public abstract Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable StartInput startInput, Map<String, DataBox<?>> settings);
+        public abstract Map<String, CompletableFuture<DataBox<?>>> compute(
+            UUID flowId,
+            @Nullable StartInput startInput,
+            Map<String, DataBox<?>> settings
+        );
 
         @Override
-        public final Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-            return this.compute(null, settings);
+        public final Map<String, CompletableFuture<DataBox<?>>> compute(
+            UUID flowId,
+            Map<String, DataBox<?>> inputs,
+            Map<String, DataBox<?>> settings,
+            Map<String, DataType<?>> inputTypes
+        ) {
+            return this.compute(flowId, null, settings);
         }
     }
 
@@ -178,12 +195,17 @@ public interface NodeType {
 
         /**
          * (Asynchronously) compute this node.
+         *
+         * @param flowId
          * @param inputs   a map of input connector name to value
          * @param settings a map of node settings
          * @return a CompletableFuture of this node's computation
          */
-        public abstract CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs,
-                Map<String, DataBox<?>> settings);
+        public abstract CompletableFuture<Void> compute(
+            UUID flowId,
+            Map<String, DataBox<?>> inputs,
+            Map<String, DataBox<?>> settings
+        );
     }
 
     /**

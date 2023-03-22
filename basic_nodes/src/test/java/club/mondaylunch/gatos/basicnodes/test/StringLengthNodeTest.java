@@ -1,6 +1,7 @@
 package club.mondaylunch.gatos.basicnodes.test;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,14 +33,14 @@ public class StringLengthNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.STRING.create(TEST_STR)
         );
-        var output = BasicNodes.STRING_LENGTH.compute(input, Map.of(), Map.of());
+        var output = BasicNodes.STRING_LENGTH.compute(UUID.randomUUID(), input, Map.of(), Map.of());
         Assertions.assertEquals(44.0, output.get("output").join().value());
     }
 
     @Test
     public void correctlyBehavesForIncorrectInputs() {
         Map<String, DataBox<?>> input0 = Map.of();
-        var output0 = BasicNodes.STRING_LENGTH.compute(input0, Map.of(), Map.of());
+        var output0 = BasicNodes.STRING_LENGTH.compute(UUID.randomUUID(), input0, Map.of(), Map.of());
         Assertions.assertEquals(0.0, output0.get("output").join().value());
     }
 }

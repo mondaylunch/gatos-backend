@@ -1,6 +1,7 @@
 package club.mondaylunch.gatos.basicnodes.test;
 
 import java.util.Map;
+import java.util.UUID;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -66,7 +67,7 @@ public class ObjectSetValueNodeTest {
 
         // result:
         JsonObject result = GSON.fromJson(GSON.toJson(new TestObjectSetValueResult()), JsonObject.class);
-        var output = BasicNodes.OBJECT_SET_VALUE.compute(input, settings, Map.of());
+        var output = BasicNodes.OBJECT_SET_VALUE.compute(UUID.randomUUID(), input, settings, Map.of());
         Assertions.assertEquals(result, output.get("output").join().value());
     }
 
@@ -87,7 +88,7 @@ public class ObjectSetValueNodeTest {
 
         // result:
         JsonObject result = GSON.fromJson(GSON.toJson(new TestObjectSetValueMember()), JsonObject.class);
-        var output = BasicNodes.OBJECT_SET_VALUE.compute(input, settings, Map.of());
+        var output = BasicNodes.OBJECT_SET_VALUE.compute(UUID.randomUUID(), input, settings, Map.of());
         Assertions.assertEquals(result, output.get("output").join().value());
     }
 
@@ -108,7 +109,7 @@ public class ObjectSetValueNodeTest {
 
         // result:
         JsonObject result = GSON.fromJson(GSON.toJson(new TestObjectSetValueEmpty()), JsonObject.class);
-        var output = BasicNodes.OBJECT_SET_VALUE.compute(input, settings, Map.of());
+        var output = BasicNodes.OBJECT_SET_VALUE.compute(UUID.randomUUID(), input, settings, Map.of());
         Assertions.assertEquals(result, output.get("output").join().value());
     }
 

@@ -437,7 +437,7 @@ public class FlowController {
             throw new InvalidNodeTypeException("Node with ID " + startNodeId + " is not a webhook start node");
         }
         var executor = new GraphExecutor(graph);
-        var executeFunction = executor.execute(startNodeId);
+        var executeFunction = executor.execute(flowId, startNodeId);
         JsonObject inputJson;
         if (input == null) {
             inputJson = new JsonObject();

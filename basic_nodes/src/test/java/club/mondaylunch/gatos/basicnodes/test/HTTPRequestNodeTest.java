@@ -1,6 +1,7 @@
 package club.mondaylunch.gatos.basicnodes.test;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -49,7 +50,7 @@ public class HTTPRequestNodeTest {
             "body", DataType.STRING.create("")
         );
 
-        var output = BasicNodes.HTTP_REQUEST.compute(input, node.settings(), Map.of());
+        var output = BasicNodes.HTTP_REQUEST.compute(UUID.randomUUID(), input, node.settings(), Map.of());
         Assertions.assertEquals(200.0, output.get("StatusCode").join().value());
         Assertions.assertEquals("GET request", output.get("responseText").join().value());
     }
@@ -64,7 +65,7 @@ public class HTTPRequestNodeTest {
             "body", DataType.STRING.create("asdsdf")
         );
 
-        var output = BasicNodes.HTTP_REQUEST.compute(input, node.settings(), Map.of());
+        var output = BasicNodes.HTTP_REQUEST.compute(UUID.randomUUID(), input, node.settings(), Map.of());
         Assertions.assertEquals(200.0, output.get("StatusCode").join().value());
         Assertions.assertEquals("POST request request has a body: asdsdf", output.get("responseText").join().value());
     }
@@ -79,7 +80,7 @@ public class HTTPRequestNodeTest {
             "body", DataType.STRING.create("")
         );
 
-        var output = BasicNodes.HTTP_REQUEST.compute(input, node.settings(), Map.of());
+        var output = BasicNodes.HTTP_REQUEST.compute(UUID.randomUUID(), input, node.settings(), Map.of());
         Assertions.assertEquals(200.0, output.get("StatusCode").join().value());
         Assertions.assertEquals("POST request", output.get("responseText").join().value());
     }
@@ -94,7 +95,7 @@ public class HTTPRequestNodeTest {
             "body", DataType.STRING.create("asdsdf")
         );
 
-        var output = BasicNodes.HTTP_REQUEST.compute(input, node.settings(), Map.of());
+        var output = BasicNodes.HTTP_REQUEST.compute(UUID.randomUUID(), input, node.settings(), Map.of());
         Assertions.assertEquals(200.0, output.get("StatusCode").join().value());
         Assertions.assertEquals("PUT request request has a body: asdsdf", output.get("responseText").join().value());
     }
@@ -109,7 +110,7 @@ public class HTTPRequestNodeTest {
             "body", DataType.STRING.create("")
         );
 
-        var output = BasicNodes.HTTP_REQUEST.compute(input, node.settings(), Map.of());
+        var output = BasicNodes.HTTP_REQUEST.compute(UUID.randomUUID(), input, node.settings(), Map.of());
         Assertions.assertEquals(200.0, output.get("StatusCode").join().value());
         Assertions.assertEquals("DELETE request", output.get("responseText").join().value());
     }
@@ -124,7 +125,7 @@ public class HTTPRequestNodeTest {
             "body", DataType.STRING.create("")
         );
 
-        var output = BasicNodes.HTTP_REQUEST.compute(input, node.settings(), Map.of());
+        var output = BasicNodes.HTTP_REQUEST.compute(UUID.randomUUID(), input, node.settings(), Map.of());
         Assertions.assertEquals(404.0, output.get("StatusCode").join().value());
         Assertions.assertEquals("URL or method are incorrect", output.get("responseText").join().value());
     }
@@ -139,7 +140,7 @@ public class HTTPRequestNodeTest {
             "body", DataType.STRING.create("")
         );
 
-        var output = BasicNodes.HTTP_REQUEST.compute(input, node.settings(), Map.of());
+        var output = BasicNodes.HTTP_REQUEST.compute(UUID.randomUUID(), input, node.settings(), Map.of());
         Assertions.assertEquals(404.0, output.get("StatusCode").join().value());
         Assertions.assertEquals("URL or method are incorrect", output.get("responseText").join().value());
     }

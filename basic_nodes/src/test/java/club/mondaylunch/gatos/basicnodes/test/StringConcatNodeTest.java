@@ -2,6 +2,7 @@ package club.mondaylunch.gatos.basicnodes.test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,7 @@ public class StringConcatNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.STRING.listOf().create(TEST_LIST)
         );
-        var output = BasicNodes.STRING_CONCAT.compute(input, Map.of(), Map.of());
+        var output = BasicNodes.STRING_CONCAT.compute(UUID.randomUUID(), input, Map.of(), Map.of());
         Assertions.assertEquals(output.get("output").join().value(), String.join("", TEST_LIST));
     }
 
@@ -44,7 +45,7 @@ public class StringConcatNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.STRING.listOf().create(TEST_LIST)
         );
-        var output = BasicNodes.STRING_CONCAT.compute(input, node.settings(), Map.of());
+        var output = BasicNodes.STRING_CONCAT.compute(UUID.randomUUID(), input, node.settings(), Map.of());
         Assertions.assertEquals(output.get("output").join().value(), String.join(" amongus ", TEST_LIST));
     }
 }

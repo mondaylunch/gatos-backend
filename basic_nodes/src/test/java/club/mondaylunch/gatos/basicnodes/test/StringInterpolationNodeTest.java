@@ -1,6 +1,7 @@
 package club.mondaylunch.gatos.basicnodes.test;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -51,7 +52,7 @@ public class StringInterpolationNodeTest {
             "Placeholder 5", DataType.STRING.create("work correctly?"),
             "Placeholder 6", DataType.STRING.create("This one shouldn't:"));
 
-        var result = (String) BasicNodes.STRING_INTERPOLATION.compute(inputs, node.settings(), Map.of()).get("output")
+        var result = (String) BasicNodes.STRING_INTERPOLATION.compute(UUID.randomUUID(), inputs, node.settings(), Map.of()).get("output")
             .join()
             .value();
         Assertions.assertEquals(

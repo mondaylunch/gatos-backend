@@ -45,7 +45,7 @@ public class HTTPRequestNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var url = DataBox.get(settings, "url", DataType.STRING).orElse("");
         var method = DataBox.get(settings, "method", DataType.STRING).orElse("").toUpperCase();
         var body = DataBox.get(inputs, "body", DataType.STRING).orElse("");

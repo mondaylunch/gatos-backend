@@ -2,6 +2,7 @@ package club.mondaylunch.gatos.basicnodes.test;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,7 @@ public class OptionalOrElseNodeTypeTest {
             .updateInputTypes(Map.of("fallback", DataType.STRING));
 
         var output = BasicNodes.OPTIONAL_OR_ELSE.compute(
-            Map.of(
+            UUID.randomUUID(), Map.of(
                 "optional",
                 DataType.STRING.optionalOf().create(Optional.of("Hello!")),
                 "fallback",
@@ -69,7 +70,7 @@ public class OptionalOrElseNodeTypeTest {
             .updateInputTypes(Map.of("fallback", DataType.STRING));
 
         var output = BasicNodes.OPTIONAL_OR_ELSE.compute(
-            Map.of(
+            UUID.randomUUID(), Map.of(
                 "optional",
                 DataType.STRING.optionalOf().create(Optional.empty()),
                 "fallback",

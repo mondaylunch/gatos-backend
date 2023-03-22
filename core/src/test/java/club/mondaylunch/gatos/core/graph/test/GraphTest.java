@@ -483,8 +483,8 @@ public class GraphTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
-                Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs,
+                                                                  Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Map.of();
         }
     }
@@ -507,7 +507,7 @@ public class GraphTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable Object o, Map<String, DataBox<?>> settings) {
+        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, @Nullable Object o, Map<String, DataBox<?>> settings) {
             return Map.of();
         }
     }
@@ -525,7 +525,7 @@ public class GraphTest {
         }
 
         @Override
-        public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+        public CompletableFuture<Void> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
             return CompletableFuture.runAsync(() -> {
             });
         }
@@ -550,7 +550,7 @@ public class GraphTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable Object o, Map<String, DataBox<?>> settings) {
+        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, @Nullable Object o, Map<String, DataBox<?>> settings) {
             return Map.of();
         }
     }
@@ -570,7 +570,7 @@ public class GraphTest {
         }
 
         @Override
-        public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+        public CompletableFuture<Void> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
             return CompletableFuture.runAsync(() -> {
             });
         }

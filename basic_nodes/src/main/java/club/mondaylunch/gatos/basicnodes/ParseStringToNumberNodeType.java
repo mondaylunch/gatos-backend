@@ -29,7 +29,7 @@ public class ParseStringToNumberNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         double output = 0;
         try {
             output = Double.parseDouble(String.join("", DataBox.get(inputs, "input", DataType.STRING).orElse("").split(",")));
@@ -41,6 +41,6 @@ public class ParseStringToNumberNodeType extends NodeType.Process {
     }
 
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs) {
-        return this.compute(inputs, Map.of(), Map.of());
+        return this.compute(UUID.randomUUID(), inputs, Map.of(), Map.of());
     }
 }

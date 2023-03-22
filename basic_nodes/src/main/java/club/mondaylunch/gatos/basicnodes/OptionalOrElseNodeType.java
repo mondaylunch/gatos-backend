@@ -37,7 +37,7 @@ public class OptionalOrElseNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         DataType<?> type = this.getTypeFromInputs(inputTypes);
         DataType<?> optionalDataType = type == DataType.ANY ? OptionalDataType.GENERIC_OPTIONAL : type.optionalOf();
         Optional<?> optional = (Optional<?>) DataBox.get(inputs, "optional", optionalDataType).orElseThrow();

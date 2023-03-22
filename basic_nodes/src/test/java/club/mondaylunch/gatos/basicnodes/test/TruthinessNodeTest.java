@@ -3,6 +3,7 @@ package club.mondaylunch.gatos.basicnodes.test;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Assertions;
@@ -52,7 +53,7 @@ public class TruthinessNodeTest {
             var data = entry.getKey();
             Map<String, DataBox<?>> input = Map.of("input_data", dataType.create(data));
             var result =
-                BasicNodes.TRUTHINESS.compute(input, Map.of(), Map.of("input", dataType));
+                BasicNodes.TRUTHINESS.compute(UUID.randomUUID(), input, Map.of(), Map.of("input", dataType));
             Assertions.assertTrue((boolean) result.get("output").join().value());
         }
     }
@@ -65,7 +66,7 @@ public class TruthinessNodeTest {
             var data = entry.getKey();
             Map<String, DataBox<?>> input = Map.of("input_data", dataType.create(data));
             var result =
-                BasicNodes.TRUTHINESS.compute(input, Map.of(), Map.of("input", dataType));
+                BasicNodes.TRUTHINESS.compute(UUID.randomUUID(), input, Map.of(), Map.of("input", dataType));
             Assertions.assertFalse((boolean) result.get("output").join().value());
         }
     }

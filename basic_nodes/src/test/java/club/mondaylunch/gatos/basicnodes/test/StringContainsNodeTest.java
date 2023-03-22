@@ -1,6 +1,7 @@
 package club.mondaylunch.gatos.basicnodes.test;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ public class StringContainsNodeTest {
         Map<String, DataBox<?>> input0 = Map.of(
             "input", DataType.STRING.create(TEST_STR)
         );
-        var output0 = BasicNodes.STRING_CONTAINS.compute(input0, node.settings(), Map.of());
+        var output0 = BasicNodes.STRING_CONTAINS.compute(UUID.randomUUID(), input0, node.settings(), Map.of());
         Assertions.assertTrue((boolean) output0.get("output").join().value());
     }
 
@@ -46,7 +47,7 @@ public class StringContainsNodeTest {
         Map<String, DataBox<?>> input1 = Map.of(
             "input", DataType.STRING.create(TEST_STR.toUpperCase())
         );
-        var output1 = BasicNodes.STRING_CONTAINS.compute(input1, node.settings(), Map.of());
+        var output1 = BasicNodes.STRING_CONTAINS.compute(UUID.randomUUID(), input1, node.settings(), Map.of());
         Assertions.assertFalse((boolean) output1.get("output").join().value());
     }
 }

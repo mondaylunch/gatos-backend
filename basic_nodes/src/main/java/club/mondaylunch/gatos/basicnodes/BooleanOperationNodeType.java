@@ -38,7 +38,7 @@ public class BooleanOperationNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         Mode mode = DataBox.get(settings, "mode", BOOL_OPERATION_MODE).orElseThrow();
         if (mode.equals(Mode.NOT)) {
             return Map.of("output", CompletableFuture.completedFuture(DataType.BOOLEAN.create(

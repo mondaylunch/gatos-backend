@@ -3,6 +3,7 @@ package club.mondaylunch.gatos.basicnodes.test;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -48,7 +49,7 @@ public class ListSortNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST)
         );
-        var output = BasicNodes.LIST_SORT.compute(input, node.settings(),
+        var output = BasicNodes.LIST_SORT.compute(UUID.randomUUID(), input, node.settings(),
             Map.of("input", DataType.NUMBER.listOf()));
         Assertions.assertEquals(List.of(1., 2., 3., 4., 5.), output.get("output").join().value());
     }
@@ -59,7 +60,7 @@ public class ListSortNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_STR_LIST)
         );
-        var output = BasicNodes.LIST_SORT.compute(input, node.settings(),
+        var output = BasicNodes.LIST_SORT.compute(UUID.randomUUID(), input, node.settings(),
             Map.of("input", DataType.STRING.listOf()));
         Assertions.assertEquals(List.of("a", "b", "c", "d", "e"), output.get("output").join().value());
     }
@@ -70,7 +71,7 @@ public class ListSortNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_BOO_LIST)
         );
-        var output = BasicNodes.LIST_SORT.compute(input, node.settings(),
+        var output = BasicNodes.LIST_SORT.compute(UUID.randomUUID(), input, node.settings(),
             Map.of("input", DataType.BOOLEAN.listOf()));
         Assertions.assertEquals(List.of(false, false, false, true, true), output.get("output").join().value());
     }
@@ -82,7 +83,7 @@ public class ListSortNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST)
         );
-        var output = BasicNodes.LIST_SORT.compute(input, node.settings(),
+        var output = BasicNodes.LIST_SORT.compute(UUID.randomUUID(), input, node.settings(),
             Map.of("input", DataType.NUMBER.listOf()));
         Assertions.assertEquals(List.of(5., 4., 3., 2., 1.), output.get("output").join().value());
     }
@@ -93,7 +94,7 @@ public class ListSortNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_JSN_LIST)
         );
-        var output = BasicNodes.LIST_SORT.compute(input, node.settings(),
+        var output = BasicNodes.LIST_SORT.compute(UUID.randomUUID(), input, node.settings(),
             Map.of("input", DataType.JSON_OBJECT.listOf()));
         Assertions.assertEquals(TEST_JSN_LIST, output.get("output").join().value());
     }
@@ -104,7 +105,7 @@ public class ListSortNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST)
         );
-        var output = BasicNodes.LIST_SORT.compute(input, node.settings(),
+        var output = BasicNodes.LIST_SORT.compute(UUID.randomUUID(), input, node.settings(),
             Map.of("input", DataType.NUMBER.listOf()));
         var outputList = output.get("output").join().value();
         Assertions.assertNotEquals(TEST_NUM_LIST, outputList);
@@ -117,7 +118,7 @@ public class ListSortNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_STR_LIST)
         );
-        var output = BasicNodes.LIST_SORT.compute(input, node.settings(),
+        var output = BasicNodes.LIST_SORT.compute(UUID.randomUUID(), input, node.settings(),
             Map.of("input", DataType.STRING.listOf()));
         var outputList = (List<String>) output.get("output").join().value();
         Assertions.assertThrows(Exception.class, () -> outputList.add("allan please add details"));

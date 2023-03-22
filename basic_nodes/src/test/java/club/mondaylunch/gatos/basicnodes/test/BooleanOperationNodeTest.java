@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,13 +34,13 @@ public class BooleanOperationNodeTest {
         Map<String, DataBox<?>> inputs = Map.of(
             "input", DataType.BOOLEAN.create(true)
         );
-        boolean result = (boolean) BasicNodes.BOOL_OP.compute(inputs, NOT.settings(), Map.of()).get("output").join().value();
+        boolean result = (boolean) BasicNodes.BOOL_OP.compute(UUID.randomUUID(), inputs, NOT.settings(), Map.of()).get("output").join().value();
         assertFalse(result);
 
         inputs = Map.of(
             "input", DataType.BOOLEAN.create(false)
         );
-        result = (boolean) BasicNodes.BOOL_OP.compute(inputs, NOT.settings(), Map.of()).get("output").join().value();
+        result = (boolean) BasicNodes.BOOL_OP.compute(UUID.randomUUID(), inputs, NOT.settings(), Map.of()).get("output").join().value();
         assertTrue(result);
     }
 
@@ -49,7 +50,7 @@ public class BooleanOperationNodeTest {
                 "inputA", DataType.BOOLEAN.create(true),
                 "inputB", DataType.BOOLEAN.create(false)
         );
-        boolean result = (boolean) BasicNodes.BOOL_OP.compute(inputs, OR.settings(), Map.of()).get("output").join().value();
+        boolean result = (boolean) BasicNodes.BOOL_OP.compute(UUID.randomUUID(), inputs, OR.settings(), Map.of()).get("output").join().value();
         assertTrue(result);
     }
 
@@ -59,7 +60,7 @@ public class BooleanOperationNodeTest {
                 "inputA", DataType.BOOLEAN.create(true),
                 "inputB", DataType.BOOLEAN.create(true)
         );
-        boolean result = (boolean) BasicNodes.BOOL_OP.compute(inputs, OR.settings(), Map.of()).get("output").join().value();
+        boolean result = (boolean) BasicNodes.BOOL_OP.compute(UUID.randomUUID(), inputs, OR.settings(), Map.of()).get("output").join().value();
         assertTrue(result);
     }
 
@@ -69,7 +70,7 @@ public class BooleanOperationNodeTest {
                 "inputA", DataType.BOOLEAN.create(false),
                 "inputB", DataType.BOOLEAN.create(false)
         );
-        boolean result = (boolean) BasicNodes.BOOL_OP.compute(inputs, OR.settings(), Map.of()).get("output").join().value();
+        boolean result = (boolean) BasicNodes.BOOL_OP.compute(UUID.randomUUID(), inputs, OR.settings(), Map.of()).get("output").join().value();
         assertFalse(result);
     }
 
@@ -80,7 +81,7 @@ public class BooleanOperationNodeTest {
                 "inputB", DataType.BOOLEAN.create(false)
         );
 
-        boolean result = (boolean) BasicNodes.BOOL_OP.compute(inputs, AND.settings(), Map.of()).get("output").join().value();
+        boolean result = (boolean) BasicNodes.BOOL_OP.compute(UUID.randomUUID(), inputs, AND.settings(), Map.of()).get("output").join().value();
         assertFalse(result);
     }
 
@@ -90,7 +91,7 @@ public class BooleanOperationNodeTest {
                 "inputA", DataType.BOOLEAN.create(true),
                 "inputB", DataType.BOOLEAN.create(true)
         );
-        boolean result = (boolean) BasicNodes.BOOL_OP.compute(inputs, AND.settings(), Map.of()).get("output").join().value();
+        boolean result = (boolean) BasicNodes.BOOL_OP.compute(UUID.randomUUID(), inputs, AND.settings(), Map.of()).get("output").join().value();
         assertTrue(result);
     }
 
@@ -100,7 +101,7 @@ public class BooleanOperationNodeTest {
                 "inputA", DataType.BOOLEAN.create(false),
                 "inputB", DataType.BOOLEAN.create(false)
         );
-        boolean result = (boolean) BasicNodes.BOOL_OP.compute(inputs, AND.settings(), Map.of()).get("output").join().value();
+        boolean result = (boolean) BasicNodes.BOOL_OP.compute(UUID.randomUUID(), inputs, AND.settings(), Map.of()).get("output").join().value();
         assertFalse(result);
     }
 
@@ -110,7 +111,7 @@ public class BooleanOperationNodeTest {
                 "inputA", DataType.BOOLEAN.create(true),
                 "inputB", DataType.BOOLEAN.create(false)
         );
-        boolean result = (boolean) BasicNodes.BOOL_OP.compute(inputs, XOR.settings(), Map.of()).get("output").join().value();
+        boolean result = (boolean) BasicNodes.BOOL_OP.compute(UUID.randomUUID(), inputs, XOR.settings(), Map.of()).get("output").join().value();
         assertTrue(result);
     }
 
@@ -120,7 +121,7 @@ public class BooleanOperationNodeTest {
                 "inputA", DataType.BOOLEAN.create(true),
                 "inputB", DataType.BOOLEAN.create(true)
         );
-        boolean result = (boolean) BasicNodes.BOOL_OP.compute(inputs, XOR.settings(), Map.of()).get("output").join().value();
+        boolean result = (boolean) BasicNodes.BOOL_OP.compute(UUID.randomUUID(), inputs, XOR.settings(), Map.of()).get("output").join().value();
         assertFalse(result);
     }
 
@@ -130,7 +131,7 @@ public class BooleanOperationNodeTest {
                 "inputA", DataType.BOOLEAN.create(false),
                 "inputB", DataType.BOOLEAN.create(false)
         );
-        boolean result = (boolean) BasicNodes.BOOL_OP.compute(inputs, XOR.settings(), Map.of()).get("output").join().value();
+        boolean result = (boolean) BasicNodes.BOOL_OP.compute(UUID.randomUUID(), inputs, XOR.settings(), Map.of()).get("output").join().value();
         assertFalse(result);
     }
 }

@@ -39,7 +39,7 @@ public class ValueProviderNodeType<T> extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         return Map.of(
             "output", CompletableFuture.completedFuture(this.type.create(DataBox.get(settings, "value", this.type).orElse(this.defaultValue)))
         );

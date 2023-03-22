@@ -3,6 +3,7 @@ package club.mondaylunch.gatos.basicnodes.test;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -74,7 +75,7 @@ public class ListMappingNodeTypeTest {
     @Test
     public void correctlyMapsList() {
         Map<String, DataBox<?>> inputs = Map.of("list_input", DataType.STRING.listOf().create(List.of("a", "bb", "ccc")));
-        var results = BasicNodes.LIST_MAPPING.compute(inputs, this.node.settings(), Map.of());
+        var results = BasicNodes.LIST_MAPPING.compute(UUID.randomUUID(), inputs, this.node.settings(), Map.of());
         var mappedList = results.get("mapped_list").join();
         Assertions.assertEquals(mappedList.type(), this.outputType);
         Assertions.assertTrue(mappedList.value() instanceof List<?>);

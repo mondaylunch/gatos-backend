@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -39,7 +40,7 @@ public class GetAtIndexNodeTest {
             "input", ListDataType.GENERIC_LIST.create(new ArrayList<>()),
             "index", DataType.NUMBER.create(0.0)
         );
-        var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), Map.of());
+        var output = BasicNodes.GET_AT_INDEX.compute(UUID.randomUUID(), input, Map.of(), Map.of());
         Assertions.assertEquals(Optional.empty(), output.get("output").join().value());
     }
 
@@ -49,7 +50,7 @@ public class GetAtIndexNodeTest {
             "input", ListDataType.GENERIC_LIST.create(new ArrayList<>()),
             "index", DataType.NUMBER.create(6.0)
         );
-        var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), Map.of());
+        var output = BasicNodes.GET_AT_INDEX.compute(UUID.randomUUID(), input, Map.of(), Map.of());
         Assertions.assertEquals(Optional.empty(), output.get("output").join().value());
     }
 
@@ -71,10 +72,10 @@ public class GetAtIndexNodeTest {
             "index", DataType.NUMBER.create(1.0)
         );
 
-        var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), Map.of());
+        var output = BasicNodes.GET_AT_INDEX.compute(UUID.randomUUID(), input, Map.of(), Map.of());
         Assertions.assertEquals(Optional.of(0), output.get("output").join().value());
 
-        var output2 = BasicNodes.GET_AT_INDEX.compute(input2, Map.of(), Map.of());
+        var output2 = BasicNodes.GET_AT_INDEX.compute(UUID.randomUUID(), input2, Map.of(), Map.of());
         Assertions.assertEquals(Optional.of(1), output2.get("output").join().value());
     }
 
@@ -96,7 +97,7 @@ public class GetAtIndexNodeTest {
         );
 
         var node = Node.create(BasicNodes.GET_AT_INDEX).updateInputTypes(inputTypes);
-        var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), node.inputTypes());
+        var output = BasicNodes.GET_AT_INDEX.compute(UUID.randomUUID(), input, Map.of(), node.inputTypes());
         Assertions.assertEquals(Optional.of(0), output.get("output").join().value());
         Assertions.assertEquals(DataType.NUMBER, node.inputTypes().get("input"));
         Assertions.assertEquals(OptionalDataType.GENERIC_OPTIONAL, node.getOutputWithName("output").orElseThrow().type());
@@ -113,7 +114,7 @@ public class GetAtIndexNodeTest {
             "input", DataType.NUMBER
         );
 
-        var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), inputTypes);
+        var output = BasicNodes.GET_AT_INDEX.compute(UUID.randomUUID(), input, Map.of(), inputTypes);
         Assertions.assertEquals(Optional.empty(), output.get("output").join().value());
     }
 
@@ -134,7 +135,7 @@ public class GetAtIndexNodeTest {
             "input", DataType.STRING
         );
 
-        var output = BasicNodes.GET_AT_INDEX.compute(input, Map.of(), inputTypes);
+        var output = BasicNodes.GET_AT_INDEX.compute(UUID.randomUUID(), input, Map.of(), inputTypes);
         Assertions.assertEquals(Optional.of("i0"), output.get("output").join().value());
     }
 

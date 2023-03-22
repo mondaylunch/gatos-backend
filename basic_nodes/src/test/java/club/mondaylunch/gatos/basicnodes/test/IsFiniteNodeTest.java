@@ -1,6 +1,7 @@
 package club.mondaylunch.gatos.basicnodes.test;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ public class IsFiniteNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.NUMBER.create(5.0)
         );
-        var output = BasicNodes.IS_FINITE.compute(input, Map.of(), Map.of());
+        var output = BasicNodes.IS_FINITE.compute(UUID.randomUUID(), input, Map.of(), Map.of());
         Assertions.assertTrue((boolean) output.get("output").join().value());
     }
 
@@ -40,7 +41,7 @@ public class IsFiniteNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.NUMBER.create(Double.POSITIVE_INFINITY)
         );
-        var output = BasicNodes.IS_FINITE.compute(input, Map.of(), Map.of());
+        var output = BasicNodes.IS_FINITE.compute(UUID.randomUUID(), input, Map.of(), Map.of());
         Assertions.assertFalse((boolean) output.get("output").join().value());
     }
 
@@ -49,7 +50,7 @@ public class IsFiniteNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.NUMBER.create(Double.NEGATIVE_INFINITY)
         );
-        var output = BasicNodes.IS_FINITE.compute(input, Map.of(), Map.of());
+        var output = BasicNodes.IS_FINITE.compute(UUID.randomUUID(), input, Map.of(), Map.of());
         Assertions.assertFalse((boolean) output.get("output").join().value());
     }
 
@@ -58,7 +59,7 @@ public class IsFiniteNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.NUMBER.create(Double.NaN)
         );
-        var output = BasicNodes.IS_FINITE.compute(input, Map.of(), Map.of());
+        var output = BasicNodes.IS_FINITE.compute(UUID.randomUUID(), input, Map.of(), Map.of());
         Assertions.assertFalse((boolean) output.get("output").join().value());
     }
 }

@@ -1,6 +1,7 @@
 package club.mondaylunch.gatos.basicnodes.test;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ public class ValueReplacerNodeTypeTest {
         BasicNodes.VALUE_PROVIDER_TYPES_WITH_DEFAULTS.forEach(databox -> {
             var nodeType = BasicNodes.VALUE_REPLACERS.get(databox.type());
             var node = Node.create(nodeType);
-            Assertions.assertEquals(databox.value(), nodeType.compute(Map.of("input", DataType.ANY.create("")), node.settings(), Map.of()).get("output").join().value());
+            Assertions.assertEquals(databox.value(), nodeType.compute(UUID.randomUUID(), Map.of("input", DataType.ANY.create("")), node.settings(), Map.of()).get("output").join().value());
         });
     }
 
@@ -52,7 +53,7 @@ public class ValueReplacerNodeTypeTest {
         BasicNodes.VALUE_PROVIDER_TYPES_WITH_DEFAULTS.forEach(databox -> {
             var nodeType = BasicNodes.VALUE_REPLACERS.get(databox.type());
             var node = Node.create(nodeType).modifySetting("value", createDataBox(databox.type(), TEST_VALUES.get(databox.type())));
-            Assertions.assertEquals(TEST_VALUES.get(databox.type()), nodeType.compute(Map.of("input", DataType.ANY.create("")), node.settings(), Map.of()).get("output").join().value());
+            Assertions.assertEquals(TEST_VALUES.get(databox.type()), nodeType.compute(UUID.randomUUID(), Map.of("input", DataType.ANY.create("")), node.settings(), Map.of()).get("output").join().value());
         });
     }
 }

@@ -40,7 +40,7 @@ public abstract class AbstractListSeparationNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var inputList = DataBox.get(inputs, "input", ListDataType.GENERIC_LIST).orElse(List.of());
         var outputType = this.findExactDatatype(inputTypes.get("input"));
         var optionalType = outputType == DataType.ANY ? OptionalDataType.GENERIC_OPTIONAL : outputType.optionalOf();

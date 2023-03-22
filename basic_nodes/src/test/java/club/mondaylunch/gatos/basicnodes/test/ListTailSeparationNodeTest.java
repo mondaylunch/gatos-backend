@@ -2,6 +2,7 @@ package club.mondaylunch.gatos.basicnodes.test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,7 @@ public class ListTailSeparationNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST)
         );
-        var output = BasicNodes.LIST_TAIL_SEPARATION.compute(input, node.settings(),
+        var output = BasicNodes.LIST_TAIL_SEPARATION.compute(UUID.randomUUID(), input, node.settings(),
             Map.of("input", DataType.NUMBER));
         Assertions.assertEquals(TEST_NUM_LIST.get(TEST_NUM_LIST.size() - 1), output.get("first").join().value());
         Assertions.assertEquals(TEST_NUM_LIST.subList(0, TEST_NUM_LIST.size() - 1), output.get("rest").join().value());
@@ -49,7 +50,7 @@ public class ListTailSeparationNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_STR_LIST)
         );
-        var output = BasicNodes.LIST_TAIL_SEPARATION.compute(input, node.settings(),
+        var output = BasicNodes.LIST_TAIL_SEPARATION.compute(UUID.randomUUID(), input, node.settings(),
             Map.of("input", DataType.STRING));
         Assertions.assertEquals(TEST_STR_LIST.get(0), output.get("first").join().value());
         Assertions.assertEquals(List.of(), output.get("rest").join().value());

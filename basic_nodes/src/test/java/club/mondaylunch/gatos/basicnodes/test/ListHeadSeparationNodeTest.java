@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -40,7 +41,7 @@ public class ListHeadSeparationNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST)
         );
-        var output = BasicNodes.LIST_HEAD_SEPARATION.compute(input, node.settings(),
+        var output = BasicNodes.LIST_HEAD_SEPARATION.compute(UUID.randomUUID(), input, node.settings(),
             Map.of("input", DataType.NUMBER));
         Assertions.assertEquals(TEST_NUM_LIST.get(0), output.get("first").join().value());
         Assertions.assertEquals(TEST_NUM_LIST.subList(1, TEST_NUM_LIST.size()), output.get("rest").join().value());
@@ -52,7 +53,7 @@ public class ListHeadSeparationNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_STR_LIST)
         );
-        var output = BasicNodes.LIST_HEAD_SEPARATION.compute(input, node.settings(),
+        var output = BasicNodes.LIST_HEAD_SEPARATION.compute(UUID.randomUUID(), input, node.settings(),
             Map.of("input", DataType.STRING));
         Assertions.assertEquals(TEST_STR_LIST.get(0), output.get("first").join().value());
         Assertions.assertEquals(List.of(), output.get("rest").join().value());
@@ -64,7 +65,7 @@ public class ListHeadSeparationNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", ListDataType.GENERIC_LIST.create(TEST_EMPTY_LIST)
         );
-        var output = BasicNodes.LIST_HEAD_SEPARATION.compute(input, node.settings(), Map.of());
+        var output = BasicNodes.LIST_HEAD_SEPARATION.compute(UUID.randomUUID(), input, node.settings(), Map.of());
         Assertions.assertEquals(Optional.empty(), output.get("first").join().value());
         Assertions.assertEquals(List.of(), output.get("rest").join().value());
     }
@@ -81,7 +82,7 @@ public class ListHeadSeparationNodeTest {
     public void outputsWithCorrectTypes() {
         var node = Node.create(BasicNodes.LIST_HEAD_SEPARATION)
             .updateInputTypes(Map.of("input", DataType.NUMBER.listOf()));
-        var res = BasicNodes.LIST_HEAD_SEPARATION.compute(Map.of("input", DataType.NUMBER.listOf().create(List.of(10., 5., 4.))), node.settings(), node.inputTypes());
+        var res = BasicNodes.LIST_HEAD_SEPARATION.compute(UUID.randomUUID(), Map.of("input", DataType.NUMBER.listOf().create(List.of(10., 5., 4.))), node.settings(), node.inputTypes());
         Assertions.assertEquals(DataType.NUMBER.optionalOf(), res.get("first").join().type());
         Assertions.assertEquals(DataType.NUMBER.listOf(), res.get("rest").join().type());
     }

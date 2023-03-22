@@ -3,6 +3,7 @@ package club.mondaylunch.gatos.basicnodes.test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -51,7 +52,7 @@ public class EqualsNodeTest {
             "inputB", DataType.ANY.create("test_string")
         );
 
-        var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
+        var output = BasicNodes.EQUALS.compute(UUID.randomUUID(), input, Map.of(), Map.of());
         Assertions.assertEquals(true, output.get("output").join().value());
     }
 
@@ -62,7 +63,7 @@ public class EqualsNodeTest {
             "inputB", DataType.ANY.create("this is not equal to the first string")
         );
 
-        var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
+        var output = BasicNodes.EQUALS.compute(UUID.randomUUID(), input, Map.of(), Map.of());
         Assertions.assertEquals(false, output.get("output").join().value());
     }
 
@@ -73,7 +74,7 @@ public class EqualsNodeTest {
             "inputB", DataType.ANY.create(0.0)
         );
 
-        var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
+        var output = BasicNodes.EQUALS.compute(UUID.randomUUID(), input, Map.of(), Map.of());
         Assertions.assertEquals(true, output.get("output").join().value());
     }
 
@@ -84,7 +85,7 @@ public class EqualsNodeTest {
             "inputB", DataType.ANY.create(0.0)
         );
 
-        var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
+        var output = BasicNodes.EQUALS.compute(UUID.randomUUID(), input, Map.of(), Map.of());
         Assertions.assertEquals(false, output.get("output").join().value());
     }
 
@@ -95,7 +96,7 @@ public class EqualsNodeTest {
             "inputB", DataType.ANY.create(true)
         );
 
-        var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
+        var output = BasicNodes.EQUALS.compute(UUID.randomUUID(), input, Map.of(), Map.of());
         Assertions.assertEquals(true, output.get("output").join().value());
     }
 
@@ -106,7 +107,7 @@ public class EqualsNodeTest {
             "inputB", DataType.ANY.create(false)
         );
 
-        var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
+        var output = BasicNodes.EQUALS.compute(UUID.randomUUID(), input, Map.of(), Map.of());
         Assertions.assertEquals(false, output.get("output").join().value());
     }
 
@@ -125,7 +126,7 @@ public class EqualsNodeTest {
             "inputB", DataType.ANY.create(secondObject)
         );
 
-        var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
+        var output = BasicNodes.EQUALS.compute(UUID.randomUUID(), input, Map.of(), Map.of());
         Assertions.assertEquals(true, output.get("output").join().value());
     }
 
@@ -143,7 +144,7 @@ public class EqualsNodeTest {
             "inputA", DataType.ANY.create(firstObject),
             "inputB", DataType.ANY.create(secondObject)
         );
-        var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
+        var output = BasicNodes.EQUALS.compute(UUID.randomUUID(), input, Map.of(), Map.of());
         Assertions.assertEquals(false, output.get("output").join().value());
     }
 
@@ -159,7 +160,7 @@ public class EqualsNodeTest {
             "inputA", DataType.ANY.create(firstObject),
             "inputB", DataType.ANY.create(true)
         );
-        var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
+        var output = BasicNodes.EQUALS.compute(UUID.randomUUID(), input, Map.of(), Map.of());
         Assertions.assertEquals(false, output.get("output").join().value());
     }
 
@@ -178,10 +179,10 @@ public class EqualsNodeTest {
             "inputB", DataType.ANY.create(TEST_JSON_OBJECT_2)
         );
 
-        var output_1 = BasicNodes.EQUALS.compute(input_1, Map.of(), Map.of());
+        var output_1 = BasicNodes.EQUALS.compute(UUID.randomUUID(), input_1, Map.of(), Map.of());
         Assertions.assertEquals(true, output_1.get("output").join().value());
 
-        var output_2 = BasicNodes.EQUALS.compute(input_2, Map.of(), Map.of());
+        var output_2 = BasicNodes.EQUALS.compute(UUID.randomUUID(), input_2, Map.of(), Map.of());
         Assertions.assertEquals(true, output_2.get("output").join().value());
     }
 
@@ -195,7 +196,7 @@ public class EqualsNodeTest {
             "inputB", DataType.ANY.create(TEST_JSON_OBJECT_2)
         );
 
-        var output = BasicNodes.EQUALS.compute(input, Map.of(), Map.of());
+        var output = BasicNodes.EQUALS.compute(UUID.randomUUID(), input, Map.of(), Map.of());
         Assertions.assertEquals(false, output.get("output").join().value());
     }
 

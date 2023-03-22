@@ -3,6 +3,7 @@ package club.mondaylunch.gatos.basicnodes.test;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -54,10 +55,10 @@ public class ListSetOperationNodeTest {
             FIRST_KEY, DataType.NUMBER.listOf(),
             SECOND_KEY, DataType.NUMBER.listOf()
         );
-        var output = BasicNodes.LIST_SET_OPERATION.compute(dataInputs, node.settings(), typeInputs);
+        var output = BasicNodes.LIST_SET_OPERATION.compute(UUID.randomUUID(), dataInputs, node.settings(), typeInputs);
         Assertions.assertEquals(List.of(2., 4., 6., 8., 3.5, Math.PI, Math.sqrt(2)), output.get("output").join().value());
 
-        var output1 = BasicNodes.LIST_SET_OPERATION.compute(dataInputs1, node.settings(), typeInputs);
+        var output1 = BasicNodes.LIST_SET_OPERATION.compute(UUID.randomUUID(), dataInputs1, node.settings(), typeInputs);
         Assertions.assertEquals(List.of(Math.sqrt(2), Math.PI, 3.5, 6., 2., 4., 8.), output1.get("output").join().value());
 
         Assertions.assertThrows(UnsupportedOperationException.class,
@@ -82,10 +83,10 @@ public class ListSetOperationNodeTest {
             FIRST_KEY, DataType.NUMBER.listOf(),
             SECOND_KEY, DataType.NUMBER.listOf()
         );
-        var output = BasicNodes.LIST_SET_OPERATION.compute(dataInputs, node.settings(), typeInputs);
+        var output = BasicNodes.LIST_SET_OPERATION.compute(UUID.randomUUID(), dataInputs, node.settings(), typeInputs);
         Assertions.assertEquals(List.of(6., 3.5, Math.PI), output.get("output").join().value());
 
-        var output1 = BasicNodes.LIST_SET_OPERATION.compute(dataInputs1, node.settings(), typeInputs);
+        var output1 = BasicNodes.LIST_SET_OPERATION.compute(UUID.randomUUID(), dataInputs1, node.settings(), typeInputs);
         Assertions.assertEquals(List.of(Math.PI, 3.5, 6.), output1.get("output").join().value());
 
         Assertions.assertThrows(UnsupportedOperationException.class,
@@ -110,10 +111,10 @@ public class ListSetOperationNodeTest {
             FIRST_KEY, DataType.NUMBER.listOf(),
             SECOND_KEY, DataType.NUMBER.listOf()
         );
-        var output = BasicNodes.LIST_SET_OPERATION.compute(dataInputs, node.settings(), typeInputs);
+        var output = BasicNodes.LIST_SET_OPERATION.compute(UUID.randomUUID(), dataInputs, node.settings(), typeInputs);
         Assertions.assertEquals(List.of(2., 4., 8.), output.get("output").join().value());
 
-        var output1 = BasicNodes.LIST_SET_OPERATION.compute(dataInputs1, node.settings(), typeInputs);
+        var output1 = BasicNodes.LIST_SET_OPERATION.compute(UUID.randomUUID(), dataInputs1, node.settings(), typeInputs);
         Assertions.assertEquals(List.of(Math.sqrt(2)), output1.get("output").join().value());
 
         Assertions.assertThrows(UnsupportedOperationException.class,
@@ -134,7 +135,7 @@ public class ListSetOperationNodeTest {
             SECOND_KEY, DataType.STRING.listOf()
         );
         Assertions.assertThrows(IllegalArgumentException.class,
-            () -> BasicNodes.LIST_SET_OPERATION.compute(dataInputs, node.settings(), typeInputs)
+            () -> BasicNodes.LIST_SET_OPERATION.compute(UUID.randomUUID(), dataInputs, node.settings(), typeInputs)
         );
     }
 }

@@ -2,6 +2,7 @@ package club.mondaylunch.gatos.basicnodes.test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -25,14 +26,14 @@ public class EmptyListNodeTest {
 
     @Test
     public void correctlyGetsEmptyList() {
-        var output = BasicNodes.EMPTY_LIST.compute(Map.of(), Map.of(), Map.of());
+        var output = BasicNodes.EMPTY_LIST.compute(UUID.randomUUID(), Map.of(), Map.of(), Map.of());
         Assertions.assertEquals(List.of(), output.get("output").join().value());
     }
 
     @Test
     @SuppressWarnings("unchecked")
     public void cannotModifyEmptyList() {
-        var output = BasicNodes.EMPTY_LIST.compute(Map.of(), Map.of(), Map.of());
+        var output = BasicNodes.EMPTY_LIST.compute(UUID.randomUUID(), Map.of(), Map.of(), Map.of());
         var createdList = (List<String>) output.get("output").join().value();
         Assertions.assertThrows(Exception.class, () -> {
             createdList.add("turi ip ip ip");
