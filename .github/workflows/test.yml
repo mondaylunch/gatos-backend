@@ -16,8 +16,8 @@ jobs:
           docker-compose up -d
       - name: Run tests
         env:
-          AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
-          AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
+          BACKEND_AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
+          BACKEND_AUTH0_CLIENT_SECRET: ${{ secrets.BACKEND_AUTH0_CLIENT_SECRET }}
           AUTH0_ISSUER: ${{ vars.AUTH0_ISSUER }}
           AUTH0_AUDIENCE: ${{ vars.AUTH0_AUDIENCE }}
           AUTH0_TOKEN_URL: ${{ vars.AUTH0_TOKEN_URL }}
