@@ -63,3 +63,14 @@ You may want to use a different tag, but this will replace your deployment image
 ```
 
 To run and generate a run configuration for the backend tests in IntelliJ, `ctrl` click all the `test` folders in all the modules, right-click one of them, and select `Run 'All Tests'`.
+
+## Reference List
+
+-   **Spring Boot**: Framework for building web applications available under Apache-2.0 License. Source: (https://spring.io/projects/spring-boot)
+-   **GSON**: Java serialisation library under Apache-2.0 License. Source: (https://github.com/google/gson)
+-   **JUnit**: Unit testing library under Eclipse Public License 2.0. Source: (https://junit.org/junit5/docs/current/user-guide/)
+-   **Bouncy Castle Encryption**: Argon2 encryption library under MIT License. Source: (https://www.bouncycastle.org/)
+-   **Jackson**: JSON serialisation library under Apache-2.0 License. Source: (https://github.com/FasterXML/jackson)
+-   **Guava**: Core libraries provided by Google under Apache-2.0 License. Source: (https://guava.dev/)
+
+Some code has been taken from library documentation, this is mentioned where relevant in the code.
