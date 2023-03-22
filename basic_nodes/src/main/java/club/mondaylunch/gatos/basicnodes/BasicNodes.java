@@ -33,6 +33,12 @@ public final class BasicNodes implements GatosPlugin {
         .register("string_contains", new StringContainsNodeType());
     public static final StringConcatNodeType STRING_CONCAT = NodeType.REGISTRY
         .register("string_concat", new StringConcatNodeType());
+    public static final StringCaseNodeType STRING_CASE = NodeType.REGISTRY
+        .register("string_case", new StringCaseNodeType());
+    public static final StringRegexReplacementNodeType STRING_REGEX_REPLACE = NodeType.REGISTRY
+        .register("string_regex_replace", new StringRegexReplacementNodeType());
+    public static final StringRegexSplitNodeType STRING_REGEX_SPLIT = NodeType.REGISTRY
+        .register("string_regex_split", new StringRegexSplitNodeType());
     public static final NumberComparisonNodeType NUMBER_COMPARISON = NodeType.REGISTRY
         .register("number_comparison", new NumberComparisonNodeType());
     public static final MathNodeType MATH = NodeType.REGISTRY
@@ -85,6 +91,10 @@ public final class BasicNodes implements GatosPlugin {
         .register("webhook_end", new WebhookEndNodeType());
     public static final EmptyListNodeType EMPTY_LIST = NodeType.REGISTRY
         .register("empty_list", new EmptyListNodeType());
+    public static final EmptyOptionalNodeType EMPTY_OPTIONAL = NodeType.REGISTRY
+        .register("empty_optional", new EmptyOptionalNodeType());
+    public static final OptionalCreationNodeType OPTIONAL_CREATION = NodeType.REGISTRY
+        .register("optional_creation", new OptionalCreationNodeType());
     public static final ObjectSetValueNodeType OBJECT_SET_VALUE = NodeType.REGISTRY
         .register("object_set_value", new ObjectSetValueNodeType());
     public static final RegexNodeType REGEX = NodeType.REGISTRY

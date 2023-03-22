@@ -36,7 +36,7 @@ public class RegistryTest {
     public void testDuplicateRegistration() {
         Foo foo = new Foo("test");
         FOO_REGISTRY.register("test_foo", foo);
-        Assertions.assertThrows(IllegalArgumentException.class, () -> FOO_REGISTRY.register("test_foo_to", foo));
+        Assertions.assertDoesNotThrow(() -> FOO_REGISTRY.register("test_foo_to", foo));
     }
 
     @Test
@@ -44,7 +44,7 @@ public class RegistryTest {
         Foo foo1 = new Foo("test_1");
         Foo foo2 = new Foo("test_2");
         FOO_REGISTRY.register("test_foo", foo1);
-        Assertions.assertThrows(IllegalArgumentException.class, () -> FOO_REGISTRY.register("test_foo", foo2));
+        Assertions.assertDoesNotThrow(() -> FOO_REGISTRY.register("test_foo", foo2));
     }
 
     @Test

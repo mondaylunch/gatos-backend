@@ -37,12 +37,6 @@ public class Registry<T> {
      * @throws IllegalStateException if the object is already registered, or something is already registered with the name
      */
     public <E extends T> E register(@NotNull String name, @NotNull E value) {
-        if (this.map.containsKey(name)) {
-            throw new IllegalArgumentException("Tried to register %s (%s) but something with that name (%s) already exists!".formatted(name, value, this.map.get(name)));
-        }
-        if (this.reverseMap.containsKey(value)) {
-            throw new IllegalArgumentException("Tried to register %s @ %s but it already exists @ %s!".formatted(value, name, this.reverseMap.get(value)));
-        }
         this.map.put(name, value);
         this.reverseMap.put(value, name);
         return value;

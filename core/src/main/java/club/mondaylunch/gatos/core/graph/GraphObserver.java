@@ -468,6 +468,10 @@ public class GraphObserver {
         );
     }
 
+    public Set<Node> getRemovedNodes() {
+        return Set.copyOf(this.removedNodes.values());
+    }
+
     private record ConnectionId(UUID fromId, String fromName, UUID toId, String toName) {
         ConnectionId(NodeConnection<?> connection) {
             this(connection.from().nodeId(), connection.from().name(), connection.to().nodeId(), connection.to().name());
@@ -477,5 +481,15 @@ public class GraphObserver {
     public record GraphChanges(@BsonProperty("removed_nodes") Set<String> removedNodes, @BsonProperty("added_nodes") Set<Node> addedNodes,
                                @BsonProperty("removed_connections") Set<NodeConnection<?>> removedConnections, @BsonProperty("added_connections") Set<NodeConnection<?>> addedConnections,
                                @BsonProperty("removed_metadata") Set<String> removedMetadata, @BsonProperty("added_metadata") Map<String, NodeMetadata> addedMetadata) {
+        public static GraphChanges empty() {
+            return new GraphChanges(
+                Set.of(),
+                Set.of(),
+                Set.of(),
+                Set.of(),
+                Set.of(),
+                Map.of()
+            );
+        }
     }
 }

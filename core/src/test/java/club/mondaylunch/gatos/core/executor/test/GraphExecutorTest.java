@@ -376,6 +376,11 @@ public class GraphExecutorTest {
         @Override
         public void setupFlow(Flow flow, Consumer<@Nullable Object> function, Node node) {
         }
+
+        @Override
+        public void teardownFlow(Flow flow, Node node) {
+
+        }
     }
 
     private static final class OutputIntNodeType extends NodeType.End {

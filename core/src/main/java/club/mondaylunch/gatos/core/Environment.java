@@ -37,6 +37,14 @@ public enum Environment {
     }
 
     /**
+     * Get the Discord bot token.
+     * @return the discord token
+     */
+    public static String getDiscordToken() {
+        return INSTANCE.env.get("DISCORD_TOKEN", "");
+    }
+
+    /**
      * Check whether we are in a JUnit test.
      * https://stackoverflow.com/a/12717377
      *

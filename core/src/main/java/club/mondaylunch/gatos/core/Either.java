@@ -4,6 +4,8 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * A union - holds a value of either of two types, designated 'left' and 'right'. A little like {@link Optional},
  * but with two types (one of which will always be present).
@@ -30,6 +32,16 @@ public abstract sealed class Either<L, R> {
         return new Right<>(value);
     }
 
+    /**
+     * Creates an Either from the left value if it exists, or else the right value.
+     * @param left  the left value, or null
+     * @param right the right value
+     * @return      the Either
+     */
+    public static <L, R> Either<L, R> of(@Nullable L left, R right) {
+        return left == null ? right(right) : left(left);
+    }
+    
     /**
      * Maps both sides of the Either.
      * @param leftFunc  the function to map the left side
