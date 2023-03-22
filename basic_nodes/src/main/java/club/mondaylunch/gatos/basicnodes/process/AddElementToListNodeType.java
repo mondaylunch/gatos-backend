@@ -1,4 +1,4 @@
-package club.mondaylunch.gatos.basicnodes;
+package club.mondaylunch.gatos.basicnodes.process;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +41,7 @@ public class AddElementToListNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var inputListType = this.getExactListType(inputTypes.getOrDefault("list", ListDataType.GENERIC_LIST));
         var inputElemType = this.getExactElemType(inputListType);
         var inputList = (List<?>) DataBox.get(inputs, "list", inputListType).orElseThrow();
@@ -69,6 +69,6 @@ public class AddElementToListNodeType extends NodeType.Process {
 
     private <T> List<?> generateList(ArrayList<T> list, Object element) {
         list.add((T) element);
-        return list;
+        return list; 
     }
 }
