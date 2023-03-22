@@ -41,7 +41,7 @@ public final class SettingWidgets {
         var factory = WIDGET_FACTORIES.get(type);
         if (factory == null) {
             if (type.clazz().isEnum()) {
-                return Widget.dropDown(enumValueFunc(type));
+                return Widget.dropdown(enumValueFunc(type));
             } else {
                 return $ -> Widget.TEXTBOX;
             }
@@ -62,6 +62,9 @@ public final class SettingWidgets {
         Widget createWidget(User user);
     }
 
+    /**
+     * Represents a widget for a node setting.
+     */
     public static sealed class Widget {
         public static final Widget TEXTBOX = new Widget("textbox");
         public static final Widget TEXTAREA = new Widget("textarea");
@@ -74,14 +77,26 @@ public final class SettingWidgets {
             this.name = name;
         }
 
-        public static WidgetFactory dropDown(Function<User, List<String>> func) {
+        /**
+         * Creates a dropdown widget.
+         * @param func  a function to create the list of options for a given user
+         * @return      the dropdown widget
+         */
+        public static WidgetFactory dropdown(Function<User, List<String>> func) {
             return user -> new Dropdown(func.apply(user));
         }
 
+        /**
+         * Gets the name of the widget.
+         * @return  the name
+         */
         public String getName() {
             return this.name;
         }
 
+        /**
+         * Represents a dropdown widget.
+         */
         public static final class Dropdown extends Widget {
             private final List<String> options;
 
@@ -90,6 +105,10 @@ public final class SettingWidgets {
                 this.options = options;
             }
 
+            /**
+             * Gets the list of options for the dropdown.
+             * @return  the options
+             */
             public List<String> getOptions() {
                 return this.options;
             }

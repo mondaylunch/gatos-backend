@@ -56,9 +56,9 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
         SettingWidgets.register(BOOLEAN, SettingWidgets.Widget.CHECKBOX);
         SettingWidgets.register(STRING, SettingWidgets.Widget.TEXTBOX);
         SettingWidgets.register(JSON_OBJECT, SettingWidgets.Widget.TEXTAREA);
-        SettingWidgets.register(DATA_TYPE, SettingWidgets.Widget.dropDown(u ->
+        SettingWidgets.register(DATA_TYPE, SettingWidgets.Widget.dropdown(u ->
             DataType.REGISTRY.getEntries().stream().map(Map.Entry::getKey).toList()));
-        SettingWidgets.register(PROCESS_NODE_TYPE, SettingWidgets.Widget.dropDown(u ->
+        SettingWidgets.register(PROCESS_NODE_TYPE, SettingWidgets.Widget.dropdown(u ->
             NodeType.REGISTRY.getEntries().stream()
                 .filter(kv -> kv.getValue().category() == NodeCategory.PROCESS)
                 .map(Map.Entry::getKey).toList()));
