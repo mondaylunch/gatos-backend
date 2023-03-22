@@ -48,7 +48,7 @@ public class AddElementToListNodeType extends NodeType.Process {
         var inputElem = DataBox.get(inputs, "element", inputElemType).orElseThrow();
 
         var copyList = new ArrayList<>(inputList);
-        var output = generateList(copyList, inputElem);
+        var output = this.generateList(copyList, inputElem);
         return Map.of(
             "output", CompletableFuture.completedFuture(this.getGenericListBox(output, inputListType))
         );

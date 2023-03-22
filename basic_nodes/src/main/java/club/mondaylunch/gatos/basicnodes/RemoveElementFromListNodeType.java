@@ -66,8 +66,9 @@ public class RemoveElementFromListNodeType extends NodeType.Process {
             } catch (ClassCastException e) {
                 throw new IllegalArgumentException("The Element's Type does not match that of the List");
             }
+        } else {
+            index = (int) (double) DataBox.get(inputs, "index", DataType.NUMBER).orElseThrow();
         }
-        else index = (int) (double) DataBox.get(inputs, "index", DataType.NUMBER).orElseThrow();
         
         ArrayList<?> copyList = new ArrayList<>(inputList);
         copyList.remove(index);
