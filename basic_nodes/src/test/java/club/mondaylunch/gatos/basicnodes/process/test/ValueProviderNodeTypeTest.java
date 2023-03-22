@@ -3,6 +3,7 @@ package club.mondaylunch.gatos.basicnodes.process.test;
 import java.util.Map;
 import java.util.UUID;
 
+import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +41,8 @@ public class ValueProviderNodeTypeTest {
     private static final Map<DataType<?>, ?> TEST_VALUES = Map.of(
         DataType.BOOLEAN, true,
         DataType.NUMBER, 3.14,
-        DataType.STRING, "Hello World!"
+        DataType.STRING, "Hello World!",
+        DataType.JSON_OBJECT, new JsonObject()
     );
 
     @SuppressWarnings("unchecked")
