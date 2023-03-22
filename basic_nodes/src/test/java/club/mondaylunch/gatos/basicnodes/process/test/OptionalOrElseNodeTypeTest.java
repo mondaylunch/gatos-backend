@@ -23,8 +23,8 @@ public class OptionalOrElseNodeTypeTest {
     @Test
     public void hasOutput() {
         var node = Node.create(BasicNodes.OPTIONAL_OR_ELSE);
-        Assertions.assertEquals(1, node.getOutputs().size());
-        Assertions.assertTrue(node.getOutputs().containsKey("output"));
+        Assertions.assertEquals(1, node.outputs().size());
+        Assertions.assertTrue(node.outputs().containsKey("output"));
     }
 
     @Test

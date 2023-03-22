@@ -28,8 +28,8 @@ public class ListLengthNodeTest {
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.LIST_LENGTH);
-        Assertions.assertEquals(1, node.getOutputs().size());
-        Assertions.assertTrue(node.getOutputs().containsKey("output"));
+        Assertions.assertEquals(1, node.outputs().size());
+        Assertions.assertTrue(node.outputs().containsKey("output"));
     }
 
     @Test

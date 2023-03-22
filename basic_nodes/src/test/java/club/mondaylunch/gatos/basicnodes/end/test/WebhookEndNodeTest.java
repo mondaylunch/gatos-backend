@@ -40,7 +40,7 @@ public class WebhookEndNodeTest {
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.WEBHOOK_END);
-        Assertions.assertTrue(node.getOutputs().isEmpty());
+        Assertions.assertTrue(node.outputs().isEmpty());
     }
 
     @Test

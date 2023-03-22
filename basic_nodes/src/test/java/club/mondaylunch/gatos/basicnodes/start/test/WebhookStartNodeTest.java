@@ -30,7 +30,7 @@ public class WebhookStartNodeTest {
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.WEBHOOK_START);
-        var outputs = node.getOutputs();
+        var outputs = node.outputs();
         Assertions.assertEquals(2, outputs.size());
         var nodeId = node.id();
         var requestBody = outputs.get("requestBody");

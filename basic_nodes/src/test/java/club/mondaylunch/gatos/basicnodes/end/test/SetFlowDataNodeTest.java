@@ -69,7 +69,7 @@ public class SetFlowDataNodeTest {
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.SET_FLOW_DATA);
-        Assertions.assertTrue(node.getOutputs().isEmpty());
+        Assertions.assertTrue(node.outputs().isEmpty());
     }
 
     @Test

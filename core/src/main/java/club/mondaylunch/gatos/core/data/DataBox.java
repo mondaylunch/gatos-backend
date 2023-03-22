@@ -38,4 +38,20 @@ public record DataBox<T>(T value, DataType<T> type) {
         }
         return Optional.empty();
     }
+
+    /**
+     * Retrieves a data value of a certain type from a map. If the value does not
+     * exist or is not of the expected type, the fallback map is checked.
+     *
+     * @param boxes        the map
+     * @param fallbackBoxes the fallback map
+     * @param key         the key
+     * @param type       the expected datatype
+     * @param <K> the type of the key
+     * @param <T> the type of the data
+     * @return an Optional of the value, or empty
+     */
+    public static <K, T> Optional<T> get(Map<K, DataBox<?>> boxes, Map<K, DataBox<?>> fallbackBoxes, K key, DataType<T> type) {
+        return get(boxes, key, type).or(() -> get(fallbackBoxes, key, type));
+    }
 }

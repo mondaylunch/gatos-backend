@@ -27,9 +27,9 @@ public class ListTailSeparationNodeTest {
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.LIST_TAIL_SEPARATION);
-        Assertions.assertEquals(2, node.getOutputs().size());
-        Assertions.assertTrue(node.getOutputs().containsKey("first"));
-        Assertions.assertTrue(node.getOutputs().containsKey("rest"));
+        Assertions.assertEquals(2, node.outputs().size());
+        Assertions.assertTrue(node.outputs().containsKey("first"));
+        Assertions.assertTrue(node.outputs().containsKey("rest"));
     }
 
     @Test

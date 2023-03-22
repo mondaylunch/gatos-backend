@@ -34,8 +34,8 @@ public class ListSetOperationNodeTest {
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.LIST_SET_OPERATION);
-        Assertions.assertEquals(1, node.getOutputs().size());
-        Assertions.assertTrue(node.getOutputs().containsKey("output"));
+        Assertions.assertEquals(1, node.outputs().size());
+        Assertions.assertTrue(node.outputs().containsKey("output"));
     }
 
     @Test

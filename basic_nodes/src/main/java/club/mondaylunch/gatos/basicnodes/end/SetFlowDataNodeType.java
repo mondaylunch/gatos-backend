@@ -37,9 +37,7 @@ public class SetFlowDataNodeType extends NodeType.End {
 
     @Override
     public CompletableFuture<Void> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
-        var key = DataBox.get(settings, "key", DataType.STRING).or(() ->
-            DataBox.get(inputs, "key", DataType.STRING)
-        ).orElseThrow();
+        var key = DataBox.get(settings, inputs, "key", DataType.STRING).orElseThrow();
         var value = inputs.get("value");
         Objects.requireNonNull(value, "No value input");
         boolean overwrite = DataBox.get(settings, "overwrite", DataType.BOOLEAN).orElse(true);

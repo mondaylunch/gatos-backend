@@ -32,7 +32,7 @@ public class NodeTest {
     @Test
     public void canGetOutputs() {
         var node = Node.create(TEST_NODE_TYPE);
-        Assertions.assertTrue(node.getOutputs().containsKey("out"));
+        Assertions.assertTrue(node.outputs().containsKey("out"));
     }
 
     @Test

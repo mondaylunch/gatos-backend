@@ -35,9 +35,9 @@ public class HTTPRequestNodeTest {
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.HTTP_REQUEST);
-        Assertions.assertEquals(2, node.getOutputs().size());
-        Assertions.assertTrue(node.getOutputs().containsKey("StatusCode"));
-        Assertions.assertTrue(node.getOutputs().containsKey("responseText"));
+        Assertions.assertEquals(2, node.outputs().size());
+        Assertions.assertTrue(node.outputs().containsKey("StatusCode"));
+        Assertions.assertTrue(node.outputs().containsKey("responseText"));
     }
 
     @Test

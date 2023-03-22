@@ -32,7 +32,7 @@ public class ListMappingNodeTypeTest {
 
     @Test
     public void areOutputsCorrect() {
-        Assertions.assertEquals(1, this.node.getOutputs().size());
+        Assertions.assertEquals(1, this.node.outputs().size());
         var mappedList = this.node.getOutputWithName("mapped_list");
         Assertions.assertTrue(mappedList.isPresent());
         Assertions.assertEquals(this.outputType, mappedList.get().type());

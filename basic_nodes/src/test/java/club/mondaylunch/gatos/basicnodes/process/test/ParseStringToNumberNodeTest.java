@@ -30,8 +30,8 @@ public class ParseStringToNumberNodeTest {
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.PARSE_STRING_TO_NUMBER);
-        Assertions.assertEquals(node.getOutputs().size(), 1);
-        Assertions.assertTrue(node.getOutputs().containsKey("output"));
+        Assertions.assertEquals(node.outputs().size(), 1);
+        Assertions.assertTrue(node.outputs().containsKey("output"));
     }
 
     @Test

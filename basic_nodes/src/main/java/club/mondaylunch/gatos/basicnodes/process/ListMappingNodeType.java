@@ -90,7 +90,7 @@ public class ListMappingNodeType extends NodeType.Process {
             );
         }
 
-        var otherOutputs = mappingNode.getOutputs().values().stream()
+        var otherOutputs = mappingNode.outputs().values().stream()
             .filter(output -> !output.equals(outputConnector.get()))
             .toList();
 
