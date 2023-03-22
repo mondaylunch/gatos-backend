@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.ServiceLoader;
 
 import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.models.Flow;
 
 /**
  * Gatos Core entrypoint.
@@ -41,6 +42,8 @@ public final class GatosCore implements GatosPlugin {
         });
         // load language files
         LANG = new GatosLang();
+        // setup flow triggers
+        setupAllFlowTriggers();
     }
 
     @Override
@@ -50,5 +53,9 @@ public final class GatosCore implements GatosPlugin {
     @Override
     public String name() {
         return "core";
+    }
+
+    private static void setupAllFlowTriggers() {
+        Flow.objects.getCollection().find().forEach(Flow::setupTriggers);
     }
 }

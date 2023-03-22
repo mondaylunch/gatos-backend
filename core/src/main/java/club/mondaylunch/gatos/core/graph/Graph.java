@@ -30,6 +30,7 @@ import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeCategory;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
+import club.mondaylunch.gatos.core.models.Flow;
 
 /**
  * A flow graph.
@@ -49,6 +50,7 @@ public class Graph {
      * The nodes of this graph.
      */
     private final Map<UUID, Node> nodes = new HashMap<>();
+
     /**
      * The edges of this graph.
      */
@@ -57,7 +59,6 @@ public class Graph {
      * The edges of this graph, easily retrievable by their associated nodes' UUIDs.
      */
     private final Map<UUID, Set<NodeConnection<?>>> connectionsByNode = new HashMap<>();
-
     /**
      * The metadata of each node in the graph.
      */
@@ -77,6 +78,14 @@ public class Graph {
         connections.forEach(this::addConnection);
 
         this.observer.reset();
+    }
+
+    /**
+     * Returns an immutable set of all nodes in the graph.
+     * @return the graph's nodes
+     */
+    public Set<Node> nodes() {
+        return Set.copyOf(this.nodes.values());
     }
 
     /**
@@ -397,15 +406,24 @@ public class Graph {
      * node to
      * an {@link NodeCategory#END output} node, and there are no cycles.
      *
+     * @param flow the flow for this graph (or null)
      * @return a list of any errors in this graph
      */
-    public List<GraphValidityError> validate() {
+    public List<GraphValidityError> validate(@Nullable Flow flow) {
         List<GraphValidityError> errors = this.getExecutionOrder().map($ -> new ArrayList<>(), ArrayList::new);
         errors.addAll(this.nodes.values().stream()
-            .flatMap(n -> n.type().isValid(n, this).stream())
+            .flatMap(n -> n.type().isValid(n, Either.of(flow, this)).stream())
             .toList());
 
         return errors;
+    }
+
+    /**
+     * Convenience overload for {@link #validate(Flow)} that passes null for the flow.
+     * @return  a list of any errors in this graph
+     */
+    public List<GraphValidityError> validate() {
+        return this.validate(null);
     }
 
     /**
@@ -442,7 +460,9 @@ public class Graph {
         while (!nodesWithoutIncoming.isEmpty()) {
             UUID nodeId = nodesWithoutIncoming.pop();
             var node = this.nodes.get(nodeId);
-            res.add(node);
+            if (!res.contains(node)) {
+                res.add(node);
+            }
 
             if (!hasSeenInput && node.type().category() == NodeCategory.START) {
                 hasSeenInput = true;
@@ -459,7 +479,8 @@ public class Graph {
                 ) {
                     visitedConnections.add(conn);
                     UUID to = conn.to().nodeId();
-                    if (this.getConnectionsForNode(to).stream()
+                    if (!res.contains(this.getNode(to).orElseThrow())
+                        && this.getConnectionsForNode(to).stream()
                         .filter(deduplicatedConnections::contains)
                         .filter(c -> c.to().nodeId().equals(to))
                         .allMatch(visitedConnections::contains)) {

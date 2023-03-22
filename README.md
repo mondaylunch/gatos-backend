@@ -32,6 +32,7 @@ AUTH0_ISSUER=[Auth0 issuer URL]
 AUTH0_AUDIENCE=[Auth0 API audience]
 AUTH0_TOKEN_URL=[Auth0 API token URL, looks like https://<domain>/oauth/token]
 AUTH0_MANAGEMENT_AUDIENCE=[Auth0 Management API audience]
+DISCORD_TOKEN=[Discord token]
 ```
 
 Start the API:

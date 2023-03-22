@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import club.mondaylunch.gatos.core.Either;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.data.ListDataType;
@@ -18,6 +19,7 @@ import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector.Input;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector.Output;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
+import club.mondaylunch.gatos.core.models.Flow;
 
 public class ListMappingNodeType extends NodeType.Process {
 
@@ -37,7 +39,7 @@ public class ListMappingNodeType extends NodeType.Process {
     }
 
     @Override
-    public Collection<GraphValidityError> isValid(Node node, Graph graph) {
+    public Collection<GraphValidityError> isValid(Node node, Either<Flow, Graph> graph) {
         Set<GraphValidityError> errors = new HashSet<>(super.isValid(node, graph));
         var inputConnectorName = DataBox.get(node.settings(), INPUT_CONNECTOR_SETTING, DataType.STRING).orElseThrow();
         var outputConnectorName = DataBox.get(node.settings(), OUTPUT_CONNECTOR_SETTING, DataType.STRING).orElseThrow();

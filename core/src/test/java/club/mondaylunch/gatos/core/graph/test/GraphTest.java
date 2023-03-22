@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import club.mondaylunch.gatos.core.Either;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Graph;
@@ -430,12 +431,25 @@ public class GraphTest {
     }
 
     @Test
+    public void graphWithTwoIntoOneIsValid() {
+        var graph = new Graph();
+        var input1 = graph.addNode(START_NODE_TYPE);
+        var input2 = graph.addNode(START_NODE_TYPE);
+        var output = graph.addNode(END_TWO_INPUTS_NODE_TYPE);
+        var conn = NodeConnection.create(input1, "out", output, "in1");
+        graph.addConnection(conn);
+        conn = NodeConnection.create(input2, "out", output, "in2");
+        graph.addConnection(conn);
+        Assertions.assertTrue(graph.validate().isEmpty());
+    }
+
+    @Test
     public void graphWithNodeSpecificErrorIsInvalid() {
         var graph = new Graph();
         var input = graph.addNode(START_NODE_TYPE);
         var middle = graph.addNode(new TestNodeType(1, DataType.NUMBER) {
             @Override
-            public Collection<GraphValidityError> isValid(Node node, Graph graph) {
+            public Collection<GraphValidityError> isValid(Node node, Either<Flow, Graph> graph) {
                 return List.of(new GraphValidityError(node.id(), "Test error"));
             }
         });
@@ -507,6 +521,11 @@ public class GraphTest {
         }
 
         @Override
+        public void teardownFlow(Flow flow, Node node) {
+
+        }
+
+        @Override
         public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable Object o, Map<String, DataBox<?>> settings) {
             return Map.of();
         }
@@ -547,6 +566,11 @@ public class GraphTest {
 
         @Override
         public void setupFlow(Flow flow, Consumer<@Nullable Object> function, Node node) {
+        }
+
+        @Override
+        public void teardownFlow(Flow flow, Node node) {
+
         }
 
         @Override

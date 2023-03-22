@@ -14,6 +14,7 @@ public interface UserCreationHelper {
     default User createSimpleUser(String username, String email) {
         var user = new User();
         user.setEmail(email);
+        user.setDiscordId(username);
         User.objects.insert(user);
         return user;
     }
