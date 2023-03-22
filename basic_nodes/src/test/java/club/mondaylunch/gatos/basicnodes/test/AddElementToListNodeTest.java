@@ -45,7 +45,7 @@ public class AddElementToListNodeTest {
         var node = Node.create(BasicNodes.ADD_ELEM_TO_LIST);
         Map<String, DataBox<?>> inputs = Map.of(
             "list", DataType.BOOLEAN.listOf().create(TEST_EMPTY_LIST),
-            "element", DataType.ANY.create(true)
+            "element", DataType.BOOLEAN.create(true)
         );
 
         Map<String, DataType<?>> inputTypes = Map.of(
