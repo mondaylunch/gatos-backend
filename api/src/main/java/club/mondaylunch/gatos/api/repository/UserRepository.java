@@ -22,7 +22,12 @@ public class UserRepository {
      * @return a user object
      */
     public User getOrCreateUser(String email) {
-        return User.objects.getOrCreateUserByEmail(email);
+        var res = User.objects.getOrCreateUserByEmail(email);
+        if (res.getDiscordId() == null) {
+            return this.getUserWithUpdatedDetails(res);
+        } else {
+            return res;
+        }
     }
 
     /**
