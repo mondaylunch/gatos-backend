@@ -184,12 +184,12 @@ public class GraphTest {
         var node1 = graph.addNode(TEST_NUMBER_NODE_TYPE);
         var node2 = graph.addNode(TestNodeTypes.TEST_VARYING_OUTPUT_NODE_TYPE);
 
-        Assertions.assertEquals(DataType.ANY, node2.getOutputs().get("out").type());
+        Assertions.assertEquals(DataType.ANY, node2.outputs().get("out").type());
         var conn = NodeConnection.create(node1, "out", node2, "in");
         graph.addConnection(conn);
-        Assertions.assertEquals(DataType.NUMBER, graph.getNode(node2.id()).orElseThrow().getOutputs().get("out").type());
+        Assertions.assertEquals(DataType.NUMBER, graph.getNode(node2.id()).orElseThrow().outputs().get("out").type());
         graph.removeConnection(graph.getConnection(node1.id(), "out", node2.id(), "in").orElseThrow());
-        Assertions.assertEquals(DataType.ANY, graph.getNode(node2.id()).orElseThrow().getOutputs().get("out").type());
+        Assertions.assertEquals(DataType.ANY, graph.getNode(node2.id()).orElseThrow().outputs().get("out").type());
     }
 
     @Test
@@ -202,7 +202,7 @@ public class GraphTest {
         var conn1 = NodeConnection.create(node1, "out", node2, "in");
         graph.addConnection(conn1);
         node2 = graph.getNode(node2.id()).orElseThrow();
-        Assertions.assertEquals(DataType.NUMBER, graph.getNode(node2.id()).orElseThrow().getOutputs().get("out").type());
+        Assertions.assertEquals(DataType.NUMBER, graph.getNode(node2.id()).orElseThrow().outputs().get("out").type());
         var conn2 = NodeConnection.create(node2, "out", node3, "in");
         graph.addConnection(conn2);
         graph.removeConnection(graph.getConnection(node1.id(), "out", node2.id(), "in").orElseThrow());
@@ -219,7 +219,7 @@ public class GraphTest {
         var conn1 = NodeConnection.create(node1, "out", node2, "in");
         graph.addConnection(conn1);
         node2 = graph.getNode(node2.id()).orElseThrow();
-        Assertions.assertEquals(DataType.NUMBER, graph.getNode(node2.id()).orElseThrow().getOutputs().get("out").type());
+        Assertions.assertEquals(DataType.NUMBER, graph.getNode(node2.id()).orElseThrow().outputs().get("out").type());
         var conn2 = NodeConnection.create(node2, "out", node3, "in");
         graph.addConnection(conn2);
         graph.removeConnection(graph.getConnection(node1.id(), "out", node2.id(), "in").orElseThrow());
@@ -497,8 +497,12 @@ public class GraphTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
-                Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+        public Map<String, CompletableFuture<DataBox<?>>> compute(
+            UUID flowId,
+            Map<String, DataBox<?>> inputs,
+            Map<String, DataBox<?>> settings,
+            Map<String, DataType<?>> inputTypes
+        ) {
             return Map.of();
         }
     }
@@ -526,7 +530,11 @@ public class GraphTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable Object o, Map<String, DataBox<?>> settings) {
+        public Map<String, CompletableFuture<DataBox<?>>> compute(
+            UUID flowId,
+            @Nullable Object o,
+            Map<String, DataBox<?>> settings
+        ) {
             return Map.of();
         }
     }
@@ -544,7 +552,11 @@ public class GraphTest {
         }
 
         @Override
-        public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+        public CompletableFuture<Void> compute(
+            UUID flowId,
+            Map<String, DataBox<?>> inputs,
+            Map<String, DataBox<?>> settings
+        ) {
             return CompletableFuture.runAsync(() -> {
             });
         }
@@ -574,7 +586,11 @@ public class GraphTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable Object o, Map<String, DataBox<?>> settings) {
+        public Map<String, CompletableFuture<DataBox<?>>> compute(
+            UUID flowId,
+            @Nullable Object o,
+            Map<String, DataBox<?>> settings
+        ) {
             return Map.of();
         }
     }
@@ -594,7 +610,11 @@ public class GraphTest {
         }
 
         @Override
-        public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+        public CompletableFuture<Void> compute(
+            UUID flowId,
+            Map<String, DataBox<?>> inputs,
+            Map<String, DataBox<?>> settings
+        ) {
             return CompletableFuture.runAsync(() -> {
             });
         }

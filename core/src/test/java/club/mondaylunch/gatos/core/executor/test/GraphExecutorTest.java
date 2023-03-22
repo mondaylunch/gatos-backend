@@ -59,7 +59,7 @@ public class GraphExecutorTest {
         Assertions.assertTrue(executionOrderedNodes.isLeft());
         var graphExecutor = new GraphExecutor(executionOrderedNodes.left(), graph.getConnections());
 
-        graphExecutor.execute().get().join();
+        graphExecutor.execute(UUID.randomUUID()).get().join();
         Assertions.assertEquals(15, result.get());
     }
 
@@ -92,7 +92,7 @@ public class GraphExecutorTest {
         Assertions.assertTrue(executionOrderedNodes.isLeft());
         var graphExecutor = new GraphExecutor(executionOrderedNodes.left(), graph.getConnections());
 
-        graphExecutor.execute().get().join();
+        graphExecutor.execute(UUID.randomUUID()).get().join();
         Assertions.assertEquals(15, result.get());
     }
 
@@ -133,7 +133,7 @@ public class GraphExecutorTest {
         Assertions.assertTrue(executionOrderedNodes.isLeft());
         var graphExecutor = new GraphExecutor(executionOrderedNodes.left(), graph.getConnections());
 
-        graphExecutor.execute().get().join();
+        graphExecutor.execute(UUID.randomUUID()).get().join();
         Assertions.assertEquals(32, result.get());
     }
 
@@ -182,7 +182,7 @@ public class GraphExecutorTest {
         Assertions.assertTrue(executionOrderedNodes.isLeft());
         var graphExecutor = new GraphExecutor(executionOrderedNodes.left(), graph.getConnections());
 
-        graphExecutor.execute().get().join();
+        graphExecutor.execute(UUID.randomUUID()).get().join();
         Assertions.assertEquals(32, result1.get());
         Assertions.assertEquals(48, result2.get());
     }
@@ -232,7 +232,7 @@ public class GraphExecutorTest {
         Assertions.assertTrue(executionOrderedNodes.isLeft());
         var graphExecutor = new GraphExecutor(executionOrderedNodes.left(), graph.getConnections());
 
-        graphExecutor.execute().get().join();
+        graphExecutor.execute(UUID.randomUUID()).get().join();
         Assertions.assertEquals(32, result1.get());
         Assertions.assertEquals("48.0", result2.get());
     }
@@ -275,7 +275,7 @@ public class GraphExecutorTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
+        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs,
                                                                   Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Map.of(
                 "out", CompletableFuture.completedFuture(DataType.NUMBER.create(
@@ -304,7 +304,7 @@ public class GraphExecutorTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
+        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs,
                                                                   Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Map.of(
                 "out", CompletableFuture.completedFuture(DataType.NUMBER.create(
@@ -333,7 +333,7 @@ public class GraphExecutorTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
+        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs,
                                                                   Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Map.of(
                 "out", CompletableFuture.supplyAsync(this.addIntsSlowly(
@@ -367,7 +367,7 @@ public class GraphExecutorTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable Object input, Map<String, DataBox<?>> settings) {
+        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, @Nullable Object input, Map<String, DataBox<?>> settings) {
             return Map.of(
                 "out", CompletableFuture.completedFuture(
                     DataType.NUMBER.create(DataBox.get(settings, "value", DataType.NUMBER).orElseThrow())));
@@ -404,7 +404,7 @@ public class GraphExecutorTest {
         }
 
         @Override
-        public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+        public CompletableFuture<Void> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
             this.result.set(DataBox.get(inputs, "in", DataType.NUMBER).orElseThrow().intValue());
             return CompletableFuture.runAsync(() -> {
             });
@@ -432,7 +432,7 @@ public class GraphExecutorTest {
         }
 
         @Override
-        public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+        public CompletableFuture<Void> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
             this.result.set(DataBox.get(inputs, "in", DataType.STRING).orElseThrow());
             return CompletableFuture.runAsync(() -> {
             });

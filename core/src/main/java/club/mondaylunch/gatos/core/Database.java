@@ -10,6 +10,7 @@ import org.bson.BsonDocument;
 import org.bson.BsonInt64;
 import org.bson.Document;
 import org.bson.UuidRepresentation;
+import org.bson.codecs.UuidCodec;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
@@ -64,6 +65,7 @@ public enum Database {
                 DataBoxCodecProvider.INSTANCE,
                 RegistryObjectCodec.Provider.INSTANCE
             ),
+            CodecRegistries.fromCodecs(new UuidCodec(UuidRepresentation.STANDARD)),
             MongoClientSettings.getDefaultCodecRegistry(),
             CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build())
         );

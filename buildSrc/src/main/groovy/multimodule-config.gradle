@@ -14,7 +14,3 @@ dependencies {
 
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
-
-jar {
-    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
-}

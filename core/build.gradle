@@ -31,6 +31,10 @@ dependencies {
     testImplementation("org.skyscreamer:jsonassert:1.5.1")
 }
 
+jar {
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
 }

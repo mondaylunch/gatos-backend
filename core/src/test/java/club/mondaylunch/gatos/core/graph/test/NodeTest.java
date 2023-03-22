@@ -32,7 +32,7 @@ public class NodeTest {
     @Test
     public void canGetOutputs() {
         var node = Node.create(TEST_NODE_TYPE);
-        Assertions.assertTrue(node.getOutputs().containsKey("out"));
+        Assertions.assertTrue(node.outputs().containsKey("out"));
     }
 
     @Test
@@ -121,8 +121,8 @@ public class NodeTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
-                Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs,
+                                                                  Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Map.of();
         }
     }

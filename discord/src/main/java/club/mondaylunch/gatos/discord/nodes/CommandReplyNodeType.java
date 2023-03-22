@@ -53,10 +53,11 @@ public class CommandReplyNodeType extends NodeType.End {
     }
 
     @Override
-    public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+    public CompletableFuture<Void> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
         String content = DataBox.get(inputs, "content", DataType.STRING).orElse("");
         boolean isEphemeral = DataBox.get(settings, "is_ephemeral", DataType.BOOLEAN).orElse(false);
         var event = DataBox.get(inputs, "event", DiscordDataTypes.SLASH_COMMAND_EVENT).orElseThrow();
-        return event.reply(content).setEphemeral(isEphemeral).submit().thenAccept($ -> {});
+        return event.reply(content).setEphemeral(isEphemeral).submit().thenAccept($ -> {
+        });
     }
 }
