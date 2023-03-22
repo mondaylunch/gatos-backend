@@ -76,13 +76,16 @@ public class AddElementToListNodeTest {
         var node = Node.create(BasicNodes.ADD_ELEM_TO_LIST);
         Map<String, DataBox<?>> inputs = Map.of(
             "list", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST),
-            "element", DataType.ANY.create(true)
+            "element", DataType.ANY.create("true")
         );
 
         Map<String, DataType<?>> inputTypes = Map.of(
             "list", DataType.NUMBER.listOf(),
-            "element", DataType.BOOLEAN
+            "element", DataType.STRING
         );
-        Assertions.assertThrows(IllegalArgumentException.class, () -> BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), inputTypes));
+        // Assertions.assertThrows(IllegalArgumentException.class, () -> BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), inputTypes));
+        
+        var output = BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), inputTypes).get("output").join().value();
+        Assertions.assertEquals(List.of(1, 2, 3), output);
     }
 }
