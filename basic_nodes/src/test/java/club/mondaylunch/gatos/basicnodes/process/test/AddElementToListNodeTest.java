@@ -1,9 +1,10 @@
-package club.mondaylunch.gatos.basicnodes.test;
+package club.mondaylunch.gatos.basicnodes.process.test;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -36,8 +37,8 @@ public class AddElementToListNodeTest {
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.ADD_ELEM_TO_LIST);
-        Assertions.assertEquals(1, node.getOutputs().size());
-        Assertions.assertTrue(node.getOutputs().containsKey("output"));
+        Assertions.assertEquals(1, node.outputs().size());
+        Assertions.assertTrue(node.outputs().containsKey("output"));
     }
 
     @Test
@@ -52,7 +53,7 @@ public class AddElementToListNodeTest {
             "list", DataType.BOOLEAN.listOf(),
             "element", DataType.BOOLEAN
         );
-        var output = BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), inputTypes);
+        var output = BasicNodes.ADD_ELEM_TO_LIST.compute(UUID.randomUUID(), inputs, node.settings(), inputTypes);
         Assertions.assertEquals(List.of(true), output.get("output").join().value());
     }
 
@@ -67,7 +68,7 @@ public class AddElementToListNodeTest {
             "list", DataType.NUMBER.listOf(),
             "element", DataType.NUMBER
         );
-        var output = BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), inputTypes);
+        var output = BasicNodes.ADD_ELEM_TO_LIST.compute(UUID.randomUUID(), inputs, node.settings(), inputTypes);
         Assertions.assertEquals(List.of(1.0, 2.0, 3.0, 4.0), output.get("output").join().value());
 
         inputs = Map.of(
@@ -78,7 +79,7 @@ public class AddElementToListNodeTest {
             "list", DataType.BOOLEAN.listOf(),
             "element", DataType.BOOLEAN
         );
-        output = BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), inputTypes);
+        output = BasicNodes.ADD_ELEM_TO_LIST.compute(UUID.randomUUID(), inputs, node.settings(), inputTypes);
         Assertions.assertEquals(List.of(true, false, true, false), output.get("output").join().value());   
     }
 
@@ -94,6 +95,6 @@ public class AddElementToListNodeTest {
             "list", DataType.NUMBER.listOf(),
             "element", DataType.STRING
         );
-        Assertions.assertThrows(NoSuchElementException.class, () -> BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), inputTypes));
+        Assertions.assertThrows(NoSuchElementException.class, () -> BasicNodes.ADD_ELEM_TO_LIST.compute(UUID.randomUUID(), inputs, node.settings(), inputTypes));
     }
 }

@@ -1,7 +1,8 @@
-package club.mondaylunch.gatos.basicnodes.test;
+package club.mondaylunch.gatos.basicnodes.process.test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -43,8 +44,8 @@ public class RemoveElementFromListNodeTest {
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.REMOVE_ELEM_FROM_LIST);
-        Assertions.assertEquals(1, node.getOutputs().size());
-        Assertions.assertTrue(node.getOutputs().containsKey("output"));
+        Assertions.assertEquals(1, node.outputs().size());
+        Assertions.assertTrue(node.outputs().containsKey("output"));
     }
 
     @Test
@@ -54,21 +55,21 @@ public class RemoveElementFromListNodeTest {
             "list", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST),
             "element", DataType.ANY.create(1)
         );
-        var output = BasicNodes.REMOVE_ELEM_FROM_LIST.compute(inputs, node.settings(), Map.of("input", DataType.NUMBER));
+        var output = BasicNodes.REMOVE_ELEM_FROM_LIST.compute(UUID.randomUUID(), inputs, node.settings(), Map.of("input", DataType.NUMBER));
         Assertions.assertEquals(List.of(2, 3), output.get("output").join().value());
 
         inputs = Map.of(
             "list", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST),
             "element", DataType.ANY.create(2)
         );
-        output = BasicNodes.REMOVE_ELEM_FROM_LIST.compute(inputs, node.settings(), Map.of("input", DataType.NUMBER));
+        output = BasicNodes.REMOVE_ELEM_FROM_LIST.compute(UUID.randomUUID(), inputs, node.settings(), Map.of("input", DataType.NUMBER));
         Assertions.assertEquals(List.of(1, 3), output.get("output").join().value());
 
         inputs = Map.of(
             "list", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST),
             "element", DataType.ANY.create(3)
         );
-        output = BasicNodes.REMOVE_ELEM_FROM_LIST.compute(inputs, node.settings(), Map.of("input", DataType.NUMBER));
+        output = BasicNodes.REMOVE_ELEM_FROM_LIST.compute(UUID.randomUUID(), inputs, node.settings(), Map.of("input", DataType.NUMBER));
         Assertions.assertEquals(List.of(1, 2), output.get("output").join().value());
 
         node = TEST_INDEX_REMOVE;
@@ -76,21 +77,21 @@ public class RemoveElementFromListNodeTest {
             "list", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST),
             "index", DataType.NUMBER.create(0.0)
         );
-        output = BasicNodes.REMOVE_ELEM_FROM_LIST.compute(inputs, node.settings(), Map.of("input", DataType.NUMBER));
+        output = BasicNodes.REMOVE_ELEM_FROM_LIST.compute(UUID.randomUUID(), inputs, node.settings(), Map.of("input", DataType.NUMBER));
         Assertions.assertEquals(List.of(2, 3), output.get("output").join().value());
 
         inputs = Map.of(
             "list", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST),
             "index", DataType.NUMBER.create(1.0)
         );
-        output = BasicNodes.REMOVE_ELEM_FROM_LIST.compute(inputs, node.settings(), Map.of("input", DataType.NUMBER));
+        output = BasicNodes.REMOVE_ELEM_FROM_LIST.compute(UUID.randomUUID(), inputs, node.settings(), Map.of("input", DataType.NUMBER));
         Assertions.assertEquals(List.of(1, 3), output.get("output").join().value());
 
         inputs = Map.of(
             "list", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST),
             "index", DataType.NUMBER.create(2.0)
         );
-        output = BasicNodes.REMOVE_ELEM_FROM_LIST.compute(inputs, node.settings(), Map.of("input", DataType.NUMBER));
+        output = BasicNodes.REMOVE_ELEM_FROM_LIST.compute(UUID.randomUUID(), inputs, node.settings(), Map.of("input", DataType.NUMBER));
         Assertions.assertEquals(List.of(1, 2), output.get("output").join().value());
     }
 }
