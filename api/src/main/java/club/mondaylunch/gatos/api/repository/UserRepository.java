@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import club.mondaylunch.gatos.api.auth.Auth0ManagementAPI;
+import club.mondaylunch.gatos.core.Environment;
 import club.mondaylunch.gatos.core.models.User;
 
 @Repository
@@ -23,7 +24,7 @@ public class UserRepository {
      */
     public User getOrCreateUser(String email) {
         var res = User.objects.getOrCreateUserByEmail(email);
-        if (res.getDiscordId() == null) {
+        if (res.getDiscordId() == null && !Environment.isJUnitTest()) {
             return this.getUserWithUpdatedDetails(res);
         } else {
             return res;
