@@ -41,11 +41,12 @@ public class SetFlowDataNodeType extends NodeType.End {
         var value = inputs.get("value");
         Objects.requireNonNull(value, "No value input");
         boolean overwrite = DataBox.get(settings, "overwrite", DataType.BOOLEAN).orElse(true);
-        if (overwrite) {
-            FlowData.objects.set(flowId, key, value);
-        } else {
-            FlowData.objects.setIfAbsent(flowId, key, value);
-        }
-        return CompletableFuture.completedFuture(null);
+        return CompletableFuture.runAsync(() -> {
+            if (overwrite) {
+                FlowData.objects.set(flowId, key, value);
+            } else {
+                FlowData.objects.setIfAbsent(flowId, key, value);
+            }
+        });
     }
 }
