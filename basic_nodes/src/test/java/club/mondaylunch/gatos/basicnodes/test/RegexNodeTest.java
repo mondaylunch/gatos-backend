@@ -6,10 +6,11 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import club.mondaylunch.gatos.basicnodes.BasicNodes;
+import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Graph;
-import club.mondaylunch.gatos.core.data.DataBox;
-import club.mondaylunch.gatos.basicnodes.BasicNodes;
 
 public class RegexNodeTest {
 
@@ -80,7 +81,6 @@ public class RegexNodeTest {
         Assertions.assertEquals(List.of("1", "2"), groups.get());
     }
 
-    
     @Test
     public void doesntAssignNonExistantGroups() {
         Map<String, DataBox<?>> input = Map.of(
