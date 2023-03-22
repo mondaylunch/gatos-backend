@@ -2,10 +2,10 @@ package club.mondaylunch.gatos.basicnodes.test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.data.DataBox;
@@ -56,9 +56,13 @@ public class RegexNodeTest {
             "regex", DataType.STRING.create("Hello"),
             "word", DataType.STRING.create("Hello")
         );
+        
         var output = BasicNodes.REGEX.compute(input);
         Assertions.assertTrue((boolean) output.get("isMatch").join().value());
-        Assertions.assertEquals("Hello", output.get("match").join().value());
+
+        Optional<String> match = (Optional<String>) output.get("match").join().value();
+        Assertions.assertTrue(match.isPresent());
+        Assertions.assertEquals("Hello", match.get());
     }
 
     @Test
@@ -69,9 +73,25 @@ public class RegexNodeTest {
         );
 
         var output = BasicNodes.REGEX.compute(input);
+        Assertions.assertTrue((boolean) output.get("isMatch").join().value());
+        
+        Optional<List<String>> groups = (Optional<List<String>>) output.get("groups").join().value();
+        Assertions.assertTrue(groups.isPresent());
+        Assertions.assertEquals(List.of("1", "2"), groups.get());
+    }
+
+    
+    @Test
+    public void doesntAssignNonExistantGroups() {
+        Map<String, DataBox<?>> input = Map.of(
+            "regex", DataType.STRING.create("word"),
+            "word", DataType.STRING.create("word")
+        );
+        var output = BasicNodes.REGEX.compute(input);
 
         Assertions.assertTrue((boolean) output.get("isMatch").join().value());
-        Assertions.assertEquals(List.of("1", "2"), output.get("groups").join().value());
+        Assertions.assertTrue(((Optional<String>) output.get("match").join().value()).isPresent());
+        Assertions.assertTrue(((Optional<List<String>>) output.get("groups").join().value()).isEmpty());
     }
 
     @Test
@@ -83,7 +103,13 @@ public class RegexNodeTest {
         var output = BasicNodes.REGEX.compute(input);
         
         Assertions.assertEquals(true, output.get("isMatch").join().value());
-        Assertions.assertEquals("Hello", output.get("match").join().value());
-        Assertions.assertEquals(List.of("e", "l"), output.get("groups").join().value());
+        
+        Optional<String> match = (Optional<String>) output.get("match").join().value();
+        Assertions.assertTrue(match.isPresent());
+        Assertions.assertEquals("Hello", match.get());
+
+        Optional<List<String>> groups = (Optional<List<String>>) output.get("groups").join().value();
+        Assertions.assertTrue(groups.isPresent());
+        Assertions.assertEquals(List.of("e", "l"), groups.get());
     }
 }

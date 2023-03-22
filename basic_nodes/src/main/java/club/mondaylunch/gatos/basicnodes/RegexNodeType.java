@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Optional;
 
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
@@ -59,32 +60,37 @@ public class RegexNodeType extends NodeType.Process {
         var word = DataBox.get(inputs, "word", DataType.STRING).orElseThrow();
         var matcher = regex.matcher(word);
 
-        if (!matcher.find()) return Map.of(
-            "isMatch", CompletableFuture.completedFuture(DataType.BOOLEAN.create(false)),
-            "match", CompletableFuture.completedFuture(DataType.STRING.create(null)),
-            "groups", CompletableFuture.completedFuture(DataType.STRING.listOf().create(null))
-        );
-
         return Map.of(
-            "isMatch", CompletableFuture.completedFuture(DataType.BOOLEAN.create(true)),
-            "match", CompletableFuture.completedFuture(DataType.STRING.create(matcher.group())),
-            "groups", CompletableFuture.completedFuture(DataType.STRING.listOf().create(this.getGroups(matcher)))
+            "isMatch", CompletableFuture.completedFuture(DataType.BOOLEAN.create(matcher.find())),
+            "match", CompletableFuture.completedFuture(DataType.STRING.optionalOf().create(this.getMatch(matcher))),
+            "groups", CompletableFuture.completedFuture(DataType.STRING.listOf().optionalOf().create(this.getGroups(matcher)))
         );
     }
 
     /**
-     * A function method to gather all the groups a regular expression finds in an input word as a list. 
+     * A function method to acquire the matching text and return it as an optional
      * @param matcher a Matcher given a word set to a regex Pattern
-     * @return a List of Strings
+     * @return an Optional of a String or an empty Optional if no match was found
      */
-    public List<String> getGroups(Matcher matcher) {
+    public Optional<String> getMatch(Matcher matcher) {
+        matcher.reset();
+        if(!matcher.find()) return Optional.empty();
+        return Optional.of(matcher.group());
+    }
+
+    /**
+     * A function method to gather all the groups a regular expression finds in an input word as an optional list. 
+     * @param matcher a Matcher given a word set to a regex Pattern
+     * @return an Optional of a List of Strings or an empty Optional if no groups are found
+     */
+    public Optional<List<String>> getGroups(Matcher matcher) {
         int groups = matcher.groupCount();
-        if (groups == 0) return null;
+        if (groups == 0) return Optional.empty();
 
         ArrayList<String> lst = new ArrayList<String>();
         for (int i = 1; i <= groups; i++) lst.add(matcher.group(i));
         
-        return lst;
+        return Optional.of(lst);
     }
 
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
