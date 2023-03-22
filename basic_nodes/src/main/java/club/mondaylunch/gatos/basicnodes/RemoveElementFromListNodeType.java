@@ -1,7 +1,9 @@
 package club.mondaylunch.gatos.basicnodes;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -62,27 +64,30 @@ public class RemoveElementFromListNodeType extends NodeType.Process {
             var inputElem = DataBox.get(inputs, "element", DataType.ANY).orElseThrow();
             try {
                 index = inputList.indexOf(inputElem);
+                if (index == -1) throw new NoSuchElementException("The given Element is not present in the List");
             } catch (ClassCastException e) {
-                return Map.of(
-                    "output", CompletableFuture.completedFuture(this.getGenericListBox(inputList, listType))
-                );
+                throw new IllegalArgumentException("The Element's Type does not match that of the List");
             }
         }
-
-        if (mode == Mode.INDEX) index = (int) (double) DataBox.get(inputs, "index", DataType.NUMBER).orElseThrow();
-
-        System.out.println(index);
-
-        if (index == -1) return Map.of("output", CompletableFuture.completedFuture(this.getGenericListBox(inputList, listType)));
-   
+        else index = (int) (double) DataBox.get(inputs, "index", DataType.NUMBER).orElseThrow();
+        
+        ArrayList<?> copyList = new ArrayList<>(inputList);
+        copyList.remove(index);
+        
         return Map.of(
+            "output", CompletableFuture.completedFuture(this.getGenericListBox(
+                copyList, listType
+            ))
+        );
+
+        /*return Map.of(
             "output", CompletableFuture.completedFuture(this.getGenericListBox(
                 Stream.concat(
                     inputList.subList(0, index).stream(),
                     inputList.subList(index + 1, inputList.size()).stream())
                     .collect(Collectors.toList()),
                 listType))
-        );
+        );*/
     }
 
     @SuppressWarnings({"unchecked", "ListUsedAsFieldOrParameterType"})
