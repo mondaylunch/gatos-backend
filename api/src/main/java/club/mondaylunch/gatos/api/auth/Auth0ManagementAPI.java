@@ -101,11 +101,15 @@ public class Auth0ManagementAPI {
      * @return       the user profile
      */
     public JsonObject getUserProfile(String userId) {
-        JsonArray array = new Gson().fromJson(this.get(this.AUDIENCE + "users-by-email?email=" + URLEncoder.encode(userId, StandardCharsets.UTF_8)), JsonArray.class);
-        if (array.size() == 0 || !array.get(0).isJsonObject()) {
+        try {
+            JsonArray array = new Gson().fromJson(this.get(this.AUDIENCE + "users-by-email?email=" + URLEncoder.encode(userId, StandardCharsets.UTF_8)), JsonArray.class);
+            if (array.size() == 0 || !array.get(0).isJsonObject()) {
+                return new JsonObject();
+            } else {
+                return array.get(0).getAsJsonObject();
+            }
+        } catch (JsonSyntaxException e) {
             return new JsonObject();
-        } else {
-            return array.get(0).getAsJsonObject();
         }
     }
 }
