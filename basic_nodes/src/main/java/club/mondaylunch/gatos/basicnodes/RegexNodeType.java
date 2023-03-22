@@ -68,13 +68,13 @@ public class RegexNodeType extends NodeType.Process {
     }
 
     /**
-     * A function method to acquire the matching text and return it as an optional
+     * A function method to acquire the matching text and return it as an optional.
      * @param matcher a Matcher given a word set to a regex Pattern
      * @return an Optional of a String or an empty Optional if no match was found
      */
     public Optional<String> getMatch(Matcher matcher) {
         matcher.reset();
-        if(!matcher.find()) return Optional.empty();
+        if (!matcher.find()) return Optional.empty();
         return Optional.of(matcher.group());
     }
 
