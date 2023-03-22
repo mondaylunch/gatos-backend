@@ -30,7 +30,7 @@ public class FlowData {
     }
 
     public Id getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(Id id) {
@@ -38,7 +38,7 @@ public class FlowData {
     }
 
     public DataBox<?> getValue() {
-        return value;
+        return this.value;
     }
 
     public void setValue(DataBox<?> value) {
