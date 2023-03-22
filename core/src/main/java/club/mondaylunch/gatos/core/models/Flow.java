@@ -128,7 +128,7 @@ public class Flow extends BaseModel {
             var executor = new GraphExecutor(this.graph);
             this.graph.nodes().stream()
                 .filter(n -> n.type().category() == NodeCategory.START)
-                .forEach(n -> ((NodeType.Start<?>) n.type()).setupFlow(this, executor.execute(n.id()), n));
+                .forEach(n -> ((NodeType.Start<?>) n.type()).setupFlow(this, executor.execute(n.id())::apply, n));
         } else {
             this.graph.nodes().stream()
                 .filter(n -> n.type().category() == NodeCategory.START)
