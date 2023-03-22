@@ -3,7 +3,6 @@ package club.mondaylunch.gatos.basicnodes.test;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -16,8 +15,7 @@ import club.mondaylunch.gatos.core.graph.Graph;
 import club.mondaylunch.gatos.core.graph.Node;
 
 public class AddElementToListNodeTest {
-    private static final List<Number> TEST_NUM_LIST = List.of(1,2,3);
-    private static final List<String> TEST_STR_LIST = List.of("CHEESE");
+    private static final List<Number> TEST_NUM_LIST = List.of(1, 2, 3);
     private static final List<Boolean> TEST_EMPTY_LIST = new LinkedList<>();
 
     @Test
@@ -49,7 +47,12 @@ public class AddElementToListNodeTest {
             "list", ListDataType.GENERIC_LIST.create(TEST_EMPTY_LIST),
             "element", DataType.ANY.create(true)
         );
-        var output = BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), Map.of("input", DataType.BOOLEAN));
+
+        Map<String, DataType<?>> inputTypes = Map.of(
+            "list", DataType.BOOLEAN.listOf(),
+            "element", DataType.BOOLEAN
+        );
+        var output = BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), inputTypes);
         Assertions.assertEquals(List.of(true), output.get("output").join().value());
     }
 
@@ -60,8 +63,12 @@ public class AddElementToListNodeTest {
             "list", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST),
             "element", DataType.ANY.create(4)
         );
-        var output = BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), Map.of("input", DataType.NUMBER));
-        Assertions.assertEquals(List.of(1,2,3,4), output.get("output").join().value());
+        Map<String, DataType<?>> inputTypes = Map.of(
+            "list", DataType.NUMBER.listOf(),
+            "element", DataType.NUMBER
+        );
+        var output = BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), inputTypes);
+        Assertions.assertEquals(List.of(1, 2, 3, 4), output.get("output").join().value());
     }
 
     @Test
@@ -71,7 +78,11 @@ public class AddElementToListNodeTest {
             "list", ListDataType.GENERIC_LIST.create(TEST_NUM_LIST),
             "element", DataType.ANY.create(true)
         );
-        var output = BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), Map.of("input", DataType.BOOLEAN));
-        Assertions.assertEquals(TEST_NUM_LIST, output.get("output").join().value());
+
+        Map<String, DataType<?>> inputTypes = Map.of(
+            "list", DataType.NUMBER.listOf(),
+            "element", DataType.BOOLEAN
+        );
+        Assertions.assertThrows(IllegalArgumentException.class, () -> BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), inputTypes));
     }
 }
