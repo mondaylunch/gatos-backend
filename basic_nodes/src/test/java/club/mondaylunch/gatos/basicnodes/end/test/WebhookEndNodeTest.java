@@ -52,7 +52,7 @@ public class WebhookEndNodeTest {
             "graphOutput", DataType.JSON_OBJECT.create(graphOutput),
             "outputReference", DataType.REFERENCE.create(outputReference)
         );
-        BasicNodes.WEBHOOK_END.compute(UUID.randomUUID(), inputs, Map.of());
+        BasicNodes.WEBHOOK_END.compute(UUID.randomUUID(), inputs, Map.of()).join();
         Assertions.assertEquals(graphOutput, outputReference.get());
     }
 }
