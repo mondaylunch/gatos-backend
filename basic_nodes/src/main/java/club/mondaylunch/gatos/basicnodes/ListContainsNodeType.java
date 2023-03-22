@@ -20,7 +20,7 @@ public class ListContainsNodeType extends NodeType.Process {
 
     @Override
     public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        var inputListType = this.getExactListType(inputTypes.getOrDefault("input", ListDataType.GENERIC_LIST));
+        var inputListType = this.getExactListType(inputTypes.getOrDefault("list", ListDataType.GENERIC_LIST));
         var inputElemType = this.getExactElemType(inputListType);
         return Set.of(
             new NodeConnector.Input<>(nodeId, "list", inputListType),
