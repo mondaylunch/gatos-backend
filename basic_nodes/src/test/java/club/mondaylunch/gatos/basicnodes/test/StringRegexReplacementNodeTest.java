@@ -1,6 +1,7 @@
 package club.mondaylunch.gatos.basicnodes.test;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -23,8 +24,8 @@ public class StringRegexReplacementNodeTest {
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.STRING_REGEX_REPLACE);
-        Assertions.assertEquals(1, node.getOutputs().size());
-        Assertions.assertTrue(node.getOutputs().containsKey("output"));
+        Assertions.assertEquals(1, node.outputs().size());
+        Assertions.assertTrue(node.outputs().containsKey("output"));
     }
 
     @Test
@@ -37,7 +38,7 @@ public class StringRegexReplacementNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.STRING.create(TEST_STR)
         );
-        var output = BasicNodes.STRING_REGEX_REPLACE.compute(input, node.settings(), Map.of());
+        var output = BasicNodes.STRING_REGEX_REPLACE.compute(UUID.randomUUID(), input, node.settings(), Map.of());
         Assertions.assertEquals(TEST_STR.replace(oldRgx, newRgx), output.get("output").join().value());
     }
 }

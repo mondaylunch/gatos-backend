@@ -2,6 +2,7 @@ package club.mondaylunch.gatos.basicnodes.test;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Assertions;
@@ -30,8 +31,8 @@ public class OptionalCreationNodeTest {
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.OPTIONAL_CREATION);
-        Assertions.assertEquals(1, node.getOutputs().size());
-        Assertions.assertTrue(node.getOutputs().containsKey("output"));
+        Assertions.assertEquals(1, node.outputs().size());
+        Assertions.assertTrue(node.outputs().containsKey("output"));
     }
 
     @Test
@@ -42,7 +43,7 @@ public class OptionalCreationNodeTest {
             var data = entry.getKey();
             Map<String, DataBox<?>> input = Map.of("input", dataType.create(data));
             var output = BasicNodes.OPTIONAL_CREATION.compute(
-                input, Map.of(), Map.of("input", dataType)
+                UUID.randomUUID(), input, Map.of(), Map.of("input", dataType)
             );
             Assertions.assertEquals(Optional.of(entry.getKey()), output.get("output").join().value());
         }
@@ -56,7 +57,7 @@ public class OptionalCreationNodeTest {
             var data = entry.getKey();
             Map<String, DataBox<?>> input = Map.of("input", dataType.create(data));
             var output = BasicNodes.OPTIONAL_CREATION.compute(
-                input, Map.of(), Map.of("input", dataType)
+                UUID.randomUUID(), input, Map.of(), Map.of("input", dataType)
             );
             Assertions.assertEquals(entry.getValue().type().optionalOf(), output.get("output").join().type());
         }

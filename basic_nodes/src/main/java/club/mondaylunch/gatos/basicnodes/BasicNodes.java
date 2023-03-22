@@ -6,12 +6,58 @@ import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.VisibleForTesting;
 
+import club.mondaylunch.gatos.basicnodes.end.IncrementFlowDataNodeType;
+import club.mondaylunch.gatos.basicnodes.end.MultiplyFlowDataNodeType;
+import club.mondaylunch.gatos.basicnodes.end.RemoveFlowDataNodeType;
+import club.mondaylunch.gatos.basicnodes.end.SetFlowDataNodeType;
+import club.mondaylunch.gatos.basicnodes.end.WebhookEndNodeType;
+import club.mondaylunch.gatos.basicnodes.process.BooleanOperationNodeType;
+import club.mondaylunch.gatos.basicnodes.process.ContainsFlowDataNodeType;
+import club.mondaylunch.gatos.basicnodes.process.EmptyListNodeType;
+import club.mondaylunch.gatos.basicnodes.process.EmptyOptionalNodeType;
+import club.mondaylunch.gatos.basicnodes.process.EqualsNodeType;
+import club.mondaylunch.gatos.basicnodes.process.GetAtIndexNodeType;
+import club.mondaylunch.gatos.basicnodes.process.GetFlowDataNodeType;
+import club.mondaylunch.gatos.basicnodes.process.HTTPRequestNodeType;
+import club.mondaylunch.gatos.basicnodes.process.IsFiniteNodeType;
+import club.mondaylunch.gatos.basicnodes.process.IsNanNodeType;
+import club.mondaylunch.gatos.basicnodes.process.ListContainsNodeType;
+import club.mondaylunch.gatos.basicnodes.process.ListDistinctNodeType;
+import club.mondaylunch.gatos.basicnodes.process.ListHeadSeparationNodeType;
+import club.mondaylunch.gatos.basicnodes.process.ListLengthNodeType;
+import club.mondaylunch.gatos.basicnodes.process.ListMappingNodeType;
+import club.mondaylunch.gatos.basicnodes.process.ListReverseNodeType;
+import club.mondaylunch.gatos.basicnodes.process.ListSetOperationNodeType;
+import club.mondaylunch.gatos.basicnodes.process.ListSortNodeType;
+import club.mondaylunch.gatos.basicnodes.process.ListTailSeparationNodeType;
+import club.mondaylunch.gatos.basicnodes.process.MathNodeType;
+import club.mondaylunch.gatos.basicnodes.process.NegationNodeType;
+import club.mondaylunch.gatos.basicnodes.process.NumberComparisonNodeType;
+import club.mondaylunch.gatos.basicnodes.process.ObjectSetValueNodeType;
+import club.mondaylunch.gatos.basicnodes.process.OptionalCreationNodeType;
+import club.mondaylunch.gatos.basicnodes.process.OptionalOrElseNodeType;
+import club.mondaylunch.gatos.basicnodes.process.ParseStringToNumberNodeType;
+import club.mondaylunch.gatos.basicnodes.process.RegexNodeType;
+import club.mondaylunch.gatos.basicnodes.process.StringCaseNodeType;
+import club.mondaylunch.gatos.basicnodes.process.StringConcatNodeType;
+import club.mondaylunch.gatos.basicnodes.process.StringContainsNodeType;
+import club.mondaylunch.gatos.basicnodes.process.StringInterpolationNodeType;
+import club.mondaylunch.gatos.basicnodes.process.StringLengthNodeType;
+import club.mondaylunch.gatos.basicnodes.process.StringRegexReplacementNodeType;
+import club.mondaylunch.gatos.basicnodes.process.StringRegexSplitNodeType;
+import club.mondaylunch.gatos.basicnodes.process.TruthinessNodeType;
+import club.mondaylunch.gatos.basicnodes.process.ValueProviderNodeType;
+import club.mondaylunch.gatos.basicnodes.process.ValueReplacerNodeType;
+import club.mondaylunch.gatos.basicnodes.process.VariableExtractionNodeType;
+import club.mondaylunch.gatos.basicnodes.process.VariableRemappingNodeType;
+import club.mondaylunch.gatos.basicnodes.start.WebhookStartNodeType;
 import club.mondaylunch.gatos.core.GatosPlugin;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 public final class BasicNodes implements GatosPlugin {
+
     @Override
     public void init() {
     }
@@ -95,6 +141,18 @@ public final class BasicNodes implements GatosPlugin {
         .register("object_set_value", new ObjectSetValueNodeType());
     public static final RegexNodeType REGEX = NodeType.REGISTRY
         .register("regex", new RegexNodeType());
+    public static final GetFlowDataNodeType GET_FLOW_DATA = NodeType.REGISTRY
+        .register("get_flow_data", new GetFlowDataNodeType());
+    public static final SetFlowDataNodeType SET_FLOW_DATA = NodeType.REGISTRY
+        .register("set_flow_data", new SetFlowDataNodeType());
+    public static final ContainsFlowDataNodeType CONTAINS_FLOW_DATA = NodeType.REGISTRY
+        .register("contains_flow_data", new ContainsFlowDataNodeType());
+    public static final RemoveFlowDataNodeType REMOVE_FLOW_DATA = NodeType.REGISTRY
+        .register("remove_flow_data", new RemoveFlowDataNodeType());
+    public static final IncrementFlowDataNodeType INCREMENT_FLOW_DATA = NodeType.REGISTRY
+        .register("increment_flow_data", new IncrementFlowDataNodeType());
+    public static final MultiplyFlowDataNodeType MULTIPLY_FLOW_DATA = NodeType.REGISTRY
+        .register("multiply_flow_data", new MultiplyFlowDataNodeType());
 
     @VisibleForTesting
     public static final Set<DataBox<?>> VALUE_PROVIDER_TYPES_WITH_DEFAULTS = Set.of(
@@ -106,13 +164,12 @@ public final class BasicNodes implements GatosPlugin {
     public static final Map<DataType<?>, ValueProviderNodeType<?>> VALUE_PROVIDERS = VALUE_PROVIDER_TYPES_WITH_DEFAULTS.stream()
         .collect(Collectors.toMap(
             DataBox::type,
-            box -> NodeType.REGISTRY.register("value_provider_"+DataType.REGISTRY.getName(box.type()).orElseThrow(), new ValueProviderNodeType<>(box))
+            box -> NodeType.REGISTRY.register("value_provider_" + DataType.REGISTRY.getName(box.type()).orElseThrow(), new ValueProviderNodeType<>(box))
         ));
 
     public static final Map<DataType<?>, ValueReplacerNodeType<?>> VALUE_REPLACERS = VALUE_PROVIDER_TYPES_WITH_DEFAULTS.stream()
         .collect(Collectors.toMap(
             DataBox::type,
-            box -> NodeType.REGISTRY.register("value_replacer_"+DataType.REGISTRY.getName(box.type()).orElseThrow(), new ValueReplacerNodeType<>(box))
+            box -> NodeType.REGISTRY.register("value_replacer_" + DataType.REGISTRY.getName(box.type()).orElseThrow(), new ValueReplacerNodeType<>(box))
         ));
-    
 }

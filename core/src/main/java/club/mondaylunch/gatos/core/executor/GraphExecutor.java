@@ -64,11 +64,12 @@ public class GraphExecutor {
     /**
      * Creates a function which, when run, executes this flow graph asynchronously, from a certain input node using a given input.
      *
-     * @param triggerNodeId the UUID of the start node that should take in the input
      * @param <T>           the type of the input
+     * @param flowId        the UUID of the flow that is being executed
+     * @param triggerNodeId the UUID of the start node that should take in the input
      * @return an execution function
      */
-    public <T> Function<@Nullable T, CompletableFuture<Void>> execute(@Nullable UUID triggerNodeId) {
+    public <T> Function<@Nullable T, CompletableFuture<Void>> execute(UUID flowId, @Nullable UUID triggerNodeId) {
         final Node triggerNode;
         if (triggerNodeId != null) {
             triggerNode = this.startNodes.stream()
@@ -85,11 +86,11 @@ public class GraphExecutor {
                 CompletableFuture<Map<NodeConnection<?>, DataBox<?>>> resultFuture;
                 if (node == triggerNode) {
                     @SuppressWarnings("unchecked")
-                    var outputs = (((NodeType.Start<T>) node.type()).compute(input, node.settings()));
+                    var outputs = (((NodeType.Start<T>) node.type()).compute(flowId, input, node.settings()));
                     resultFuture = this.associateResultsWithConnections(node, allOf(outputs));
                 } else {
                     var inputs = this.collectInputsForNode(node, resultsFuture);
-                    resultFuture = this.getNodeResults(node, inputs);
+                    resultFuture = this.getNodeResults(flowId, node, inputs);
                 }
                 resultsFuture = resultsFuture.thenCompose(results -> resultFuture.thenApply(result -> {
                     results.putAll(result);
@@ -100,7 +101,7 @@ public class GraphExecutor {
             var computedEndNodeFutures = this.endNodes.stream().map(node -> {
                 var inputsFuture = this.collectInputsForNode(node, finalResultsFuture);
                 return inputsFuture.thenCompose(inputs ->
-                    ((NodeType.End) node.type()).compute(inputs, node.settings())
+                    ((NodeType.End) node.type()).compute(flowId, inputs, node.settings())
                 );
             }).toArray(CompletableFuture[]::new);
             return CompletableFuture.allOf(computedEndNodeFutures);
@@ -108,12 +109,13 @@ public class GraphExecutor {
     }
 
     /**
-     * Convenience overload of {@link #execute(UUID)} which returns a Supplier instead, and triggers no start node.
+     * Convenience overload of {@link #execute(UUID, UUID)} which returns a Supplier instead, and triggers no start node.
      *
+     * @param flowId the UUID of the flow that is being executed
      * @return a Supplier which, when run, executes this flow graph asynchronously
      */
-    public Supplier<CompletableFuture<Void>> execute() {
-        var function = this.execute(null);
+    public Supplier<CompletableFuture<Void>> execute(UUID flowId) {
+        var function = this.execute(flowId, null);
         return () -> function.apply(null);
     }
 
@@ -145,18 +147,20 @@ public class GraphExecutor {
      * Creates future of a map of each of a node's
      * output connections to their output data.
      *
+     * @param flowId       the UUID of the flow that is being executed
      * @param node         the node
      * @param inputsFuture a future of a map of inputs to the node
      * @return a map from each output connection to that connection's output
      */
     private CompletableFuture<Map<NodeConnection<?>, DataBox<?>>> getNodeResults(
+        UUID flowId,
         Node node,
         CompletableFuture<Map<String, DataBox<?>>> inputsFuture
     ) {
         var resultsByConnectorNameFuture = inputsFuture.thenApply(inputs -> {
             Map<String, CompletableFuture<DataBox<?>>> resultsByConnectorName;
             if (node.type() instanceof NodeType.WithOutputs outputs) {
-                resultsByConnectorName = outputs.compute(inputs, node.settings(), node.inputTypes());
+                resultsByConnectorName = outputs.compute(flowId, inputs, node.settings(), node.inputTypes());
             } else {
                 resultsByConnectorName = Map.of();
             }

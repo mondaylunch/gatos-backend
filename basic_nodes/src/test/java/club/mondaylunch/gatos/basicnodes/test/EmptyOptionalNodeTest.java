@@ -2,6 +2,7 @@ package club.mondaylunch.gatos.basicnodes.test;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -19,13 +20,13 @@ public class EmptyOptionalNodeTest {
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.EMPTY_OPTIONAL);
-        Assertions.assertEquals(1, node.getOutputs().size());
-        Assertions.assertTrue(node.getOutputs().containsKey("output"));
+        Assertions.assertEquals(1, node.outputs().size());
+        Assertions.assertTrue(node.outputs().containsKey("output"));
     }
 
     @Test
     public void correctlyGetsEmptyOptional() {
-        var output = BasicNodes.EMPTY_OPTIONAL.compute(Map.of(), Map.of(), Map.of());
+        var output = BasicNodes.EMPTY_OPTIONAL.compute(UUID.randomUUID(), Map.of(), Map.of(), Map.of());
         Assertions.assertEquals(Optional.empty(), output.get("output").join().value());
     }
 }

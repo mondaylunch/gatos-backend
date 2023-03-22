@@ -3,6 +3,7 @@ package club.mondaylunch.gatos.basicnodes.test;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,8 +27,8 @@ public class StringRegexSplitNodeTest {
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.STRING_REGEX_SPLIT);
-        Assertions.assertEquals(1, node.getOutputs().size());
-        Assertions.assertTrue(node.getOutputs().containsKey("output"));
+        Assertions.assertEquals(1, node.outputs().size());
+        Assertions.assertTrue(node.outputs().containsKey("output"));
     }
 
     @Test
@@ -37,7 +38,7 @@ public class StringRegexSplitNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.STRING.create(TEST_STR)
         );
-        var outputLst = (List<String>) BasicNodes.STRING_REGEX_SPLIT.compute(input, node.settings(), Map.of()).get("output").join().value();
+        var outputLst = (List<String>) BasicNodes.STRING_REGEX_SPLIT.compute(UUID.randomUUID(), input, node.settings(), Map.of()).get("output").join().value();
         Assertions.assertEquals(Arrays.stream(TEST_STR.split("")).toList(), outputLst);
     }
 
@@ -49,7 +50,7 @@ public class StringRegexSplitNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.STRING.create(TEST_STR)
         );
-        var outputLst = (List<String>) BasicNodes.STRING_REGEX_SPLIT.compute(input, node.settings(), Map.of()).get("output").join().value();
+        var outputLst = (List<String>) BasicNodes.STRING_REGEX_SPLIT.compute(UUID.randomUUID(), input, node.settings(), Map.of()).get("output").join().value();
         Assertions.assertEquals(Arrays.stream(TEST_STR.split(RGX)).toList(), outputLst);
     }
 }
