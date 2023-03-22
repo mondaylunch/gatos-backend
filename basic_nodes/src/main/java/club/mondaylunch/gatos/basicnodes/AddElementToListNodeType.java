@@ -89,8 +89,6 @@ public class AddElementToListNodeType extends NodeType.Process {
     }
 
     private <T> List<T> generateTypeList(DataType<T> type, List<?> initialize, Object element) {
-        //if (element) throw new IllegalArgumentException("The types of the given List and Element are incompatible.");
-
         List<T> output = new ArrayList<T>((List<T>) initialize);
         output.add((T) element);
         return output;
