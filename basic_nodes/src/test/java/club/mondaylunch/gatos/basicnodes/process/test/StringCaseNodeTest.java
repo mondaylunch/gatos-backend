@@ -1,4 +1,4 @@
-package club.mondaylunch.gatos.basicnodes.test;
+package club.mondaylunch.gatos.basicnodes.process.test;
 
 import java.util.Map;
 import java.util.UUID;
