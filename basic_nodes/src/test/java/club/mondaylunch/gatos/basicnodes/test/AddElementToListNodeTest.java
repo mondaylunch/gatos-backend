@@ -83,8 +83,6 @@ public class AddElementToListNodeTest {
             "list", DataType.NUMBER.listOf(),
             "element", DataType.STRING
         );
-        // Assertions.assertThrows(IllegalArgumentException.class, () -> BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), inputTypes));
-        
         var output = BasicNodes.ADD_ELEM_TO_LIST.compute(inputs, node.settings(), inputTypes).get("output").join().value();
         Assertions.assertEquals(List.of(1, 2, 3), output);
     }
