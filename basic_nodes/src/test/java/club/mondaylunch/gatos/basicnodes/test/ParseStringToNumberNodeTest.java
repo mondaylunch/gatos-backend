@@ -41,7 +41,7 @@ public class ParseStringToNumberNodeTest {
         );
         double output = (double) BasicNodes.PARSE_STRING_TO_NUMBER.compute(input).get("output").join().value();
         Assertions.assertEquals(1, output);
-        
+
         input = Map.of(
             "input", DataType.STRING.create("11")
         );
@@ -89,7 +89,7 @@ public class ParseStringToNumberNodeTest {
         );
         double output = (double) BasicNodes.PARSE_STRING_TO_NUMBER.compute(input).get("output").join().value();
         Assertions.assertEquals(Double.NaN, output);
-        
+
         input = Map.of(
             "input", DataType.STRING.create("hello I am an integer")    // the jester doth lie most fiendishly
         );

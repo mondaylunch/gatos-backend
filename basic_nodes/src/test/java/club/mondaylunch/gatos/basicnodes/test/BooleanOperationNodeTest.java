@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
-import club.mondaylunch.gatos.basicnodes.BooleanOperationNodeType;
+import club.mondaylunch.gatos.basicnodes.process.BooleanOperationNodeType;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Graph;
@@ -47,8 +47,8 @@ public class BooleanOperationNodeTest {
     @Test
     public void correctlyResolvesOrDiff() {
         Map<String, DataBox<?>> inputs = Map.of(
-                "inputA", DataType.BOOLEAN.create(true),
-                "inputB", DataType.BOOLEAN.create(false)
+            "inputA", DataType.BOOLEAN.create(true),
+            "inputB", DataType.BOOLEAN.create(false)
         );
         boolean result = (boolean) BasicNodes.BOOL_OP.compute(UUID.randomUUID(), inputs, OR.settings(), Map.of()).get("output").join().value();
         assertTrue(result);
@@ -57,8 +57,8 @@ public class BooleanOperationNodeTest {
     @Test
     public void correctlyResolvesOrTrue() {
         Map<String, DataBox<?>> inputs = Map.of(
-                "inputA", DataType.BOOLEAN.create(true),
-                "inputB", DataType.BOOLEAN.create(true)
+            "inputA", DataType.BOOLEAN.create(true),
+            "inputB", DataType.BOOLEAN.create(true)
         );
         boolean result = (boolean) BasicNodes.BOOL_OP.compute(UUID.randomUUID(), inputs, OR.settings(), Map.of()).get("output").join().value();
         assertTrue(result);
@@ -67,8 +67,8 @@ public class BooleanOperationNodeTest {
     @Test
     public void correctlyResolvesOrFalse() {
         Map<String, DataBox<?>> inputs = Map.of(
-                "inputA", DataType.BOOLEAN.create(false),
-                "inputB", DataType.BOOLEAN.create(false)
+            "inputA", DataType.BOOLEAN.create(false),
+            "inputB", DataType.BOOLEAN.create(false)
         );
         boolean result = (boolean) BasicNodes.BOOL_OP.compute(UUID.randomUUID(), inputs, OR.settings(), Map.of()).get("output").join().value();
         assertFalse(result);
@@ -77,8 +77,8 @@ public class BooleanOperationNodeTest {
     @Test
     public void correctlyResolvesAndDiff() {
         Map<String, DataBox<?>> inputs = Map.of(
-                "inputA", DataType.BOOLEAN.create(true),
-                "inputB", DataType.BOOLEAN.create(false)
+            "inputA", DataType.BOOLEAN.create(true),
+            "inputB", DataType.BOOLEAN.create(false)
         );
 
         boolean result = (boolean) BasicNodes.BOOL_OP.compute(UUID.randomUUID(), inputs, AND.settings(), Map.of()).get("output").join().value();
@@ -88,8 +88,8 @@ public class BooleanOperationNodeTest {
     @Test
     public void correctlyResolvesAndTrue() {
         Map<String, DataBox<?>> inputs = Map.of(
-                "inputA", DataType.BOOLEAN.create(true),
-                "inputB", DataType.BOOLEAN.create(true)
+            "inputA", DataType.BOOLEAN.create(true),
+            "inputB", DataType.BOOLEAN.create(true)
         );
         boolean result = (boolean) BasicNodes.BOOL_OP.compute(UUID.randomUUID(), inputs, AND.settings(), Map.of()).get("output").join().value();
         assertTrue(result);
@@ -98,8 +98,8 @@ public class BooleanOperationNodeTest {
     @Test
     public void correctlyResolvesAndFalse() {
         Map<String, DataBox<?>> inputs = Map.of(
-                "inputA", DataType.BOOLEAN.create(false),
-                "inputB", DataType.BOOLEAN.create(false)
+            "inputA", DataType.BOOLEAN.create(false),
+            "inputB", DataType.BOOLEAN.create(false)
         );
         boolean result = (boolean) BasicNodes.BOOL_OP.compute(UUID.randomUUID(), inputs, AND.settings(), Map.of()).get("output").join().value();
         assertFalse(result);
@@ -108,8 +108,8 @@ public class BooleanOperationNodeTest {
     @Test
     public void correctlyResolvesXorDiff() {
         Map<String, DataBox<?>> inputs = Map.of(
-                "inputA", DataType.BOOLEAN.create(true),
-                "inputB", DataType.BOOLEAN.create(false)
+            "inputA", DataType.BOOLEAN.create(true),
+            "inputB", DataType.BOOLEAN.create(false)
         );
         boolean result = (boolean) BasicNodes.BOOL_OP.compute(UUID.randomUUID(), inputs, XOR.settings(), Map.of()).get("output").join().value();
         assertTrue(result);
@@ -118,8 +118,8 @@ public class BooleanOperationNodeTest {
     @Test
     public void correctlyResolvesXorTrue() {
         Map<String, DataBox<?>> inputs = Map.of(
-                "inputA", DataType.BOOLEAN.create(true),
-                "inputB", DataType.BOOLEAN.create(true)
+            "inputA", DataType.BOOLEAN.create(true),
+            "inputB", DataType.BOOLEAN.create(true)
         );
         boolean result = (boolean) BasicNodes.BOOL_OP.compute(UUID.randomUUID(), inputs, XOR.settings(), Map.of()).get("output").join().value();
         assertFalse(result);
@@ -128,8 +128,8 @@ public class BooleanOperationNodeTest {
     @Test
     public void correctlyResolvesXorFalse() {
         Map<String, DataBox<?>> inputs = Map.of(
-                "inputA", DataType.BOOLEAN.create(false),
-                "inputB", DataType.BOOLEAN.create(false)
+            "inputA", DataType.BOOLEAN.create(false),
+            "inputB", DataType.BOOLEAN.create(false)
         );
         boolean result = (boolean) BasicNodes.BOOL_OP.compute(UUID.randomUUID(), inputs, XOR.settings(), Map.of()).get("output").join().value();
         assertFalse(result);
