@@ -69,5 +69,7 @@ public class FlowCollection extends BaseCollection<Flow> {
         flow.getGraph()
             .observer()
             .updateFlow(flow.getId(), this.getCollection());
+
+        flow.setupTriggers();
     }
 }

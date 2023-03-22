@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
+import club.mondaylunch.gatos.core.Either;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Graph;
@@ -52,13 +53,13 @@ public class ListMappingNodeTypeTest {
         var node = graph.addNode(BasicNodes.LIST_MAPPING);
         node = graph.modifyNode(node.id(), n -> n.modifySetting("mapping_node", DataType.PROCESS_NODE_TYPE.create(this.mappingNode)).modifySetting("input_connector", DataType.STRING.create("fgjklsdkg")));
 
-        Assertions.assertTrue(node.type().isValid(node, graph).stream().anyMatch(e -> e.message().toLowerCase(Locale.ROOT).contains("input connector")));
-        Assertions.assertFalse(node.type().isValid(node, graph).stream().anyMatch(e -> e.message().toLowerCase(Locale.ROOT).contains("output connector")));
+        Assertions.assertTrue(node.type().isValid(node, Either.right(graph)).stream().anyMatch(e -> e.message().toLowerCase(Locale.ROOT).contains("input connector")));
+        Assertions.assertFalse(node.type().isValid(node, Either.right(graph)).stream().anyMatch(e -> e.message().toLowerCase(Locale.ROOT).contains("output connector")));
 
         node = graph.modifyNode(node.id(), n -> n.modifySetting("input_connector", DataType.STRING.create("input")).modifySetting("output_connector", DataType.STRING.create("jksghklsgtres")));
 
-        Assertions.assertFalse(node.type().isValid(node, graph).stream().anyMatch(e -> e.message().toLowerCase(Locale.ROOT).contains("input connector")));
-        Assertions.assertTrue(node.type().isValid(node, graph).stream().anyMatch(e -> e.message().toLowerCase(Locale.ROOT).contains("output connector")));
+        Assertions.assertFalse(node.type().isValid(node, Either.right(graph)).stream().anyMatch(e -> e.message().toLowerCase(Locale.ROOT).contains("input connector")));
+        Assertions.assertTrue(node.type().isValid(node, Either.right(graph)).stream().anyMatch(e -> e.message().toLowerCase(Locale.ROOT).contains("output connector")));
     }
 
     @Test
@@ -69,7 +70,7 @@ public class ListMappingNodeTypeTest {
             .modifySetting("input_connector", DataType.STRING.create("input"))
             .modifySetting("output_connector", DataType.STRING.create("output")));
 
-        Assertions.assertFalse(node.type().isValid(node, graph).stream().anyMatch(e -> e.message().toLowerCase(Locale.ROOT).contains("connector not found on mapping node")));
+        Assertions.assertFalse(node.type().isValid(node, Either.right(graph)).stream().anyMatch(e -> e.message().toLowerCase(Locale.ROOT).contains("connector not found on mapping node")));
     }
 
     @Test

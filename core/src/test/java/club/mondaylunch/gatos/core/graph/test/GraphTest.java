@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import club.mondaylunch.gatos.core.Either;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Graph;
@@ -183,12 +184,12 @@ public class GraphTest {
         var node1 = graph.addNode(TEST_NUMBER_NODE_TYPE);
         var node2 = graph.addNode(TestNodeTypes.TEST_VARYING_OUTPUT_NODE_TYPE);
 
-        Assertions.assertEquals(DataType.ANY, node2.outputs().get("out").type());
+        Assertions.assertEquals(DataType.ANY, node2.getOutputs().get("out").type());
         var conn = NodeConnection.create(node1, "out", node2, "in");
         graph.addConnection(conn);
-        Assertions.assertEquals(DataType.NUMBER, graph.getNode(node2.id()).orElseThrow().outputs().get("out").type());
+        Assertions.assertEquals(DataType.NUMBER, graph.getNode(node2.id()).orElseThrow().getOutputs().get("out").type());
         graph.removeConnection(graph.getConnection(node1.id(), "out", node2.id(), "in").orElseThrow());
-        Assertions.assertEquals(DataType.ANY, graph.getNode(node2.id()).orElseThrow().outputs().get("out").type());
+        Assertions.assertEquals(DataType.ANY, graph.getNode(node2.id()).orElseThrow().getOutputs().get("out").type());
     }
 
     @Test
@@ -201,7 +202,7 @@ public class GraphTest {
         var conn1 = NodeConnection.create(node1, "out", node2, "in");
         graph.addConnection(conn1);
         node2 = graph.getNode(node2.id()).orElseThrow();
-        Assertions.assertEquals(DataType.NUMBER, graph.getNode(node2.id()).orElseThrow().outputs().get("out").type());
+        Assertions.assertEquals(DataType.NUMBER, graph.getNode(node2.id()).orElseThrow().getOutputs().get("out").type());
         var conn2 = NodeConnection.create(node2, "out", node3, "in");
         graph.addConnection(conn2);
         graph.removeConnection(graph.getConnection(node1.id(), "out", node2.id(), "in").orElseThrow());
@@ -218,7 +219,7 @@ public class GraphTest {
         var conn1 = NodeConnection.create(node1, "out", node2, "in");
         graph.addConnection(conn1);
         node2 = graph.getNode(node2.id()).orElseThrow();
-        Assertions.assertEquals(DataType.NUMBER, graph.getNode(node2.id()).orElseThrow().outputs().get("out").type());
+        Assertions.assertEquals(DataType.NUMBER, graph.getNode(node2.id()).orElseThrow().getOutputs().get("out").type());
         var conn2 = NodeConnection.create(node2, "out", node3, "in");
         graph.addConnection(conn2);
         graph.removeConnection(graph.getConnection(node1.id(), "out", node2.id(), "in").orElseThrow());
@@ -430,12 +431,25 @@ public class GraphTest {
     }
 
     @Test
+    public void graphWithTwoIntoOneIsValid() {
+        var graph = new Graph();
+        var input1 = graph.addNode(START_NODE_TYPE);
+        var input2 = graph.addNode(START_NODE_TYPE);
+        var output = graph.addNode(END_TWO_INPUTS_NODE_TYPE);
+        var conn = NodeConnection.create(input1, "out", output, "in1");
+        graph.addConnection(conn);
+        conn = NodeConnection.create(input2, "out", output, "in2");
+        graph.addConnection(conn);
+        Assertions.assertTrue(graph.validate().isEmpty());
+    }
+
+    @Test
     public void graphWithNodeSpecificErrorIsInvalid() {
         var graph = new Graph();
         var input = graph.addNode(START_NODE_TYPE);
         var middle = graph.addNode(new TestNodeType(1, DataType.NUMBER) {
             @Override
-            public Collection<GraphValidityError> isValid(Node node, Graph graph) {
+            public Collection<GraphValidityError> isValid(Node node, Either<Flow, Graph> graph) {
                 return List.of(new GraphValidityError(node.id(), "Test error"));
             }
         });
@@ -483,8 +497,8 @@ public class GraphTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs,
-                                                                  Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+        public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs,
+                Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Map.of();
         }
     }
@@ -507,7 +521,12 @@ public class GraphTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, @Nullable Object o, Map<String, DataBox<?>> settings) {
+        public void teardownFlow(Flow flow, Node node) {
+
+        }
+
+        @Override
+        public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable Object o, Map<String, DataBox<?>> settings) {
             return Map.of();
         }
     }
@@ -525,7 +544,7 @@ public class GraphTest {
         }
 
         @Override
-        public CompletableFuture<Void> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+        public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
             return CompletableFuture.runAsync(() -> {
             });
         }
@@ -550,7 +569,12 @@ public class GraphTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, @Nullable Object o, Map<String, DataBox<?>> settings) {
+        public void teardownFlow(Flow flow, Node node) {
+
+        }
+
+        @Override
+        public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable Object o, Map<String, DataBox<?>> settings) {
             return Map.of();
         }
     }
@@ -570,7 +594,7 @@ public class GraphTest {
         }
 
         @Override
-        public CompletableFuture<Void> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+        public CompletableFuture<Void> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
             return CompletableFuture.runAsync(() -> {
             });
         }

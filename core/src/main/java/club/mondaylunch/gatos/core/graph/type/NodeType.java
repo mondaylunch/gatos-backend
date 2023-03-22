@@ -7,11 +7,13 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import club.mondaylunch.gatos.core.Either;
 import club.mondaylunch.gatos.core.Registry;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
@@ -62,12 +64,12 @@ public interface NodeType {
     Map<String, DataBox<?>> settings();
 
     /**
-     * Determine whether the given node is valid in the graph.
-     * @param node  the node to check
-     * @param graph the graph the node is in
-     * @return      any errors related to the node in the graph
+     * Determine whether the given node is valid in the flow.
+     * @param node          the node to check
+     * @param flowOrGraph   the flow the node is in, or the graph the node is in
+     * @return      any errors related to the node in the flow
      */
-    Collection<GraphValidityError> isValid(Node node, Graph graph);
+    Collection<GraphValidityError> isValid(Node node, Either<Flow, Graph> flowOrGraph);
 
     /**
      * Extended by node types which have input connectors.
@@ -126,7 +128,7 @@ public interface NodeType {
         }
 
         @Override
-        public Collection<GraphValidityError> isValid(Node node, Graph graph) {
+        public Collection<GraphValidityError> isValid(Node node, Either<Flow, Graph> flowOrGraph) {
             return Set.of();
         }
 
@@ -137,6 +139,13 @@ public interface NodeType {
          * @param node  the node
          */
         public abstract void setupFlow(Flow flow, Consumer<@Nullable StartInput> function, Node node);
+
+        /**
+         * Perform whatever teardown is needed to make this flow no longer trigger from this node.
+         * @param flow the flow this node is a part of
+         * @param node the node (pre-whatever modification made it invalid)
+         */
+        public abstract void teardownFlow(Flow flow, Node node);
 
         /**
          * (Asynchronously) compute the outputs of this node in a map of output
@@ -169,8 +178,8 @@ public interface NodeType {
      */
     abstract class Process implements NodeType, WithInputs, WithOutputs {
         @Override
-        public Collection<GraphValidityError> isValid(Node node, Graph graph) {
-            return defaultValidation(node, graph);
+        public Collection<GraphValidityError> isValid(Node node, Either<Flow, Graph> flowOrGraph) {
+            return defaultValidation(node, flowOrGraph);
         }
 
         @Override
@@ -184,8 +193,8 @@ public interface NodeType {
      */
     abstract class End implements NodeType, WithInputs {
         @Override
-        public Collection<GraphValidityError> isValid(Node node, Graph graph) {
-            return NodeType.defaultValidation(node, graph);
+        public Collection<GraphValidityError> isValid(Node node, Either<Flow, Graph> flowOrGraph) {
+            return NodeType.defaultValidation(node, flowOrGraph);
         }
 
         @Override
@@ -235,12 +244,13 @@ public interface NodeType {
 
     /**
      * Ensures that all inputs of a node are hooked up, if any outputs are.
-     * @param node  the node
-     * @param graph the graph
-     * @return      any validation errors
+     * @param node          the node
+     * @param flowOrGraph   the flow or graph the node is in
+     * @return              any validation errors
      */
     @NotNull
-    static Collection<GraphValidityError> defaultValidation(Node node, Graph graph) {
+    static Collection<GraphValidityError> defaultValidation(Node node, Either<Flow, Graph> flowOrGraph) {
+        var graph = flowOrGraph.map(Flow::getGraph, Function.identity());
         var conns = List.copyOf(graph.getConnectionsForNode(node.id()));
         if (conns.stream().anyMatch(c -> c.to().nodeId().equals(node.id()))) {
             return node.inputs().values().stream()

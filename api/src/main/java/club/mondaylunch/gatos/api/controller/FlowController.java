@@ -385,7 +385,7 @@ public class FlowController {
         User user = this.userRepository.getOrCreateUser(userEmail);
         var flow = this.flowRepository.getFlow(user, flowId);
         var graph = flow.getGraph();
-        var errors = graph.validate();
+        var errors = graph.validate(flow);
         return SerializationUtils.toJson(new GraphErrorInfo(errors));
     }
 
