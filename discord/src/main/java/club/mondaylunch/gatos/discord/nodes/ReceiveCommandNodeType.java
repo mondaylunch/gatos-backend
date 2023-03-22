@@ -78,7 +78,7 @@ public class ReceiveCommandNodeType extends NodeType.Start<SlashCommandInteracti
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable SlashCommandInteractionEvent event, Map<String, DataBox<?>> settings) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, @Nullable SlashCommandInteractionEvent event, Map<String, DataBox<?>> settings) {
         if (event == null) {
             return Map.of(
                 "user", CompletableFuture.completedFuture(DiscordDataTypes.USER_ID.create("")),

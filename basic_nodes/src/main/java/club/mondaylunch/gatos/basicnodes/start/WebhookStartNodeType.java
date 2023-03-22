@@ -1,4 +1,4 @@
-package club.mondaylunch.gatos.basicnodes;
+package club.mondaylunch.gatos.basicnodes.start;
 
 import java.util.Map;
 import java.util.Objects;
@@ -42,7 +42,7 @@ public class WebhookStartNodeType extends NodeType.Start<WebhookStartNodeInput> 
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(@Nullable WebhookStartNodeInput input, Map<String, DataBox<?>> settings) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, @Nullable WebhookStartNodeInput input, Map<String, DataBox<?>> settings) {
         Objects.requireNonNull(input);
         return Map.of(
             "requestBody", CompletableFuture.completedFuture(DataType.JSON_OBJECT.create(

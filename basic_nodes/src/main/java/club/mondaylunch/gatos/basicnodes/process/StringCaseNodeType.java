@@ -1,4 +1,4 @@
-package club.mondaylunch.gatos.basicnodes;
+package club.mondaylunch.gatos.basicnodes.process;
 
 import java.util.Map;
 import java.util.Set;
@@ -31,7 +31,7 @@ public class StringCaseNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var inputStr = DataBox.get(inputs, "input", DataType.STRING).orElseThrow();
         var setting = DataBox.get(settings, "case_setting", CASE_SETTING).orElse(CaseSetting.UPPER);
         return Map.of("output", CompletableFuture.completedFuture(DataType.STRING.create(setting.apply(inputStr))));

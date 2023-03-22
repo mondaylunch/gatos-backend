@@ -1,4 +1,4 @@
-package club.mondaylunch.gatos.basicnodes;
+package club.mondaylunch.gatos.basicnodes.process;
 
 import java.util.Map;
 import java.util.Optional;
@@ -31,7 +31,7 @@ public class EmptyOptionalNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         return Map.of("output", CompletableFuture.completedFuture(OptionalDataType.GENERIC_OPTIONAL.create(Optional.empty())));
     }
 }

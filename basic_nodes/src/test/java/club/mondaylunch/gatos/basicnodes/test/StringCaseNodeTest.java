@@ -1,12 +1,13 @@
 package club.mondaylunch.gatos.basicnodes.test;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
-import club.mondaylunch.gatos.basicnodes.StringCaseNodeType;
+import club.mondaylunch.gatos.basicnodes.process.StringCaseNodeType;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Node;
@@ -24,8 +25,8 @@ public class StringCaseNodeTest {
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.STRING_CASE);
-        Assertions.assertEquals(1, node.getOutputs().size());
-        Assertions.assertTrue(node.getOutputs().containsKey("output"));
+        Assertions.assertEquals(1, node.outputs().size());
+        Assertions.assertTrue(node.outputs().containsKey("output"));
     }
 
     @Test
@@ -35,7 +36,7 @@ public class StringCaseNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.STRING.create(TEST_STR)
         );
-        var output = BasicNodes.STRING_CASE.compute(input, node.settings(), Map.of());
+        var output = BasicNodes.STRING_CASE.compute(UUID.randomUUID(), input, node.settings(), Map.of());
         Assertions.assertEquals(TEST_STR.toUpperCase(), output.get("output").join().value());
     }
 
@@ -46,7 +47,7 @@ public class StringCaseNodeTest {
         Map<String, DataBox<?>> input = Map.of(
             "input", DataType.STRING.create(TEST_STR)
         );
-        var output = BasicNodes.STRING_CASE.compute(input, node.settings(), Map.of());
+        var output = BasicNodes.STRING_CASE.compute(UUID.randomUUID(), input, node.settings(), Map.of());
         Assertions.assertEquals(TEST_STR.toLowerCase(), output.get("output").join().value());
     }
 }
