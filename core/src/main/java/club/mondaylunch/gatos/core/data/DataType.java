@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -15,6 +14,7 @@ import com.google.gson.JsonPrimitive;
 import club.mondaylunch.gatos.core.Registry;
 import club.mondaylunch.gatos.core.graph.type.NodeCategory;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
+import club.mondaylunch.gatos.core.models.JsonObjectReference;
 
 /**
  * A type of value which can be stored in a {@link DataBox}.
@@ -30,7 +30,7 @@ public sealed class DataType<T> permits ListDataType, OptionalDataType {
     public static final DataType<JsonObject> JSON_OBJECT = register("json_object", JsonObject.class);
     public static final DataType<JsonElement> JSON_ELEMENT = register("json_element", JsonElement.class);
     public static final DataType<DataType<?>> DATA_TYPE = register("data_type", DataType.class);
-    public static final DataType<AtomicReference<?>> REFERENCE = register("reference", AtomicReference.class);
+    public static final DataType<JsonObjectReference> REFERENCE = register("reference", JsonObjectReference.class);
     public static final DataType<NodeType.Process> PROCESS_NODE_TYPE = register("process_node_type", NodeType.class);
 
     static {

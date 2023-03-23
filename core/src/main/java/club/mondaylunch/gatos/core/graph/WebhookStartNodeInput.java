@@ -1,11 +1,11 @@
 package club.mondaylunch.gatos.core.graph;
 
-import java.util.concurrent.atomic.AtomicReference;
-
 import com.google.gson.JsonObject;
+
+import club.mondaylunch.gatos.core.models.JsonObjectReference;
 
 public record WebhookStartNodeInput(
     JsonObject requestBody,
-    AtomicReference<?> endOutput
+    JsonObjectReference endOutput
 ) {
 }

@@ -67,6 +67,7 @@ public class AddElementToListNodeType extends NodeType.Process {
         return type instanceof ListDataType<?> list ? list.contains() : DataType.ANY;
     }
 
+    @SuppressWarnings("unchecked")
     private <T> List<?> generateList(ArrayList<T> list, Object element) {
         list.add((T) element);
         return list; 

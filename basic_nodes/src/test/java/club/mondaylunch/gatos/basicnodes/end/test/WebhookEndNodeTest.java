@@ -2,7 +2,6 @@ package club.mondaylunch.gatos.basicnodes.end.test;
 
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.gson.JsonObject;
 import org.junit.jupiter.api.Assertions;
@@ -12,6 +11,7 @@ import club.mondaylunch.gatos.basicnodes.BasicNodes;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Node;
+import club.mondaylunch.gatos.core.models.JsonObjectReference;
 
 public class WebhookEndNodeTest {
 
@@ -47,12 +47,12 @@ public class WebhookEndNodeTest {
     public void computesCorrectly() {
         var graphOutput = new JsonObject();
         graphOutput.addProperty("test", 1);
-        AtomicReference<?> outputReference = new AtomicReference<>();
+        var outputReference = new JsonObjectReference();
         Map<String, DataBox<?>> inputs = Map.of(
             "graphOutput", DataType.JSON_OBJECT.create(graphOutput),
             "outputReference", DataType.REFERENCE.create(outputReference)
         );
         BasicNodes.WEBHOOK_END.compute(UUID.randomUUID(), inputs, Map.of()).join();
-        Assertions.assertEquals(graphOutput, outputReference.get());
+        Assertions.assertEquals(graphOutput, outputReference.getValue());
     }
 }

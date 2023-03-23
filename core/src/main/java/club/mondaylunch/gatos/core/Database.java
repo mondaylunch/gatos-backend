@@ -18,6 +18,7 @@ import org.bson.conversions.Bson;
 
 import club.mondaylunch.gatos.core.codec.DataBoxCodecProvider;
 import club.mondaylunch.gatos.core.codec.GraphCodecProvider;
+import club.mondaylunch.gatos.core.codec.JsonElementCodecProvider;
 import club.mondaylunch.gatos.core.codec.NodeCodecProvider;
 import club.mondaylunch.gatos.core.codec.NodeConnectionCodecProvider;
 import club.mondaylunch.gatos.core.codec.NodeConnectorCodecProvider;
@@ -63,9 +64,12 @@ public enum Database {
                 GraphCodecProvider.INSTANCE,
                 NodeCodecProvider.FOR_DB,
                 DataBoxCodecProvider.INSTANCE,
+                JsonElementCodecProvider.INSTANCE,
                 RegistryObjectCodec.Provider.INSTANCE
             ),
-            CodecRegistries.fromCodecs(new UuidCodec(UuidRepresentation.STANDARD)),
+            CodecRegistries.fromCodecs(
+                new UuidCodec(UuidRepresentation.STANDARD)
+            ),
             MongoClientSettings.getDefaultCodecRegistry(),
             CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build())
         );

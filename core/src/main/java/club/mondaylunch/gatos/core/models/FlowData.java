@@ -1,5 +1,6 @@
 package club.mondaylunch.gatos.core.models;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -43,6 +44,31 @@ public class FlowData {
 
     public void setValue(DataBox<?> value) {
         this.value = value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.id, this.value);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        } else if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        } else {
+            FlowData flowData = (FlowData) obj;
+            return Objects.equals(this.id, flowData.id) && Objects.equals(this.value, flowData.value);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "FlowData{"
+            + "id=" + this.id
+            + ", value=" + this.value
+            + '}';
     }
 
     public record Id(
