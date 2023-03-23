@@ -3,7 +3,6 @@ package club.mondaylunch.gatos.api.controller;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import javax.validation.Valid;
@@ -46,6 +45,7 @@ import club.mondaylunch.gatos.core.graph.connector.NodeConnection;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 import club.mondaylunch.gatos.core.models.BasicFlowInfo;
 import club.mondaylunch.gatos.core.models.Flow;
+import club.mondaylunch.gatos.core.models.JsonObjectReference;
 import club.mondaylunch.gatos.core.models.User;
 
 @RestController
@@ -448,14 +448,14 @@ public class FlowController {
                 throw new InvalidBodyException("Body must be a JSON object", e);
             }
         }
-        AtomicReference<?> outputReference = new AtomicReference<>();
+        var outputReference = new JsonObjectReference();
         var webhookStartInput = new WebhookStartNodeInput(inputJson, outputReference);
         try {
             executeFunction.apply(webhookStartInput).join();
         } catch (Exception e) {
             throw new FlowExecutionException(e);
         }
-        var output = outputReference.get();
+        var output = outputReference.getValue();
         if (output == null) {
             return "{}";
         } else {

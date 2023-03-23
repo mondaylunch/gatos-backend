@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicReference;
 
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
@@ -33,13 +32,12 @@ public class WebhookEndNodeType extends NodeType.End {
             "graphOutput",
             DataType.JSON_OBJECT
         ).orElseThrow();
-        @SuppressWarnings("unchecked")
-        var outputReference = (AtomicReference<Object>) DataBox.get(
+        var outputReference = DataBox.get(
             inputs,
             "outputReference",
             DataType.REFERENCE
         ).orElseThrow();
-        outputReference.set(graphOutput);
+        outputReference.setValue(graphOutput);
         return CompletableFuture.completedFuture(null);
     }
 }
