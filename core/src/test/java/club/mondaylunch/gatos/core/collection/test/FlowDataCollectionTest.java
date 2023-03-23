@@ -2,6 +2,9 @@ package club.mondaylunch.gatos.core.collection.test;
 
 import java.util.UUID;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.mongodb.MongoWriteException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -11,6 +14,8 @@ import org.junit.jupiter.api.Test;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.models.FlowData;
+import club.mondaylunch.gatos.core.models.JsonObjectReference;
+import club.mondaylunch.gatos.testshared.graph.type.test.TestNodeTypes;
 
 public class FlowDataCollectionTest {
 
@@ -180,6 +185,29 @@ public class FlowDataCollectionTest {
         var retrieved = FlowData.objects.get(id, "test");
         Assertions.assertTrue(retrieved.isPresent());
         Assertions.assertEquals(DataType.NUMBER.create(10.0), retrieved.orElseThrow());
+    }
+
+    @Test
+    public void canStoreAllDataTypes() {
+        var flowId = UUID.randomUUID();
+        assertSetData(flowId, "string", DataType.STRING.create("Test data"));
+        assertSetData(flowId, "number", DataType.NUMBER.create(1.0));
+        assertSetData(flowId, "boolean", DataType.BOOLEAN.create(true));
+        var jsonObject = new JsonObject();
+        jsonObject.addProperty("string", "Test data");
+        jsonObject.addProperty("number", 1.0);
+        jsonObject.addProperty("boolean", true);
+        var nestedJsonObject = new JsonObject();
+        nestedJsonObject.addProperty("string", "Test data");
+        jsonObject.add("object", nestedJsonObject);
+        var nestedJsonArray = new JsonArray();
+        nestedJsonArray.add("Test data");
+        jsonObject.add("array", nestedJsonArray);
+        assertSetData(flowId, "json_object", DataType.JSON_OBJECT.create(jsonObject));
+        assertSetData(flowId, "json_array", DataType.JSON_ELEMENT.create(new JsonPrimitive("Test data")));
+        assertSetData(flowId, "data_type", DataType.DATA_TYPE.create(DataType.ANY));
+        assertSetData(flowId, "reference", DataType.REFERENCE.create(new JsonObjectReference(jsonObject)));
+        assertSetData(flowId, "process_node_type", DataType.PROCESS_NODE_TYPE.create(TestNodeTypes.PROCESS));
     }
 
     private static void assertSetData(UUID flowId, String key, DataBox<?> value) {
