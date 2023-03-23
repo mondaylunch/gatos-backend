@@ -34,7 +34,7 @@ public class ListReverseNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var inputListCopy = new ArrayList<>(DataBox.get(inputs, "input", ListDataType.GENERIC_LIST).orElseThrow());
         var outputType = inputTypes.getOrDefault("input", ListDataType.GENERIC_LIST);
         Collections.reverse(inputListCopy);

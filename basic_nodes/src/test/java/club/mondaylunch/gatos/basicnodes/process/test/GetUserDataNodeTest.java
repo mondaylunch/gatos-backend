@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Test;
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Node;
-import club.mondaylunch.gatos.core.models.FlowData;
+import club.mondaylunch.gatos.core.models.UserData;
 
-public class GetFlowDataNodeTest {
+public class GetUserDataNodeTest {
 
     @BeforeEach
     void setUp() {
@@ -27,12 +27,12 @@ public class GetFlowDataNodeTest {
     }
 
     private void reset() {
-        FlowData.objects.clear();
+        UserData.objects.clear();
     }
 
     @Test
     public void areSettingsCorrect() {
-        var settings = BasicNodes.GET_FLOW_DATA.settings();
+        var settings = BasicNodes.GET_USER_DATA.settings();
         Assertions.assertEquals(2, settings.size());
         Assertions.assertTrue(settings.containsKey("key"));
         Assertions.assertTrue(settings.containsKey("type"));
@@ -40,7 +40,7 @@ public class GetFlowDataNodeTest {
 
     @Test
     public void areInputsCorrect() {
-        var node = Node.create(BasicNodes.GET_FLOW_DATA);
+        var node = Node.create(BasicNodes.GET_USER_DATA);
         var inputs = node.inputs();
         Assertions.assertEquals(1, inputs.size());
         var nodeId = node.id();
@@ -52,7 +52,7 @@ public class GetFlowDataNodeTest {
 
     @Test
     public void areInputsCorrectWithKeySetting() {
-        var node = Node.create(BasicNodes.GET_FLOW_DATA)
+        var node = Node.create(BasicNodes.GET_USER_DATA)
             .modifySetting("key", DataType.STRING.create("test_key"));
         var inputs = node.inputs();
         Assertions.assertEquals(0, inputs.size());
@@ -60,7 +60,7 @@ public class GetFlowDataNodeTest {
 
     @Test
     public void areOutputsCorrect() {
-        var node = Node.create(BasicNodes.GET_FLOW_DATA);
+        var node = Node.create(BasicNodes.GET_USER_DATA);
         var outputs = node.outputs();
         Assertions.assertEquals(1, outputs.size());
         var nodeId = node.id();
@@ -73,7 +73,7 @@ public class GetFlowDataNodeTest {
 
     @Test
     public void areOutputsCorrectWithType() {
-        var node = Node.create(BasicNodes.GET_FLOW_DATA)
+        var node = Node.create(BasicNodes.GET_USER_DATA)
             .modifySetting("type", DataType.DATA_TYPE.create(DataType.STRING));
         var outputs = node.outputs();
         Assertions.assertEquals(1, outputs.size());
@@ -87,12 +87,12 @@ public class GetFlowDataNodeTest {
 
     @Test
     public void canGetValue() {
-        var nodeType = BasicNodes.GET_FLOW_DATA;
-        var flowId = UUID.randomUUID();
+        var nodeType = BasicNodes.GET_USER_DATA;
+        var userId = UUID.randomUUID();
         var value = DataType.STRING.create("Test value");
-        FlowData.objects.set(flowId, "test_key", value);
+        UserData.objects.set(userId, "test_key", value);
         var outputs = nodeType.compute(
-            flowId,
+            userId,
             Map.of("key", DataType.STRING.create("test_key")),
             Map.of(),
             Map.of()
@@ -106,10 +106,10 @@ public class GetFlowDataNodeTest {
 
     @Test
     public void canGetNonExistentValue() {
-        var nodeType = BasicNodes.GET_FLOW_DATA;
-        var flowId = UUID.randomUUID();
+        var nodeType = BasicNodes.GET_USER_DATA;
+        var userId = UUID.randomUUID();
         var outputs = nodeType.compute(
-            flowId,
+            userId,
             Map.of("key", DataType.STRING.create("test_key")),
             Map.of(),
             Map.of()
@@ -123,12 +123,12 @@ public class GetFlowDataNodeTest {
 
     @Test
     public void canGetValueWithType() {
-        var nodeType = BasicNodes.GET_FLOW_DATA;
-        var flowId = UUID.randomUUID();
+        var nodeType = BasicNodes.GET_USER_DATA;
+        var userId = UUID.randomUUID();
         var value = DataType.STRING.create("Test value");
-        FlowData.objects.set(flowId, "test_key", value);
+        UserData.objects.set(userId, "test_key", value);
         var outputs = nodeType.compute(
-            flowId,
+            userId,
             Map.of("key", DataType.STRING.create("test_key")),
             Map.of("type", DataType.DATA_TYPE.create(DataType.STRING)),
             Map.of()

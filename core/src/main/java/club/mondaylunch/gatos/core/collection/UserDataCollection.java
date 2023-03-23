@@ -16,54 +16,54 @@ import org.bson.codecs.EncoderContext;
 import club.mondaylunch.gatos.core.Database;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
-import club.mondaylunch.gatos.core.models.FlowData;
+import club.mondaylunch.gatos.core.models.UserData;
 
-public class FlowDataCollection {
+public class UserDataCollection {
 
-    private final MongoCollection<FlowData> collection;
+    private final MongoCollection<UserData> collection;
 
-    public FlowDataCollection() {
-        this.collection = Database.getCollection("flow_data", FlowData.class);
+    public UserDataCollection() {
+        this.collection = Database.getCollection("user_data", UserData.class);
     }
 
-    public Optional<DataBox<?>> get(UUID flowId, String key) {
-        var id = new FlowData.Id(flowId, key);
-        var flowData = this.collection.find(Filters.eq(id))
+    public Optional<DataBox<?>> get(UUID userId, String key) {
+        var id = new UserData.Id(userId, key);
+        var userData = this.collection.find(Filters.eq(id))
             .limit(1)
             .first();
-        if (flowData == null) {
+        if (userData == null) {
             return Optional.empty();
         } else {
-            return Optional.of(flowData.getValue());
+            return Optional.of(userData.getValue());
         }
     }
 
-    public void set(UUID flowId, String key, DataBox<?> value) {
-        var flowData = new FlowData(flowId, key, value);
-        this.collection.replaceOne(Filters.eq(flowData.getId()), flowData, new ReplaceOptions().upsert(true));
+    public void set(UUID userId, String key, DataBox<?> value) {
+        var userData = new UserData(userId, key, value);
+        this.collection.replaceOne(Filters.eq(userData.getId()), userData, new ReplaceOptions().upsert(true));
     }
 
-    public void setIfAbsent(UUID flowId, String key, DataBox<?> value) {
-        var id = new FlowData.Id(flowId, key);
-        var flowData = new FlowData(flowId, key, value);
+    public void setIfAbsent(UUID userId, String key, DataBox<?> value) {
+        var id = new UserData.Id(userId, key);
+        var userData = new UserData(userId, key, value);
         var document = new BsonDocument();
         var context = EncoderContext.builder().build();
-        var codec = Database.getCodecRegistry().get(FlowData.class);
+        var codec = Database.getCodecRegistry().get(UserData.class);
         try (var writer = new BsonDocumentWriter(document)) {
-            codec.encode(writer, flowData, context);
+            codec.encode(writer, userData, context);
         }
         var update = Updates.setOnInsert(document);
         this.collection.updateOne(Filters.eq(id), update, new UpdateOptions().upsert(true));
     }
 
-    public void increment(UUID flowId, String key, Number value) {
-        var id = new FlowData.Id(flowId, key);
+    public void increment(UUID userId, String key, Number value) {
+        var id = new UserData.Id(userId, key);
         var update = Updates.inc("value.value", value);
         this.collection.updateOne(Filters.eq(id), update);
     }
 
-    public void incrementOrSet(UUID flowId, String key, Number value) {
-        var id = new FlowData.Id(flowId, key);
+    public void incrementOrSet(UUID userId, String key, Number value) {
+        var id = new UserData.Id(userId, key);
         var update = Updates.combine(
             Updates.set("_id", id),
             Updates.set("value.type", DataType.NUMBER.name()),
@@ -72,24 +72,28 @@ public class FlowDataCollection {
         this.collection.updateOne(Filters.eq(id), update, new UpdateOptions().upsert(true));
     }
 
-    public void multiply(UUID flowId, String key, Number value) {
-        var id = new FlowData.Id(flowId, key);
+    public void multiply(UUID userId, String key, Number value) {
+        var id = new UserData.Id(userId, key);
         var update = Updates.mul("value.value", value);
         this.collection.updateOne(Filters.eq(id), update);
     }
 
-    public void remove(UUID flowId, String key) {
-        var id = new FlowData.Id(flowId, key);
+    public void delete(UUID userId, String key) {
+        var id = new UserData.Id(userId, key);
         this.collection.deleteOne(Filters.eq(id));
     }
 
-    public boolean contains(UUID flowId, String key) {
-        var id = new FlowData.Id(flowId, key);
+    public void delete(UUID userId) {
+        this.collection.deleteMany(Filters.eq("_id.user_id", userId));
+    }
+
+    public boolean contains(UUID userId, String key) {
+        var id = new UserData.Id(userId, key);
         return this.collection.countDocuments(Filters.eq(id), new CountOptions().limit(1)) > 0;
     }
 
-    public boolean contains(UUID flowId, String key, DataType<?> type) {
-        var id = new FlowData.Id(flowId, key);
+    public boolean contains(UUID userId, String key, DataType<?> type) {
+        var id = new UserData.Id(userId, key);
         return this.collection.countDocuments(
             Filters.and(
                 Filters.eq(id),

@@ -13,11 +13,11 @@ import org.junit.jupiter.api.Test;
 
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
-import club.mondaylunch.gatos.core.models.FlowData;
 import club.mondaylunch.gatos.core.models.JsonObjectReference;
+import club.mondaylunch.gatos.core.models.UserData;
 import club.mondaylunch.gatos.testshared.graph.type.test.TestNodeTypes;
 
-public class FlowDataCollectionTest {
+public class UserDataCollectionTest {
 
     @BeforeEach
     void setUp() {
@@ -30,7 +30,7 @@ public class FlowDataCollectionTest {
     }
 
     private void reset() {
-        FlowData.objects.clear();
+        UserData.objects.clear();
     }
 
     @Test
@@ -51,10 +51,10 @@ public class FlowDataCollectionTest {
         var id = UUID.randomUUID();
         var data1 = DataType.STRING.create("Test data");
         var data2 = DataType.STRING.create("Test data 2");
-        FlowData.objects.set(id, "test", data1);
-        FlowData.objects.set(id, "test2", data2);
-        var retrieved1 = FlowData.objects.get(id, "test");
-        var retrieved2 = FlowData.objects.get(id, "test2");
+        UserData.objects.set(id, "test", data1);
+        UserData.objects.set(id, "test2", data2);
+        var retrieved1 = UserData.objects.get(id, "test");
+        var retrieved2 = UserData.objects.get(id, "test2");
         Assertions.assertTrue(retrieved1.isPresent());
         Assertions.assertTrue(retrieved2.isPresent());
         Assertions.assertEquals(data1, retrieved1.orElseThrow());
@@ -65,8 +65,8 @@ public class FlowDataCollectionTest {
     public void canSetIfAbsentExistentData() {
         var id = UUID.randomUUID();
         assertSetData(id, "test", "Test data");
-        FlowData.objects.setIfAbsent(id, "test", DataType.STRING.create("Test data 2"));
-        var retrieved = FlowData.objects.get(id, "test");
+        UserData.objects.setIfAbsent(id, "test", DataType.STRING.create("Test data 2"));
+        var retrieved = UserData.objects.get(id, "test");
         Assertions.assertTrue(retrieved.isPresent());
         Assertions.assertEquals(DataType.STRING.create("Test data"), retrieved.orElseThrow());
     }
@@ -75,8 +75,8 @@ public class FlowDataCollectionTest {
     public void canSetIfAbsentNonExistentData() {
         var id = UUID.randomUUID();
         var value = DataType.STRING.create("Test data");
-        FlowData.objects.setIfAbsent(id, "test", value);
-        var retrieved = FlowData.objects.get(id, "test");
+        UserData.objects.setIfAbsent(id, "test", value);
+        var retrieved = UserData.objects.get(id, "test");
         Assertions.assertTrue(retrieved.isPresent());
         Assertions.assertEquals(value, retrieved.orElseThrow());
     }
@@ -85,17 +85,17 @@ public class FlowDataCollectionTest {
     public void canCheckDataType() {
         var id = UUID.randomUUID();
         assertSetData(id, "test", "Test data");
-        Assertions.assertFalse(FlowData.objects.contains(id, "test", DataType.NUMBER));
+        Assertions.assertFalse(UserData.objects.contains(id, "test", DataType.NUMBER));
     }
 
     @Test
     public void canRemoveData() {
         var id = UUID.randomUUID();
         assertSetData(id, "test", "Test data");
-        FlowData.objects.remove(id, "test");
-        Assertions.assertFalse(FlowData.objects.contains(id, "test"));
-        Assertions.assertFalse(FlowData.objects.contains(id, "test", DataType.STRING));
-        var retrieved = FlowData.objects.get(id, "test");
+        UserData.objects.delete(id, "test");
+        Assertions.assertFalse(UserData.objects.contains(id, "test"));
+        Assertions.assertFalse(UserData.objects.contains(id, "test", DataType.STRING));
+        var retrieved = UserData.objects.get(id, "test");
         Assertions.assertTrue(retrieved.isEmpty());
     }
 
@@ -103,8 +103,8 @@ public class FlowDataCollectionTest {
     public void canIncrementNumber() {
         var id = UUID.randomUUID();
         assertSetData(id, "test", 1);
-        FlowData.objects.increment(id, "test", 1);
-        var retrieved = FlowData.objects.get(id, "test");
+        UserData.objects.increment(id, "test", 1);
+        var retrieved = UserData.objects.get(id, "test");
         Assertions.assertTrue(retrieved.isPresent());
         Assertions.assertEquals(DataType.NUMBER.create(2.0), retrieved.orElseThrow());
     }
@@ -113,8 +113,8 @@ public class FlowDataCollectionTest {
     public void canIncrementNegativeNumber() {
         var id = UUID.randomUUID();
         assertSetData(id, "test", 1);
-        FlowData.objects.increment(id, "test", -1);
-        var retrieved = FlowData.objects.get(id, "test");
+        UserData.objects.increment(id, "test", -1);
+        var retrieved = UserData.objects.get(id, "test");
         Assertions.assertTrue(retrieved.isPresent());
         Assertions.assertEquals(DataType.NUMBER.create(0.0), retrieved.orElseThrow());
     }
@@ -123,8 +123,8 @@ public class FlowDataCollectionTest {
     public void canIncrementFractionalNumber() {
         var id = UUID.randomUUID();
         assertSetData(id, "test", 1);
-        FlowData.objects.increment(id, "test", 0.5);
-        var retrieved = FlowData.objects.get(id, "test");
+        UserData.objects.increment(id, "test", 0.5);
+        var retrieved = UserData.objects.get(id, "test");
         Assertions.assertTrue(retrieved.isPresent());
         Assertions.assertEquals(DataType.NUMBER.create(1.5), retrieved.orElseThrow());
     }
@@ -133,8 +133,8 @@ public class FlowDataCollectionTest {
     public void canIncrementZero() {
         var id = UUID.randomUUID();
         assertSetData(id, "test", 1);
-        FlowData.objects.increment(id, "test", 0);
-        var retrieved = FlowData.objects.get(id, "test");
+        UserData.objects.increment(id, "test", 0);
+        var retrieved = UserData.objects.get(id, "test");
         Assertions.assertTrue(retrieved.isPresent());
         Assertions.assertEquals(DataType.NUMBER.create(1.0), retrieved.orElseThrow());
     }
@@ -145,16 +145,16 @@ public class FlowDataCollectionTest {
         assertSetData(id, "test", "Test data");
         Assertions.assertThrows(
             MongoWriteException.class,
-            () -> FlowData.objects.increment(id, "test", 1)
+            () -> UserData.objects.increment(id, "test", 1)
         );
     }
 
     @Test
     public void cannotIncrementNonExistentData() {
         var id = UUID.randomUUID();
-        FlowData.objects.increment(id, "test", 1);
-        Assertions.assertFalse(FlowData.objects.contains(id, "test"));
-        var retrieved = FlowData.objects.get(id, "test");
+        UserData.objects.increment(id, "test", 1);
+        Assertions.assertFalse(UserData.objects.contains(id, "test"));
+        var retrieved = UserData.objects.get(id, "test");
         Assertions.assertTrue(retrieved.isEmpty());
     }
 
@@ -162,8 +162,8 @@ public class FlowDataCollectionTest {
     public void canIncrementOrSetExistentData() {
         var id = UUID.randomUUID();
         assertSetData(id, "test", 1);
-        FlowData.objects.incrementOrSet(id, "test", 1);
-        var retrieved = FlowData.objects.get(id, "test");
+        UserData.objects.incrementOrSet(id, "test", 1);
+        var retrieved = UserData.objects.get(id, "test");
         Assertions.assertTrue(retrieved.isPresent());
         Assertions.assertEquals(DataType.NUMBER.create(2.0), retrieved.orElseThrow());
     }
@@ -171,8 +171,8 @@ public class FlowDataCollectionTest {
     @Test
     public void canIncrementOrSetNonExistentData() {
         var id = UUID.randomUUID();
-        FlowData.objects.incrementOrSet(id, "test", 1);
-        var retrieved = FlowData.objects.get(id, "test");
+        UserData.objects.incrementOrSet(id, "test", 1);
+        var retrieved = UserData.objects.get(id, "test");
         Assertions.assertTrue(retrieved.isPresent());
         Assertions.assertEquals(DataType.NUMBER.create(1.0), retrieved.orElseThrow());
     }
@@ -181,8 +181,8 @@ public class FlowDataCollectionTest {
     public void canMultiplyNumber() {
         var id = UUID.randomUUID();
         assertSetData(id, "test", 5);
-        FlowData.objects.multiply(id, "test", 2);
-        var retrieved = FlowData.objects.get(id, "test");
+        UserData.objects.multiply(id, "test", 2);
+        var retrieved = UserData.objects.get(id, "test");
         Assertions.assertTrue(retrieved.isPresent());
         Assertions.assertEquals(DataType.NUMBER.create(10.0), retrieved.orElseThrow());
     }
@@ -211,10 +211,10 @@ public class FlowDataCollectionTest {
     }
 
     private static void assertSetData(UUID flowId, String key, DataBox<?> value) {
-        FlowData.objects.set(flowId, key, value);
-        Assertions.assertTrue(FlowData.objects.contains(flowId, key));
-        Assertions.assertTrue(FlowData.objects.contains(flowId, key, value.type()));
-        var retrieved = FlowData.objects.get(flowId, key);
+        UserData.objects.set(flowId, key, value);
+        Assertions.assertTrue(UserData.objects.contains(flowId, key));
+        Assertions.assertTrue(UserData.objects.contains(flowId, key, value.type()));
+        var retrieved = UserData.objects.get(flowId, key);
         Assertions.assertTrue(retrieved.isPresent());
         Assertions.assertEquals(value, retrieved.orElseThrow());
     }

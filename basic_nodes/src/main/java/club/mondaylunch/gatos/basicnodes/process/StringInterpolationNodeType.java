@@ -45,7 +45,7 @@ public class StringInterpolationNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs,
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs,
                                                               Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         String template = DataBox.get(settings, "template", DataType.STRING).orElse("");
         var matcher = PLACEHOLDER_PATTERN.matcher(template);

@@ -12,9 +12,9 @@ import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
-import club.mondaylunch.gatos.core.models.FlowData;
+import club.mondaylunch.gatos.core.models.UserData;
 
-public class SetFlowDataNodeType extends NodeType.End {
+public class SetUserDataNodeType extends NodeType.End {
 
     @Override
     public Map<String, DataBox<?>> settings() {
@@ -36,16 +36,16 @@ public class SetFlowDataNodeType extends NodeType.End {
     }
 
     @Override
-    public CompletableFuture<Void> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+    public CompletableFuture<Void> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
         var key = DataBox.get(settings, inputs, "key", DataType.STRING).orElseThrow();
         var value = inputs.get("value");
         Objects.requireNonNull(value, "No value input");
         boolean overwrite = DataBox.get(settings, "overwrite", DataType.BOOLEAN).orElse(true);
         return CompletableFuture.runAsync(() -> {
             if (overwrite) {
-                FlowData.objects.set(flowId, key, value);
+                UserData.objects.set(userId, key, value);
             } else {
-                FlowData.objects.setIfAbsent(flowId, key, value);
+                UserData.objects.setIfAbsent(userId, key, value);
             }
         });
     }

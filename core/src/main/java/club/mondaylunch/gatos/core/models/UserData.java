@@ -7,12 +7,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
-import club.mondaylunch.gatos.core.collection.FlowDataCollection;
+import club.mondaylunch.gatos.core.collection.UserDataCollection;
 import club.mondaylunch.gatos.core.data.DataBox;
 
-public class FlowData {
+public class UserData {
 
-    public static final FlowDataCollection objects = new FlowDataCollection();
+    public static final UserDataCollection objects = new UserDataCollection();
 
     @BsonId
     @BsonProperty("_id")
@@ -22,11 +22,11 @@ public class FlowData {
     private DataBox<?> value;
 
     @SuppressWarnings("unused")
-    public FlowData() {
+    public UserData() {
     }
 
-    public FlowData(UUID flowId, String key, DataBox<?> value) {
-        this.id = new Id(flowId, key);
+    public UserData(UUID userId, String key, DataBox<?> value) {
+        this.id = new Id(userId, key);
         this.value = value;
     }
 
@@ -58,23 +58,23 @@ public class FlowData {
         } else if (obj == null || getClass() != obj.getClass()) {
             return false;
         } else {
-            FlowData flowData = (FlowData) obj;
-            return Objects.equals(this.id, flowData.id) && Objects.equals(this.value, flowData.value);
+            UserData userData = (UserData) obj;
+            return Objects.equals(this.id, userData.id) && Objects.equals(this.value, userData.value);
         }
     }
 
     @Override
     public String toString() {
-        return "FlowData{"
+        return "UserData{"
             + "id=" + this.id
             + ", value=" + this.value
             + '}';
     }
 
     public record Id(
-        @BsonProperty("flow_id")
-        @JsonProperty("flow_id")
-        UUID flowID,
+        @BsonProperty("user_id")
+        @JsonProperty("user_id")
+        UUID userId,
         String key
     ) {
     }

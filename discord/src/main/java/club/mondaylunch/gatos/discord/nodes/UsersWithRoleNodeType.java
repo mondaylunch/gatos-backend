@@ -62,7 +62,7 @@ public class UsersWithRoleNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         String guildId = DataBox.get(settings, "guild_id", DiscordDataTypes.GUILD_ID).orElseThrow();
         String roleId = DataBox.get(inputs, "role_id", DiscordDataTypes.ROLE_ID).orElseThrow();
         Guild guild = this.gatosDiscord.getJda().getGuildById(guildId);

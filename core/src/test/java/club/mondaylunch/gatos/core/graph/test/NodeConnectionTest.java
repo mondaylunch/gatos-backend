@@ -85,7 +85,7 @@ public class NodeConnectionTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs,
+        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs,
                                                                   Map<String, DataBox<?>> settings,
                                                                   Map<String, DataType<?>> inputTypes) {
             return Map.of();
@@ -110,7 +110,7 @@ public class NodeConnectionTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs,
+        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs,
                                                                   Map<String, DataBox<?>> settings,
                                                                   Map<String, DataType<?>> inputTypes) {
             return Map.of();

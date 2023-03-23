@@ -11,9 +11,9 @@ import org.junit.jupiter.api.Test;
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Node;
-import club.mondaylunch.gatos.core.models.FlowData;
+import club.mondaylunch.gatos.core.models.UserData;
 
-public class RemoveFlowDataNodeTest {
+public class RemoveUserDataNodeTest {
 
     @BeforeEach
     void setUp() {
@@ -26,19 +26,19 @@ public class RemoveFlowDataNodeTest {
     }
 
     private void reset() {
-        FlowData.objects.clear();
+        UserData.objects.clear();
     }
 
     @Test
     public void areSettingsCorrect() {
-        var settings = BasicNodes.REMOVE_FLOW_DATA.settings();
+        var settings = BasicNodes.REMOVE_USER_DATA.settings();
         Assertions.assertEquals(1, settings.size());
         Assertions.assertTrue(settings.containsKey("key"));
     }
 
     @Test
     public void areInputsCorrect() {
-        var node = Node.create(BasicNodes.REMOVE_FLOW_DATA);
+        var node = Node.create(BasicNodes.REMOVE_USER_DATA);
         var inputs = node.inputs();
         Assertions.assertEquals(1, inputs.size());
         var nodeId = node.id();
@@ -50,7 +50,7 @@ public class RemoveFlowDataNodeTest {
 
     @Test
     public void areInputsCorrectWithKeySetting() {
-        var node = Node.create(BasicNodes.REMOVE_FLOW_DATA)
+        var node = Node.create(BasicNodes.REMOVE_USER_DATA)
             .modifySetting("key", DataType.STRING.create("test_key"));
         var inputs = node.inputs();
         Assertions.assertEquals(0, inputs.size());
@@ -58,35 +58,35 @@ public class RemoveFlowDataNodeTest {
 
     @Test
     public void areOutputsCorrect() {
-        var node = Node.create(BasicNodes.REMOVE_FLOW_DATA);
+        var node = Node.create(BasicNodes.REMOVE_USER_DATA);
         Assertions.assertTrue(node.outputs().isEmpty());
     }
 
     @Test
     public void canRemoveData() {
-        var nodeType = BasicNodes.REMOVE_FLOW_DATA;
-        var flowId = UUID.randomUUID();
+        var nodeType = BasicNodes.REMOVE_USER_DATA;
+        var userId = UUID.randomUUID();
         var value = DataType.STRING.create("Test value");
-        FlowData.objects.set(flowId, "test_key", value);
+        UserData.objects.set(userId, "test_key", value);
         nodeType.compute(
-            flowId,
+            userId,
             Map.of("key", DataType.STRING.create("test_key")),
             Map.of()
         ).join();
-        var retrievedValue = FlowData.objects.get(flowId, "test_key");
+        var retrievedValue = UserData.objects.get(userId, "test_key");
         Assertions.assertTrue(retrievedValue.isEmpty());
     }
 
     @Test
     public void canRemoveNonExistentData() {
-        var nodeType = BasicNodes.REMOVE_FLOW_DATA;
-        var flowId = UUID.randomUUID();
+        var nodeType = BasicNodes.REMOVE_USER_DATA;
+        var userId = UUID.randomUUID();
         nodeType.compute(
-            flowId,
+            userId,
             Map.of("key", DataType.STRING.create("test_key")),
             Map.of()
         ).join();
-        var retrievedValue = FlowData.objects.get(flowId, "test_key");
+        var retrievedValue = UserData.objects.get(userId, "test_key");
         Assertions.assertTrue(retrievedValue.isEmpty());
     }
 }

@@ -32,7 +32,7 @@ public class StringRegexReplacementNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var inputStr = DataBox.get(inputs, "input", DataType.STRING).orElseThrow();
         var oldRgx = DataBox.get(settings, "regex_old", DataType.STRING).orElse("");
         var newRgx = DataBox.get(settings, "regex_new", DataType.STRING).orElse("");

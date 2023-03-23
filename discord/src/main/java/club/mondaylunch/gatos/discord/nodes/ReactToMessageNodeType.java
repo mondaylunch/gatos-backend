@@ -37,7 +37,7 @@ public class ReactToMessageNodeType extends NodeType.End {
     }
 
     @Override
-    public CompletableFuture<Void> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+    public CompletableFuture<Void> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
         Message message = DataBox.get(settings, "message", DiscordDataTypes.MESSAGE).orElseThrow();
         String emojiId = DataBox.get(inputs, "emoji_id", DiscordDataTypes.EMOJI_ID).orElseThrow();
         Guild guild = message.getGuild();

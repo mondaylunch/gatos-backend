@@ -49,7 +49,7 @@ public class VariableExtractionNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var jsonInput = DataBox.get(inputs, "input", DataType.JSON_OBJECT).orElse(new JsonObject());
         var keyStr = DataBox.get(inputs, "key", DataType.STRING).orElse("");
         var returnType = !settings.isEmpty() ? (ReturnType) settings.get("output_type").value() : ReturnType.STRING;

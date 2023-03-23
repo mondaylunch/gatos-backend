@@ -9,9 +9,9 @@ import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
-import club.mondaylunch.gatos.core.models.FlowData;
+import club.mondaylunch.gatos.core.models.UserData;
 
-public class RemoveFlowDataNodeType extends NodeType.End {
+public class RemoveUserDataNodeType extends NodeType.End {
 
     @Override
     public Map<String, DataBox<?>> settings() {
@@ -31,8 +31,8 @@ public class RemoveFlowDataNodeType extends NodeType.End {
     }
 
     @Override
-    public CompletableFuture<Void> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+    public CompletableFuture<Void> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
         var key = DataBox.get(settings, inputs, "key", DataType.STRING).orElseThrow();
-        return CompletableFuture.runAsync(() -> FlowData.objects.remove(flowId, key));
+        return CompletableFuture.runAsync(() -> UserData.objects.delete(userId, key));
     }
 }

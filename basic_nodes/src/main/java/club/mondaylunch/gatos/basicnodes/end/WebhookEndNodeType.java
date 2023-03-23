@@ -26,7 +26,7 @@ public class WebhookEndNodeType extends NodeType.End {
     }
 
     @Override
-    public CompletableFuture<Void> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+    public CompletableFuture<Void> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
         var graphOutput = DataBox.get(
             inputs,
             "graphOutput",

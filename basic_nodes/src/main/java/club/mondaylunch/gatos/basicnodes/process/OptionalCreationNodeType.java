@@ -35,7 +35,7 @@ public class OptionalCreationNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var inputType = inputTypes.getOrDefault("input", DataType.ANY);
         var optionalType = inputType == DataType.ANY ? OptionalDataType.GENERIC_OPTIONAL : inputType.optionalOf();
         var inputData = DataBox.get(inputs, "input", inputType).orElseThrow();

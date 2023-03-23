@@ -35,7 +35,7 @@ public class ListSortNodeType extends NodeType.Process {
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var inputListCopy = new ArrayList<>(DataBox.get(inputs, "input", ListDataType.GENERIC_LIST).orElseThrow());
         var outputType = inputTypes.get("input");
         var isSortingAscendingly = DataBox.get(settings, "Sort Ascendingly?", DataType.BOOLEAN).orElse(true);

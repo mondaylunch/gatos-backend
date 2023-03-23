@@ -11,9 +11,9 @@ import org.junit.jupiter.api.Test;
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Node;
-import club.mondaylunch.gatos.core.models.FlowData;
+import club.mondaylunch.gatos.core.models.UserData;
 
-public class IncrementFlowDataNodeTest {
+public class IncrementUserDataNodeTest {
 
     @BeforeEach
     void setUp() {
@@ -26,12 +26,12 @@ public class IncrementFlowDataNodeTest {
     }
 
     private void reset() {
-        FlowData.objects.clear();
+        UserData.objects.clear();
     }
 
     @Test
     public void areSettingsCorrect() {
-        var settings = BasicNodes.INCREMENT_FLOW_DATA.settings();
+        var settings = BasicNodes.INCREMENT_USER_DATA.settings();
         Assertions.assertEquals(2, settings.size());
         Assertions.assertTrue(settings.containsKey("key"));
         Assertions.assertTrue(settings.containsKey("set_if_absent"));
@@ -39,7 +39,7 @@ public class IncrementFlowDataNodeTest {
 
     @Test
     public void areInputsCorrect() {
-        var node = Node.create(BasicNodes.INCREMENT_FLOW_DATA);
+        var node = Node.create(BasicNodes.INCREMENT_USER_DATA);
         var inputs = node.inputs();
         Assertions.assertEquals(2, inputs.size());
         var nodeId = node.id();
@@ -55,7 +55,7 @@ public class IncrementFlowDataNodeTest {
 
     @Test
     public void areInputsCorrectWithKeySetting() {
-        var node = Node.create(BasicNodes.INCREMENT_FLOW_DATA)
+        var node = Node.create(BasicNodes.INCREMENT_USER_DATA)
             .modifySetting("key", DataType.STRING.create("test_key"));
         var inputs = node.inputs();
         Assertions.assertEquals(1, inputs.size());
@@ -68,56 +68,56 @@ public class IncrementFlowDataNodeTest {
 
     @Test
     public void areOutputsCorrect() {
-        var node = Node.create(BasicNodes.INCREMENT_FLOW_DATA);
+        var node = Node.create(BasicNodes.INCREMENT_USER_DATA);
         Assertions.assertTrue(node.outputs().isEmpty());
     }
 
     @Test
     public void canIncrementData() {
-        var nodeType = BasicNodes.INCREMENT_FLOW_DATA;
-        var flowId = UUID.randomUUID();
+        var nodeType = BasicNodes.INCREMENT_USER_DATA;
+        var userId = UUID.randomUUID();
         var key = DataType.STRING.create("test_key");
         var value = DataType.NUMBER.create(1.0);
-        FlowData.objects.set(flowId, "test_key", value);
+        UserData.objects.set(userId, "test_key", value);
         nodeType.compute(
-            flowId,
+            userId,
             Map.of("key", key, "value", value),
             Map.of("set_if_absent", DataType.BOOLEAN.create(false))
         ).join();
-        var retrievedValue = FlowData.objects.get(flowId, "test_key");
+        var retrievedValue = UserData.objects.get(userId, "test_key");
         Assertions.assertTrue(retrievedValue.isPresent());
         Assertions.assertEquals(DataType.NUMBER.create(2.0), retrievedValue.orElseThrow());
     }
 
     @Test
     public void canIncrementOrSetExistentData() {
-        var nodeType = BasicNodes.INCREMENT_FLOW_DATA;
-        var flowId = UUID.randomUUID();
+        var nodeType = BasicNodes.INCREMENT_USER_DATA;
+        var userId = UUID.randomUUID();
         var key = DataType.STRING.create("test_key");
         var value = DataType.NUMBER.create(1.0);
-        FlowData.objects.set(flowId, "test_key", value);
+        UserData.objects.set(userId, "test_key", value);
         nodeType.compute(
-            flowId,
+            userId,
             Map.of("key", key, "value", value),
             Map.of()
         ).join();
-        var retrievedValue = FlowData.objects.get(flowId, "test_key");
+        var retrievedValue = UserData.objects.get(userId, "test_key");
         Assertions.assertTrue(retrievedValue.isPresent());
         Assertions.assertEquals(DataType.NUMBER.create(2.0), retrievedValue.orElseThrow());
     }
 
     @Test
     public void canIncrementOrSetNonExistentData() {
-        var nodeType = BasicNodes.INCREMENT_FLOW_DATA;
-        var flowId = UUID.randomUUID();
+        var nodeType = BasicNodes.INCREMENT_USER_DATA;
+        var userId = UUID.randomUUID();
         var key = DataType.STRING.create("test_key");
         var value = DataType.NUMBER.create(1.0);
         nodeType.compute(
-            flowId,
+            userId,
             Map.of("key", key, "value", value),
             Map.of()
         ).join();
-        var retrievedValue = FlowData.objects.get(flowId, "test_key");
+        var retrievedValue = UserData.objects.get(userId, "test_key");
         Assertions.assertTrue(retrievedValue.isPresent());
         Assertions.assertEquals(value, retrievedValue.orElseThrow());
     }

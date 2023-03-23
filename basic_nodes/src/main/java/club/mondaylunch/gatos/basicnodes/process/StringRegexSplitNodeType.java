@@ -32,7 +32,7 @@ public class StringRegexSplitNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var inputStr = DataBox.get(inputs, "input", DataType.STRING).orElseThrow();
         var rgx = DataBox.get(settings, "regex", DataType.STRING).orElse("");
         return Map.of("output", CompletableFuture.completedFuture(DataType.STRING.listOf().create(Arrays.stream(inputStr.split(rgx)).toList())));
