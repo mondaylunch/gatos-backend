@@ -18,6 +18,7 @@ dependencies {
 jar {
     manifest {
         attributes 'Main-Class': 'org.springframework.boot.loader.Launcher'
+        attributes 'Start-Class': 'club.mondaylunch.gatos.api.ApiApplication'
     }
 }
 
