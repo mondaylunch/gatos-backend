@@ -30,9 +30,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests()
+            .requestMatchers("/api/v1/flows/*/run/*").permitAll()
             .anyRequest().authenticated()
             .and().oauth2ResourceServer().jwt().and()
-            .and().cors();
+            .and().cors()
+            .and().csrf().disable();
         return http.build();
     }
 

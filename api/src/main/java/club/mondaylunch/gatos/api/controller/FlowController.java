@@ -420,13 +420,11 @@ public class FlowController {
      */
     @PostMapping(value = "{flowId}/run/{startNodeId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public String executeFlow(
-        @RequestHeader("x-user-email") String userEmail,
         @PathVariable UUID flowId,
         @PathVariable UUID startNodeId,
         @RequestBody(required = false) @Nullable String input
     ) {
-        User user = this.userRepository.getOrCreateUser(userEmail);
-        var flow = this.flowRepository.getFlow(user, flowId);
+        var flow = Flow.objects.get(flowId);
         var graph = flow.getGraph();
         var startNode = graph.getNode(startNodeId)
             .orElseThrow(() -> new NodeNotFoundException(startNodeId));
