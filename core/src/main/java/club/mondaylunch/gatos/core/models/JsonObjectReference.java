@@ -26,7 +26,7 @@ public class JsonObjectReference {
 
     @Override
     public int hashCode() {
-        return value.hashCode();
+        return this.value.hashCode();
     }
 
     @Override
@@ -37,14 +37,14 @@ public class JsonObjectReference {
             return false;
         } else {
             JsonObjectReference that = (JsonObjectReference) obj;
-            return Objects.equals(value, that.value);
+            return Objects.equals(this.value, that.value);
         }
     }
 
     @Override
     public String toString() {
         return "JsonObjectReference{"
-            + "value=" + value
+            + "value=" + this.value
             + '}';
     }
 }

@@ -48,7 +48,7 @@ public class FlowData {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, value);
+        return Objects.hash(this.id, this.value);
     }
 
     @Override
@@ -59,15 +59,15 @@ public class FlowData {
             return false;
         } else {
             FlowData flowData = (FlowData) obj;
-            return Objects.equals(id, flowData.id) && Objects.equals(value, flowData.value);
+            return Objects.equals(this.id, flowData.id) && Objects.equals(this.value, flowData.value);
         }
     }
 
     @Override
     public String toString() {
         return "FlowData{"
-            + "id=" + id
-            + ", value=" + value
+            + "id=" + this.id
+            + ", value=" + this.value
             + '}';
     }
 
