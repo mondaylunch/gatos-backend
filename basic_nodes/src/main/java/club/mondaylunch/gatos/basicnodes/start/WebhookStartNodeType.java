@@ -1,13 +1,10 @@
 package club.mondaylunch.gatos.basicnodes.start;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-
-import club.mondaylunch.gatos.core.models.JsonObjectReference;
 
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Nullable;
@@ -19,6 +16,7 @@ import club.mondaylunch.gatos.core.graph.WebhookStartNodeInput;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 import club.mondaylunch.gatos.core.models.Flow;
+import club.mondaylunch.gatos.core.models.JsonObjectReference;
 
 public class WebhookStartNodeType extends NodeType.Start<WebhookStartNodeInput> {
 
