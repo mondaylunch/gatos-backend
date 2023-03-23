@@ -78,9 +78,13 @@ public class UserDataCollection {
         this.collection.updateOne(Filters.eq(id), update);
     }
 
-    public void remove(UUID userId, String key) {
+    public void delete(UUID userId, String key) {
         var id = new UserData.Id(userId, key);
         this.collection.deleteOne(Filters.eq(id));
+    }
+
+    public void delete(UUID userId) {
+        this.collection.deleteMany(Filters.eq("_id.user_id", userId));
     }
 
     public boolean contains(UUID userId, String key) {

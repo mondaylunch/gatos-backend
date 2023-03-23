@@ -92,7 +92,7 @@ public class UserDataCollectionTest {
     public void canRemoveData() {
         var id = UUID.randomUUID();
         assertSetData(id, "test", "Test data");
-        UserData.objects.remove(id, "test");
+        UserData.objects.delete(id, "test");
         Assertions.assertFalse(UserData.objects.contains(id, "test"));
         Assertions.assertFalse(UserData.objects.contains(id, "test", DataType.STRING));
         var retrieved = UserData.objects.get(id, "test");

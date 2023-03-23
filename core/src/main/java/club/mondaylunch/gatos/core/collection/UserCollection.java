@@ -1,11 +1,12 @@
 package club.mondaylunch.gatos.core.collection;
 
-import static com.mongodb.client.model.Filters.eq;
+import java.util.UUID;
 
 import com.google.gson.JsonObject;
-import org.bson.conversions.Bson;
+import com.mongodb.client.model.Filters;
 
 import club.mondaylunch.gatos.core.models.User;
+import club.mondaylunch.gatos.core.models.UserData;
 
 /**
  * "users" collection for {@link User}.
@@ -23,7 +24,7 @@ public class UserCollection extends BaseCollection<User> {
      * @return The POJO.
      */
     public User getUserByUserId(String userId) {
-        return this.getCollection().find(this.userIdFilter(userId)).first();
+        return this.getCollection().find(Filters.eq(userId)).first();
     }
 
     /**
@@ -33,7 +34,7 @@ public class UserCollection extends BaseCollection<User> {
      * @return The POJO.
      */
     public User getUserByEmail(String email) {
-        return this.getCollection().find(this.emailFilter(email)).first();
+        return this.getCollection().find(Filters.eq("email", email)).first();
     }
 
     public User getOrCreateUserByEmail(String email) {
@@ -67,11 +68,9 @@ public class UserCollection extends BaseCollection<User> {
         return user;
     }
 
-    private Bson userIdFilter(String userId) {
-        return eq(userId);
-    }
-
-    private Bson emailFilter(String email) {
-        return eq("email", email);
+    @Override
+    public void delete(UUID id) {
+        super.delete(id);
+        UserData.objects.delete(id);
     }
 }

@@ -33,6 +33,6 @@ public class RemoveUserDataNodeType extends NodeType.End {
     @Override
     public CompletableFuture<Void> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
         var key = DataBox.get(settings, inputs, "key", DataType.STRING).orElseThrow();
-        return CompletableFuture.runAsync(() -> UserData.objects.remove(userId, key));
+        return CompletableFuture.runAsync(() -> UserData.objects.delete(userId, key));
     }
 }
