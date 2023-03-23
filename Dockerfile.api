@@ -2,7 +2,9 @@ FROM gradle:8.0.2-jdk17 AS build
 COPY --chown=gradle:gradle . /home/gradle/src
 WORKDIR /home/gradle/src
 RUN ./gradlew :api:bootJar
+RUN ./gradlew :discord:jar
 
 FROM openjdk:17-jdk-slim
 COPY --from=build /home/gradle/src/api/build/libs/api-*-SNAPSHOT.jar api.jar
-CMD ["java", "-jar", "api.jar"]
+COPY --from=build /home/gradle/src/discord/build/libs/discord-*-SNAPSHOT.jar discord.jar
+CMD ["java", "-classpath", "discord.jar", "-jar", "api.jar"]
