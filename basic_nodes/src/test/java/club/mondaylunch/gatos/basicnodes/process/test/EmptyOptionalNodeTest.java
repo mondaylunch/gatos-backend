@@ -4,14 +4,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import club.mondaylunch.gatos.core.data.DataType;
-
-import club.mondaylunch.gatos.core.data.OptionalDataType;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
+import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.data.OptionalDataType;
 import club.mondaylunch.gatos.core.graph.Node;
 
 public class EmptyOptionalNodeTest {
