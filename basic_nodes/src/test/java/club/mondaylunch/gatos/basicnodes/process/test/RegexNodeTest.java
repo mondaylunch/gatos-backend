@@ -62,6 +62,7 @@ public class RegexNodeTest {
         var output = BasicNodes.REGEX.compute(UUID.randomUUID(), input);
         Assertions.assertTrue((boolean) output.get("isMatch").join().value());
 
+        @SuppressWarnings("unchecked")
         Optional<String> match = (Optional<String>) output.get("match").join().value();
         Assertions.assertTrue(match.isPresent());
         Assertions.assertEquals("Hello", match.get());
