@@ -25,6 +25,11 @@ public class JsonObjectReference {
     }
 
     @Override
+    public int hashCode() {
+        return value.hashCode();
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -34,11 +39,6 @@ public class JsonObjectReference {
             JsonObjectReference that = (JsonObjectReference) obj;
             return Objects.equals(value, that.value);
         }
-    }
-
-    @Override
-    public int hashCode() {
-        return value.hashCode();
     }
 
     @Override
