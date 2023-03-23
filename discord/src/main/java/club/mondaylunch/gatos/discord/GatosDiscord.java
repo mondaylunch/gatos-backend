@@ -43,6 +43,11 @@ public class GatosDiscord implements GatosPlugin {
             this.jda.shutdown();
         }
 
+        if (this.getToken().isBlank()) {
+            LOGGER.warn("Not going to try and run Discord, no token!");
+            return;
+        }
+
         this.commands = new DiscordCommands(this);
         this.events = new DiscordEvents();
 
