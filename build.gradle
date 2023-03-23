@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.transformers.*
+
 plugins {
     id 'java'
     id 'io.spring.dependency-management' version '1.1.0'
@@ -20,5 +22,16 @@ jar {
 }
 
 shadowJar {
+    configurations = [project.configurations.productionRuntimeClasspath]
+
     mergeServiceFiles()
+
+    append 'META-INF/spring.handlers'
+    append 'META-INF/spring.schemas'
+    append 'META-INF/spring.tooling'
+
+    transform(PropertiesFileTransformer) {
+        paths = ['META-INF/spring.factories' ]
+        mergeStrategy = "append"
+    }
 }
