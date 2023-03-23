@@ -16,6 +16,7 @@ public final class OptionalDataType<T> extends DataType<Optional<T>> {
         super(makeName(contains), Optional.class);
         this.contains = contains;
         Conversions.registerSimple(this, GENERIC_OPTIONAL, $ -> $);
+        Conversions.registerSimple(contains, this, Optional::of);
     }
 
     /**

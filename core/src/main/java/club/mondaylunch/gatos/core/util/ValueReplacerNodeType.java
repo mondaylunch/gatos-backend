@@ -1,4 +1,4 @@
-package club.mondaylunch.gatos.basicnodes.process;
+package club.mondaylunch.gatos.core.util;
 
 import java.util.Map;
 import java.util.Set;
@@ -10,6 +10,9 @@ import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
+/**
+ * A node type that provides a value, discarding any input.
+ */
 public class ValueReplacerNodeType<T> extends NodeType.Process {
     private final DataType<T> type;
     private final T defaultValue;

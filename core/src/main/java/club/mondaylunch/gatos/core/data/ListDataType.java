@@ -16,6 +16,7 @@ public final class ListDataType<T> extends DataType<List<T>> {
         super(makeName(contains), List.class);
         this.contains = contains;
         Conversions.registerSimple(this, GENERIC_LIST, $ -> $);
+        Conversions.registerSimple(contains, this, List::of);
     }
 
     /**

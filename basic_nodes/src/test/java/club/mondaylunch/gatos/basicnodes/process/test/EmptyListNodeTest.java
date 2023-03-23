@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
+import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.data.ListDataType;
 import club.mondaylunch.gatos.core.graph.Node;
 
 public class EmptyListNodeTest {
@@ -26,19 +28,16 @@ public class EmptyListNodeTest {
 
     @Test
     public void correctlyGetsEmptyList() {
-        var output = BasicNodes.EMPTY_LIST.compute(UUID.randomUUID(), Map.of(), Map.of(), Map.of());
+        var output = BasicNodes.EMPTY_LIST.compute(UUID.randomUUID(), Map.of(), BasicNodes.EMPTY_LIST.settings(), Map.of());
         Assertions.assertEquals(List.of(), output.get("output").join().value());
+        Assertions.assertEquals(ListDataType.GENERIC_LIST, output.get("output").join().type());
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void cannotModifyEmptyList() {
-        var output = BasicNodes.EMPTY_LIST.compute(UUID.randomUUID(), Map.of(), Map.of(), Map.of());
-        var createdList = (List<String>) output.get("output").join().value();
-        Assertions.assertThrows(Exception.class, () -> {
-            createdList.add("turi ip ip ip");
-            createdList.add("ip ip ip ip tsha ik");
-            createdList.add("ip tsha ip ik");
-        });
+    public void correctlyGetsEmptyListOfCorrectType() {
+        var node = Node.create(BasicNodes.EMPTY_LIST).modifySetting("containing_type", DataType.DATA_TYPE.create(DataType.NUMBER));
+        var output = BasicNodes.EMPTY_LIST.compute(UUID.randomUUID(), Map.of(), node.settings(), Map.of());
+        Assertions.assertEquals(List.of(), output.get("output").join().value());
+        Assertions.assertEquals(DataType.NUMBER.listOf(), output.get("output").join().type());
     }
 }

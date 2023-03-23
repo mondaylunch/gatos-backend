@@ -8,14 +8,15 @@ import java.util.concurrent.CompletableFuture;
 
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
-import club.mondaylunch.gatos.core.data.ListDataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
 public class EmptyListNodeType extends NodeType.Process {
     @Override
     public Map<String, DataBox<?>> settings() {
-        return Map.of();
+        return Map.of(
+            "containing_type", DataType.DATA_TYPE.create(DataType.ANY)
+        );
     }
 
     @Override
@@ -25,13 +26,15 @@ public class EmptyListNodeType extends NodeType.Process {
 
     @Override
     public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+        var containingType = DataBox.get(settings, "containing_type", DataType.DATA_TYPE).orElseThrow();
         return Set.of(
-            new NodeConnector.Output<>(nodeId, "output", ListDataType.GENERIC_LIST)
+            new NodeConnector.Output<>(nodeId, "output", containingType.listOf())
         );
     }
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        return Map.of("output", CompletableFuture.completedFuture(ListDataType.GENERIC_LIST.create(List.of())));
+        var containingType = DataBox.get(settings, "containing_type", DataType.DATA_TYPE).orElseThrow();
+        return Map.of("output", CompletableFuture.completedFuture(containingType.listOf().create(List.of())));
     }
 }
