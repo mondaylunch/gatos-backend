@@ -4,5 +4,5 @@ WORKDIR /home/gradle/src
 RUN ./gradlew :shadowJar
 
 FROM openjdk:17-jdk-slim
-COPY --from=build /home/gradle/src/build/libs/Gatos*-all.jar gatos.jar
+COPY --from=build /home/gradle/src/api/build/libs/*-SNAPSHOT.jar gatos.jar
 CMD ["java", "-jar", "gatos.jar"]
