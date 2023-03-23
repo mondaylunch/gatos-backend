@@ -51,7 +51,7 @@ public class RemoveElementFromListNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var mode = DataBox.get(settings, "mode", ELEMENT_REFERENCE).orElse(Mode.ELEMENT);
         var inputList = DataBox.get(inputs, "list", ListDataType.GENERIC_LIST).orElse(List.of());
         var outputType = this.findExactDatatype(inputTypes.get("input"));

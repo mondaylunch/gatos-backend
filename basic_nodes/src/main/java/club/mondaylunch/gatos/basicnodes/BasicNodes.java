@@ -7,19 +7,19 @@ import java.util.stream.Collectors;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.VisibleForTesting;
 
-import club.mondaylunch.gatos.basicnodes.end.IncrementFlowDataNodeType;
-import club.mondaylunch.gatos.basicnodes.end.MultiplyFlowDataNodeType;
-import club.mondaylunch.gatos.basicnodes.end.RemoveFlowDataNodeType;
-import club.mondaylunch.gatos.basicnodes.end.SetFlowDataNodeType;
+import club.mondaylunch.gatos.basicnodes.end.IncrementUserDataNodeType;
+import club.mondaylunch.gatos.basicnodes.end.MultiplyUserDataNodeType;
+import club.mondaylunch.gatos.basicnodes.end.RemoveUserDataNodeType;
+import club.mondaylunch.gatos.basicnodes.end.SetUserDataNodeType;
 import club.mondaylunch.gatos.basicnodes.end.WebhookEndNodeType;
 import club.mondaylunch.gatos.basicnodes.process.AddElementToListNodeType;
 import club.mondaylunch.gatos.basicnodes.process.BooleanOperationNodeType;
-import club.mondaylunch.gatos.basicnodes.process.ContainsFlowDataNodeType;
+import club.mondaylunch.gatos.basicnodes.process.ContainsUserDataNodeType;
 import club.mondaylunch.gatos.basicnodes.process.EmptyListNodeType;
 import club.mondaylunch.gatos.basicnodes.process.EmptyOptionalNodeType;
 import club.mondaylunch.gatos.basicnodes.process.EqualsNodeType;
 import club.mondaylunch.gatos.basicnodes.process.GetAtIndexNodeType;
-import club.mondaylunch.gatos.basicnodes.process.GetFlowDataNodeType;
+import club.mondaylunch.gatos.basicnodes.process.GetUserDataNodeType;
 import club.mondaylunch.gatos.basicnodes.process.HTTPRequestNodeType;
 import club.mondaylunch.gatos.basicnodes.process.IsFiniteNodeType;
 import club.mondaylunch.gatos.basicnodes.process.IsNanNodeType;
@@ -148,18 +148,18 @@ public final class BasicNodes implements GatosPlugin {
         .register("object_set_value", new ObjectSetValueNodeType());
     public static final RegexNodeType REGEX = NodeType.REGISTRY
         .register("regex", new RegexNodeType());
-    public static final GetFlowDataNodeType GET_FLOW_DATA = NodeType.REGISTRY
-        .register("get_flow_data", new GetFlowDataNodeType());
-    public static final SetFlowDataNodeType SET_FLOW_DATA = NodeType.REGISTRY
-        .register("set_flow_data", new SetFlowDataNodeType());
-    public static final ContainsFlowDataNodeType CONTAINS_FLOW_DATA = NodeType.REGISTRY
-        .register("contains_flow_data", new ContainsFlowDataNodeType());
-    public static final RemoveFlowDataNodeType REMOVE_FLOW_DATA = NodeType.REGISTRY
-        .register("remove_flow_data", new RemoveFlowDataNodeType());
-    public static final IncrementFlowDataNodeType INCREMENT_FLOW_DATA = NodeType.REGISTRY
-        .register("increment_flow_data", new IncrementFlowDataNodeType());
-    public static final MultiplyFlowDataNodeType MULTIPLY_FLOW_DATA = NodeType.REGISTRY
-        .register("multiply_flow_data", new MultiplyFlowDataNodeType());
+    public static final GetUserDataNodeType GET_USER_DATA = NodeType.REGISTRY
+        .register("get_user_data", new GetUserDataNodeType());
+    public static final SetUserDataNodeType SET_USER_DATA = NodeType.REGISTRY
+        .register("set_user_data", new SetUserDataNodeType());
+    public static final ContainsUserDataNodeType CONTAINS_USER_DATA = NodeType.REGISTRY
+        .register("contains_user_data", new ContainsUserDataNodeType());
+    public static final RemoveUserDataNodeType REMOVE_USER_DATA = NodeType.REGISTRY
+        .register("remove_user_data", new RemoveUserDataNodeType());
+    public static final IncrementUserDataNodeType INCREMENT_USER_DATA = NodeType.REGISTRY
+        .register("increment_user_data", new IncrementUserDataNodeType());
+    public static final MultiplyUserDataNodeType MULTIPLY_USER_DATA = NodeType.REGISTRY
+        .register("multiply_user_data", new MultiplyUserDataNodeType());
 
     @VisibleForTesting
     public static final Set<DataBox<?>> VALUE_PROVIDER_TYPES_WITH_DEFAULTS = Set.of(

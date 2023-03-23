@@ -55,7 +55,7 @@ public class CreateEmbedNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var embed = new EmbedBuilder();
         DataBox.get(inputs, "title", DataType.STRING.optionalOf()).flatMap(Function.identity())
             .ifPresent(embed::setTitle);

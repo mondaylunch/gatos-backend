@@ -104,14 +104,14 @@ public interface NodeType {
          * (Asynchronously) compute the outputs of this node in a map of output
          * connector name to value.
          *
-         * @param flowId
+         * @param userId     the ID of the user who owns the flow this node is a part of
          * @param inputs     a map of input connector name to value
          * @param settings   a map of node settings
          * @param inputTypes what type of output connector the input connectors to this node are connected to, if any
          * @return a CompletableFuture of each output in a map by name
          */
         Map<String, CompletableFuture<DataBox<?>>> compute(
-            UUID flowId,
+            UUID userId,
             Map<String, DataBox<?>> inputs,
             Map<String, DataBox<?>> settings,
             Map<String, DataType<?>> inputTypes
@@ -151,25 +151,25 @@ public interface NodeType {
          * (Asynchronously) compute the outputs of this node in a map of output
          * connector name to value.
          *
-         * @param flowId
+         * @param userId     the ID of the user who owns the flow this node is a part of
          * @param startInput whatever input this start node has. This can be null, if this node is not the one triggering the flow!
          * @param settings   a map of node settings
          * @return a CompletableFuture of each output in a map by name
          */
         public abstract Map<String, CompletableFuture<DataBox<?>>> compute(
-            UUID flowId,
+            UUID userId,
             @Nullable StartInput startInput,
             Map<String, DataBox<?>> settings
         );
 
         @Override
         public final Map<String, CompletableFuture<DataBox<?>>> compute(
-            UUID flowId,
+            UUID userId,
             Map<String, DataBox<?>> inputs,
             Map<String, DataBox<?>> settings,
             Map<String, DataType<?>> inputTypes
         ) {
-            return this.compute(flowId, null, settings);
+            return this.compute(userId, null, settings);
         }
     }
 
@@ -205,13 +205,13 @@ public interface NodeType {
         /**
          * (Asynchronously) compute this node.
          *
-         * @param flowId
+         * @param userId   the ID of the user who owns the flow this node is a part of
          * @param inputs   a map of input connector name to value
          * @param settings a map of node settings
          * @return a CompletableFuture of this node's computation
          */
         public abstract CompletableFuture<Void> compute(
-            UUID flowId,
+            UUID userId,
             Map<String, DataBox<?>> inputs,
             Map<String, DataBox<?>> settings
         );

@@ -34,7 +34,7 @@ public class EqualsNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var inputA = DataBox.get(inputs, "inputA", DataType.ANY).orElse("");
         var inputB = DataBox.get(inputs, "inputB", DataType.ANY).orElse("");
         return Map.of("output", CompletableFuture.completedFuture(DataType.BOOLEAN.create(inputA.equals(inputB))));

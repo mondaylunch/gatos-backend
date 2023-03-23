@@ -275,7 +275,7 @@ public class GraphExecutorTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs,
+        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs,
                                                                   Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Map.of(
                 "out", CompletableFuture.completedFuture(DataType.NUMBER.create(
@@ -304,7 +304,7 @@ public class GraphExecutorTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs,
+        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs,
                                                                   Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Map.of(
                 "out", CompletableFuture.completedFuture(DataType.NUMBER.create(
@@ -333,7 +333,7 @@ public class GraphExecutorTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs,
+        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs,
                                                                   Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Map.of(
                 "out", CompletableFuture.supplyAsync(this.addIntsSlowly(
@@ -367,7 +367,7 @@ public class GraphExecutorTest {
         }
 
         @Override
-        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, @Nullable Object input, Map<String, DataBox<?>> settings) {
+        public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, @Nullable Object input, Map<String, DataBox<?>> settings) {
             return Map.of(
                 "out", CompletableFuture.completedFuture(
                     DataType.NUMBER.create(DataBox.get(settings, "value", DataType.NUMBER).orElseThrow())));
@@ -404,7 +404,7 @@ public class GraphExecutorTest {
         }
 
         @Override
-        public CompletableFuture<Void> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+        public CompletableFuture<Void> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
             this.result.set(DataBox.get(inputs, "in", DataType.NUMBER).orElseThrow().intValue());
             return CompletableFuture.runAsync(() -> {
             });
@@ -432,7 +432,7 @@ public class GraphExecutorTest {
         }
 
         @Override
-        public CompletableFuture<Void> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+        public CompletableFuture<Void> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
             this.result.set(DataBox.get(inputs, "in", DataType.STRING).orElseThrow());
             return CompletableFuture.runAsync(() -> {
             });

@@ -32,7 +32,7 @@ public class ListDistinctNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var inputListCopy = List.copyOf(DataBox.get(inputs, "input", ListDataType.GENERIC_LIST).orElseThrow().stream().distinct().toList());
         var outputType = inputTypes.getOrDefault("input", ListDataType.GENERIC_LIST);
         return Map.of("output", CompletableFuture.completedFuture(

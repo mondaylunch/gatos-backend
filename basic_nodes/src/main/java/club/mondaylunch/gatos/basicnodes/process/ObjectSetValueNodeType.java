@@ -39,7 +39,7 @@ public class ObjectSetValueNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var key = (String) settings.get("key").value();
         var jsonObject = DataBox.get(inputs, "object", DataType.JSON_OBJECT).orElse(new JsonObject());
         var jsonElement = DataBox.get(inputs, "element", DataType.JSON_ELEMENT);

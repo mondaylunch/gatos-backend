@@ -46,10 +46,10 @@
     "node_type.optional_creation": "Create Optional",
     "node_type.regex": "Regex",
     "node_type.list_set_operation": "List Set Operation",
-    "node_type.get_flow_data": "Get Flow Data",
-    "node_type.set_flow_data": "Set Flow Data",
-    "node_type.contains_flow_data": "Contains Flow Data",
-    "node_type.remove_flow_data": "Remove Flow Data",
-    "node_type.increment_flow_data": "Increment Flow Data",
-    "node_type.multiply_flow_data": "Multiply Flow Data"
+    "node_type.get_user_data": "Get User Data",
+    "node_type.set_user_data": "Set User Data",
+    "node_type.contains_user_data": "Contains User Data",
+    "node_type.remove_user_data": "Remove User Data",
+    "node_type.increment_user_data": "Increment User Data",
+    "node_type.multiply_user_data": "Multiply User Data"
 }

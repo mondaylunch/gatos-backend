@@ -56,7 +56,7 @@ public class RegexNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var regex = Pattern.compile(DataBox.get(inputs, "regex", DataType.STRING).orElseThrow());
         var word = DataBox.get(inputs, "word", DataType.STRING).orElseThrow();
         var matcher = regex.matcher(word);

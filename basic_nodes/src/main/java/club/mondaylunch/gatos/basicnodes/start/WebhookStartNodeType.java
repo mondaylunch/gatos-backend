@@ -43,7 +43,7 @@ public class WebhookStartNodeType extends NodeType.Start<WebhookStartNodeInput> 
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, @Nullable WebhookStartNodeInput input, Map<String, DataBox<?>> settings) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, @Nullable WebhookStartNodeInput input, Map<String, DataBox<?>> settings) {
         if (input == null) {
             input = new WebhookStartNodeInput(new JsonObject(), new JsonObjectReference());
         }

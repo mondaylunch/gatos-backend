@@ -1,19 +1,17 @@
 package club.mondaylunch.gatos.basicnodes.process;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import club.mondaylunch.gatos.core.data.Conversions;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
-import club.mondaylunch.gatos.core.models.FlowData;
+import club.mondaylunch.gatos.core.models.UserData;
 
-public class GetFlowDataNodeType extends NodeType.Process {
+public class ContainsUserDataNodeType extends NodeType.Process {
 
     @Override
     public Map<String, DataBox<?>> settings() {
@@ -35,24 +33,22 @@ public class GetFlowDataNodeType extends NodeType.Process {
 
     @Override
     public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        var type = DataBox.get(settings, "type", DataType.DATA_TYPE)
-            .orElse(DataType.ANY)
-            .optionalOf();
-        return Set.of(new NodeConnector.Output<>(nodeId, "value", type));
+        return Set.of(new NodeConnector.Output<>(nodeId, "contains", DataType.BOOLEAN));
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var key = DataBox.get(settings, inputs, "key", DataType.STRING).orElseThrow();
         var type = DataBox.get(settings, "type", DataType.DATA_TYPE).orElse(DataType.ANY);
-        @SuppressWarnings("unchecked")
-        var optionalType = (DataType<Optional<?>>) (DataType<?>) type.optionalOf();
         return Map.of(
-            "value", CompletableFuture.supplyAsync(() -> {
-                var valueOptional = FlowData.objects.get(flowId, key)
-                    .filter(dataBox -> Conversions.canConvert(dataBox.type(), type))
-                    .map(dataBox -> Conversions.convert(dataBox, type).value());
-                return optionalType.create(valueOptional);
+            "contains", CompletableFuture.supplyAsync(() -> {
+                boolean contains;
+                if (type.equals(DataType.ANY)) {
+                    contains = UserData.objects.contains(userId, key);
+                } else {
+                    contains = UserData.objects.contains(userId, key, type);
+                }
+                return DataType.BOOLEAN.create(contains);
             })
         );
     }

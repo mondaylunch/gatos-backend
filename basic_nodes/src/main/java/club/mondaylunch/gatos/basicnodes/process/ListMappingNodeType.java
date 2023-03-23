@@ -108,7 +108,7 @@ public class ListMappingNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var inputConnectorName = DataBox.get(settings, INPUT_CONNECTOR_SETTING, DataType.STRING).orElseThrow();
         var outputConnectorName = DataBox.get(settings, OUTPUT_CONNECTOR_SETTING, DataType.STRING).orElseThrow();
         var mappingNode = getMappingNode(settings);
@@ -119,7 +119,7 @@ public class ListMappingNodeType extends NodeType.Process {
         var inputListBox = inputs.get(LIST_INPUT);
         var inputListType = inputListBox.type();
         DataType<?> contentsType = inputListType instanceof ListDataType<?> listDataType ? listDataType.contains() : DataType.ANY;
-        List<CompletableFuture<Object>> resultList = mapInput(flowId, (List<?>) inputListBox.value(), mappingNode, inputs, inputConnector, outputConnector, contentsType, (NodeType.Process) mappingNode.type());
+        List<CompletableFuture<Object>> resultList = mapInput(userId, (List<?>) inputListBox.value(), mappingNode, inputs, inputConnector, outputConnector, contentsType, (NodeType.Process) mappingNode.type());
         CompletableFuture<Void> resultFuture = CompletableFuture.allOf(resultList.toArray(CompletableFuture[]::new));
         return Map.of(MAPPED_LIST_OUTPUT, resultFuture.thenApply(v -> listOutputType.create(resultList.stream().map(CompletableFuture::join).toList())));
     }

@@ -11,9 +11,9 @@ import org.junit.jupiter.api.Test;
 import club.mondaylunch.gatos.basicnodes.BasicNodes;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Node;
-import club.mondaylunch.gatos.core.models.FlowData;
+import club.mondaylunch.gatos.core.models.UserData;
 
-public class SetFlowDataNodeTest {
+public class SetUserDataNodeTest {
 
     @BeforeEach
     void setUp() {
@@ -26,12 +26,12 @@ public class SetFlowDataNodeTest {
     }
 
     private void reset() {
-        FlowData.objects.clear();
+        UserData.objects.clear();
     }
 
     @Test
     public void areSettingsCorrect() {
-        var settings = BasicNodes.SET_FLOW_DATA.settings();
+        var settings = BasicNodes.SET_USER_DATA.settings();
         Assertions.assertEquals(2, settings.size());
         Assertions.assertTrue(settings.containsKey("key"));
         Assertions.assertTrue(settings.containsKey("overwrite"));
@@ -39,7 +39,7 @@ public class SetFlowDataNodeTest {
 
     @Test
     public void areInputsCorrect() {
-        var node = Node.create(BasicNodes.SET_FLOW_DATA);
+        var node = Node.create(BasicNodes.SET_USER_DATA);
         var inputs = node.inputs();
         Assertions.assertEquals(2, inputs.size());
         var nodeId = node.id();
@@ -55,7 +55,7 @@ public class SetFlowDataNodeTest {
 
     @Test
     public void areInputsCorrectWithKeySetting() {
-        var node = Node.create(BasicNodes.SET_FLOW_DATA)
+        var node = Node.create(BasicNodes.SET_USER_DATA)
             .modifySetting("key", DataType.STRING.create("test_key"));
         var inputs = node.inputs();
         Assertions.assertEquals(1, inputs.size());
@@ -68,91 +68,91 @@ public class SetFlowDataNodeTest {
 
     @Test
     public void areOutputsCorrect() {
-        var node = Node.create(BasicNodes.SET_FLOW_DATA);
+        var node = Node.create(BasicNodes.SET_USER_DATA);
         Assertions.assertTrue(node.outputs().isEmpty());
     }
 
     @Test
     public void canSetDataWithSettingsKey() {
-        var nodeType = BasicNodes.SET_FLOW_DATA;
-        var flowId = UUID.randomUUID();
+        var nodeType = BasicNodes.SET_USER_DATA;
+        var userId = UUID.randomUUID();
         var key = DataType.STRING.create("test_key");
         var value = DataType.STRING.create("Test value");
         nodeType.compute(
-            flowId,
+            userId,
             Map.of("value", value),
             Map.of("key", key)
         ).join();
-        var retrievedValue = FlowData.objects.get(flowId, "test_key");
+        var retrievedValue = UserData.objects.get(userId, "test_key");
         Assertions.assertTrue(retrievedValue.isPresent());
         Assertions.assertEquals(value, retrievedValue.orElseThrow());
     }
 
     @Test
     public void canSetDataWithInputKey() {
-        var nodeType = BasicNodes.SET_FLOW_DATA;
-        var flowId = UUID.randomUUID();
+        var nodeType = BasicNodes.SET_USER_DATA;
+        var userId = UUID.randomUUID();
         var key = DataType.STRING.create("test_key");
         var value = DataType.STRING.create("Test value");
         nodeType.compute(
-            flowId,
+            userId,
             Map.of("value", value, "key", key),
             Map.of()
         ).join();
-        var retrievedValue = FlowData.objects.get(flowId, "test_key");
+        var retrievedValue = UserData.objects.get(userId, "test_key");
         Assertions.assertTrue(retrievedValue.isPresent());
         Assertions.assertEquals(value, retrievedValue.orElseThrow());
     }
 
     @Test
     public void canSetDataWithSettingsAndInputsKey() {
-        var nodeType = BasicNodes.SET_FLOW_DATA;
-        var flowId = UUID.randomUUID();
+        var nodeType = BasicNodes.SET_USER_DATA;
+        var userId = UUID.randomUUID();
         var settingsKey = DataType.STRING.create("settings_key");
         var inputKey = DataType.STRING.create("input_key");
         var value = DataType.STRING.create("Test value");
         nodeType.compute(
-            flowId,
+            userId,
             Map.of("key", inputKey, "value", value),
             Map.of("key", settingsKey)
         ).join();
-        var settingsKeyRetrievedValue = FlowData.objects.get(flowId, "settings_key");
+        var settingsKeyRetrievedValue = UserData.objects.get(userId, "settings_key");
         Assertions.assertTrue(settingsKeyRetrievedValue.isPresent());
         Assertions.assertEquals(value, settingsKeyRetrievedValue.orElseThrow());
-        var inputKeyRetrievedValue = FlowData.objects.get(flowId, "input_key");
+        var inputKeyRetrievedValue = UserData.objects.get(userId, "input_key");
         Assertions.assertTrue(inputKeyRetrievedValue.isEmpty());
     }
 
     @Test
     public void canSetDataIfAbsentWithAbsent() {
-        var nodeType = BasicNodes.SET_FLOW_DATA;
-        var flowId = UUID.randomUUID();
+        var nodeType = BasicNodes.SET_USER_DATA;
+        var userId = UUID.randomUUID();
         var key = DataType.STRING.create("test_key");
         var value = DataType.STRING.create("Test value");
         nodeType.compute(
-            flowId,
+            userId,
             Map.of("value", value, "key", key),
             Map.of("overwrite", DataType.BOOLEAN.create(false))
         ).join();
-        var retrievedValue = FlowData.objects.get(flowId, "test_key");
+        var retrievedValue = UserData.objects.get(userId, "test_key");
         Assertions.assertTrue(retrievedValue.isPresent());
         Assertions.assertEquals(value, retrievedValue.orElseThrow());
     }
 
     @Test
     public void canSetDataIfAbsentWithPresent() {
-        var nodeType = BasicNodes.SET_FLOW_DATA;
-        var flowId = UUID.randomUUID();
+        var nodeType = BasicNodes.SET_USER_DATA;
+        var userId = UUID.randomUUID();
         var key = DataType.STRING.create("test_key");
         var value = DataType.STRING.create("Test value");
         var otherValue = DataType.STRING.create("Other value");
-        FlowData.objects.set(flowId, "test_key", value);
+        UserData.objects.set(userId, "test_key", value);
         nodeType.compute(
-            flowId,
+            userId,
             Map.of("value", otherValue, "key", key),
             Map.of("overwrite", DataType.BOOLEAN.create(false))
         ).join();
-        var retrievedValue = FlowData.objects.get(flowId, "test_key");
+        var retrievedValue = UserData.objects.get(userId, "test_key");
         Assertions.assertTrue(retrievedValue.isPresent());
         Assertions.assertEquals(value, retrievedValue.orElseThrow());
     }

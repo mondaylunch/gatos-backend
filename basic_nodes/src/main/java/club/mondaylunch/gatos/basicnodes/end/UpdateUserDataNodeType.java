@@ -12,7 +12,7 @@ import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 
-public abstract class UpdateFlowDataNodeType extends NodeType.End {
+public abstract class UpdateUserDataNodeType extends NodeType.End {
 
     @Override
     public Map<String, DataBox<?>> settings() {
@@ -34,12 +34,12 @@ public abstract class UpdateFlowDataNodeType extends NodeType.End {
     }
 
     @Override
-    public CompletableFuture<Void> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
+    public CompletableFuture<Void> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
         var key = DataBox.get(settings, inputs, "key", DataType.STRING).orElseThrow();
         var value = DataBox.get(inputs, "value", DataType.NUMBER).orElseThrow();
         boolean setIfAbsent = DataBox.get(settings, "set_if_absent", DataType.BOOLEAN).orElse(true);
-        return CompletableFuture.runAsync(() -> this.updateValue(flowId, key, value, setIfAbsent));
+        return CompletableFuture.runAsync(() -> this.updateValue(userId, key, value, setIfAbsent));
     }
 
-    protected abstract void updateValue(UUID flowId, String key, double value, boolean setIfAbsent);
+    protected abstract void updateValue(UUID userId, String key, double value, boolean setIfAbsent);
 }

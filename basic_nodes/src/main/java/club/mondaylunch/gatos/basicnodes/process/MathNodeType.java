@@ -34,7 +34,7 @@ public class MathNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         double a = DataBox.get(inputs, "inputA", DataType.NUMBER).orElseThrow();
         double b = DataBox.get(inputs, "inputB", DataType.NUMBER).orElseThrow();
 

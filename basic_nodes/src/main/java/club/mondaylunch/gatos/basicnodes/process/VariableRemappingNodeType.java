@@ -35,7 +35,7 @@ public class VariableRemappingNodeType extends NodeType.Process {
     }
 
     @Override
-    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
+    public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         var jsonInput = DataBox.get(inputs, "input", DataType.JSON_OBJECT).orElse(new JsonObject());
         var oldKeyStr = DataBox.get(inputs, "oldKey", DataType.STRING).orElse("");
         var newKeyStr = DataBox.get(inputs, "newKey", DataType.STRING).orElse("");
