@@ -7,6 +7,9 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
+import club.mondaylunch.gatos.core.models.JsonObjectReference;
+
+import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Nullable;
 
 import club.mondaylunch.gatos.core.data.DataBox;
@@ -43,7 +46,9 @@ public class WebhookStartNodeType extends NodeType.Start<WebhookStartNodeInput> 
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, @Nullable WebhookStartNodeInput input, Map<String, DataBox<?>> settings) {
-        Objects.requireNonNull(input);
+        if (input == null) {
+            input = new WebhookStartNodeInput(new JsonObject(), new JsonObjectReference());
+        }
         return Map.of(
             "requestBody", CompletableFuture.completedFuture(DataType.JSON_OBJECT.create(
                 input.requestBody()
