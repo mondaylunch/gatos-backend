@@ -1,6 +1,5 @@
 package club.mondaylunch.gatos.core.data;
 
-import java.util.List;
 import java.util.Optional;
 
 public final class OptionalDataType<T> extends DataType<Optional<T>> {
