@@ -49,7 +49,6 @@ public class ReplyToMessageNodeType extends NodeType.End {
         return message.reply(new MessageCreateBuilder()
             .addContent(replyText)
             .addEmbeds(replyEmbed.map(EmbedBuilder::build).map(List::of).orElse(List.of()).toArray(MessageEmbed[]::new))
-            .build()).submit().thenAccept($ -> {
-        });
+            .build()).submit().thenAccept($ -> {});
     }
 }
