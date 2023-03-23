@@ -41,7 +41,7 @@
     "node_type.get_at_index": "Get Item From List",
     "node_type.empty_optional": "Create Empty Optional",
     "node_type.list_contains": "List Contains?",
-    "node_type.list_distinct": "Remove List Duplicates",
+    "node_type.list_distinct": "Remove Duplicates",
     "node_type.list_reverse": "Reverse List",
     "node_type.optional_creation": "Create Optional",
     "node_type.regex": "Regex",
