@@ -93,7 +93,7 @@ public class ReceiveCommandNodeType extends NodeType.Start<SlashCommandInteracti
         }
 
         GatosDiscord.LOGGER.info("Deferring reply for command");
-        boolean isEphemeral = DataBox.get(settings, "is_reply_ephemeral", DataType.BOOLEAN).orElseThrow();
+        boolean isEphemeral = DataBox.get(settings, "is_reply_ephemeral", DataType.BOOLEAN).orElse(false);
         return Map.of(
             "user", CompletableFuture.completedFuture(DiscordDataTypes.USER_ID.create(event.getUser().getId())),
             "channel", CompletableFuture.completedFuture(DiscordDataTypes.CHANNEL_ID.create(event.getChannel().getId())),
