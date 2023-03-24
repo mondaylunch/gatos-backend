@@ -45,10 +45,10 @@ public class ReceiveCommandNodeType extends NodeType.Start<SlashCommandInteracti
     @Override
     public Collection<GraphValidityError> isValid(Node node, Either<Flow, Graph> flowOrGraph) {
         var graph = flowOrGraph.map(Flow::getGraph, Function.identity());
-        var canFindReceive = graph.nodes().stream().anyMatch(n -> n.type().equals(this.gatosDiscord.getNodeTypes().commandReply()));
+        var canFindReply = graph.nodes().stream().anyMatch(n -> n.type().equals(this.gatosDiscord.getNodeTypes().commandReply()));
         return GatosUtils.union(
             super.isValid(node, flowOrGraph),
-            canFindReceive ? Set.of() : Set.of(new GraphValidityError(node.id(), "No receive command node found.")),
+            canFindReply ? Set.of() : Set.of(new GraphValidityError(node.id(), "No command reply node found.")),
             GraphValidityError.ensureSetting(node, "guild_id", DiscordDataTypes.GUILD_ID, s -> s.isBlank() ? "A Discord server must be set" : null),
             GraphValidityError.ensureSetting(node, "command_name", DiscordDataTypes.GUILD_ID, s -> s.isBlank() ? "Command name cannot be blank" : null),
             this.gatosDiscord.validateUserHasPermission(node, "guild_id", flowOrGraph)
