@@ -39,6 +39,7 @@ import club.mondaylunch.gatos.basicnodes.process.ObjectSetValueNodeType;
 import club.mondaylunch.gatos.basicnodes.process.OptionalCreationNodeType;
 import club.mondaylunch.gatos.basicnodes.process.OptionalOrElseNodeType;
 import club.mondaylunch.gatos.basicnodes.process.ParseStringToNumberNodeType;
+import club.mondaylunch.gatos.basicnodes.process.ParseStringToObjectNodeType;
 import club.mondaylunch.gatos.basicnodes.process.RegexNodeType;
 import club.mondaylunch.gatos.basicnodes.process.RemoveElementFromListNodeType;
 import club.mondaylunch.gatos.basicnodes.process.StringCaseNodeType;
@@ -49,8 +50,6 @@ import club.mondaylunch.gatos.basicnodes.process.StringLengthNodeType;
 import club.mondaylunch.gatos.basicnodes.process.StringRegexReplacementNodeType;
 import club.mondaylunch.gatos.basicnodes.process.StringRegexSplitNodeType;
 import club.mondaylunch.gatos.basicnodes.process.TruthinessNodeType;
-import club.mondaylunch.gatos.core.util.ValueProviderNodeType;
-import club.mondaylunch.gatos.core.util.ValueReplacerNodeType;
 import club.mondaylunch.gatos.basicnodes.process.VariableExtractionNodeType;
 import club.mondaylunch.gatos.basicnodes.process.VariableRemappingNodeType;
 import club.mondaylunch.gatos.basicnodes.start.WebhookStartNodeType;
@@ -58,6 +57,8 @@ import club.mondaylunch.gatos.core.GatosPlugin;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
+import club.mondaylunch.gatos.core.util.ValueProviderNodeType;
+import club.mondaylunch.gatos.core.util.ValueReplacerNodeType;
 
 public final class BasicNodes implements GatosPlugin {
 
@@ -132,6 +133,8 @@ public final class BasicNodes implements GatosPlugin {
         .register("negation", new NegationNodeType());
     public static final ParseStringToNumberNodeType PARSE_STRING_TO_NUMBER = NodeType.REGISTRY
         .register("parse_string_to_number", new ParseStringToNumberNodeType());
+    public static final ParseStringToObjectNodeType PARSE_STRING_TO_OBJECT = NodeType.REGISTRY
+        .register("parse_string_to_object", new ParseStringToObjectNodeType());
     public static final HTTPRequestNodeType HTTP_REQUEST = NodeType.REGISTRY
         .register("http_request", new HTTPRequestNodeType());
     public static final WebhookStartNodeType WEBHOOK_START = NodeType.REGISTRY
