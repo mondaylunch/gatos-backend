@@ -28,15 +28,31 @@ public class HTTPRequestNodeTest {
     @Test
     public void areInputsCorrect() {
         var node = Node.create(BasicNodes.HTTP_REQUEST);
+        Assertions.assertEquals(2, node.inputs().size());
+        Assertions.assertTrue(node.inputs().containsKey("body"));
+        Assertions.assertTrue(node.inputs().containsKey("url"));
+    }
+
+    @Test
+    public void areInputsCorrectWithUrlSet() {
+        var node = Node.create(BasicNodes.HTTP_REQUEST)
+            .modifySetting("url", DataType.STRING.create(URL));
         Assertions.assertEquals(1, node.inputs().size());
         Assertions.assertTrue(node.inputs().containsKey("body"));
+    }
+
+    @Test
+    public void areInputsCorrectWithGet() {
+        var node = Node.create(BasicNodes.HTTP_REQUEST)
+            .modifySetting("method", DataType.STRING.create("GET"));
+        Assertions.assertFalse(node.inputs().containsKey("body"));
     }
 
     @Test
     public void areOutputsCorrect() {
         var node = Node.create(BasicNodes.HTTP_REQUEST);
         Assertions.assertEquals(2, node.outputs().size());
-        Assertions.assertTrue(node.outputs().containsKey("StatusCode"));
+        Assertions.assertTrue(node.outputs().containsKey("statusCode"));
         Assertions.assertTrue(node.outputs().containsKey("responseText"));
     }
 
@@ -46,12 +62,10 @@ public class HTTPRequestNodeTest {
             .modifySetting("url", DataType.STRING.create(URL))
             .modifySetting("method", DataType.STRING.create("GET"));
 
-        Map<String, DataBox<?>> input = Map.of(
-            "body", DataType.STRING.create("")
-        );
+        Map<String, DataBox<?>> input = Map.of();
 
         var output = BasicNodes.HTTP_REQUEST.compute(UUID.randomUUID(), input, node.settings(), Map.of());
-        Assertions.assertEquals(200.0, output.get("StatusCode").join().value());
+        Assertions.assertEquals(200.0, output.get("statusCode").join().value());
         Assertions.assertEquals("GET request", output.get("responseText").join().value());
     }
 
@@ -66,7 +80,7 @@ public class HTTPRequestNodeTest {
         );
 
         var output = BasicNodes.HTTP_REQUEST.compute(UUID.randomUUID(), input, node.settings(), Map.of());
-        Assertions.assertEquals(200.0, output.get("StatusCode").join().value());
+        Assertions.assertEquals(200.0, output.get("statusCode").join().value());
         Assertions.assertEquals("POST request request has a body: asdsdf", output.get("responseText").join().value());
     }
 
@@ -81,7 +95,7 @@ public class HTTPRequestNodeTest {
         );
 
         var output = BasicNodes.HTTP_REQUEST.compute(UUID.randomUUID(), input, node.settings(), Map.of());
-        Assertions.assertEquals(200.0, output.get("StatusCode").join().value());
+        Assertions.assertEquals(200.0, output.get("statusCode").join().value());
         Assertions.assertEquals("POST request", output.get("responseText").join().value());
     }
 
@@ -96,7 +110,7 @@ public class HTTPRequestNodeTest {
         );
 
         var output = BasicNodes.HTTP_REQUEST.compute(UUID.randomUUID(), input, node.settings(), Map.of());
-        Assertions.assertEquals(200.0, output.get("StatusCode").join().value());
+        Assertions.assertEquals(200.0, output.get("statusCode").join().value());
         Assertions.assertEquals("PUT request request has a body: asdsdf", output.get("responseText").join().value());
     }
 
@@ -111,7 +125,7 @@ public class HTTPRequestNodeTest {
         );
 
         var output = BasicNodes.HTTP_REQUEST.compute(UUID.randomUUID(), input, node.settings(), Map.of());
-        Assertions.assertEquals(200.0, output.get("StatusCode").join().value());
+        Assertions.assertEquals(200.0, output.get("statusCode").join().value());
         Assertions.assertEquals("DELETE request", output.get("responseText").join().value());
     }
 
@@ -126,7 +140,7 @@ public class HTTPRequestNodeTest {
         );
 
         var output = BasicNodes.HTTP_REQUEST.compute(UUID.randomUUID(), input, node.settings(), Map.of());
-        Assertions.assertEquals(404.0, output.get("StatusCode").join().value());
+        Assertions.assertEquals(404.0, output.get("statusCode").join().value());
         Assertions.assertEquals("URL or method are incorrect", output.get("responseText").join().value());
     }
 
@@ -141,7 +155,7 @@ public class HTTPRequestNodeTest {
         );
 
         var output = BasicNodes.HTTP_REQUEST.compute(UUID.randomUUID(), input, node.settings(), Map.of());
-        Assertions.assertEquals(404.0, output.get("StatusCode").join().value());
+        Assertions.assertEquals(404.0, output.get("statusCode").join().value());
         Assertions.assertEquals("URL or method are incorrect", output.get("responseText").join().value());
     }
 }

@@ -11,6 +11,7 @@ import java.net.http.HttpRequest.Builder;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,21 +57,29 @@ public class HTTPRequestNodeType extends NodeType.Process {
 
     @Override
     public Set<Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        return Set.of(
-            new NodeConnector.Input<>(nodeId, "body", DataType.STRING));
+        Set<NodeConnector.Input<?>> inputs = new HashSet<>();
+        var url = DataBox.get(settings, "url", DataType.STRING).orElse("");
+        if (url.isBlank()) {
+            inputs.add(new NodeConnector.Input<>(nodeId, "url", DataType.STRING));
+        }
+        if (!DataBox.get(settings, "method", DataType.STRING).orElse("").equalsIgnoreCase("GET")) {
+            inputs.add(new NodeConnector.Input<>(nodeId, "body", DataType.STRING));
+        }
+
+        return inputs;
     }
 
     @Override
     public Set<Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         return Set.of(
-            new NodeConnector.Output<>(nodeId, "StatusCode", DataType.NUMBER),
+            new NodeConnector.Output<>(nodeId, "statusCode", DataType.NUMBER),
             new NodeConnector.Output<>(nodeId, "responseText", DataType.STRING)
         );
     }
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        var url = DataBox.get(settings, "url", DataType.STRING).orElse("");
+        var url = DataBox.get(settings, inputs, "url", DataType.STRING).orElse("");
         var method = DataBox.get(settings, "method", DataType.STRING).orElse("").toUpperCase();
         var body = DataBox.get(inputs, "body", DataType.STRING).orElse("");
 
@@ -86,14 +95,14 @@ public class HTTPRequestNodeType extends NodeType.Process {
 
         CompletableFuture<HttpResponse<String>> future = httpClient.sendAsync(request, BodyHandlers.ofString()).exceptionally(ex -> null);
         return Map.of(
-            "StatusCode", future.thenApply(response -> response == null ? DataType.NUMBER.create(404.0) : DataType.NUMBER.create((double) response.statusCode())),
+            "statusCode", future.thenApply(response -> response == null ? DataType.NUMBER.create(404.0) : DataType.NUMBER.create((double) response.statusCode())),
             "responseText", future.thenApply(response -> response == null ? DataType.STRING.create("URL or method are incorrect") : DataType.STRING.create(response.body()))
         );
     }
 
     private Map<String, CompletableFuture<DataBox<?>>> handleInvalidReturns() {
         return Map.of(
-            "StatusCode", CompletableFuture.completedFuture(DataType.NUMBER.create(404.0)),
+            "statusCode", CompletableFuture.completedFuture(DataType.NUMBER.create(404.0)),
             "responseText", CompletableFuture.completedFuture(DataType.STRING.create("URL or method are incorrect"))
         );
     }
