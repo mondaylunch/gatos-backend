@@ -65,7 +65,7 @@ public class HTTPRequestNodeType extends NodeType.Process {
     @Override
     public Set<Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         Set<NodeConnector.Input<?>> inputs = new HashSet<>();
-        var url = DataBox.get(settings, "url", DataType.STRING).orElse("");
+        var url = DataBox.get(settings, "url", DataType.STRING).orElse("").replace(" ", "%20");
         if (url.isBlank()) {
             inputs.add(new NodeConnector.Input<>(nodeId, "url", DataType.STRING));
         }
