@@ -100,6 +100,23 @@ public class UserDataCollectionTest {
     }
 
     @Test
+    public void canRemoveAllDataForUser() {
+        var id1 = UUID.randomUUID();
+        var id2 = UUID.randomUUID();
+        assertSetData(id1, "test_1", "Test data 1");
+        assertSetData(id1, "test_2", "Test data 2");
+        assertSetData(id2, "test_3", "Test data 3");
+        UserData.objects.delete(id1);
+        Assertions.assertEquals(1, UserData.objects.size());
+        Assertions.assertFalse(UserData.objects.contains(id1, "test_1"));
+        Assertions.assertFalse(UserData.objects.contains(id1, "test_2"));
+        Assertions.assertTrue(UserData.objects.contains(id2, "test_3"));
+        var retrieved = UserData.objects.get(id2, "test_3");
+        Assertions.assertTrue(retrieved.isPresent());
+        Assertions.assertEquals(DataType.STRING.create("Test data 3"), retrieved.orElseThrow());
+    }
+
+    @Test
     public void canIncrementNumber() {
         var id = UUID.randomUUID();
         assertSetData(id, "test", 1);

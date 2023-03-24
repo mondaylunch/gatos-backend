@@ -103,6 +103,10 @@ public class UserDataCollection {
         ) > 0;
     }
 
+    public long size() {
+        return this.collection.countDocuments();
+    }
+
     public void clear() {
         this.collection.drop();
     }
