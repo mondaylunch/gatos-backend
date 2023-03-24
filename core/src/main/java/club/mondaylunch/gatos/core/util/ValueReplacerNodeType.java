@@ -22,6 +22,7 @@ public class ValueReplacerNodeType<T> extends NodeType.Process {
         this.defaultValue = box.value();
     }
 
+    @SuppressWarnings("unused")
     public ValueReplacerNodeType(DataType<T> type, T defaultValue) {
         this.type = type;
         this.defaultValue = defaultValue;

@@ -90,6 +90,7 @@ public final class SettingWidgets {
          * Gets the name of the widget.
          * @return  the name
          */
+        @SuppressWarnings("unused")
         public String getName() {
             return this.name;
         }

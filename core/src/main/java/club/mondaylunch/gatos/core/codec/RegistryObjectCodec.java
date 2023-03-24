@@ -42,8 +42,10 @@ public class RegistryObjectCodec<T> implements Codec<T> {
     }
 
     public enum Provider implements CodecProvider {
+
         INSTANCE;
 
+        @SuppressWarnings("unchecked")
         @Override
         public <T> Codec<T> get(Class<T> clazz, CodecRegistry registry) {
             return (Codec<T>) Registry.getRegistryByClass(clazz).map(RegistryObjectCodec::new).orElse(null);

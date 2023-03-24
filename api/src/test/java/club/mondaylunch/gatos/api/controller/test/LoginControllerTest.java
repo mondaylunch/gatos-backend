@@ -61,9 +61,9 @@ public class LoginControllerTest extends BaseMvcTest implements UserCreationHelp
                 .header("x-user-email", USER_EMAIL))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
-        result = compareFields(OBJECT_EXPRESSION_PREFIX, result,
-                Map.entry("email", USER_EMAIL),
-                Map.entry("discord_id", USER_DISCORD_ID));
+        compareFields(OBJECT_EXPRESSION_PREFIX, result,
+            Map.entry("email", USER_EMAIL),
+            Map.entry("discord_id", USER_DISCORD_ID));
     }
 
     @Test
@@ -75,7 +75,7 @@ public class LoginControllerTest extends BaseMvcTest implements UserCreationHelp
                 .header("x-user-email", otherUserEmail))
             .andExpect(MockMvcResultMatchers.status().isOk());
 
-        result = compareFields(OBJECT_EXPRESSION_PREFIX, result,
-                Map.entry("email", otherUserEmail));
+        compareFields(OBJECT_EXPRESSION_PREFIX, result,
+            Map.entry("email", otherUserEmail));
     }
 }

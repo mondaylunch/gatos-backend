@@ -84,6 +84,7 @@ public class FlowController {
         return this.flowRepository.getFlow(user, flowId).toJson();
     }
 
+    @SuppressWarnings("unused")
     private record BodyAddFlow(
         @NotNull @Length(min = 1, max = 32) String name, String description) {
     }
@@ -106,6 +107,7 @@ public class FlowController {
         return new BasicFlowInfo(flow);
     }
 
+    @SuppressWarnings("unused")
     private record BodyUpdateFlow(
         @NotNull @Length(min = 1, max = 32) String name, String description) {
     }
@@ -144,6 +146,7 @@ public class FlowController {
 
     // Graph operations
 
+    @SuppressWarnings("unused")
     private record BodyAddNode(
         @JsonProperty("type") String nodeType
     ) {
@@ -279,6 +282,7 @@ public class FlowController {
         return connectionsJson.toString();
     }
 
+    @SuppressWarnings("unused")
     private record BodyConnection(
         @JsonProperty("from_node_id") UUID fromNodeId,
         @JsonProperty("from_name") String fromName,

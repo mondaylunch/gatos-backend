@@ -23,6 +23,6 @@ public interface UserCreationHelper {
      * Create a new user with random values.
      */
     default User createRandomUser() {
-        return this.createSimpleUser(UUID.randomUUID().toString(), UUID.randomUUID().toString() + "@example.com");
+        return this.createSimpleUser(UUID.randomUUID().toString(), UUID.randomUUID() + "@example.com");
     }
 }

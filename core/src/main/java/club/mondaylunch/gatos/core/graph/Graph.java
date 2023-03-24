@@ -318,6 +318,7 @@ public class Graph {
      * @param toName    the name of the connector the connection is to
      * @return          the connection, if it exists
      */
+    @SuppressWarnings("unchecked")
     public <T> Optional<NodeConnection<T>> getConnection(UUID fromId, String fromName, UUID toId, String toName) {
         return this.getConnectionsForNode(fromId).stream()
             .filter(conn -> conn.from().name().equals(fromName) && conn.to().nodeId().equals(toId) && conn.to().name().equals(toName))
@@ -519,6 +520,7 @@ public class Graph {
      * @param connection the connection to check
      * @return whether the connection is valid for the given node
      */
+    @SuppressWarnings("unused")
     private static boolean isConnectionValid(Node node, NodeConnection<?> connection) {
         if (connection.from().nodeId().equals(node.id())) {
             return node.getOutputWithName(connection.from().name()).map(it ->

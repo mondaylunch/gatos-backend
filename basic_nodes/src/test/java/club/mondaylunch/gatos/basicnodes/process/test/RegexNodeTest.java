@@ -77,12 +77,14 @@ public class RegexNodeTest {
 
         var output = BasicNodes.REGEX.compute(UUID.randomUUID(), input);
         Assertions.assertTrue((boolean) output.get("isMatch").join().value());
-        
+
+        @SuppressWarnings("unchecked")
         Optional<List<String>> groups = (Optional<List<String>>) output.get("groups").join().value();
         Assertions.assertTrue(groups.isPresent());
         Assertions.assertEquals(List.of("1", "2"), groups.get());
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void doesntAssignNonExistantGroups() {
         Map<String, DataBox<?>> input = Map.of(
@@ -103,13 +105,15 @@ public class RegexNodeTest {
             "word", DataType.STRING.create("Hello")
         );
         var output = BasicNodes.REGEX.compute(UUID.randomUUID(), input);
-        
+
         Assertions.assertEquals(true, output.get("isMatch").join().value());
-        
+
+        @SuppressWarnings("unchecked")
         Optional<String> match = (Optional<String>) output.get("match").join().value();
         Assertions.assertTrue(match.isPresent());
         Assertions.assertEquals("Hello", match.get());
 
+        @SuppressWarnings("unchecked")
         Optional<List<String>> groups = (Optional<List<String>>) output.get("groups").join().value();
         Assertions.assertTrue(groups.isPresent());
         Assertions.assertEquals(List.of("e", "l"), groups.get());

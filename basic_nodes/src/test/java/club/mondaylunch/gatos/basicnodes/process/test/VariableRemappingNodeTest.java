@@ -15,6 +15,7 @@ import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.Node;
 
 public class VariableRemappingNodeTest {
+    @SuppressWarnings("unused")
     private static final class TestJSONRemappingClass {
         private final String firstKey = "Doctor";
         private final String secondKey = "Jeroen";

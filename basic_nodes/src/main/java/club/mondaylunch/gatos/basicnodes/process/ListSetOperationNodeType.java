@@ -49,6 +49,7 @@ public class ListSetOperationNodeType extends NodeType.Process {
         );
     }
 
+    @SuppressWarnings("SameParameterValue")
     private DataType<?> getOutputListTypeOrThrow(Map<String, DataType<?>> inputTypes, String firstKey, String secondKey) {
         var first = inputTypes.getOrDefault(firstKey, ListDataType.GENERIC_LIST);
         if (!first.equals(inputTypes.getOrDefault(secondKey, ListDataType.GENERIC_LIST))) {

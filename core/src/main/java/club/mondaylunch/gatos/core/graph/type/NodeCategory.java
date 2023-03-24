@@ -18,6 +18,7 @@ public enum NodeCategory {
      * A conditional node. Takes in a boolean input.
      * Must have no output connections. Has condition-connections
      */
+    @SuppressWarnings("unused")
     CONDITIONAL,
     /**
      * A node at an end of a flow. Every graph must have at least one of these.

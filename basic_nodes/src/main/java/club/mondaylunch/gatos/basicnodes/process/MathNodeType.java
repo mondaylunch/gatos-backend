@@ -95,6 +95,7 @@ public class MathNodeType extends NodeType.Process {
      * @param inputs a map of the two inputted doubles
      * @return a map of the computed result
      */
+    @SuppressWarnings("unused")
     public Map<String, CompletableFuture<DataBox<?>>> compute(Map<String, DataBox<?>> inputs) {
         return this.compute(UUID.randomUUID(), inputs, this.settings(), Map.of());
     }

@@ -38,12 +38,14 @@ public class DiscordNodeTypes {
     private final ReplyToMessageNodeType replyToMessageNodeType;
     private final CreateEmbedNodeType createEmbedNodeType;
 
+    @SuppressWarnings("unused")
     private final Map<DataType<?>, ValueProviderNodeType<?>> valueProviders = VALUE_PROVIDER_TYPES_WITH_DEFAULTS.stream()
         .collect(Collectors.toMap(
             DataBox::type,
             box -> NodeType.REGISTRY.register("value_provider_" + DataType.REGISTRY.getName(box.type()).orElseThrow(), new ValueProviderNodeType<>(box))
         ));
 
+    @SuppressWarnings("unused")
     private final Map<DataType<?>, ValueReplacerNodeType<?>> valueReplacers = VALUE_PROVIDER_TYPES_WITH_DEFAULTS.stream()
         .collect(Collectors.toMap(
             DataBox::type,
@@ -57,11 +59,12 @@ public class DiscordNodeTypes {
         this.applyRoleNodeType = NodeType.REGISTRY.register("discord.apply_role", new ApplyRoleNodeType(gatosDiscord));
         this.usersWithRoleNodeType = NodeType.REGISTRY.register("discord.users_with_role", new UsersWithRoleNodeType(gatosDiscord));
         this.receiveMessageNodeType = NodeType.REGISTRY.register("discord.receive_message", new ReceiveMessageNodeType(gatosDiscord));
-        this.reactToMessageNodeType = NodeType.REGISTRY.register("discord.react_to_message", new ReactToMessageNodeType(gatosDiscord));
-        this.replyToMessageNodeType = NodeType.REGISTRY.register("discord.reply_to_message", new ReplyToMessageNodeType(gatosDiscord));
+        this.reactToMessageNodeType = NodeType.REGISTRY.register("discord.react_to_message", new ReactToMessageNodeType());
+        this.replyToMessageNodeType = NodeType.REGISTRY.register("discord.reply_to_message", new ReplyToMessageNodeType());
         this.createEmbedNodeType = NodeType.REGISTRY.register("discord.create_embed", new CreateEmbedNodeType(gatosDiscord));
     }
 
+    @SuppressWarnings("unused")
     public SendMessageNodeType sendDiscordMessage() {
         return this.sendMessageNodeTypeType;
     }
@@ -74,26 +77,32 @@ public class DiscordNodeTypes {
         return this.receiveCommandNodeType;
     }
 
+    @SuppressWarnings("unused")
     public ApplyRoleNodeType applyRole() {
         return this.applyRoleNodeType;
     }
 
+    @SuppressWarnings("unused")
     public UsersWithRoleNodeType usersWithRole() {
         return this.usersWithRoleNodeType;
     }
 
+    @SuppressWarnings("unused")
     public ReceiveMessageNodeType receiveMessage() {
         return this.receiveMessageNodeType;
     }
 
+    @SuppressWarnings("unused")
     public ReactToMessageNodeType reactToMessage() {
         return this.reactToMessageNodeType;
     }
 
+    @SuppressWarnings("unused")
     public ReplyToMessageNodeType replyToMessage() {
         return this.replyToMessageNodeType;
     }
 
+    @SuppressWarnings("unused")
     public CreateEmbedNodeType createEmbed() {
         return this.createEmbedNodeType;
     }

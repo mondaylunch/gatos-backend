@@ -974,6 +974,8 @@ public class FlowControllerTest extends BaseMvcTest implements UserCreationHelpe
 
     @FunctionalInterface
     private interface UnorderedComparator<T> {
+
+        @SuppressWarnings("unused")
         void compare(T expected, int index, ResultActions result);
     }
 }

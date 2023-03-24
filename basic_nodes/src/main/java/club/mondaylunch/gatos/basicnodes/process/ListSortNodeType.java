@@ -1,7 +1,6 @@
 package club.mondaylunch.gatos.basicnodes.process;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,9 +39,8 @@ public class ListSortNodeType extends NodeType.Process {
         var outputType = inputTypes.get("input");
         var isSortingAscendingly = DataBox.get(settings, "Sort Ascendingly?", DataType.BOOLEAN).orElse(true);
         if (!inputListCopy.isEmpty() && this.containsOnlyComparables(inputListCopy)) {
-            Collections.sort((List<Comparable>) inputListCopy, (object1, object2) ->
-                isSortingAscendingly ? object1.compareTo(object2) : -1 * object1.compareTo(object2)
-            );
+            ((List<Comparable>) inputListCopy).sort((object1, object2) ->
+                isSortingAscendingly ? object1.compareTo(object2) : -1 * object1.compareTo(object2));
         }
         return Map.of("output", CompletableFuture.completedFuture(
             this.getGenericListBox(inputListCopy.stream().toList(), outputType))

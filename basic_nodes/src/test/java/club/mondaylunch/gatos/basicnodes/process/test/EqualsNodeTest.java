@@ -17,12 +17,14 @@ import club.mondaylunch.gatos.core.graph.Node;
 
 public class EqualsNodeTest {
 
+    @SuppressWarnings("unused")
     private static final class TestEqualsNodeFirstJSON {
         private final String firstKey = "Doctor";
         private final String secondKey = "Jeroen";
         private final String thirdKey = "Keppens";
     }
 
+    @SuppressWarnings("unused")
     private static final class TestEqualsNodeSecondJSON {
         private final String firstKey = "Doctor";
         private final String secondKey = "Keppens";

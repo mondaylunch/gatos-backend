@@ -20,6 +20,8 @@ public class TestNodeTypes {
     public static final NodeType.End END = NodeType.REGISTRY.register("test_end", new TestEndNodeType(DataType.NUMBER));
     public static final NodeType.End END_STRING = NodeType.REGISTRY.register("test_end_string", new TestEndNodeType(DataType.STRING));
     public static final NodeType TEST_VARYING_OUTPUT_NODE_TYPE = NodeType.REGISTRY.register("test_varying_inputs", new TestVaryingOutputNodeType());
+    @SuppressWarnings("unused")
+    public static final NodeType TEST_TYPE_SPECIALISED_NODE_TYPE = NodeType.REGISTRY.register("test_specialised", new TestTypeSpecialisedNodeType());
 
     private static class TestNoInputNodeType extends NodeType.Process {
 
@@ -166,6 +168,7 @@ public class TestNodeTypes {
             return Set.of(new NodeConnector.Output<>(nodeId, "process_output", returnType));
         }
 
+        @SuppressWarnings("unused")
         @Override
         public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
             return Map.of();

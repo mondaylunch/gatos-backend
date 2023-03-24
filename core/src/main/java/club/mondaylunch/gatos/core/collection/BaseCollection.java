@@ -77,6 +77,7 @@ public class BaseCollection<T extends BaseModel> {
      * @param value The field value.
      * @return a {@code List} of POJOs.
      */
+    @SuppressWarnings("unused")
     public List<T> get(String field, Object value) {
         return this.getCollection()
             .find(Filters.eq(field, value))
