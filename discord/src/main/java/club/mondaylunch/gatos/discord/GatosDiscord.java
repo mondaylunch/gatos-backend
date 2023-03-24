@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -97,8 +96,12 @@ public class GatosDiscord implements GatosPlugin {
         if (id == null) {
             return false;
         }
-        Member member = guild.retrieveMember(UserSnowflake.fromId(id)).complete();
-        return member != null && member.hasPermission(Permission.ADMINISTRATOR);
+        try {
+            var member = guild.retrieveMember(UserSnowflake.fromId(id)).complete();
+            return member != null && member.hasPermission(Permission.ADMINISTRATOR);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public List<GraphValidityError> validateUserHasPermission(Node node, String guildIdKey, Either<Flow, Graph> flow) {
