@@ -1,7 +1,6 @@
 package club.mondaylunch.gatos.core.graph.type;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -53,21 +52,24 @@ public interface NodeType {
 
     /**
      * Returns the category this node type belongs to.
+     *
      * @return the category this node type belongs to
      */
     NodeCategory category();
 
     /**
      * The setting keys and default values for a node of this type.
+     *
      * @return the settings for a node of this type
      */
     Map<String, DataBox<?>> settings();
 
     /**
      * Determine whether the given node is valid in the flow.
-     * @param node          the node to check
-     * @param flowOrGraph   the flow the node is in, or the graph the node is in
-     * @return      any errors related to the node in the flow
+     *
+     * @param node        the node to check
+     * @param flowOrGraph the flow the node is in, or the graph the node is in
+     * @return any errors related to the node in the flow
      */
     Collection<GraphValidityError> isValid(Node node, Either<Flow, Graph> flowOrGraph);
 
@@ -78,8 +80,9 @@ public interface NodeType {
     interface WithInputs {
         /**
          * The input connectors of a node with a given UUID, settings, & current input connections (if any).
-         * @param nodeId the node UUID
-         * @param settings  the node settings
+         *
+         * @param nodeId     the node UUID
+         * @param settings   the node settings
          * @param inputTypes what type of output connector the input connectors to this node are connected to, if any
          * @return the input connectors of the node
          */
@@ -93,8 +96,9 @@ public interface NodeType {
     interface WithOutputs {
         /**
          * The output connectors of a node with a given UUID, settings, & input connections.
-         * @param nodeId the node UUID
-         * @param settings  the node settings
+         *
+         * @param nodeId     the node UUID
+         * @param settings   the node settings
          * @param inputTypes what type of output connector the input connectors to this node are connected to, if any
          * @return the output connectors of the node
          */
@@ -134,14 +138,16 @@ public interface NodeType {
 
         /**
          * Perform whatever setup is needed to get the flow this node is in to trigger.
-         * @param flow  the flow this node is a part of
+         *
+         * @param flow     the flow this node is a part of
          * @param function the function to call to start the flow from this node
-         * @param node  the node
+         * @param node     the node
          */
         public abstract void setupFlow(Flow flow, Consumer<@Nullable StartInput> function, Node node);
 
         /**
          * Perform whatever teardown is needed to make this flow no longer trigger from this node.
+         *
          * @param flow the flow this node is a part of
          * @param node the node (pre-whatever modification made it invalid)
          */
@@ -220,8 +226,9 @@ public interface NodeType {
     /**
      * Gets the inputs of a node type, or an empty set if the type does not specify
      * inputs.
-     * @param type  the node type
-     * @param id    the UUID of the node these inputs are for
+     *
+     * @param type     the node type
+     * @param id       the UUID of the node these inputs are for
      * @param settings the settings of the node these inputs are for
      * @return the inputs, or empty
      */
@@ -232,9 +239,10 @@ public interface NodeType {
     /**
      * Gets the outputs of a node type, or an empty set if the type does not specify
      * outputs.
-     * @param type  the node type
-     * @param id    the UUID of the node these outputs are for
-     * @param settings the settings of the node these outputs are for
+     *
+     * @param type       the node type
+     * @param id         the UUID of the node these outputs are for
+     * @param settings   the settings of the node these outputs are for
      * @param inputTypes what type of output connector the input connectors to the node are connected to, if any
      * @return the outputs, or empty
      */
@@ -244,21 +252,18 @@ public interface NodeType {
 
     /**
      * Ensures that all inputs of a node are hooked up, if any outputs are.
-     * @param node          the node
-     * @param flowOrGraph   the flow or graph the node is in
-     * @return              any validation errors
+     *
+     * @param node        the node
+     * @param flowOrGraph the flow or graph the node is in
+     * @return any validation errors
      */
     @NotNull
     static Collection<GraphValidityError> defaultValidation(Node node, Either<Flow, Graph> flowOrGraph) {
         var graph = flowOrGraph.map(Flow::getGraph, Function.identity());
-        var conns = List.copyOf(graph.getConnectionsForNode(node.id()));
-        if (conns.stream().anyMatch(c -> c.to().nodeId().equals(node.id()))) {
-            return node.inputs().values().stream()
-                .filter(input -> conns.stream().noneMatch(c -> c.to().equals(input)))
-                .map(GraphValidityError::missingInput)
-                .toList();
-        } else {
-            return List.of();
-        }
+        var conns = graph.getConnectionsForNode(node.id());
+        return node.inputs().values().stream()
+            .filter(input -> conns.stream().noneMatch(c -> c.to().equals(input)))
+            .map(GraphValidityError::missingInput)
+            .toList();
     }
 }
