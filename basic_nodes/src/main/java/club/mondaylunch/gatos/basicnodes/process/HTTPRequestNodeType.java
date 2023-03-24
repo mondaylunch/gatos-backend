@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -85,7 +86,7 @@ public class HTTPRequestNodeType extends NodeType.Process {
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        var url = DataBox.get(settings, inputs, "url", DataType.STRING).orElse("");
+        var url = DataBox.get(settings, inputs, "url", DataType.STRING, Predicate.not(String::isBlank)).orElse("");
         var method = DataBox.get(settings, "method", DataType.STRING).orElse("").toUpperCase();
         var body = DataBox.get(inputs, "body", DataType.STRING).orElse("");
 

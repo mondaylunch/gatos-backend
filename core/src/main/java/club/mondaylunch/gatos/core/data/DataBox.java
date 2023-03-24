@@ -2,6 +2,7 @@ package club.mondaylunch.gatos.core.data;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * Holds (boxes) a value and a reference to its type.
@@ -43,15 +44,16 @@ public record DataBox<T>(T value, DataType<T> type) {
      * Retrieves a data value of a certain type from a map. If the value does not
      * exist or is not of the expected type, the fallback map is checked.
      *
-     * @param boxes        the map
+     * @param boxes         the map
      * @param fallbackBoxes the fallback map
-     * @param key         the key
-     * @param type       the expected datatype
+     * @param key           the key
+     * @param type          the expected datatype
+     * @param predicate     a predicate to check the value
      * @param <K> the type of the key
      * @param <T> the type of the data
      * @return an Optional of the value, or empty
      */
-    public static <K, T> Optional<T> get(Map<K, DataBox<?>> boxes, Map<K, DataBox<?>> fallbackBoxes, K key, DataType<T> type) {
-        return get(boxes, key, type).or(() -> get(fallbackBoxes, key, type));
+    public static <K, T> Optional<T> get(Map<K, DataBox<?>> boxes, Map<K, DataBox<?>> fallbackBoxes, K key, DataType<T> type, Predicate<T> predicate) {
+        return get(boxes, key, type).filter(predicate).or(() -> get(fallbackBoxes, key, type));
     }
 }
