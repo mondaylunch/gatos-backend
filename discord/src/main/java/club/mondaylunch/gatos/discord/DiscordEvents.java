@@ -13,15 +13,18 @@ public class DiscordEvents implements EventListener {
     private final Map<UUID, EventListenerInfo<?>> eventListeners = new LinkedHashMap<>();
 
     public <T> void createEventListener(UUID id, Class<T> eventClass, Consumer<T> function) {
+        GatosDiscord.LOGGER.info("Creating event listener: {}", id);
         this.eventListeners.put(id, new EventListenerInfo<>(eventClass, function));
     }
 
     public void removeEventListener(UUID id) {
+        GatosDiscord.LOGGER.info("Removing event listener: {}", id);
         this.eventListeners.remove(id);
     }
 
     @Override
     public void onEvent(@NotNull GenericEvent event) {
+        GatosDiscord.LOGGER.debug("Received event: {}", event);
         for (EventListenerInfo<?> info : this.eventListeners.values()) {
             info.maybeAccept(event);
         }
@@ -30,6 +33,7 @@ public class DiscordEvents implements EventListener {
     private record EventListenerInfo<T>(Class<T> eventClass, Consumer<T> function) {
         private void maybeAccept(GenericEvent event) {
             if (this.eventClass.isInstance(event)) {
+                GatosDiscord.LOGGER.info("Handling event: {}", event);
                 this.function.accept(this.eventClass.cast(event));
             }
         }

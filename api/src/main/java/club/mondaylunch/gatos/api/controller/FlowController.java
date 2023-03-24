@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import club.mondaylunch.gatos.api.ApiApplication;
 import club.mondaylunch.gatos.api.exception.InvalidBodyException;
 import club.mondaylunch.gatos.api.exception.flow.FlowExecutionException;
 import club.mondaylunch.gatos.api.exception.flow.InvalidConnectionException;
@@ -451,6 +452,7 @@ public class FlowController {
         try {
             executeFunction.apply(webhookStartInput).join();
         } catch (Exception e) {
+            ApiApplication.LOGGER.error("Error while executing flow", e);
             throw new FlowExecutionException(e);
         }
         var output = outputReference.getValue();

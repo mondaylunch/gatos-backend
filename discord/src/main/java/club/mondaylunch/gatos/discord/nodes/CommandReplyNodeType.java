@@ -56,6 +56,10 @@ public class CommandReplyNodeType extends NodeType.End {
         content = content.substring(0, Math.min(content.length(), 2000));
         final var finalContent = content;
         var event = DataBox.get(inputs, "event", DiscordDataTypes.SLASH_COMMAND_EVENT).orElseThrow();
+        GatosDiscord.LOGGER.info("Going to reply to a command with content: {}", content);
+        if (event.action() == null) {
+            GatosDiscord.LOGGER.warn("sike!! not gonna do that because the event has no action");
+        }
         return event.action() == null
             ? CompletableFuture.runAsync(() -> {})
             : event.action().thenApply(msg -> msg.editOriginal(finalContent).submit()).thenAccept($ -> {});
