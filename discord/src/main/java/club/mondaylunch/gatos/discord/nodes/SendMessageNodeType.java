@@ -61,6 +61,7 @@ public class SendMessageNodeType extends NodeType.End {
     public CompletableFuture<Void> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
         String channelId = DataBox.get(inputs, "channel_id", DiscordDataTypes.CHANNEL_ID).orElseThrow();
         String messageText = DataBox.get(inputs, "message_text", DataType.STRING).orElseThrow();
+        messageText = messageText.substring(0, Math.min(messageText.length(), 2000));
         Optional<EmbedBuilder> messageEmbeds = DataBox.get(inputs, "message_embed", DiscordDataTypes.MESSAGE_EMBED.optionalOf()).flatMap(Function.identity());
         TextChannel channel = this.gatosDiscord.getJda().getTextChannelById(channelId);
         if (channel == null) {

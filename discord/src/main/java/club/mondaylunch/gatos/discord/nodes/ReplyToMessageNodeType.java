@@ -45,6 +45,7 @@ public class ReplyToMessageNodeType extends NodeType.End {
     public CompletableFuture<Void> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
         Message message = DataBox.get(inputs, "message", DiscordDataTypes.MESSAGE).orElseThrow();
         String replyText = DataBox.get(inputs, "reply_text", DataType.STRING).orElseThrow();
+        replyText = replyText.substring(0, Math.min(replyText.length(), 2000));
         Optional<EmbedBuilder> replyEmbed = DataBox.get(inputs, "reply_embed", DiscordDataTypes.MESSAGE_EMBED.optionalOf()).flatMap(Function.identity());
         return message.reply(new MessageCreateBuilder()
             .addContent(replyText)

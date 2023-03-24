@@ -53,9 +53,11 @@ public class CommandReplyNodeType extends NodeType.End {
     @Override
     public CompletableFuture<Void> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
         String content = DataBox.get(inputs, "content", DataType.STRING).orElse("");
+        content = content.substring(0, Math.min(content.length(), 2000));
+        final var finalContent = content;
         var event = DataBox.get(inputs, "event", DiscordDataTypes.SLASH_COMMAND_EVENT).orElseThrow();
         return event.action() == null
             ? CompletableFuture.runAsync(() -> {})
-            : event.action().thenApply(msg -> msg.editOriginal(content).submit()).thenAccept($ -> {});
+            : event.action().thenApply(msg -> msg.editOriginal(finalContent).submit()).thenAccept($ -> {});
     }
 }
