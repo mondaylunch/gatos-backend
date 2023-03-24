@@ -45,6 +45,7 @@
     "node_type.list_distinct": "Remove Duplicates",
     "node_type.list_reverse": "Reverse List",
     "node_type.optional_creation": "Create Optional",
+    "node_type.optional_filter": "Filter Optional",
     "node_type.regex": "Regex",
     "node_type.list_set_operation": "List Set Operation",
     "node_type.get_user_data": "Get User Data",

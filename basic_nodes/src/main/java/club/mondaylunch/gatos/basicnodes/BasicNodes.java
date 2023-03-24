@@ -37,6 +37,7 @@ import club.mondaylunch.gatos.basicnodes.process.NegationNodeType;
 import club.mondaylunch.gatos.basicnodes.process.NumberComparisonNodeType;
 import club.mondaylunch.gatos.basicnodes.process.ObjectSetValueNodeType;
 import club.mondaylunch.gatos.basicnodes.process.OptionalCreationNodeType;
+import club.mondaylunch.gatos.basicnodes.process.OptionalFilterNodeType;
 import club.mondaylunch.gatos.basicnodes.process.OptionalOrElseNodeType;
 import club.mondaylunch.gatos.basicnodes.process.ParseStringToNumberNodeType;
 import club.mondaylunch.gatos.basicnodes.process.ParseStringToObjectNodeType;
@@ -147,6 +148,8 @@ public final class BasicNodes implements GatosPlugin {
         .register("empty_optional", new EmptyOptionalNodeType());
     public static final OptionalCreationNodeType OPTIONAL_CREATION = NodeType.REGISTRY
         .register("optional_creation", new OptionalCreationNodeType());
+    public static final OptionalFilterNodeType OPTIONAL_FILTER = NodeType.REGISTRY
+        .register("optional_filter", new OptionalFilterNodeType());
     public static final ObjectSetValueNodeType OBJECT_SET_VALUE = NodeType.REGISTRY
         .register("object_set_value", new ObjectSetValueNodeType());
     public static final RegexNodeType REGEX = NodeType.REGISTRY
