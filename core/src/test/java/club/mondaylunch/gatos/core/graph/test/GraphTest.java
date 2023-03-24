@@ -329,7 +329,7 @@ public class GraphTest {
     }
 
     @Test
-    public void graphWithLongerPathAndExtraNodesIsValid() {
+    public void graphWithExtraNodesIsNotValid() {
         var graph = new Graph();
         var input = graph.addNode(START_NODE_TYPE);
         var output = graph.addNode(END_NODE_TYPE);
@@ -357,7 +357,7 @@ public class GraphTest {
             graph.addNode(TEST_NUMBER_NODE_TYPE);
         }
 
-        Assertions.assertTrue(graph.validate().isEmpty());
+        Assertions.assertFalse(graph.validate().isEmpty());
     }
 
     @Test
