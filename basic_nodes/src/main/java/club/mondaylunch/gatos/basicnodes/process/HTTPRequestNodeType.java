@@ -46,6 +46,10 @@ public class HTTPRequestNodeType extends NodeType.Process {
     public Collection<GraphValidityError> isValid(Node node, Either<Flow, Graph> flowOrGraph) {
         return GatosUtils.union(
             GraphValidityError.ensureSetting(node, "url", DataType.STRING, s -> {
+                if (s.isBlank()) {
+                    return null;
+                }
+
                 try {
                     new URL(s);
                     return null;
