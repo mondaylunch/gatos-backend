@@ -53,7 +53,7 @@ public class ReceiveMessageNodeType extends NodeType.Start<MessageReceivedEvent>
         return Set.of(
             new NodeConnector.Output<>(nodeId, "user", DiscordDataTypes.USER_ID),
             new NodeConnector.Output<>(nodeId, "channel", DiscordDataTypes.CHANNEL_ID),
-            new NodeConnector.Output<>(nodeId, "command_event", DiscordDataTypes.SLASH_COMMAND_EVENT)
+            new NodeConnector.Output<>(nodeId, "command_event", DiscordDataTypes.MESSAGE)
         );
     }
 
