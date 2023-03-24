@@ -34,6 +34,7 @@ public class UserData {
         return this.id;
     }
 
+    @SuppressWarnings("unused")
     public void setId(Id id) {
         this.id = id;
     }
@@ -42,6 +43,7 @@ public class UserData {
         return this.value;
     }
 
+    @SuppressWarnings("unused")
     public void setValue(DataBox<?> value) {
         this.value = value;
     }

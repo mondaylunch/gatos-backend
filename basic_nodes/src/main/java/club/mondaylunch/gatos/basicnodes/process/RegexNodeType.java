@@ -88,12 +88,13 @@ public class RegexNodeType extends NodeType.Process {
         int groups = matcher.groupCount();
         if (groups == 0) return Optional.empty();
 
-        ArrayList<String> lst = new ArrayList<String>();
+        ArrayList<String> lst = new ArrayList<>();
         for (int i = 1; i <= groups; i++) lst.add(matcher.group(i));
 
         return Optional.of(lst);
     }
 
+    @SuppressWarnings("unused")
     public Map<String, CompletableFuture<DataBox<?>>> compute(UUID flowId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
         return this.compute(flowId, inputs, settings, Map.of());
     }

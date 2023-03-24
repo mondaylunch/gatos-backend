@@ -17,6 +17,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import org.jetbrains.annotations.Nullable;
+
 import club.mondaylunch.gatos.core.Either;
 import club.mondaylunch.gatos.core.GatosUtils;
 import club.mondaylunch.gatos.core.data.DataBox;
@@ -98,14 +100,17 @@ public class HTTPRequestNodeType extends NodeType.Process {
         );
     }
 
+    @Nullable
     private URI getURI(String url, String method) {
-        URI uri = null;
+        URI uri;
         if (this.validateMethod(method)) {
             try {
                 uri = new URI(url);
-            } catch (URISyntaxException e) {
+            } catch (URISyntaxException ignored) {
                 uri = null;
             }
+        } else {
+            uri = null;
         }
         return uri;
     }

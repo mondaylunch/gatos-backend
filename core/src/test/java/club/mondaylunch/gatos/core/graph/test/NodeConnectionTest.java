@@ -24,7 +24,7 @@ public class NodeConnectionTest {
         var node1 = Node.create(TEST_NODE_TYPE);
         var node2 = Node.create(TEST_NODE_TYPE);
 
-        var conn = NodeConnection.create(node1, "out", node2, "in");
+        NodeConnection.create(node1, "out", node2, "in");
         Assertions.assertTrue(true);
     }
 

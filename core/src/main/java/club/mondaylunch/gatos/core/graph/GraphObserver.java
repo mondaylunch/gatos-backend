@@ -478,9 +478,14 @@ public class GraphObserver {
         }
     }
 
-    public record GraphChanges(@BsonProperty("removed_nodes") Set<String> removedNodes, @BsonProperty("added_nodes") Set<Node> addedNodes,
-                               @BsonProperty("removed_connections") Set<NodeConnection<?>> removedConnections, @BsonProperty("added_connections") Set<NodeConnection<?>> addedConnections,
-                               @BsonProperty("removed_metadata") Set<String> removedMetadata, @BsonProperty("added_metadata") Map<String, NodeMetadata> addedMetadata) {
+    public record GraphChanges(@BsonProperty("removed_nodes") Set<String> removedNodes,
+                               @BsonProperty("added_nodes") Set<Node> addedNodes,
+                               @BsonProperty("removed_connections") Set<NodeConnection<?>> removedConnections,
+                               @BsonProperty("added_connections") Set<NodeConnection<?>> addedConnections,
+                               @BsonProperty("removed_metadata") Set<String> removedMetadata,
+                               @BsonProperty("added_metadata") Map<String, NodeMetadata> addedMetadata) {
+
+        @SuppressWarnings("unused")
         public static GraphChanges empty() {
             return new GraphChanges(
                 Set.of(),

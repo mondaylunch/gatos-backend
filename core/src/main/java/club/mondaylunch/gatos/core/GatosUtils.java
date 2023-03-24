@@ -15,6 +15,7 @@ public final class GatosUtils {
      * @param valueMapper   the function to map the values
      * @return              the transformed map
      */
+    @SuppressWarnings("unused")
     public static <K, V, K1, V1> Map<K1, V1> mapMap(Map<K, V> map, Function<K, K1> keyMapper, Function<V, V1> valueMapper) {
         return map.entrySet().stream().collect(Collectors.toMap(
             e -> keyMapper.apply(e.getKey()),

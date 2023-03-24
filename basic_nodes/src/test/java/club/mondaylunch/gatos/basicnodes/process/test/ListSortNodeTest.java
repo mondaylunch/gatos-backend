@@ -21,6 +21,7 @@ public class ListSortNodeTest {
     private static final List<String> TEST_STR_LIST = Arrays.asList("e", "b", "a", "d", "c");
     private static final List<Boolean> TEST_BOO_LIST = Arrays.asList(false, true, false, true, false);
 
+    @SuppressWarnings("unused")
     private static final class TestJSONObjectClass {
         private final double sampleInt = 23;
         private final boolean sampleBoolean = true;

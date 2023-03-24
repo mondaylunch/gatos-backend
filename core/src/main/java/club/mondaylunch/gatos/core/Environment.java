@@ -32,6 +32,7 @@ public enum Environment {
      *
      * @return String
      */
+    @SuppressWarnings("unused")
     public static String getRedisUri() {
         return INSTANCE.env.get("REDIS_URI", "redis://localhost");
     }
@@ -46,7 +47,7 @@ public enum Environment {
 
     /**
      * Check whether we are in a JUnit test.
-     * https://stackoverflow.com/a/12717377
+     * <a href="https://stackoverflow.com/a/12717377">Source</a>
      *
      * @return whether we are in a JUnit test
      */

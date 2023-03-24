@@ -16,15 +16,18 @@ import club.mondaylunch.gatos.core.graph.Node;
 
 public class ObjectSetValueNodeTest {
 
+    @SuppressWarnings("unused")
     private static final class TestObjectSetValue {
         private final String firstKey = "Doctor";
         private final String secondKey = "Keppens";
     }
 
+    @SuppressWarnings("unused")
     private static final class TestObjectSetValueMember {
         private final String firstKey = "Prof";
     }
 
+    @SuppressWarnings("unused")
     private static final class TestObjectSetValueResult {
         private final String firstKey = "Prof";
         private final String secondKey = "Keppens";

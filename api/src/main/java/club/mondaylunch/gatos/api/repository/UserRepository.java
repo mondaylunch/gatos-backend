@@ -34,7 +34,6 @@ public class UserRepository {
     /**
      * Ensures the details of a user are complete.
      * @param user      the user
-     * @param discordId the discord id
      */
     public User getUserWithUpdatedDetails(User user) {
         return User.objects.updateDetailsForUser(user, this.auth0ManagementAPI.getUserProfile(user.getEmail()));

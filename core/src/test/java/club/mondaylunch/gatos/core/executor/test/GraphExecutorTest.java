@@ -237,6 +237,7 @@ public class GraphExecutorTest {
         Assertions.assertEquals("48.0", result2.get());
     }
 
+    @SuppressWarnings("SameParameterValue")
     private static void connectInt(Graph graph, Node a, String connectorA, Node b, String connectorB) {
         var conn = NodeConnection.create(
             a, connectorA,
@@ -246,6 +247,7 @@ public class GraphExecutorTest {
         graph.addConnection(conn);
     }
 
+    @SuppressWarnings("SameParameterValue")
     private static void connectString(Graph graph, Node a, String connectorA, Node b, String connectorB) {
         var conn = NodeConnection.create(
             a, connectorA,

@@ -18,13 +18,10 @@ import club.mondaylunch.gatos.core.data.DataType;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
 import club.mondaylunch.gatos.discord.DiscordDataTypes;
-import club.mondaylunch.gatos.discord.GatosDiscord;
 
 public class ReplyToMessageNodeType extends NodeType.End {
-    private final GatosDiscord gatosDiscord;
 
-    public ReplyToMessageNodeType(GatosDiscord gatosDiscord) {
-        this.gatosDiscord = gatosDiscord;
+    public ReplyToMessageNodeType() {
     }
 
     @Override

@@ -23,6 +23,7 @@ public class ApiApplication {
         SpringApplication.run(ApiApplication.class, args);
     }
 
+    @SuppressWarnings("SameReturnValue")
     @GetMapping("/")
     public String hello() {
         return "Gatos";

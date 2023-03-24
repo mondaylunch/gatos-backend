@@ -143,6 +143,7 @@ public interface NodeType {
          * @param function the function to call to start the flow from this node
          * @param node     the node
          */
+        @SuppressWarnings("unused")
         public abstract void setupFlow(Flow flow, Consumer<@Nullable StartInput> function, Node node);
 
         /**
@@ -151,6 +152,7 @@ public interface NodeType {
          * @param flow the flow this node is a part of
          * @param node the node (pre-whatever modification made it invalid)
          */
+        @SuppressWarnings("unused")
         public abstract void teardownFlow(Flow flow, Node node);
 
         /**
