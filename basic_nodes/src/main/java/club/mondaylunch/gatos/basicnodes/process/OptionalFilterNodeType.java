@@ -21,28 +21,26 @@ public class OptionalFilterNodeType extends NodeType.Process {
     @Override
     public Set<NodeConnector.Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         return Set.of(
-            new NodeConnector.Input<>(nodeId, "data", DataType.ANY),
-            new NodeConnector.Input<>(nodeId, "conditional", DataType.BOOLEAN)
+            new NodeConnector.Input<>(nodeId, "optional", OptionalDataType.GENERIC_OPTIONAL),
+            new NodeConnector.Input<>(nodeId, "condition", DataType.BOOLEAN)
         );
     }
 
     @Override
     public Set<NodeConnector.Output<?>> outputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        var inputType = inputTypes.getOrDefault("data", DataType.ANY);
-        var optionalType = inputType == DataType.ANY ? OptionalDataType.GENERIC_OPTIONAL : inputType.optionalOf();
+        var inputType = inputTypes.getOrDefault("optional", OptionalDataType.GENERIC_OPTIONAL);
         return Set.of(
-            new NodeConnector.Output<>(nodeId, "output", optionalType)
+            new NodeConnector.Output<>(nodeId, "output", inputType)
         );
     }
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        var inputType = inputTypes.getOrDefault("data", DataType.ANY);
-        var optionalType = inputType == DataType.ANY ? OptionalDataType.GENERIC_OPTIONAL : inputType.optionalOf();
-        var output = DataBox.get(inputs, "data", inputType).orElseThrow();
-        var condition = DataBox.get(inputs, "conditional", DataType.BOOLEAN).orElseThrow();
+        var inputType = inputTypes.getOrDefault("optional", OptionalDataType.GENERIC_OPTIONAL);
+        Optional<?> input = (Optional<?>) DataBox.get(inputs, "optional", inputType).orElseThrow();
+        var condition = DataBox.get(inputs, "condition", DataType.BOOLEAN).orElseThrow();
         return Map.of("output", CompletableFuture.completedFuture(
-            this.getGenericOptionalBox(Optional.of(output).filter(bruh -> condition), optionalType)
+            this.getGenericOptionalBox(input.filter($ -> condition), ((OptionalDataType<?>) inputType))
         ));
     }
 

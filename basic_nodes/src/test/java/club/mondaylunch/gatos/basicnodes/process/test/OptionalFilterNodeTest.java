@@ -25,8 +25,8 @@ public class OptionalFilterNodeTest {
     public void areInputsCorrect() {
         var node = Node.create(BasicNodes.OPTIONAL_FILTER);
         Assertions.assertEquals(2, node.inputs().size());
-        Assertions.assertTrue(node.inputs().containsKey("data"));
-        Assertions.assertTrue(node.inputs().containsKey("conditional"));
+        Assertions.assertTrue(node.inputs().containsKey("optional"));
+        Assertions.assertTrue(node.inputs().containsKey("condition"));
     }
 
     @Test
@@ -43,11 +43,11 @@ public class OptionalFilterNodeTest {
             var dataType = (DataType<Object>) entry.getValue().type();
             var data = entry.getKey();
             Map<String, DataBox<?>> input = Map.of(
-                "data", dataType.create(data),
-                "conditional", DataType.BOOLEAN.create(true)
+                "optional", dataType.optionalOf().create(Optional.of(data)),
+                "condition", DataType.BOOLEAN.create(true)
             );
             var output = BasicNodes.OPTIONAL_FILTER.compute(
-                UUID.randomUUID(), input, Map.of(), Map.of("data", dataType)
+                UUID.randomUUID(), input, Map.of(), Map.of("optional", dataType.optionalOf())
             );
             var out = output.get("output").join();
             Assertions.assertEquals(Optional.of(entry.getKey()), out.value());
@@ -62,11 +62,11 @@ public class OptionalFilterNodeTest {
             var dataType = (DataType<Object>) entry.getValue().type();
             var data = entry.getKey();
             Map<String, DataBox<?>> input = Map.of(
-                "data", dataType.create(data),
-                "conditional", DataType.BOOLEAN.create(false)
+                "optional", dataType.optionalOf().create(Optional.of(data)),
+                "condition", DataType.BOOLEAN.create(false)
             );
             var output = BasicNodes.OPTIONAL_FILTER.compute(
-                UUID.randomUUID(), input, Map.of(), Map.of("data", dataType)
+                UUID.randomUUID(), input, Map.of(), Map.of("optional", dataType.optionalOf())
             );
             var out = output.get("output").join();
             Assertions.assertEquals(Optional.empty(), out.value());
@@ -78,7 +78,7 @@ public class OptionalFilterNodeTest {
     public void correctlySpecialisesTypes() {
         for (var entry : sampleValues.entrySet()) {
             var node = Node.create(BasicNodes.OPTIONAL_FILTER)
-                .updateInputTypes(Map.of("data", entry.getValue().type()));
+                .updateInputTypes(Map.of("optional", entry.getValue().type().optionalOf()));
             Assertions.assertEquals(entry.getValue().type().optionalOf(), node.getOutputWithName("output").orElseThrow().type());
         }
     }
