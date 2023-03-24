@@ -10,7 +10,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
@@ -37,9 +36,7 @@ public class SendMessageNodeType extends NodeType.End {
 
     @Override
     public Map<String, DataBox<?>> settings() {
-        return Map.of(
-            "guild_id", DiscordDataTypes.GUILD_ID.create("")
-        );
+        return Map.of();
     }
 
     @Override
@@ -62,15 +59,11 @@ public class SendMessageNodeType extends NodeType.End {
 
     @Override
     public CompletableFuture<Void> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
-        String guildId = DataBox.get(settings, "guild_id", DiscordDataTypes.GUILD_ID).orElseThrow();
         String channelId = DataBox.get(inputs, "channel_id", DiscordDataTypes.CHANNEL_ID).orElseThrow();
         String messageText = DataBox.get(inputs, "message_text", DataType.STRING).orElseThrow();
+        messageText = messageText.substring(0, Math.min(messageText.length(), 2000));
         Optional<EmbedBuilder> messageEmbeds = DataBox.get(inputs, "message_embed", DiscordDataTypes.MESSAGE_EMBED.optionalOf()).flatMap(Function.identity());
-        Guild guild = this.gatosDiscord.getJda().getGuildById(guildId);
-        if (guild == null) {
-            throw new IllegalStateException("Guild not found: " + guildId);
-        }
-        TextChannel channel = guild.getTextChannelById(channelId);
+        TextChannel channel = this.gatosDiscord.getJda().getTextChannelById(channelId);
         if (channel == null) {
             throw new IllegalStateException("Channel not found: " + channelId);
         }
