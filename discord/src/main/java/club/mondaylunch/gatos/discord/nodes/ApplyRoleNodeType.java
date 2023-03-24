@@ -39,7 +39,10 @@ public class ApplyRoleNodeType extends NodeType.End {
 
     @Override
     public Collection<GraphValidityError> isValid(Node node, Either<Flow, Graph> flowOrGraph) {
-        return GatosUtils.union(super.isValid(node, flowOrGraph), this.gatosDiscord.validateUserHasPermission(node, "guild_id", flowOrGraph));
+        return GatosUtils.union(
+            GraphValidityError.ensureSetting(node, "guild_id", DiscordDataTypes.GUILD_ID, s -> s.isBlank() ? "A Discord server must be set" : null),
+            super.isValid(node, flowOrGraph),
+            this.gatosDiscord.validateUserHasPermission(node, "guild_id", flowOrGraph));
     }
 
     @Override

@@ -1,25 +1,34 @@
 package club.mondaylunch.gatos.basicnodes.process;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpRequest.Builder;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import club.mondaylunch.gatos.core.Either;
+import club.mondaylunch.gatos.core.GatosUtils;
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
+import club.mondaylunch.gatos.core.graph.Graph;
+import club.mondaylunch.gatos.core.graph.GraphValidityError;
+import club.mondaylunch.gatos.core.graph.Node;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector.Input;
 import club.mondaylunch.gatos.core.graph.connector.NodeConnector.Output;
 import club.mondaylunch.gatos.core.graph.type.NodeType;
+import club.mondaylunch.gatos.core.models.Flow;
 
 public class HTTPRequestNodeType extends NodeType.Process {
     @Override
@@ -28,6 +37,21 @@ public class HTTPRequestNodeType extends NodeType.Process {
             "url", DataType.STRING.create(""),
             "method", DataType.STRING.create("")
         );
+    }
+
+    @Override
+    public Collection<GraphValidityError> isValid(Node node, Either<Flow, Graph> flowOrGraph) {
+        return GatosUtils.union(
+            GraphValidityError.ensureSetting(node, "url", DataType.STRING, s -> {
+                try {
+                    new URL(s);
+                    return null;
+                } catch (MalformedURLException e) {
+                    return "URL is not valid";
+                }
+            }),
+            GraphValidityError.ensureSetting(node, "method", DataType.STRING, s -> s.isBlank() ? "Method cannot be blank" : null),
+            super.isValid(node, flowOrGraph));
     }
 
     @Override

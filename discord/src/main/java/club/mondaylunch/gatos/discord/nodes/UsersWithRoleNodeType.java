@@ -43,6 +43,7 @@ public class UsersWithRoleNodeType extends NodeType.Process {
     public Collection<GraphValidityError> isValid(Node node, Either<Flow, Graph> flowOrGraph) {
         return GatosUtils.union(
             super.isValid(node, flowOrGraph),
+            GraphValidityError.ensureSetting(node, "guild_id", DiscordDataTypes.GUILD_ID, s -> s.isBlank() ? "A Discord server must be set" : null),
             this.gatosDiscord.validateUserHasPermission(node, "guild_id", flowOrGraph)
         );
     }
