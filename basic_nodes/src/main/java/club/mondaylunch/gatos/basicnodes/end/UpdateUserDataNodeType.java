@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 
 import club.mondaylunch.gatos.core.Either;
 import club.mondaylunch.gatos.core.GatosUtils;
@@ -49,7 +50,7 @@ public abstract class UpdateUserDataNodeType extends NodeType.End {
 
     @Override
     public CompletableFuture<Void> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
-        var key = DataBox.get(settings, inputs, "key", DataType.STRING).orElseThrow();
+        var key = DataBox.get(settings, inputs, "key", DataType.STRING, Predicate.not(String::isBlank)).orElseThrow();
         var value = DataBox.get(inputs, "value", DataType.NUMBER).orElseThrow();
         boolean setIfAbsent = DataBox.get(settings, "set_if_absent", DataType.BOOLEAN).orElse(true);
         return CompletableFuture.runAsync(() -> this.updateValue(userId, key, value, setIfAbsent));

@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 
 import club.mondaylunch.gatos.core.data.DataBox;
 import club.mondaylunch.gatos.core.data.DataType;
@@ -37,7 +38,7 @@ public class SetUserDataNodeType extends NodeType.End {
 
     @Override
     public CompletableFuture<Void> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
-        var key = DataBox.get(settings, inputs, "key", DataType.STRING).orElseThrow();
+        var key = DataBox.get(settings, inputs, "key", DataType.STRING, Predicate.not(String::isBlank)).orElseThrow();
         var value = inputs.get("value");
         Objects.requireNonNull(value, "No value input");
         boolean overwrite = DataBox.get(settings, "overwrite", DataType.BOOLEAN).orElse(true);

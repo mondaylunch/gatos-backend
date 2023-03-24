@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 
 import club.mondaylunch.gatos.core.Either;
 import club.mondaylunch.gatos.core.GatosUtils;
@@ -57,7 +58,7 @@ public class GetUserDataNodeType extends NodeType.Process {
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        var key = DataBox.get(settings, inputs, "key", DataType.STRING).orElseThrow();
+        var key = DataBox.get(settings, inputs, "key", DataType.STRING, Predicate.not(String::isBlank)).orElseThrow();
         var type = DataBox.get(settings, "type", DataType.DATA_TYPE).orElse(DataType.ANY);
         @SuppressWarnings("unchecked")
         var optionalType = (DataType<Optional<?>>) (DataType<?>) type.optionalOf();
