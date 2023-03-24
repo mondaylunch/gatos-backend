@@ -38,6 +38,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // taken from auth0 quickstart
     @Bean
     JwtDecoder jwtDecoder() {
         /*
