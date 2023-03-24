@@ -24,6 +24,7 @@ import club.mondaylunch.gatos.core.graph.type.NodeType;
 import club.mondaylunch.gatos.core.models.Flow;
 import club.mondaylunch.gatos.discord.DiscordDataTypes;
 import club.mondaylunch.gatos.discord.GatosDiscord;
+import club.mondaylunch.gatos.discord.SlashCommandEvent;
 
 public class ReceiveCommandNodeType extends NodeType.Start<SlashCommandInteractionEvent> {
     private final GatosDiscord gatosDiscord;
@@ -36,17 +37,18 @@ public class ReceiveCommandNodeType extends NodeType.Start<SlashCommandInteracti
     public Map<String, DataBox<?>> settings() {
         return Map.of(
             "guild_id", DiscordDataTypes.GUILD_ID.create(""),
-            "command_name", DataType.STRING.create("")
+            "command_name", DataType.STRING.create(""),
+            "is_reply_ephemeral", DataType.BOOLEAN.create(false)
         );
     }
 
     @Override
     public Collection<GraphValidityError> isValid(Node node, Either<Flow, Graph> flowOrGraph) {
         var graph = flowOrGraph.map(Flow::getGraph, Function.identity());
-        var canFindReceive = graph.nodes().stream().anyMatch(n -> n.type().equals(this.gatosDiscord.getNodeTypes().commandReply()));
+        var canFindReply = graph.nodes().stream().anyMatch(n -> n.type().equals(this.gatosDiscord.getNodeTypes().commandReply()));
         return GatosUtils.union(
             super.isValid(node, flowOrGraph),
-            canFindReceive ? Set.of() : Set.of(new GraphValidityError(node.id(), "No receive command node found.")),
+            canFindReply ? Set.of() : Set.of(new GraphValidityError(node.id(), "No command reply node found.")),
             GraphValidityError.ensureSetting(node, "guild_id", DiscordDataTypes.GUILD_ID, s -> s.isBlank() ? "A Discord server must be set" : null),
             GraphValidityError.ensureSetting(node, "command_name", DiscordDataTypes.GUILD_ID, s -> s.isBlank() ? "Command name cannot be blank" : null),
             this.gatosDiscord.validateUserHasPermission(node, "guild_id", flowOrGraph)
@@ -84,13 +86,16 @@ public class ReceiveCommandNodeType extends NodeType.Start<SlashCommandInteracti
         if (event == null) {
             return Map.of(
                 "user", CompletableFuture.completedFuture(DiscordDataTypes.USER_ID.create("")),
-                "channel", CompletableFuture.completedFuture(DiscordDataTypes.CHANNEL_ID.create(""))
+                "channel", CompletableFuture.completedFuture(DiscordDataTypes.CHANNEL_ID.create("")),
+                "command_event", CompletableFuture.completedFuture(DiscordDataTypes.SLASH_COMMAND_EVENT.create(new SlashCommandEvent(null)))
             );
         }
+
+        boolean isEphemeral = DataBox.get(settings, "is_reply_ephemeral", DataType.BOOLEAN).orElseThrow();
         return Map.of(
             "user", CompletableFuture.completedFuture(DiscordDataTypes.USER_ID.create(event.getUser().getId())),
             "channel", CompletableFuture.completedFuture(DiscordDataTypes.CHANNEL_ID.create(event.getChannel().getId())),
-            "command_event", CompletableFuture.completedFuture(DiscordDataTypes.SLASH_COMMAND_EVENT.create(event))
+            "command_event", CompletableFuture.completedFuture(DiscordDataTypes.SLASH_COMMAND_EVENT.create(new SlashCommandEvent(event.deferReply(isEphemeral).submit())))
         );
     }
 }

@@ -5,8 +5,6 @@ import java.util.function.Function;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
-import org.jetbrains.annotations.Nullable;
 
 import club.mondaylunch.gatos.core.data.Conversions;
 import club.mondaylunch.gatos.core.data.DataType;
@@ -18,7 +16,7 @@ public class DiscordDataTypes {
     public static final DataType<String> USER_ID = DataType.register("discord.user_id", String.class);
     public static final DataType<String> ROLE_ID = DataType.register("discord.role_id", String.class);
     public static final DataType<String> EMOJI_ID = DataType.register("discord.emoji_id", String.class);
-    public static final DataType<@Nullable SlashCommandInteraction> SLASH_COMMAND_EVENT = DataType.register("discord.slash_command_event", SlashCommandInteraction.class);
+    public static final DataType<SlashCommandEvent> SLASH_COMMAND_EVENT = DataType.register("discord.slash_command_event", SlashCommandEvent.class);
     public static final DataType<Message> MESSAGE = DataType.register("discord.message", Message.class);
     public static final DataType<EmbedBuilder> MESSAGE_EMBED = DataType.register("discord.message_embed", EmbedBuilder.class);
 
