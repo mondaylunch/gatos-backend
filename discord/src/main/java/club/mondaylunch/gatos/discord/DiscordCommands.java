@@ -8,7 +8,6 @@ import java.util.function.Consumer;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.commands.Command;
 import org.jetbrains.annotations.NotNull;
 
 public class DiscordCommands extends ListenerAdapter {
@@ -50,8 +49,7 @@ public class DiscordCommands extends ListenerAdapter {
             return;
         }
         this.gatosDiscord.getJda()
-            .retrieveCommandById(commandId)
-            .flatMap(Command::delete)
+            .deleteCommandById(commandId)
             .queue();
         this.commandHandlers.remove(commandId);
     }
