@@ -65,7 +65,7 @@ public class HTTPRequestNodeType extends NodeType.Process {
     @Override
     public Set<Input<?>> inputs(UUID nodeId, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
         Set<NodeConnector.Input<?>> inputs = new HashSet<>();
-        var url = DataBox.get(settings, "url", DataType.STRING).orElse("").replace(" ", "%20");
+        var url = DataBox.get(settings, "url", DataType.STRING).orElse("");
         if (url.isBlank()) {
             inputs.add(new NodeConnector.Input<>(nodeId, "url", DataType.STRING));
         }
@@ -86,7 +86,7 @@ public class HTTPRequestNodeType extends NodeType.Process {
 
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings, Map<String, DataType<?>> inputTypes) {
-        var url = DataBox.get(settings, inputs, "url", DataType.STRING, Predicate.not(String::isBlank)).orElse("");
+        var url = DataBox.get(settings, inputs, "url", DataType.STRING, Predicate.not(String::isBlank)).orElse("").replace(" ", "%20");
         var method = DataBox.get(settings, "method", DataType.STRING).orElse("").toUpperCase();
         var body = DataBox.get(inputs, "body", DataType.STRING).orElse("");
 
@@ -96,7 +96,7 @@ public class HTTPRequestNodeType extends NodeType.Process {
             return this.handleInvalidReturns();
         }
 
-        // the url and method are valid so we create and send the request
+        // the url and method are valid, so we create and send the request
         HttpRequest request = this.createRequest(method, uri, body);
         HttpClient httpClient = HttpClient.newHttpClient();
 
