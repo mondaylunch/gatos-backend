@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
+import org.jetbrains.annotations.NotNull;
 
 public class DiscordEvents implements EventListener {
     private final Map<UUID, EventListenerInfo<?>> eventListeners = new LinkedHashMap<>();
@@ -20,7 +21,7 @@ public class DiscordEvents implements EventListener {
     }
 
     @Override
-    public void onEvent(GenericEvent event) {
+    public void onEvent(@NotNull GenericEvent event) {
         for (EventListenerInfo<?> info : this.eventListeners.values()) {
             info.maybeAccept(event);
         }

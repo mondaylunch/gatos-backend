@@ -66,8 +66,10 @@ public class ReceiveMessageNodeType extends NodeType.Start<MessageReceivedEvent>
             if (guild != null) {
                 this.gatosDiscord.createEventListener(node.id(), MessageReceivedEvent.class, m -> {
                     if (m != null
+                        && !this.gatosDiscord.getJda().getSelfUser().equals(m.getAuthor())
                         && m.isFromGuild() && m.getGuild().getId().equals(guildId)
-                        && (channelIds.isEmpty() || channelIds.contains(m.getChannel().getId()))) {
+                        && (channelIds.isEmpty() || channelIds.contains(m.getChannel().getId()))
+                    ) {
                         function.accept(m);
                     }
                 });
