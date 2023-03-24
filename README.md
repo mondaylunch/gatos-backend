@@ -14,6 +14,7 @@ Please see the frontend README about how to access the software.
 
 ## Prerequisites
 
+-   Ensure you have [Git](https://git-scm.com/) installed
 -   Install [Java 17 JDK or later](https://adoptium.net/en-GB/) (LTS recommended)
 -   Install [Node.js 16 or later with npm](https://nodejs.org/en/)
 -   Install [dotenv-cli](https://www.npmjs.com/package/dotenv-cli)
