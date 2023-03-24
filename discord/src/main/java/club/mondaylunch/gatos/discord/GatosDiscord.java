@@ -54,7 +54,11 @@ public class GatosDiscord implements GatosPlugin {
             LOGGER.info("Constructing new JDA instance");
             this.jda = JDABuilder.createDefault(this.getToken())
                 .setActivity(Activity.competing("SEG"))
-                .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES)
+                .enableIntents(
+                    GatewayIntent.GUILD_MEMBERS,
+                    GatewayIntent.GUILD_MESSAGES,
+                    GatewayIntent.MESSAGE_CONTENT
+                )
                 .addEventListeners(this.commands, this.events)
                 .build()
                 .awaitReady();
