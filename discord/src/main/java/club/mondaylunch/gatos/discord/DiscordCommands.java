@@ -1,20 +1,20 @@
 package club.mondaylunch.gatos.discord;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.hooks.EventListener;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.Command;
+import org.jetbrains.annotations.NotNull;
 
-public class DiscordCommands implements EventListener {
+public class DiscordCommands extends ListenerAdapter {
 
-    private final Map<Command, Consumer<SlashCommandInteractionEvent>> commandHandlers = new HashMap<net.dv8tion.jda.api.interactions.commands.Command, Consumer<SlashCommandInteractionEvent>>();
-    private final Map<UUID, Command> commandsById = new HashMap<>();
+    private final Map<Long, Consumer<SlashCommandInteractionEvent>> commandHandlers = new ConcurrentHashMap<>();
+    private final Map<UUID, Long> commandsById = new ConcurrentHashMap<>();
 
     private final GatosDiscord gatosDiscord;
 
@@ -23,30 +23,36 @@ public class DiscordCommands implements EventListener {
     }
 
     @Override
-    public void onEvent(GenericEvent event) {
-        if (event instanceof SlashCommandInteractionEvent slash && slash.getGuild() != null) {
-            slash.getInteraction().getFullCommandName();
-            var handler = this.commandHandlers.get(slash.getGuild().retrieveCommandById(slash.getCommandId()).complete());
-            if (handler == null) {
-                GatosDiscord.LOGGER.warn("No handler for command: " + slash.getInteraction().getFullCommandName());
-            } else {
-                handler.accept(slash);
-            }
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+        if (event.getGuild() == null) {
+            return;
+        }
+        var commandId = event.getCommandIdLong();
+        var handler = this.commandHandlers.get(commandId);
+        if (handler == null) {
+            GatosDiscord.LOGGER.warn("No handler for command: " + event.getFullCommandName());
+        } else {
+            handler.accept(event);
         }
     }
 
     public void createSlashCommandListener(UUID id, String commandName, Guild guild, Consumer<SlashCommandInteractionEvent> function) {
-        var cmd = guild.upsertCommand(commandName, "A command powered by Gatos").complete();
-        this.commandHandlers.put(cmd, function);
-        this.commandsById.put(id, cmd);
+        guild.upsertCommand(commandName, "A command powered by Gatos").queue(command -> {
+            var commandId = command.getIdLong();
+            this.commandHandlers.put(commandId, function);
+            this.commandsById.put(id, commandId);
+        });
     }
 
     public void removeSlashCommandListener(UUID id) {
-        var cmd = this.commandsById.remove(id);
-        if (cmd != null) {
-            cmd.delete().queue();
-            this.commandHandlers.remove(cmd);
-            this.commandsById.remove(id);
+        var commandId = this.commandsById.remove(id);
+        if (commandId == null) {
+            return;
         }
+        this.gatosDiscord.getJda()
+            .retrieveCommandById(commandId)
+            .flatMap(Command::delete)
+            .queue();
+        this.commandHandlers.remove(commandId);
     }
 }
