@@ -26,6 +26,9 @@ public class DiscordDataTypes {
         Conversions.register(DataType.STRING, USER_ID, Function.identity());
         Conversions.register(DataType.STRING, ROLE_ID, Function.identity());
         Conversions.register(DataType.STRING, EMOJI_ID, Function.identity());
+
+        Conversions.register(MESSAGE, DataType.STRING, Message::getContentRaw);
+
         SettingWidgets.register(GUILD_ID, SettingWidgets.Widget.dropdown(u -> discord.getUserGuilds(u).map(ISnowflake::getId).toList()));
         SettingWidgets.register(CHANNEL_ID, SettingWidgets.Widget.dropdown(u -> discord.getUserGuilds(u).flatMap(g -> g.getTextChannelCache().stream()).map(ISnowflake::getId).toList()));
         SettingWidgets.register(ROLE_ID, SettingWidgets.Widget.dropdown(u -> discord.getUserGuilds(u).flatMap(g -> g.getRoleCache().stream()).map(ISnowflake::getId).toList()));
