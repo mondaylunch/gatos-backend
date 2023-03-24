@@ -2,6 +2,8 @@ package club.mondaylunch.gatos.api;
 
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +15,8 @@ import club.mondaylunch.gatos.core.GatosCore;
 @SpringBootApplication
 @RestController
 public class ApiApplication {
+    public static final Logger LOGGER = LoggerFactory.getLogger(ApiApplication.class);
+
     public static void main(String[] args) {
         Database.checkConnection();
         GatosCore.gatosInit();

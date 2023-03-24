@@ -84,6 +84,7 @@ public class ReceiveCommandNodeType extends NodeType.Start<SlashCommandInteracti
     @Override
     public Map<String, CompletableFuture<DataBox<?>>> compute(UUID userId, @Nullable SlashCommandInteractionEvent event, Map<String, DataBox<?>> settings) {
         if (event == null) {
+            GatosDiscord.LOGGER.info("Received null event for node {}", userId);
             return Map.of(
                 "user", CompletableFuture.completedFuture(DiscordDataTypes.USER_ID.create("")),
                 "channel", CompletableFuture.completedFuture(DiscordDataTypes.CHANNEL_ID.create("")),
@@ -91,6 +92,7 @@ public class ReceiveCommandNodeType extends NodeType.Start<SlashCommandInteracti
             );
         }
 
+        GatosDiscord.LOGGER.info("Deferring reply for command");
         boolean isEphemeral = DataBox.get(settings, "is_reply_ephemeral", DataType.BOOLEAN).orElseThrow();
         return Map.of(
             "user", CompletableFuture.completedFuture(DiscordDataTypes.USER_ID.create(event.getUser().getId())),

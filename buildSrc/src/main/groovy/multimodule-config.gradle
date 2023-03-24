@@ -10,6 +10,9 @@ repositories {
 dependencies {
     // Java code annotations
     implementation 'org.jetbrains:annotations:24.0.0'
+
+    // logger
+    implementation 'org.slf4j:slf4j-api:2.0.5'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
