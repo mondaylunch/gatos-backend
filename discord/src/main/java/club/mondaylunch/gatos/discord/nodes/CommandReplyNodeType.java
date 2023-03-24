@@ -29,9 +29,7 @@ public class CommandReplyNodeType extends NodeType.End {
 
     @Override
     public Map<String, DataBox<?>> settings() {
-        return Map.of(
-            "is_ephemeral", DataType.BOOLEAN.create(false)
-        );
+        return Map.of();
     }
 
     @Override
@@ -55,9 +53,9 @@ public class CommandReplyNodeType extends NodeType.End {
     @Override
     public CompletableFuture<Void> compute(UUID userId, Map<String, DataBox<?>> inputs, Map<String, DataBox<?>> settings) {
         String content = DataBox.get(inputs, "content", DataType.STRING).orElse("");
-        boolean isEphemeral = DataBox.get(settings, "is_ephemeral", DataType.BOOLEAN).orElse(false);
         var event = DataBox.get(inputs, "event", DiscordDataTypes.SLASH_COMMAND_EVENT).orElseThrow();
-        return event.reply(content).setEphemeral(isEphemeral).submit().thenAccept($ -> {
-        });
+        return event.action() == null
+            ? CompletableFuture.runAsync(() -> {})
+            : event.action().thenApply(msg -> msg.editOriginal(content).submit()).thenAccept($ -> {});
     }
 }
